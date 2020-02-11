@@ -6,6 +6,7 @@ import { MatSelectModule, MatCheckboxModule, MatCardModule, MatButtonModule,
 
 import { CategoryBoardComponent } from './category-board.component';
 import { DetailsModule } from '../details/details.module';
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 @NgModule({
   declarations: [CategoryBoardComponent],
@@ -18,7 +19,8 @@ import { DetailsModule } from '../details/details.module';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    DetailsModule
+    DetailsModule,
+    ObjectEditorModule
   ],
   exports: [CategoryBoardComponent]
 })

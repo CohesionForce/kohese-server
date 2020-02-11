@@ -8,5 +8,5 @@ export interface FormatDefinition {
 }
 
 export enum FormatDefinitionType {
-  DOCUMENT = 'document', CARD = 'card'
+  DOCUMENT = 'document', CARD = 'card', BOARD = 'board'
 }

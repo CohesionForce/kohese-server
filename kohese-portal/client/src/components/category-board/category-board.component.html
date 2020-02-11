@@ -82,9 +82,12 @@
                 <mat-icon class="fa fa-arrow-right"></mat-icon>
               </button>
             </mat-card-title>
-            <mat-card-content style="overflow: hidden; display: -webkit-box;
-              -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
-              {{item.description}}
+            <mat-card-content style="background-color: white; color: black;">
+              <format-object-editor [type]="selectedKind"
+                [viewModel]="viewModel" [object]="item"
+                [attributes]="getAttributes()"
+                [formatDefinition]="getFormatDefinition()" [disabled]="true">
+              </format-object-editor>
             </mat-card-content>
           </mat-card>
         </ng-container>
