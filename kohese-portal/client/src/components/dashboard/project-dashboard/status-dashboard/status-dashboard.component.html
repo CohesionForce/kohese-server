@@ -45,10 +45,10 @@
       <state-bar-chart [projectStream]="projectStream"></state-bar-chart>
     </ng-template>
   </mat-tab>
-  <mat-tab label="State Board">
+  <mat-tab label="Board">
     <ng-template matTabContent>
-      <state-board [project]="(projectStream | async)?.proxy.item">
-      </state-board>
+      <category-board [project]="(projectStream | async)?.proxy.item">
+      </category-board>
     </ng-template>
   </mat-tab>
 </mat-tab-group>
