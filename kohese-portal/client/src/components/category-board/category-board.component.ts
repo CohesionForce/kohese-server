@@ -54,6 +54,17 @@ export class CategoryBoardComponent {
   }
   set selectedAttribute(selectedAttribute: any) {
     this._selectedAttribute = selectedAttribute;
+    if (this._selectedAttribute !== selectedAttribute) {
+      this._shouldGroupElements = true;
+    }
+  }
+  
+  private _shouldGroupElements: boolean = true;
+  get shouldGroupElements() {
+    return this._shouldGroupElements;
+  }
+  set shouldGroupElements(shouldGroupElements: boolean) {
+    this._shouldGroupElements = shouldGroupElements;
   }
   
   private _viewModel: any;
@@ -94,6 +105,12 @@ export class CategoryBoardComponent {
     return kinds;
   }
   
+  public isSelectedAttributeMultivaluedAndInstantaneouslyFinite(): boolean {
+    return (Array.isArray(this._selectedAttribute.type) && ((this.
+      _selectedAttribute.type[0] !== 'string' || this._selectedAttribute.
+      relation)) && (this._selectedAttribute.type[0] !== 'number'));
+  }
+  
   public save(): void {
     this._itemRepository.upsertItem('Project', this._project);
   }
@@ -101,7 +118,7 @@ export class CategoryBoardComponent {
   public getCategoryItems(): Array<CategoryItems> {
     let categoryItems: { [key: string]: CategoryItems } = {};
     let attributeType: string = (Array.isArray(this._selectedAttribute.type) ?
-      this._selectedAttribute.type[0] : this._selectedAttribute.type)
+      this._selectedAttribute.type[0] : this._selectedAttribute.type);
     if ((attributeType === 'StateMachine') || ((attributeType === 'string') &&
       this._selectedAttribute.relation && (this._selectedAttribute.relation.
       kind === 'KoheseUser'))) {
@@ -153,24 +170,45 @@ export class CategoryBoardComponent {
           (itemProxy: ItemProxy) => {
           if ((itemProxy.model.item === this._selectedKind) && (itemProxy.
             item[this._selectedAttribute.name])) {
-            let attributeAsString: string;
             let attributeValue: any = itemProxy.item[this._selectedAttribute.
               name];
-            if (typeof attributeValue === 'object') {
-              attributeAsString = JSON.stringify(attributeValue);
+            let attributeAsString: string;
+            if (this._shouldGroupElements) {
+              if (typeof attributeValue === 'object') {
+                attributeAsString = JSON.stringify(attributeValue);
+              } else {
+                attributeAsString = String(attributeValue);
+              }
+              let categoryEntry: CategoryItems = categoryItems[attributeAsString];
+              if (!categoryEntry) {
+                categoryEntry = {
+                  category: attributeAsString,
+                  items: []
+                };
+                categoryItems[attributeAsString] = categoryEntry;
+              }
+              
+              categoryEntry.items.push(itemProxy.item);
             } else {
-              attributeAsString = String(attributeValue);
+              for (let k: number = 0; k < attributeValue.length; k++) {
+                if (typeof attributeValue[k] === 'object') {
+                  attributeAsString = JSON.stringify(attributeValue[k]);
+                } else {
+                  attributeAsString = String(attributeValue[k]);
+                }
+                let categoryEntry: CategoryItems = categoryItems[
+                  attributeAsString];
+                if (!categoryEntry) {
+                  categoryEntry = {
+                    category: attributeAsString,
+                    items: []
+                  };
+                  categoryItems[attributeAsString] = categoryEntry;
+                }
+                
+                categoryEntry.items.push(itemProxy.item);
+              }
             }
-            let categoryEntry: CategoryItems = categoryItems[attributeAsString];
-            if (!categoryEntry) {
-              categoryEntry = {
-                category: attributeAsString,
-                items: []
-              };
-              categoryItems[attributeAsString] = categoryEntry;
-            }
-            
-            categoryEntry.items.push(itemProxy.item);
           }
         }, undefined);
       }
@@ -189,7 +227,7 @@ export class CategoryBoardComponent {
   public getCategoryHeading(categoryItems: CategoryItems): string {
     if (this._selectedAttribute.relation && (this._selectedAttribute.relation.
       kind !== 'KoheseUser')) {
-      if (Array.isArray(this._selectedAttribute.type)) {
+      if (this._shouldGroupElements) {
         return (JSON.parse(categoryItems.category) as Array<any>).map(
           (reference: { id: string }) => {
           if (TreeConfiguration.getWorkingTree().getProxyFor(this.
