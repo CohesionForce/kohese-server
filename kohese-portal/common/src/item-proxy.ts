@@ -386,8 +386,8 @@ export class ItemProxy {
           foreignKeyDefn = relationPropertyDefn.relation;
         }
 
-        // Ignore foreign key definition for Item-> id
-        if (foreignKeyDefn && foreignKeyDefn.kind === "Item" && foreignKeyDefn.foreignKey === "id"){
+        // Ignore relation for children
+        if (relationProperty === "children"){
           continue;
         }
 
