@@ -2,9 +2,7 @@ import { StateSummaryDialogComponent } from './state-summary-dialog/state-summar
 import { DialogService } from './../../../../../services/dialog/dialog.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
-import { Subscription , 
-  Observable
-} from 'rxjs';
+import { Subscription, BehaviorSubject } from 'rxjs';
 import {
   Component,
   AfterViewInit,
@@ -29,7 +27,7 @@ export class StateBarChartComponent implements AfterViewInit {
   legend;
 
   @Input()
-  projectStream: Observable < ProjectInfo > ;
+  projectStream: BehaviorSubject<ProjectInfo>;
   projectStreamSub : Subscription;
   project : ProjectInfo;
 
@@ -82,8 +80,65 @@ export class StateBarChartComponent implements AfterViewInit {
   }
 
   constructor(private dialogService : DialogService) {}
+  
+  public ngAfterViewInit(): void {
+    this.svg = d3.select(this._svgElement.nativeElement);
+    
+    // Add the svg canvas
+    this.projectStreamSub = this.projectStream.subscribe((newProject) => {
+      if (newProject) {
+        this.project = newProject;
+        
+        for (let j: number = 0; j < this.project.projectItems.length; j++) {
+          this.project.projectItems[j].visitTree(undefined, (itemProxy:
+            ItemProxy) => {
+            if ((itemProxy.model.item.stateProperties.length > 0) && (this.
+              _kindNames.indexOf(itemProxy.kind) === -1)) {
+              this._kindNames.push(itemProxy.kind);
+            }
+          }, undefined);
+        }
+        this._kindNames.sort((oneKindName: string, anotherKindName: string) => {
+          return oneKindName.localeCompare(anotherKindName);
+        });
+        
+        if (Object.keys(this._stateMap).length !== 0) {
+          this.kindSelectionToggled(this._kindNames, false);
+        }
+        
+        this.kindSelectionToggled(this._kindNames, true);
+      }
+    });
+  }
+  
+  public ngOnDestroy(): void {
+    this.projectStreamSub.unsubscribe();
+  }
 
-  initGraph() {
+  openStateSummaryDialog(proxies: Array<ItemProxy>, kindName: string,
+    stateName: string): void {
+    this.dialogService.openComponentDialog(StateSummaryDialogComponent, {
+      data: {
+        proxies : proxies,
+        kindName: kindName,
+        stateName: stateName
+      }
+    }).updateSize('80%', '80%').afterClosed().subscribe(() => {
+      this.kindSelectionToggled(this._kindNames, false);
+      this.kindSelectionToggled(this._kindNames, true);
+    });
+  }
+
+  updateGraph() {
+    /* Using d3's remove function did not remove all child nodes of the SVG
+    element, possibly due to it using forward iteration instead of reverse
+    iteration. Thus, the below removal approach has been used instead. */
+    for (let j: number = (this._svgElement.nativeElement.childNodes.length -
+      1); j >= 0; j--) {
+      this._svgElement.nativeElement.removeChild(this._svgElement.
+        nativeElement.childNodes[j]);
+    }
+    
     this.setScales();
 
     this.xAxis = d3.axisBottom(this.xScale);
@@ -143,70 +198,6 @@ export class StateBarChartComponent implements AfterViewInit {
         }
       }
     }
-  }
-  
-  public ngAfterViewInit(): void {
-    this.svg = d3.select(this._svgElement.nativeElement);
-    
-    // Add the svg canvas
-    this.projectStreamSub = this.projectStream.subscribe((newProject) => {
-      if (newProject) {
-        this.project = newProject;
-        
-        for (let j: number = 0; j < this.project.projectItems.length; j++) {
-          this.project.projectItems[j].visitTree(undefined, (itemProxy:
-            ItemProxy) => {
-            if ((itemProxy.model.item.stateProperties.length > 0) && (this.
-              _kindNames.indexOf(itemProxy.kind) === -1)) {
-              this._kindNames.push(itemProxy.kind);
-            }
-          }, undefined);
-        }
-        this._kindNames.sort((oneKindName: string, anotherKindName: string) => {
-          return oneKindName.localeCompare(anotherKindName);
-        });
-        
-        if (Object.keys(this._stateMap).length === 0) {
-          this.kindSelectionToggled(this._kindNames, true);
-        } else {
-          let projectUpdate = this.project != undefined;
-          if (projectUpdate) {
-            this.updateGraph();
-          } else {
-            this.initGraph();
-          }
-        }
-      }
-    });
-  }
-  
-  public ngOnDestroy(): void {
-    this.projectStreamSub.unsubscribe();
-  }
-
-  openStateSummaryDialog(proxies: Array<ItemProxy>, kindName: string,
-    stateName: string): void {
-    this.dialogService.openComponentDialog(StateSummaryDialogComponent, {
-      data: {
-        proxies : proxies,
-        kindName: kindName,
-        stateName: stateName
-      }
-    }).updateSize('80%', '80%');
-  }
-
-  updateGraph() {
-    /* Using d3's remove function did not remove all child nodes of the SVG
-    element, possibly due to it using forward iteration instead of reverse
-    iteration. Thus, the below removal approach has been used instead. */
-    for (let j: number = (this._svgElement.nativeElement.childNodes.length -
-      1); j >= 0; j--) {
-      this._svgElement.nativeElement.removeChild(this._svgElement.
-        nativeElement.childNodes[j]);
-    }
-    
-    this.initGraph();
-
   }
 
   setScales () {
