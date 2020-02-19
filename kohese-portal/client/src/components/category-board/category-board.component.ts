@@ -5,6 +5,8 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DetailsDialogComponent } from '../details/details-dialog/details-dialog.component';
+import { FormatDefinition,
+  FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
@@ -301,5 +303,28 @@ export class CategoryBoardComponent {
   
   public navigate(item: any): void {
     this._navigationService.addTab('Explore', { id: item.id });
+  }
+  
+  public getAttributes(): Array<any> {
+    let attributes: Array<any> = [];
+    for (let attributeName in this._selectedKind.classProperties) {
+      let attribute: any = this._selectedKind.classProperties[attributeName].
+        definition;
+      attribute.name = attributeName;
+      attributes.push(attribute);
+    }
+    
+    return attributes;
+  }
+  
+  public getFormatDefinition(): FormatDefinition {
+    let formatDefinition: FormatDefinition = this._viewModel.formatDefinitions[
+      this._viewModel.defaultFormatKey[FormatDefinitionType.BOARD]];
+    if (formatDefinition) {
+      return formatDefinition;
+    }
+    
+    return this._viewModel.formatDefinitions[this._viewModel.defaultFormatKey[
+      FormatDefinitionType.DOCUMENT]];
   }
 }
