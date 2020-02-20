@@ -1689,7 +1689,7 @@ function createMissingProxy(forKind, forKey, forId, treeConfig) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function copyAttributes(fromItem, toProxy) {
+function copyAttributes(fromItem, toProxy : ItemProxy) {
   let modifications = {};
 
   // Copy attributes proxy
@@ -1705,11 +1705,17 @@ function copyAttributes(fromItem, toProxy) {
     }
   }
 
+  let dataModel = toProxy.model; 
+
   // Check for unexpected values
   for ( var toKey in toProxy.item) {
-    if (toKey !== '__deletedProperty' && toProxy.item.hasOwnProperty(toKey) &&
-        (toKey.charAt(0) !== '$') && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey))) {
-      // console.log('!!! Deleted Property: ' + toKey + ' in ' + toProxy.item.name);
+    let isDerivedAttribute = (dataModel && dataModel.item.classProperties && dataModel.item.classProperties[toKey] 
+      && dataModel.item.classProperties[toKey].definition.derived);
+    if (!isDerivedAttribute && toKey !== '__deletedProperty' && (toKey.charAt(0) !== '$') 
+        && toProxy.item.hasOwnProperty(toKey)
+        && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey))) 
+    {
+      console.log('!!! Deleted Property: ' + toKey + ' in ' + toProxy.item.name);
       if (!toProxy.item.__deletedProperty) {
         toProxy.item.__deletedProperty = {};
       }
