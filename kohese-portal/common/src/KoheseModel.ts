@@ -9,6 +9,8 @@ let modelMap = {
 
 export class KoheseModel extends ItemProxy {
 
+  static modelsDefined : boolean = false;
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -51,6 +53,7 @@ export class KoheseModel extends ItemProxy {
   updateItem(kind, forItem) {
     console.log('::: Updating KoheseModel: ' + forItem.id);
     super.updateItem(kind, forItem);
+    // TODO: Need to update derived properties in descendants if there is a changed
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -179,6 +182,7 @@ export class KoheseModel extends ItemProxy {
     }
 
     TreeConfiguration.registerKoheseModelClass(KoheseModel);
+    KoheseModel.modelsDefined = true;
   }
 
   //////////////////////////////////////////////////////////////////////////
