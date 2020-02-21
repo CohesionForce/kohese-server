@@ -517,8 +517,8 @@ export class DetailsFormComponent extends NavigatableComponent
   }
 
   private getType(attributeName: string): any {
-    let typeName: string = this.getTypeName(this.type.dataModelProxy.item.
-      properties[attributeName].type);
+    let propertyDetails = this.type.dataModelProxy.getPropertyDetails(attributeName);
+    let typeName: string = this.getTypeName(propertyDetails.definition.type);
     let type: any;
     if (this.type.dataModelProxy.item.localTypes) {
       for (let localTypeName in this.type.dataModelProxy.item.localTypes) {
