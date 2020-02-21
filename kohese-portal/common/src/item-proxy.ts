@@ -1715,7 +1715,7 @@ function copyAttributes(fromItem, toProxy : ItemProxy) {
         && toProxy.item.hasOwnProperty(toKey)
         && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey))) 
     {
-      console.log('!!! Deleted Property: ' + toKey + ' in ' + toProxy.item.name);
+      // console.log('!!! Deleted Property: ' + toKey + ' in ' + toProxy.item.name);
       if (!toProxy.item.__deletedProperty) {
         toProxy.item.__deletedProperty = {};
       }
