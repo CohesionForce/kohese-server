@@ -220,7 +220,7 @@ export class KoheseModel extends ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   isDerivedProperty(propertyName:string) {
     let property = this.getPropertyDetails(propertyName);
-    return property.derived;
+    return property.definition.derived;
   }
 
 
