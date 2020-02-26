@@ -1,61 +1,57 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { BehaviorSubject ,  Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { CurrentUserService } from './current-user.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { ItemRepository, RepoStates } from '../item-repository/item-repository.service';
+import { ItemRepository } from '../item-repository/item-repository.service';
 
 @Injectable()
 export class SessionService {
-  private sessionUser: BehaviorSubject<ItemProxy> = new BehaviorSubject(undefined);
-  private treeConfig: any;
-  initialized: boolean = false;
+  private _user: any;
+  get user() {
+    return this._user;
+  }
+  
+  private _users: Array<any> = [];
+  get users() {
+    return this._users;
+  }
 
-  private itemRepositoryStatusSubscription: Subscription;
+  private _treeConfigurationSubscription: Subscription;
 
-  constructor(private CurrentUserService: CurrentUserService,
+  public constructor(private CurrentUserService: CurrentUserService,
     private itemRepository: ItemRepository, private router: Router) {
-    this.CurrentUserService.getCurrentUserSubject().subscribe((decodedToken) => {
+    this.CurrentUserService.getCurrentUserSubject().subscribe((decodedToken:
+      any) => {
       if (decodedToken) {
-        console.log(this.initialized);
-        this.itemRepository.getTreeConfig().subscribe((newConfig) => {
-          if (newConfig) {
-            if (!this.initialized) {
-              this.treeConfig = newConfig.config;
-              let usersProxy: ItemProxy = this.treeConfig.getRootProxy().getChildByName('Users');
-              this.sessionUser.next(usersProxy.getChildByName(decodedToken.username));
-            } else {
-              console.log('$$$ Skip setting session user to undefined');
-              // TODO Figure out why this was set to undefined
-              // this.sessionUser.next(undefined);
-            }
-            this.initialized = true;
+        this._treeConfigurationSubscription = this.itemRepository.
+          getTreeConfig().subscribe((treeConfigurationObject: any) => {
+          this._users = [];
+          if (treeConfigurationObject) {
+            this._user = treeConfigurationObject.config.getRootProxy().
+              getChildByName('Users').getChildByName(decodedToken.username).
+              item;
+            
+            treeConfigurationObject.config.getRootProxy().visitChildren(
+              { includeOrigin: false }, (itemProxy: ItemProxy) => {
+              if (itemProxy.kind === 'KoheseUser') {
+                this._users.push(itemProxy.item);
+              }
+            });
+            
+            this._users.sort((oneUser: any, anotherUser: any) => {
+              return oneUser.name.localeCompare(anotherUser.name);
+            });
           }
-        })
+        });
       } else {
-        if (this.itemRepositoryStatusSubscription) {
-          this.itemRepositoryStatusSubscription.unsubscribe();
-          this.itemRepositoryStatusSubscription = undefined;
+        if (this._treeConfigurationSubscription) {
+          this._treeConfigurationSubscription.unsubscribe();
         }
+        
         this.router.navigate(['login']);
       }
-
     });
-  }
-
-  getSessionUser(): BehaviorSubject<ItemProxy> {
-    return this.sessionUser;
-  }
-
-  getUsers(): Array<ItemProxy> {
-    let users: Array<ItemProxy> = [];
-    this.treeConfig.getRootProxy().visitChildren(undefined, (proxy) => {
-      if (proxy.kind === 'KoheseUser') {
-        users.push(proxy);
-      }
-    });
-
-    return users;
   }
 }

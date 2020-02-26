@@ -7,7 +7,6 @@ import { ChildrenTabComponent } from './children-tab/children-tab.component';
 import { ProxySelectorTreeComponent } from './children-tab/proxy-selector-tree/proxy-selector-tree.component';
 import { ChildrenTableComponent } from './children-tab/children-table/children-table.component';
 import { JournalComponent } from './journal/journal.component';
-import { JournalEntryComponent } from './journal/journal-entry/journal-entry.component';
 import { DetailsFormComponent } from './details-form/details-form.component';
 import { ReferencesTabComponent } from './references-tab/references-tab.component';
 import { ReferenceTableComponent } from './references-tab/reference-table/reference-table.component';
@@ -24,6 +23,9 @@ import { UserInputModule } from '../user-input/user-input.module';
 import { DetailsDialogComponent } from "./details-dialog/details-dialog.component";
 import { TextEditorModule } from '../text-editor/text-editor.module';
 import { CompareItemsModule } from '../compare-items/compare-items.module';
+import { TreeViewModule } from '../tree/tree.module';
+import { MarkdownEditorModule } from '../markdown-editor/markdown-editor.module';
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,6 @@ import { CompareItemsModule } from '../compare-items/compare-items.module';
     ChildrenTableComponent,
     ProxySelectorTreeComponent,
     JournalComponent,
-    JournalEntryComponent,
     DetailsFormComponent,
     DetailsDialogComponent
   ],
@@ -54,7 +55,10 @@ import { CompareItemsModule } from '../compare-items/compare-items.module';
     TreeModule.forRoot(),
     MarkdownModule,
     TextEditorModule,
-    CompareItemsModule
+    CompareItemsModule,
+    TreeViewModule,
+    MarkdownEditorModule,
+    ObjectEditorModule
   ],
   exports : [
     DetailsComponent,

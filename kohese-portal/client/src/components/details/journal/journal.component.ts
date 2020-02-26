@@ -1,283 +1,313 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges,
-  SimpleChanges } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
+  Input } from '@angular/core';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
-import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+import { DetailsDialogComponent } from '../details-dialog/details-dialog.component';
+import { TreeComponent } from '../../tree/tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { Subscription } from 'rxjs';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+
+enum Ordering {
+  ELDEST_FIRST_WHEN_OBSERVED = 'Eldest First When Observed',
+    ELDEST_LAST_WHEN_OBSERVED = 'Eldest Last When Observed',
+    ELDEST_FIRST_JOURNAL_ENTRY_MADE = 'Eldest First Journal Entry Made',
+    ELDEST_LAST_JOURNAL_ENTRY_MADE = 'Eldest Last Journal Entry Made',
+    OBSERVER = 'Observer', JOURNAL_ENTRY_MAKER = 'Journal Entry Maker',
+    ISSUES_FIRST = 'Issues First', ISSUES_LAST = 'Issues Last'
+}
 
 @Component({
   selector: 'journal',
   templateUrl: './journal.component.html',
-  styleUrls: ['./journal.component.scss']
+  styleUrls: ['./journal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class JournalComponent implements OnInit, OnDestroy, OnChanges {
-  @Input()
-  public itemProxy: ItemProxy;
-  private initialized: boolean = false;
-  private journalEntries: Array<ItemProxy> = [];
-  public filteredEntries: Array<ItemProxy> = [];
-  public journalTargetId: string = undefined;
-  private _observationName: string = '';
-  get observationName() {
-    return this._observationName;
+export class JournalComponent {
+  private _itemProxy: ItemProxy;
+  get itemProxy() {
+    return this._itemProxy;
   }
-  set observationName(observationName: string) {
-    this._observationName = observationName;
+  @Input('itemProxy')
+  set itemProxy(itemProxy: ItemProxy) {
+    this._itemProxy = itemProxy;
+    
+    
   }
-  public journalEntryContent: string = '';
-  public readonly SORT_STRATEGIES: any = {
-    eldestFirstWhenObserved: 'Eldest First When Observed',
-    eldestLastWhenObserved: 'Eldest Last When Observed',
-    eldestFirstJournalEntryMade: 'Eldest First Journal Entry Made',
-    eldestLastJournalEntryMade: 'Eldest Last Journal Entry Made',
-    observer: 'Observer',
-    journalEntryMaker: 'Journal Entry Maker',
-    issuesFirst: 'Issues First',
-    issuesLast: 'Issues Last'
-  };
-  public selectedSortStrategy: string = Object.keys(this.SORT_STRATEGIES)[0];
-  private userProxies: Array<ItemProxy>;
-  private _filteredUserProxies: Array<ItemProxy>;
-  get filteredUserProxies() {
-    return this._filteredUserProxies;
+  
+  private _selectedParentId: string = '';
+  get selectedParentId() {
+    return this._selectedParentId;
   }
-  observingUser: string;
-  public dateObserved: string;
-  public timeObserved: string;
-  private _observingActivity: ItemProxy;
-  private _observingActivityName: string;
-  get observingActivityName() {
-    return this._observingActivityName;
+  set selectedParentId(selectedParentId: string) {
+    this._selectedParentId = selectedParentId;
   }
-  public addAsIssue: boolean = false;
-  private observationFilterText: string = '';
+  
+  private _additionalContextIds: Array<string> = [];
+  get additionalContextIds() {
+    return this._additionalContextIds;
+  }
+  
+  private _selectedOrdering: Ordering = Ordering.ELDEST_FIRST_WHEN_OBSERVED;
+  get selectedOrdering() {
+    return this._selectedOrdering;
+  }
+  set selectedOrdering(selectedOrdering: Ordering) {
+    this._selectedOrdering = selectedOrdering;
+  }
+  
+  private _filterTimeoutIdentifier: any;
+  
+  get sessionService() {
+    return this._sessionService;
+  }
+  
+  private _editableSet: Array<string> = [];
+  get editableSet() {
+    return this._editableSet;
+  }
+  
+  get Ordering() {
+    return Ordering;
+  }
+  
+  get TreeConfiguration() {
+    return TreeConfiguration;
+  }
+  
+  get Object() {
+    return Object;
+  }
 
-  private repositoryStatusSubscription: Subscription;
-
-  constructor(private itemRepository: ItemRepository,
-    private sessionService: SessionService,
-    private _dialogService: DialogService) {
+  public constructor(private _changeDetectorRef: ChangeDetectorRef,
+    private _itemRepository: ItemRepository, private _sessionService:
+    SessionService, private _dialogService: DialogService,
+    private _navigationService: NavigationService) {
   }
-
-  ngOnInit(): void {
-    let now: Date = new Date();
-    this.dateObserved = now.getFullYear() + '-' + ((now.getMonth() + 1) < 10 ?
-      '0' + (now.getMonth() + 1) : (now.getMonth() + 1)) + '-' +
-      (now.getDate() < 10 ? '0' + now.getDate() : now.getDate());
-    this.timeObserved = (now.getHours() < 10 ? '0' + now.getHours() :
-      now.getHours()) + ':' + (now.getMinutes() < 10 ? '0' + now.getMinutes() :
-      now.getMinutes()) + ':' + (now.getSeconds() < 10 ?
-      '0' + now.getSeconds() : now.getSeconds());
-
-    this.repositoryStatusSubscription = this.itemRepository.
-      getRepoStatusSubject().subscribe((statusObject: any) => {
-      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === statusObject.state) {
-        this.userProxies = this.sessionService.getUsers();
-        this.observingUser = this.sessionService.getSessionUser().getValue().
-          item.name;
-        console.log('ObservingUser');
-        console.log(this.sessionService.getSessionUser().getValue());
+  
+  public displayInformation(id: string): void {
+    this._dialogService.openComponentDialog(DetailsDialogComponent, {
+      data: {
+        itemProxy: TreeConfiguration.getWorkingTree().getProxyFor(id)
+      }
+    }).updateSize('90%', '90%').afterClosed().subscribe(() => {
+      this._changeDetectorRef.markForCheck();
+    });
+  }
+  
+  public selectParent(): void {
+    this._dialogService.openComponentDialog(TreeComponent, {
+      data: {
+        root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getChildren: (element: any) => {
+          return (element as ItemProxy).children;
+        },
+        getText: (element: any) => {
+          return (element as ItemProxy).item.name;
+        },
+        selection: [TreeConfiguration.getWorkingTree().getProxyFor(this.
+          _selectedParentId)]
+      }
+    }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+      Array<any>) => {
+      if (selection) {
+        this._selectedParentId = selection[0].item.id;
+        this._changeDetectorRef.markForCheck();
       }
     });
-
-    this.refresh();
-
-    this.initialized = true;
   }
-
-  ngOnDestroy(): void {
-    this.repositoryStatusSubscription.unsubscribe();
+  
+  public getUsernames(): Array<string> {
+    return this._sessionService.users.map((user: any) => {
+      return user.name;
+    });
   }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.initialized) {
-      this.itemProxy = changes['itemProxy'].currentValue;
-      this.refresh();
-    }
-  }
-
-  refresh(): void {
-    this.journalTargetId = this.itemProxy.item.id;
-    this.journalEntries = [];
-    this.addObservations(this.itemProxy);
-    this.filterObservations(this.observationFilterText);
-    this.sort(this.selectedSortStrategy);
-
-    let type: string = this.itemProxy.kind;
-    if ((type === 'Task') || (type === 'Action')) {
-      this._observingActivity = this.itemProxy;
-      this._observingActivityName = this.itemProxy.item.name;
-    }
-  }
-
-  addObservations(proxy: ItemProxy): void {
-    let referringContexts: Array<ItemProxy> = [];
-    let referringTypes: any = proxy.relations['referencedBy'];
-    for (let type in referringTypes) {
-      let referringTypeContexts: Array<ItemProxy> = referringTypes[type]['context'];
-      if (referringTypeContexts) {
-        referringContexts.splice(referringContexts.length - 1, 0,
-          ...referringTypeContexts);
+  
+  public addContextEntries(): void {
+    this._dialogService.openComponentDialog(TreeComponent, {
+      data: {
+        root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getChildren: (element: any) => {
+          return (element as ItemProxy).children;
+        },
+        getText: (element: any) => {
+          return (element as ItemProxy).item.name;
+        },
+        allowMultiselect: true,
+        selection: this._additionalContextIds.map((id: string) => {
+          return TreeConfiguration.getWorkingTree().getProxyFor(id);
+        })
       }
-    }
-
-    for (let j: number = 0; j < referringContexts.length; j++) {
-      let referringProxy: ItemProxy = referringContexts[j];
-      if (('Observation' === referringProxy.kind) ||
-        ('Issue' === referringProxy.kind)) {
-        this.journalEntries.push(referringProxy);
-        this.addObservations(referringProxy);
+    }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+      Array<any>) => {
+      if (selection) {
+        this._additionalContextIds = selection.map((itemProxy: ItemProxy) => {
+          return itemProxy.item.id;
+        });
+        this._changeDetectorRef.markForCheck();
       }
-    }
+    });
   }
 
-  addJournalEntry(): void {
-    let whenObserved: Date;
-    if (this.dateObserved) {
-      whenObserved = new Date(this.dateObserved);
-    } else {
-      whenObserved = new Date();
-    }
+  public async addObservation(name: string, description: string, observedBy:
+    string, dateObserved: string, timeObserved: string, asIssue: boolean):
+    Promise<void> {
+    let whenObserved: Date = new Date(dateObserved);
     // Handle the timezone offset
-    whenObserved.setTime(whenObserved.getTime() +
-      (whenObserved.getTimezoneOffset() * 60 * 1000));
-    let hour: number;
-    let minutes: number;
-    if (this.timeObserved) {
-      let timeComponents: Array<string> = this.timeObserved.split(' ');
-      let hms: Array<string> = timeComponents[0].split(':');
-      hour = parseInt(hms[0]);
-      if ('PM' === timeComponents[1]) {
-        hour += 12;
-      }
-      minutes = parseInt(hms[1]);
-    } else {
-      let d: Date = new Date();
-      hour = d.getHours();
-      minutes = d.getMinutes();
+    whenObserved.setTime(whenObserved.getTime() + (whenObserved.
+      getTimezoneOffset() * 60 * 1000));
+    let timeComponents: Array<string> = timeObserved.split(' ');
+    let hms: Array<string> = timeComponents[0].split(':');
+    let hour: number = parseInt(hms[0]);
+    if ('PM' === timeComponents[1]) {
+      hour += 12;
     }
 
     whenObserved.setHours(hour);
-    whenObserved.setMinutes(minutes);
+    whenObserved.setMinutes(parseInt(hms[1]));
+    
+    let context: Array<any> = this._additionalContextIds.map((id: string) => {
+      return {
+        id: id
+      };
+    });
+    context.unshift({ id: this._itemProxy.item.id });
 
     let observation: any = {
-      name: this._observationName,
-      description: this.journalEntryContent,
-      observedBy: this.observingUser,
+      name: name,
+      description: description,
+      observedBy: observedBy,
       observedOn: whenObserved.getTime(),
-      context: this.journalTargetId,
-      parentId: this._observingActivity.item.id
+      context: context,
+      parentId: this._selectedParentId
     };
-    let type: string;
-    if (this.addAsIssue) {
-      type = 'Issue';
-      observation.issueState = 'Observed';
-    } else {
-      type = 'Observation';
-    }
-    this.itemRepository.upsertItem(type, observation).then(
-      (proxy: ItemProxy) => {
-      this._observationName = '';
-      this.journalEntryContent = '';
-      this.refresh();
-    });
+    
+    await this._itemRepository.upsertItem((asIssue ? 'Issue' : 'Observation'),
+      observation);
+    this._changeDetectorRef.markForCheck();
   }
-
-  sort(strategy: string): void {
-    this.selectedSortStrategy = strategy;
-    let strategyKeys: Array<string> = Object.keys(this.SORT_STRATEGIES);
-    let eldestFirst: boolean = true;
-    let timeBased: boolean = true;
-    let timeSortField: string = 'observedOn';
-    let userBased: boolean = false;
-    let userSortField: string = 'observedBy';
-    let typeBased: boolean = false;
-    let issuesFirst: boolean = true;
-
-    let index: number = strategyKeys.indexOf(strategy);
-    if (index > 3) {
-      timeBased = false;
-      if (index > 5) {
-        typeBased = true;
-        if (7 === index) {
-          issuesFirst = false;
-        }
-      } else {
-        userBased = true;
-        if (5 === index) {
-          userSortField = 'createdBy';
-        }
-      }
-    } else {
-      if (index > 1) {
-        timeSortField = 'createdOn';
-        if (strategy === strategyKeys[3]) {
-          eldestFirst = false;
-        }
-      } else {
-        if (strategy === strategyKeys[1]) {
-          eldestFirst = false;
-        }
-      }
+  
+  public filterChanged(filter: string): void {
+    if (this._filterTimeoutIdentifier) {
+      clearTimeout(this._filterTimeoutIdentifier);
     }
-
-    this.filteredEntries.sort((entryOne: ItemProxy, entryTwo: ItemProxy) => {
-      let compareValue: number = 0;
-      if (timeBased) {
-        compareValue = (entryOne.item[timeSortField] >
-          entryTwo.item[timeSortField] ? 1 : (entryOne.item[timeSortField] <
-          entryTwo.item[timeSortField] ? -1 : 0));
-        if (!eldestFirst) {
-          compareValue = -compareValue;
+    
+    this._filterTimeoutIdentifier = setTimeout(() => {
+      this._changeDetectorRef.reattach();
+      this._changeDetectorRef.markForCheck();
+      this._filterTimeoutIdentifier = undefined;
+    }, 700);
+    
+    this._changeDetectorRef.detach();
+  }
+  
+  public getObservations(filter: string): Array<ItemProxy> {
+    let observationItemProxys: Array<ItemProxy> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      let contextEntry: any = itemProxy.model.item.classProperties['context'];
+      if (contextEntry && (contextEntry.definedInKind === 'Observation')){
+        // Migration code
+        if (!Array.isArray(itemProxy.item.context)) {
+          itemProxy.item.context = (itemProxy.item.context ? [itemProxy.item.
+            context] : []);
         }
-      } else if (typeBased) {
-        if (entryOne.kind !== entryTwo.kind) {
-          compareValue = (('Issue' === entryOne.kind) ? -1 : 1);
-          if (!issuesFirst) {
-            compareValue = -compareValue;
+        
+        if (itemProxy.item.context.map((reference: any) => {
+          // Migration code
+          if (reference.id) {
+            return reference.id;
+          } else {
+            return reference;
           }
+        }).indexOf(this._itemProxy.item.id) !== -1) {
+          observationItemProxys.push(itemProxy);
         }
-      } else {
-        compareValue = (entryOne.item[userSortField] >
-          entryTwo.item[userSortField] ? 1 : (entryOne.item[userSortField] <
-          entryTwo.item[userSortField] ? -1 : 0));
       }
-
-      return compareValue;
+    }, undefined);
+    
+    return observationItemProxys.filter((observationItemProxy: ItemProxy) => {
+      return (observationItemProxy.item.name.toLowerCase().indexOf(filter.
+        toLowerCase()) !== -1);
+    }).sort((oneObservationItemProxy: ItemProxy, anotherObservationItemProxy:
+      ItemProxy) => {
+      switch (this._selectedOrdering) {
+        case Ordering.ELDEST_FIRST_WHEN_OBSERVED:
+          return (oneObservationItemProxy.item.observedOn -
+            anotherObservationItemProxy.item.observedOn);
+        case Ordering.ELDEST_LAST_WHEN_OBSERVED:
+          return (anotherObservationItemProxy.item.observedOn -
+            oneObservationItemProxy.item.observedOn);
+        case Ordering.ELDEST_FIRST_JOURNAL_ENTRY_MADE:
+          return oneObservationItemProxy.item.createdOn -
+            anotherObservationItemProxy.item.createdOn;
+        case Ordering.ELDEST_LAST_JOURNAL_ENTRY_MADE:
+          return anotherObservationItemProxy.item.createdOn -
+            oneObservationItemProxy.item.createdOn;
+        case Ordering.OBSERVER:
+          return oneObservationItemProxy.item.observedBy.localeCompare(
+            anotherObservationItemProxy.item.observedBy);
+        case Ordering.JOURNAL_ENTRY_MAKER:
+          return oneObservationItemProxy.item.createdBy.localeCompare(
+            anotherObservationItemProxy.item.createdBy);
+        case Ordering.ISSUES_FIRST:
+          return oneObservationItemProxy.kind.localeCompare(
+            anotherObservationItemProxy.kind);
+        case Ordering.ISSUES_LAST:
+          return anotherObservationItemProxy.kind.localeCompare(
+            oneObservationItemProxy.kind);
+      }
     });
   }
-
-  filterObservations(filterText: string): void {
-    this.observationFilterText = filterText;
-    this.filteredEntries = [];
-    for (let j: number = 0; j < this.journalEntries.length; j++) {
-      let entry: ItemProxy = this.journalEntries[j];
-      if ((!entry.item.description) || (-1 !== entry.item.description.
-        indexOf(this.observationFilterText))) {
-        this.filteredEntries.push(this.journalEntries[j]);
-      }
+  
+  public getViewModel(typeName: string): any {
+    return TreeConfiguration.getWorkingTree().getProxyFor('view-' + typeName.
+      toLowerCase()).item;
+  }
+  
+  public save(itemProxy: ItemProxy): void {
+    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
+      (returnedItemProxy: ItemProxy) => {
+      this._changeDetectorRef.markForCheck();
+    });
+    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+  }
+  
+  public discardChanges(itemProxy: ItemProxy): void {
+    this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
+      getProxyFor(itemProxy.item.id));
+    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+    this._changeDetectorRef.markForCheck();
+  }
+  
+  public navigate(itemProxy: ItemProxy): void {
+    this._navigationService.addTab('Explore', { id: itemProxy.item.id });
+  }
+  
+  public getAttributes(type: any): Array<any> {
+    let attributes: Array<any> = [];
+    for (let attributeName in type.classProperties) {
+      let attribute: any = type.classProperties[attributeName].definition;
+      attribute.name = attributeName;
+      attributes.push(attribute);
     }
+    
+    return attributes;
   }
-
-  filterUsers(text: string): void {
-    this._filteredUserProxies = this.userProxies.filter((proxy: ItemProxy) => {
-      return (-1 !== proxy.item.name.indexOf(text));
-    });
-  }
-
-  public openObservingActivitySelectionDialog(): void {
-    this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
-      data: {},
-      allowMultiSelect : false,
-      proxyContext: this.itemProxy
-    }).updateSize('70%', '70%').afterClosed().subscribe((selected: any) => {
-      if (selected) {
-        this._observingActivity = selected;
-        this._observingActivityName = selected.item.name;
-      }
-    });
+  
+  public getFormatDefinition(typeName: string): FormatDefinition {
+    let viewModel: any = this.getViewModel(typeName);
+    let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
+      viewModel.defaultFormatKey[FormatDefinitionType.JOURNAL]];
+    if (formatDefinition) {
+      return formatDefinition;
+    }
+    
+    return viewModel.formatDefinitions[viewModel.defaultFormatKey[
+      FormatDefinitionType.DOCUMENT]];
   }
 }

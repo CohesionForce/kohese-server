@@ -161,6 +161,16 @@
               formatDefinition.id) }">
             </mat-icon>
           </button>
+          <button mat-icon-button matTooltip="Make this format definition the
+            default Journal format definition for this kind"
+            (click)="setDefaultFormatDefinition(FormatDefinitionType.JOURNAL,
+            formatDefinition.id); $event.stopPropagation()"
+            [disabled]="!editable">
+            <mat-icon class="fa fa-star" [ngClass]="{ 'highlight-foreground':
+              (viewModel.defaultFormatKey[FormatDefinitionType.JOURNAL] ===
+              formatDefinition.id) }">
+            </mat-icon>
+          </button>
           <button mat-icon-button matTooltip="Remove this format definition"
             (click)="removeFormatDefinition(formatDefinition.id); $event.
             stopPropagation()" [disabled]="(!editable ||
