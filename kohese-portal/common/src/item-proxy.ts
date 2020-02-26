@@ -52,6 +52,8 @@ export class ItemProxy {
   public relations;
   public internal : boolean = false;
 
+  public validationError;
+
   public oid;
   public deferTreeHash;
   public treeHash;
@@ -102,9 +104,23 @@ export class ItemProxy {
       // console.log('::: Constructor called for ' + itemId);
     }
 
-    ItemProxy.validateItemContent(kind, forItem, treeConfig);
+    let validationResult = ItemProxy.validateItemContent(kind, forItem, treeConfig);
 
     let proxy : ItemProxy = treeConfig.proxyMap[itemId];
+
+    if (!validationResult.valid) {
+      if (proxy){
+        proxy.validationError = validationResult;
+      } else {
+        this.validationError = validationResult;
+      }
+    } else {
+      if (proxy){
+        if (proxy.validationError) {
+          delete proxy.validationError;
+        }
+      }
+    }
 
     if (!proxy) {
     //  console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
@@ -219,7 +235,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static validateItemContent (kind, forItem, treeConfig) {
+  static validateItemContent (kind, forItem, treeConfig) : any {
     let validation = {
       valid : true
     };
@@ -250,11 +266,11 @@ export class ItemProxy {
               validation: validation,
               item: forItem
             });
-
           }
         }
       }
     }
+    return validation;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -332,6 +348,13 @@ export class ItemProxy {
 
       // Calculate derived children attribute
       this.item.children = this.getOrderedChildIdsAsReferences();
+
+      // Calculate derived validation errors
+      if (this.validationError) {
+        this.item.hasValidationError = true;
+      } else if (this.item.hasValidationError) {
+        delete this.item.hasValidationError;
+      }
     }
   }
 
@@ -1496,7 +1519,15 @@ export class ItemProxy {
   updateItem(modelKind, withItem) {
 //    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
 
-    ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
+    let validationResult = ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
+
+    if (!validationResult.valid) {
+      this.validationError = validationResult;
+    } else {
+      if (this.validationError) {
+        delete this.validationError;
+      }
+    }
 
     // Determine if item kind changed
     var newKind = modelKind;
