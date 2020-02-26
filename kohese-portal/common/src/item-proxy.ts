@@ -104,26 +104,15 @@ export class ItemProxy {
       // console.log('::: Constructor called for ' + itemId);
     }
 
+    // Perform validation before proxy creation and storage in the map since invalid items should not be allowed 
+    // after loading complete
     let validationResult = ItemProxy.validateItemContent(kind, forItem, treeConfig);
 
+    // Note: The constructor may be called for an existing item proxy.  Look for the existing proxy if it exists.
     let proxy : ItemProxy = treeConfig.proxyMap[itemId];
 
-    if (!validationResult.valid) {
-      if (proxy){
-        proxy.validationError = validationResult;
-      } else {
-        this.validationError = validationResult;
-      }
-    } else {
-      if (proxy){
-        if (proxy.validationError) {
-          delete proxy.validationError;
-        }
-      }
-    }
-
     if (!proxy) {
-    //  console.log('::: IP: Creating ' + forItem.id + ' - ' + forItem.name + ' - ' + kind);
+      // An existing proxy was not found, so use the newly created instance from this constructor
       proxy = this;
       proxy.treeConfig = treeConfig;
       proxy.children = [];
@@ -137,7 +126,17 @@ export class ItemProxy {
         referencedBy: {}
       };
       proxy.descendantCount = 0;
+      
+      // Store a reference to this new proxy in the map
       proxy.treeConfig.proxyMap[itemId] = proxy;
+    }
+
+    if (!validationResult.valid) {
+      // Store the validationResult if there is an erro
+      proxy.validationError = validationResult;
+    } else {
+      // Remove any prior validationError
+      delete proxy.validationError;
     }
 
     switch (kind){
@@ -217,7 +216,7 @@ export class ItemProxy {
     }
 
     proxy.calculateTreeHash();
-    proxy.caclulateDerivedProperties();
+    proxy.calculateDerivedProperties();
     proxy.updateReferences();
 
     if(!proxy.treeConfig.loading){
@@ -313,7 +312,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  caclulateDerivedProperties(){
+  calculateDerivedProperties(){
     if (this.model && this.model.item){
       if (this.model.item.stateProperties){
         let seperatorRequired = false;
@@ -352,7 +351,7 @@ export class ItemProxy {
       // Calculate derived validation errors
       if (this.validationError) {
         this.item.hasValidationError = true;
-      } else if (this.item.hasValidationError) {
+      } else {
         delete this.item.hasValidationError;
       }
     }
@@ -1522,11 +1521,11 @@ export class ItemProxy {
     let validationResult = ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
 
     if (!validationResult.valid) {
+      // Store the validationResult if there is an erro
       this.validationError = validationResult;
     } else {
-      if (this.validationError) {
-        delete this.validationError;
-      }
+      // Remove any prior validationError
+      delete this.validationError;
     }
 
     // Determine if item kind changed
@@ -1555,7 +1554,7 @@ export class ItemProxy {
     // console.log('%%% Modifications');
     // console.log(modifications);
 
-    this.caclulateDerivedProperties();
+    this.calculateDerivedProperties();
     this.updateReferences();
 
 
