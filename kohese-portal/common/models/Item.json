@@ -53,6 +53,11 @@
       "derived": true,
       "name": "loadPending"
     },
+    "hasValidationError": {
+      "type": "boolean",
+      "derived": true,
+      "name": "validationError"
+    },
     "children": {
       "name": "children",
       "derived": true,
