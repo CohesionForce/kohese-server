@@ -44,15 +44,13 @@
       categoryItems.category)" style="height: 100%; width: 400px; min-width:
       400px; margin: 0px 7px 0px 7px; display: flex; flex-direction: column;">
       <div style="height: 50px;">
-        <h3 matTooltip="{{getCategoryHeading(categoryItems)}}" style="display:
+        <h3 matTooltip="{{getCategoryHeading(categoryItems)}} ({{categoryItems.items.length}})" style="display:
           flex; flex-direction: row;">
-          <span style="width: 80%; white-space: nowrap; overflow: hidden;
+          <span style="max-width: 90%; white-space: nowrap; overflow: hidden;
             text-overflow: ellipsis;">
             {{getCategoryHeading(categoryItems)}}
           </span>
-          <span style="margin-left: auto;">
-            ({{categoryItems.items.length}})
-          </span>
+          &nbsp;({{categoryItems.items.length}})
         </h3>
       </div>
       <div style="height: calc(100% - 50px); overflow: auto; display: flex;
