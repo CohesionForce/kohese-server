@@ -42,8 +42,13 @@ export class CategoryBoardComponent {
       this._selectedKind.classProperties[attributeName].definition.name =
         attributeName;
     }
-    this._selectedAttribute = (<any> Object.values(this._selectedKind.
-      classProperties)[0]).definition;
+    if (this._selectedKind.stateProperties.length > 0){
+      // Kind has state properties, so default to last state
+      let defaultStatePropertyName = this._selectedKind.stateProperties[this._selectedKind.stateProperties.length - 1];
+      this._selectedAttribute = this._selectedKind.classProperties[defaultStatePropertyName].definition;  
+    } else {
+      this._selectedAttribute = this._selectedKind.classProperties['createdBy'].definition;  
+    }
     this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
       this._selectedKind.name.toLowerCase()).item;
     
