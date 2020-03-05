@@ -25,19 +25,12 @@
         "kind": "header",
         "contents": [
           {
-            "propertyName": {
-              "kind": "Analysis",
-              "attribute": "id"
-            },
+            "propertyName": "id",
             "customLabel": "id",
             "labelOrientation": "Top",
             "kind": "text",
-            "inputOptions": {
-              "type": "text",
-              "options": {
-                "isMultiLine": false
-              }
-            }
+            "visible": true,
+            "editable": false
           }
         ]
       },

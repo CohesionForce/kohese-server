@@ -3,12 +3,10 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { SessionService } from '../../../services/user/session.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { FormatDefinition,
   FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
-import { DetailsDialogComponent } from '../details-dialog/details-dialog.component';
-import { TreeComponent } from '../../tree/tree.component';
+import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
@@ -62,10 +60,6 @@ export class JournalComponent {
   
   private _filterTimeoutIdentifier: any;
   
-  get sessionService() {
-    return this._sessionService;
-  }
-  
   private _editableSet: Array<string> = [];
   get editableSet() {
     return this._editableSet;
@@ -73,6 +67,10 @@ export class JournalComponent {
   
   get Ordering() {
     return Ordering;
+  }
+  
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
   }
   
   get TreeConfiguration() {
@@ -84,111 +82,28 @@ export class JournalComponent {
   }
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _itemRepository: ItemRepository, private _sessionService:
-    SessionService, private _dialogService: DialogService,
-    private _navigationService: NavigationService) {
+    private _itemRepository: ItemRepository, private _dialogService:
+    DialogService, private _navigationService: NavigationService) {
   }
   
-  public displayInformation(id: string): void {
-    this._dialogService.openComponentDialog(DetailsDialogComponent, {
+  public addEntry(): void {
+    this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
       data: {
-        itemProxy: TreeConfiguration.getWorkingTree().getProxyFor(id)
-      }
-    }).updateSize('90%', '90%').afterClosed().subscribe(() => {
-      this._changeDetectorRef.markForCheck();
-    });
-  }
-  
-  public selectParent(): void {
-    this._dialogService.openComponentDialog(TreeComponent, {
-      data: {
-        root: TreeConfiguration.getWorkingTree().getRootProxy(),
-        getChildren: (element: any) => {
-          return (element as ItemProxy).children;
+        type: TreeConfiguration.getWorkingTree().getProxyFor('Observation').
+          item,
+        object: {
+          parentId: this._itemProxy.item.id
         },
-        getText: (element: any) => {
-          return (element as ItemProxy).item.name;
-        },
-        selection: [TreeConfiguration.getWorkingTree().getProxyFor(this.
-          _selectedParentId)]
+        formatDefinitionType: FormatDefinitionType.DEFAULT,
+        allowKindChange: true
       }
-    }).updateSize('90%', '90%').afterClosed().subscribe((selection:
-      Array<any>) => {
-      if (selection) {
-        this._selectedParentId = selection[0].item.id;
+    }).updateSize('90%', '90%').afterClosed().subscribe(async (result:
+      any) => {
+      if (result) {
+        await this._itemRepository.upsertItem(result.type.name, result.object);
         this._changeDetectorRef.markForCheck();
       }
     });
-  }
-  
-  public getUsernames(): Array<string> {
-    return this._sessionService.users.map((user: any) => {
-      return user.name;
-    });
-  }
-  
-  public addContextEntries(): void {
-    this._dialogService.openComponentDialog(TreeComponent, {
-      data: {
-        root: TreeConfiguration.getWorkingTree().getRootProxy(),
-        getChildren: (element: any) => {
-          return (element as ItemProxy).children;
-        },
-        getText: (element: any) => {
-          return (element as ItemProxy).item.name;
-        },
-        allowMultiselect: true,
-        selection: this._additionalContextIds.map((id: string) => {
-          return TreeConfiguration.getWorkingTree().getProxyFor(id);
-        })
-      }
-    }).updateSize('90%', '90%').afterClosed().subscribe((selection:
-      Array<any>) => {
-      if (selection) {
-        this._additionalContextIds = selection.map((itemProxy: ItemProxy) => {
-          return itemProxy.item.id;
-        });
-        this._changeDetectorRef.markForCheck();
-      }
-    });
-  }
-
-  public async addObservation(name: string, description: string, observedBy:
-    string, dateObserved: string, timeObserved: string, asIssue: boolean):
-    Promise<void> {
-    let whenObserved: Date = new Date(dateObserved);
-    // Handle the timezone offset
-    whenObserved.setTime(whenObserved.getTime() + (whenObserved.
-      getTimezoneOffset() * 60 * 1000));
-    let timeComponents: Array<string> = timeObserved.split(' ');
-    let hms: Array<string> = timeComponents[0].split(':');
-    let hour: number = parseInt(hms[0]);
-    if ('PM' === timeComponents[1]) {
-      hour += 12;
-    }
-
-    whenObserved.setHours(hour);
-    whenObserved.setMinutes(parseInt(hms[1]));
-    
-    let context: Array<any> = this._additionalContextIds.map((id: string) => {
-      return {
-        id: id
-      };
-    });
-    context.unshift({ id: this._itemProxy.item.id });
-
-    let observation: any = {
-      name: name,
-      description: description,
-      observedBy: observedBy,
-      observedOn: whenObserved.getTime(),
-      context: context,
-      parentId: this._selectedParentId
-    };
-    
-    await this._itemRepository.upsertItem((asIssue ? 'Issue' : 'Observation'),
-      observation);
-    this._changeDetectorRef.markForCheck();
   }
   
   public filterChanged(filter: string): void {
@@ -286,28 +201,5 @@ export class JournalComponent {
   
   public navigate(itemProxy: ItemProxy): void {
     this._navigationService.addTab('Explore', { id: itemProxy.item.id });
-  }
-  
-  public getAttributes(type: any): Array<any> {
-    let attributes: Array<any> = [];
-    for (let attributeName in type.classProperties) {
-      let attribute: any = type.classProperties[attributeName].definition;
-      attribute.name = attributeName;
-      attributes.push(attribute);
-    }
-    
-    return attributes;
-  }
-  
-  public getFormatDefinition(typeName: string): FormatDefinition {
-    let viewModel: any = this.getViewModel(typeName);
-    let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
-      viewModel.defaultFormatKey[FormatDefinitionType.JOURNAL]];
-    if (formatDefinition) {
-      return formatDefinition;
-    }
-    
-    return viewModel.formatDefinitions[viewModel.defaultFormatKey[
-      FormatDefinitionType.DOCUMENT]];
   }
 }

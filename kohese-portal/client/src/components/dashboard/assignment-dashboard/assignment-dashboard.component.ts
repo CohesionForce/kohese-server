@@ -39,6 +39,10 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     return this._editableSet;
   }
   
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
+  }
+  
   get TreeConfiguration() {
     return TreeConfiguration;
   }
@@ -169,28 +173,5 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
         }
     }
     return false;
-  }
-  
-  public getAttributes(type: any): Array<any> {
-    let attributes: Array<any> = [];
-    for (let attributeName in type.classProperties) {
-      let attribute: any = type.classProperties[attributeName].definition;
-      attribute.name = attributeName;
-      attributes.push(attribute);
-    }
-    
-    return attributes;
-  }
-  
-   public getFormatDefinition(itemProxy: ItemProxy): FormatDefinition {
-    let viewModel: any = this.getViewModel(itemProxy);
-    let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
-      viewModel.defaultFormatKey[FormatDefinitionType.CARD]];
-    if (formatDefinition) {
-      return formatDefinition;
-    }
-    
-    return viewModel.formatDefinitions[viewModel.defaultFormatKey[
-      FormatDefinitionType.DOCUMENT]];
   }
 }

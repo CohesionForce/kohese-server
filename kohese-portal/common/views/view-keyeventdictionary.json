@@ -21,25 +21,19 @@
     }
   },
   "formatDefinitions": {
-    "606b9540-fb8b-11e9-8df2-e9413ca0bcbd": {
-      "name": "New definition",
+    "815abbc0-5d77-11ea-9d2a-81904e0f9ce1": {
+      "id": "815abbc0-5d77-11ea-9d2a-81904e0f9ce1",
+      "name": "Default Format Definition",
       "header": {
         "kind": "header",
         "contents": [
           {
-            "propertyName": {
-              "kind": "KeyEventDictionary",
-              "attribute": "name"
-            },
-            "customLabel": "name",
+            "propertyName": "name",
+            "customLabel": "Name",
             "labelOrientation": "Top",
+            "visible": true,
             "kind": "text",
-            "inputOptions": {
-              "type": "text",
-              "options": {
-                "isMultiLine": false
-              }
-            }
+            "editable": true
           }
         ]
       },
@@ -48,31 +42,187 @@
           "kind": "list",
           "contents": [
             {
-              "propertyName": {
-                "kind": "KeyEventDictionary",
-                "attribute": "description"
-              },
-              "customLabel": "description",
+              "propertyName": "id",
+              "customLabel": "ID",
               "labelOrientation": "Top",
-              "kind": "markdown",
-              "inputOptions": {
-                "type": "markdown",
-                "options": {}
-              }
+              "kind": "text",
+              "visible": true,
+              "editable": false
             },
             {
-              "propertyName": {
-                "kind": "KeyEventDictionary",
-                "attribute": "KeyEvents"
-              },
+              "propertyName": "description",
+              "customLabel": "Description",
+              "labelOrientation": "Top",
+              "kind": "markdown",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "tags",
+              "customLabel": "Tags",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "parentId",
+              "customLabel": "Parent",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "createdBy",
+              "customLabel": "Made By",
+              "labelOrientation": "Top",
+              "kind": "user-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "createdOn",
+              "customLabel": "Made On",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "modifiedBy",
+              "customLabel": "Modified By",
+              "labelOrientation": "Top",
+              "kind": "user-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "modifiedOn",
+              "customLabel": "Modified On",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "children",
+              "customLabel": "Children",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "decisionState",
+              "customLabel": "decisionState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
+              "editable": true
+            },
+            {
+              "propertyName": "approvedBy",
+              "customLabel": "approvedBy",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "text",
+              "editable": true
+            },
+            {
+              "propertyName": "approvedOn",
+              "customLabel": "approvedOn",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "number",
+              "editable": true
+            },
+            {
+              "propertyName": "rationale",
+              "customLabel": "rationale",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "text",
+              "editable": true
+            },
+            {
+              "propertyName": "alternatives",
+              "customLabel": "alternatives",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "costImpact",
+              "customLabel": "costImpact",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "scheduleImpact",
+              "customLabel": "scheduleImpact",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "otherImpacts",
+              "customLabel": "otherImpacts",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "KeyEvents",
+              "customLabel": "KeyEvents",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            }
+          ]
+        }
+      ]
+    },
+    "606b9540-fb8b-11e9-8df2-e9413ca0bcbd": {
+      "name": "New definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": "name",
+            "customLabel": "Name",
+            "labelOrientation": "Top",
+            "kind": "text",
+            "visible": true,
+            "editable": true
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "description",
+              "customLabel": "Description",
+              "labelOrientation": "Top",
+              "kind": "markdown",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "KeyEvents",
               "customLabel": "KeyEvents",
               "labelOrientation": "Top",
               "kind": "",
-              "hideEmpty": false,
-              "inputOptions": {
-                "type": "proxy-selector",
-                "options": {}
-              },
+              "visible": true,
+              "editable": true,
               "tableDefinition": "b1090aa0-fb86-11e9-be56-311e0135452a"
             }
           ]
@@ -82,6 +232,7 @@
     }
   },
   "defaultFormatKey": {
+    "default": "815abbc0-5d77-11ea-9d2a-81904e0f9ce1",
     "document": "606b9540-fb8b-11e9-8df2-e9413ca0bcbd"
   },
   "tableDefinitions": {

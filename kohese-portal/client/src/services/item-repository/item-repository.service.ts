@@ -805,27 +805,25 @@ export class ItemRepository {
         for (let k: number = 0; k < formatContainer.contents.length; k++) {
           let propertyDefinition: PropertyDefinition = formatContainer.
             contents[k];
-          let value: any = koheseObject[propertyDefinition.propertyName.
-            attribute];
+          let value: any = koheseObject[propertyDefinition.propertyName];
           if (value) {
             if (propertyDefinition.labelOrientation === 'Top') {
               headerRow += ('<th>' + propertyDefinition.customLabel +
                 '</th>');
             }
             
-            if (!propertyDefinition.hideEmpty || ((Array.isArray(value) &&
-              value.length > 0) || value)) {
+            if (propertyDefinition.visible) {
               bodyRow += '<td>';
               if (propertyDefinition.labelOrientation === 'Left') {
                 bodyRow += ('**' + propertyDefinition.customLabel + ':** ');
               }
               
-              if ((propertyDefinition.inputOptions.type === '') ||
-                (propertyDefinition.inputOptions.type === 'proxy-selector')) {
+              if ((propertyDefinition.kind === '') || (propertyDefinition.kind
+                === 'proxy-selector')) {
                 if (propertyDefinition.formatDefinition) {
                   // Local type attribute
                   let dataModelType: any = dataModel.properties[
-                    propertyDefinition.propertyName.attribute].type;
+                    propertyDefinition.propertyName].type;
                   let typeName: string = (Array.isArray(dataModelType) ?
                     dataModelType[0] : dataModelType);
                   bodyRow += this.getMarkdownRepresentation(value, dataModel.
@@ -863,11 +861,9 @@ export class ItemRepository {
         for (let k: number = 0; k < formatContainer.contents.length; k++) {
           let propertyDefinition: PropertyDefinition = formatContainer.
             contents[k];
-          let value: any = koheseObject[propertyDefinition.propertyName.
-            attribute];
+          let value: any = koheseObject[propertyDefinition.propertyName];
           if (value) {
-            if (!propertyDefinition.hideEmpty || ((Array.isArray(value) &&
-              (value.length > 0)) || value)) {
+            if (propertyDefinition.visible) {
               if (propertyDefinition.labelOrientation === 'Top') {
                 representation += ('**' + propertyDefinition.customLabel +
                   '**\n\n');
@@ -876,12 +872,12 @@ export class ItemRepository {
                   ':** ');
               }
               
-              if ((propertyDefinition.inputOptions.type === '') ||
-                (propertyDefinition.inputOptions.type === 'proxy-selector')) {
+              if ((propertyDefinition.kind === '') || (propertyDefinition.kind
+                === 'proxy-selector')) {
                 if (propertyDefinition.formatDefinition) {
                   // Local type attribute
                   let dataModelType: any = dataModel.properties[
-                    propertyDefinition.propertyName.attribute].type;
+                    propertyDefinition.propertyName].type;
                   let typeName: string = (Array.isArray(dataModelType) ?
                     dataModelType[0] : dataModelType);
                   representation += this.getMarkdownRepresentation(value,

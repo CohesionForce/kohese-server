@@ -39,10 +39,8 @@
         </mat-card-title>
         <mat-card-content style="background-color: white; color: black;">
           <format-object-editor [type]="assignment.model.item"
-            [viewModel]="TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-            assignment.kind.toLowerCase()).item" [object]="assignment.item"
-            [attributes]="getAttributes(assignment.model.item)"
-            [formatDefinition]="getFormatDefinition(assignment)"
+            [object]="assignment.item"
+            [formatDefinitionType]="FormatDefinitionType.CARD"
             [disabled]="(editableSet.indexOf(assignment.item.id) === -1)">
           </format-object-editor>
         </mat-card-content>

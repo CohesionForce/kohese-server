@@ -44,11 +44,8 @@
                 </button>
               </mat-card-title>
               <mat-card-content style="background-color: white; color: black;">
-                <format-object-editor [type]="row.model.item"
-                  [viewModel]="TreeConfiguration.getWorkingTree().getProxyFor(
-                  'view-' + row.kind.toLowerCase()).item" [object]="row.item"
-                  [attributes]="getAttributes(row.model.item)"
-                  [formatDefinition]="getFormatDefinition(row)"
+                <format-object-editor [type]="row.model.item" [object]="row.
+                  item" [formatDefinitionType]="FormatDefinitionType.CARD"
                   [disabled]="(editableSet.indexOf(row.item.id) === -1)">
                 </format-object-editor>
               </mat-card-content>

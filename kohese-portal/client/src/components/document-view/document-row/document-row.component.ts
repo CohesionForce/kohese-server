@@ -30,7 +30,7 @@ import {
 } from 'commonmark';
 import * as commonmark from 'commonmark';
 
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 
 @Component({
   selector: 'document-row',
@@ -47,8 +47,8 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
   docWriter: HtmlRenderer;
   upsertComplete : Subject<any> = new Subject();
   
-  get TreeConfiguration() {
-    return TreeConfiguration;
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
   }
 
   constructor(private changeRef: ChangeDetectorRef,
@@ -92,16 +92,5 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     row[location] = false;
     this.changeRef.markForCheck();
     // TODO fix this
-  }
-  
-  public getAttributes(type: any): Array<any> {
-    let attributes: Array<any> = [];
-    for (let attributeName in type.classProperties) {
-      let attribute: any = type.classProperties[attributeName].definition;
-      attribute.name = attributeName;
-      attributes.push(attribute);
-    }
-    
-    return attributes;
   }
 }

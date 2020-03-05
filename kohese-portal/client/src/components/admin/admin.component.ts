@@ -32,7 +32,6 @@ export class AdminComponent implements OnInit, OnDestroy {
       this.itemRepository.getTreeConfig().subscribe(async (newConfig)=>{
         if (newConfig) {
         this.sessions = await this.itemRepository.getSessionMap();
-        this.users = this.sessionService.getUsers();
         }
     })
   }
@@ -87,7 +86,7 @@ export class AdminComponent implements OnInit, OnDestroy {
           selectedUserProxy.item);
       } else {
         let item: any = {
-          parentId: this.sessionService.getSessionUser().getValue().item.parentId,
+          parentId: this.sessionService.user.parentId,
           name: this.usernameInput,
           description: this.descriptionInput,
           email: this.emailInput,
@@ -98,7 +97,13 @@ export class AdminComponent implements OnInit, OnDestroy {
 
         this.itemRepository.upsertItem('KoheseUser', item)
           .then(()=>{
-            this.users = this.sessionService.getUsers();
+            let users: Array<any> = this.sessionService.users;
+            let userIndex: number = users.indexOf(item);
+            if (userIndex === -1) {
+              users.push(item);
+            } else {
+              users.splice(userIndex, 1, item);
+            }
           });
       }
 
@@ -111,7 +116,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   deleteUser(userProxy) {
     this.itemRepository.deleteItem(userProxy, false)
       .then(()=>{
-        this.users = this.sessionService.getUsers();
+        this.sessionService.users.splice(this.sessionService.users.indexOf(
+          userProxy.item), 1);
       });
   }
 }

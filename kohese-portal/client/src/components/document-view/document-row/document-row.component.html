@@ -40,10 +40,9 @@
         </div>
       </ng-template>
       <format-object-editor [type]="docInfo.proxy.model.item"
-        [viewModel]="TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        docInfo.proxy.kind.toLowerCase()).item" [object]="docInfo.proxy.item"
-        [attributes]="getAttributes(docInfo.proxy.model.item)"
-        [formatDefinition]="docInfo.format" [disabled]="!row.editable">
+        [object]="docInfo.proxy.item"
+        [formatDefinitionType]="FormatDefinitionType.DOCUMENT"
+        [disabled]="!row.editable">
       </format-object-editor>
     </div>
     <!-- <div class="document-row" *ngIf="row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}">

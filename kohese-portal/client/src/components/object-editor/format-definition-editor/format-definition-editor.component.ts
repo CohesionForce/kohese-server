@@ -66,6 +66,26 @@ export class FormatDefinitionEditorComponent implements OnInit {
     this._isDisabled = isDisabled;
   }
   
+  private _userInterfaceTypes: any = {
+    'boolean': {
+      'Boolean': 'boolean'
+    },
+    'number': {
+      'Number': 'number',
+      'Date': 'date'
+    },
+    'string': {
+      'Text': 'text',
+      'Markdown': 'markdown'
+    },
+    'StateMachine': {
+      'State': 'state-editor'
+    },
+    'user-selector': {
+      'Username': 'user-selector'
+    }
+  };
+  
   get FormatContainerKind() {
     return FormatContainerKind;
   }
@@ -137,21 +157,36 @@ export class FormatDefinitionEditorComponent implements OnInit {
   
   public attributeSelected(attributeName: string, propertyDefinition:
     PropertyDefinition): void {
-    propertyDefinition.propertyName.attribute = attributeName;
+    propertyDefinition.propertyName = attributeName;
     propertyDefinition.customLabel = attributeName;
-    propertyDefinition.hideEmpty = false;
+    propertyDefinition.visible = true;
     propertyDefinition.tableDefinition = '';
 
-    let viewModelEntry: any;
-    if (this._dataModel.localTypes) {
-      viewModelEntry = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        this._dataModel.classProperties[attributeName].definedInKind.
-        toLowerCase()).item.viewProperties[attributeName];
-    } else {
-      viewModelEntry = this._viewModel.viewProperties[attributeName];
+    let attribute: any = this._dataModel.classProperties[attributeName].
+      definition;
+    propertyDefinition.editable = !attribute.derived;
+    let userInterfaceType: string = '';
+    let attributeType: string = (Array.isArray(attribute.type) ? attribute.
+      type[0] : attribute.type);
+    switch (attributeType) {
+      case 'boolean':
+        userInterfaceType = 'boolean';
+        break;
+      case 'number':
+        userInterfaceType = 'number';
+        break;
+      case 'string':
+        userInterfaceType = 'text';
+        break;
+      case 'StateMachine':
+        userInterfaceType = 'state-editor';
+        break;
+      case 'user-selector':
+        userInterfaceType = 'user-selector';
+        break;
     }
-    propertyDefinition.kind = viewModelEntry.inputType.type;
-    propertyDefinition.inputOptions = viewModelEntry.inputType;
+    propertyDefinition.kind = userInterfaceType;
+    
     if (this._dataModel.localTypes) {
       let dataModelType: any = this._dataModel.classProperties[attributeName].
         definition.type;
@@ -172,7 +207,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
     string {
     return formatContainer.contents.map((propertyDefinition:
       PropertyDefinition) => {
-      return propertyDefinition.propertyName.attribute;
+      return propertyDefinition.propertyName;
     }).join(', ');
   }
   
@@ -195,66 +230,112 @@ export class FormatDefinitionEditorComponent implements OnInit {
       let attribute: any = this._referenceAttributes[Object.keys(this.
         _referenceAttributes)[0]][0];
       propertyDefinition = {
-        propertyName: {
-          kind: attribute.containingType,
-          attribute: attribute.name
-        },
+        propertyName: attribute.name,
         customLabel: '',
         labelOrientation: 'Top',
-        hideEmpty: false,
         kind: '',
-        inputOptions: {},
         formatDefinition: undefined,
-        tableDefinition: ''
+        tableDefinition: '',
+        visible: true,
+        editable: false
       };
     } else {
-      let attribute: any;
-      let viewModelEntry: any;
-      let formatDefinitionId: string;
-      for (let j: number = 0; j < this._attributes.length; j++) {
-        viewModelEntry = this._viewModel.viewProperties[this._attributes[j].
-          name];
-        if (viewModelEntry) {
-          attribute = this._attributes[j];
-          
-          if (this._dataModel.localTypes) {
-            let typeName: string = (Array.isArray(attribute.type) ? attribute.
-              type[0] : attribute.type);
-            if (this._dataModel.localTypes[typeName]) {
-              let formatDefinitions: Array<FormatDefinition> = Object.values(
-                this._viewModel.localTypes[typeName].formatDefinitions);
-              if (formatDefinitions.length > 0) {
-                formatDefinitionId = formatDefinitions[0].id;
-              }
-            }
-          }
-          
+      let attribute: any = this._dataModel.classProperties[Object.keys(this.
+        _dataModel.classProperties)[0]].definition;
+      let userInterfaceType: string = '';
+      let attributeType: string = (Array.isArray(attribute.type) ? attribute.
+        type[0] : attribute.type);
+      switch (attributeType) {
+        case 'boolean':
+          userInterfaceType = 'boolean';
           break;
+        case 'number':
+          userInterfaceType = 'number';
+          break;
+        case 'string':
+          userInterfaceType = 'text';
+          break;
+        case 'StateMachine':
+          userInterfaceType = 'state-editor';
+          break;
+        case 'user-selector':
+          userInterfaceType = 'user-selector';
+          break;
+      }
+      
+      let formatDefinitionId: string;
+      if (this._dataModel.localTypes) {
+        if (this._dataModel.localTypes[attributeType]) {
+          let formatDefinitions: Array<FormatDefinition> = Object.values(
+            this._viewModel.localTypes[attributeType].formatDefinitions);
+          if (formatDefinitions.length > 0) {
+            formatDefinitionId = formatDefinitions[0].id;
+          }
         }
       }
       
       propertyDefinition = {
-        propertyName: {
-          kind: this._dataModel.name,
-          attribute: attribute.name
-        },
+        propertyName: attribute.name,
         customLabel: attribute.name,
         labelOrientation: 'Top',
-        hideEmpty: false,
-        kind: viewModelEntry.inputType.type,
-        inputOptions: viewModelEntry.inputType,
+        kind: userInterfaceType,
         formatDefinition: formatDefinitionId,
-        tableDefinition: ''
+        tableDefinition: '',
+        visible: true,
+        editable: true
       };
     }
     
     formatContainer.contents.push(propertyDefinition);
   }
   
+  public getUserInterfaceTypes(attributeName: string): Array<string> {
+    let type: any = this._dataModel.classProperties[attributeName].definition.
+      type;
+    type = (Array.isArray(type) ? type[0] : type);
+    if ((type === 'string') && this._dataModel.classProperties[attributeName].
+      definition.relation) {
+      return Object.keys(this._userInterfaceTypes['user-selector']);
+    } else if (this._userInterfaceTypes[type]) {
+      return Object.keys(this._userInterfaceTypes[type]);
+    } else {
+      return ['Reference'];
+    }
+  }
+  
+  public getUserInterfaceTypeValue(attributeName: string, userInterfaceType:
+    string): string {
+    if (userInterfaceType === 'Reference') {
+      return '';
+    } else {
+      if ((userInterfaceType === Object.keys(this._userInterfaceTypes[
+        'user-selector'])[0]) && this._dataModel.classProperties[
+        attributeName].definition.relation) {
+        return 'user-selector';
+      } else {
+        let type: any = this._dataModel.classProperties[attributeName].
+          definition.type;
+        type = (Array.isArray(type) ? type[0] : type);
+        return this._userInterfaceTypes[type][userInterfaceType];
+      }
+    }
+  }
+  
+  public areUserInterfaceTypeValuesEqual(option: string, selection: string):
+    boolean {
+    if ((option === '') && (selection === 'proxy-selector')) {
+      return true;
+    } else if ((option === 'state-editor') && (selection === 'StateMachine')) {
+      return true;
+    } else {
+      return (option === selection);
+    }
+  }
+  
   public getLocalTypeFormatDefinitions(propertyDefinition: PropertyDefinition):
     Array<FormatDefinition> {
     let dataModelType: any = this._dataModel.classProperties[
-      propertyDefinition.propertyName.attribute].definition.type;
+      propertyDefinition.propertyName].definition.type;
     let typeName: string = (Array.isArray(dataModelType) ? dataModelType[0] :
       dataModelType);
     return Object.values(this._viewModel.localTypes[typeName].
@@ -264,9 +345,9 @@ export class FormatDefinitionEditorComponent implements OnInit {
   public isMultivaluedReferenceAttribute(propertyDefinition:
     PropertyDefinition): boolean {
     for (let j: number = 0; j < this._attributes.length; j++) {
-      if ((this._attributes[j].name === propertyDefinition.propertyName.
-        attribute) && this._attributes[j].relation && Array.isArray(this.
-        _attributes[j].type)) {
+      if ((this._attributes[j].name === propertyDefinition.propertyName) &&
+        this._attributes[j].relation && Array.isArray(this._attributes[j].
+        type)) {
         return true;
       }
     }
@@ -278,7 +359,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
     Array<TableDefinition> {
     let attributeTypeName: string = this._attributes.filter((attribute:
       any) => {
-      return (attribute.name === propertyDefinition.propertyName.attribute);
+      return (attribute.name === propertyDefinition.propertyName);
     })[0].type[0];
     
     if (this._viewModel.localTypes && this._viewModel.localTypes[

@@ -11,12 +11,14 @@
   "idInjection": true,
   "properties": {
     "Actors": {
+      "name": "Actors",
       "type": [
         "string"
       ],
       "required": false
     },
     "BasicPath": {
+      "name": "BasicPath",
       "type": "FlowOfEvents",
       "required": false,
       "relation": {
@@ -25,6 +27,7 @@
       }
     },
     "AlternativePaths": {
+      "name": "AlternativePaths",
       "type": [
         "FlowOfEvents"
       ],
