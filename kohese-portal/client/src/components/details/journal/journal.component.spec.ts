@@ -9,15 +9,16 @@ import { PipesModule } from '../../../pipes/pipes.module';
 
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
+import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
 import { JournalComponent } from './journal.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { SessionService } from '../../../services/user/session.service';
-import { MockSessionService } from '../../../../mocks/services/MockSessionService';
-import { JournalEntryComponent } from './journal-entry/journal-entry.component';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 
 describe('Component: Journal', ()=>{
   let journalComponent: JournalComponent;
@@ -25,8 +26,7 @@ describe('Component: Journal', ()=>{
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
-      declarations: [JournalComponent,
-                    JournalEntryComponent],
+      declarations: [JournalComponent],
       imports : [CommonModule,
          MaterialModule,
          BrowserAnimationsModule,
@@ -38,7 +38,7 @@ describe('Component: Journal', ()=>{
       providers: [
         {provide : DialogService, useClass: MockDialogService},
         {provide : ItemRepository, useClass: MockItemRepository},
-        {provide : SessionService, useClass: MockSessionService}
+        { provide: NavigationService, useClass: MockNavigationService }
       ]
     }).compileComponents();
 
@@ -46,6 +46,24 @@ describe('Component: Journal', ()=>{
     journalComponent = journalFixture.componentInstance;
 
     journalComponent.itemProxy = new ItemProxy('Item', MockItem());
+    
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: true }, (itemProxy: ItemProxy) => {
+      if (!itemProxy.model) {
+        let dataModel: any = MockDataModel();
+        dataModel.classProperties = {};
+        for (let attributeName in dataModel.properties) {
+          dataModel.classProperties[attributeName] = {
+            definedInKind: dataModel.name,
+            definition: dataModel.properties[attributeName]
+          };
+        }
+        
+        itemProxy.model = {
+          item: dataModel
+        };
+      }
+    }, undefined);
 
     journalFixture.detectChanges();
 
@@ -54,20 +72,6 @@ describe('Component: Journal', ()=>{
   it('instantiates the Journal component', ()=>{
     expect(JournalComponent).toBeTruthy();
   });
-
-  it('builds an Observation', fakeAsync(() => {
-    journalComponent.observationName = 'Kurios Iesous';
-    journalComponent.openObservingActivitySelectionDialog();
-    tick();
-    spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.
-      resolve());
-    journalComponent.addJournalEntry();
-    let observation: any = TestBed.get(ItemRepository).upsertItem.calls.
-      argsFor(0)[1];
-    expect(observation.name).toEqual('Kurios Iesous');
-    expect(observation.parentId).toEqual(ItemProxy.getWorkingTree().
-      getRootProxy().item.id);
-  }));
 
   describe('sorting', ()=>{
     it('sorts by eldest first when observed',()=>{
@@ -94,5 +98,9 @@ describe('Component: Journal', ()=>{
     it('sorts by issues last', ()=>{
       pending();
     })
+  });
+  
+  afterEach(() => {
+    TreeConfiguration.getWorkingTree().reset();
   });
 })

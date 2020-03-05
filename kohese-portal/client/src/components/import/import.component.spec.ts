@@ -1,5 +1,5 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { MarkdownModule } from 'ngx-markdown';
 import { ToastrModule } from 'ngx-toastr';
@@ -24,7 +24,7 @@ describe('Component: ', ()=>{
         MaterialModule,
         TreeViewModule
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {provide: ItemRepository, useClass: MockItemRepository}
       ]
