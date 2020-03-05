@@ -158,12 +158,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
               
               if (reportSpecifications.addLinks) {
                 initialContent += ('[' + itemProxy.item[formatDefinition.
-                  header.contents[0].propertyName.attribute] + '](' + window.
-                  location.origin + LocationMap['Explore'].route + ';id=' +
-                  itemProxy.item.id + ')\n\n');
+                  header.contents[0].propertyName] + '](' + window.location.
+                  origin + LocationMap['Explore'].route + ';id=' + itemProxy.
+                  item.id + ')\n\n');
               } else {
                 initialContent += (itemProxy.item[formatDefinition.header.
-                  contents[0].propertyName.attribute] + '\n\n');
+                  contents[0].propertyName] + '\n\n');
               }
               
               initialContent += this._itemRepository.getMarkdownRepresentation(

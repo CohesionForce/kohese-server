@@ -6,8 +6,6 @@ import { NavigatableComponent } from '../../../classes/NavigationComponent.class
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ObjectEditorComponent } from '../../object-editor/object-editor.component';
-import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
-
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
@@ -15,6 +13,7 @@ import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { StateService } from '../../../services/state/state.service';
+import { TreeComponent } from '../../tree/tree.component';
 import { Subscription ,  BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -271,18 +270,25 @@ export class DetailsFormComponent extends NavigatableComponent
         }
       });
     } else {
-      this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+      this._dialogService.openComponentDialog(TreeComponent, {
         data: {
-          type: this.getTypeName(this.type.fields[attributeName].type),
-          selected: (this.proxyStream.getValue().item[attributeName] ?
-            TreeConfiguration.getWorkingTree().getProxyFor(this.proxyStream.
-            getValue().item[attributeName].id) : undefined)
+          root: TreeConfiguration.getWorkingTree().getRootProxy(),
+          getChildren: (element: any) => {
+            return (element as ItemProxy).children;
+          },
+          getText: (element: any) => {
+            return (element as ItemProxy).item.name;
+          },
+          selection: (this.proxyStream.getValue().item[attributeName] ?
+            [TreeConfiguration.getWorkingTree().getProxyFor(this.proxyStream.
+            getValue().item[attributeName].id)] : []),
+          quickSelectElements: this._itemRepository.getRecentProxies()
         }
-      }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
-        ItemProxy) => {
-        if (itemProxy) {
+      }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+        Array<any>) => {
+        if (selection) {
           this.proxyStream.getValue().item[attributeName] = {
-            id: itemProxy.item.id
+            id: selection[0].item.id
           };
           this.whenNonFormFieldChanges(attributeName, this.proxyStream.
             getValue().item[attributeName]);
@@ -405,23 +411,34 @@ export class DetailsFormComponent extends NavigatableComponent
         let isLocalTypeInstance: boolean = (Object.keys(this.
           DynamicTypeService.getKoheseTypes()).indexOf(type.name) === -1);
         if (!isLocalTypeInstance) {
-          this._dialogService.openComponentDialog(
-            ProxySelectorDialogComponent, {
+          this._dialogService.openComponentDialog(TreeComponent, {
             data: {
-              type: this.getTypeName(this.type.fields[attributeName].type),
-              selected: (this.proxyStream.getValue().item[attributeName] ?
-                TreeConfiguration.getWorkingTree().getProxyFor(this.
-                proxyStream.getValue().item[attributeName].id) : undefined)
+              root: TreeConfiguration.getWorkingTree().getRootProxy(),
+              getChildren: (element: any) => {
+                return (element as ItemProxy).children;
+              },
+              getText: (element: any) => {
+                return (element as ItemProxy).item.name;
+              },
+              selection: (this.proxyStream.getValue().item[attributeName] ?
+                this.proxyStream.getValue().item[attributeName].map((reference:
+                any) => {
+                return TreeConfiguration.getWorkingTree().getProxyFor(
+                  reference.id);
+              }) : []),
+              quickSelectElements: this._itemRepository.getRecentProxies()
             }
-          }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
-            ItemProxy) => {
-            if (itemProxy) {
-              this.proxyStream.getValue().item[attributeName].splice(index,
-                1, {
-                id: itemProxy.item.id
-              });
-              this.whenNonFormFieldChanges(attributeName, this.proxyStream.
-                getValue().item[attributeName]);
+          }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+            Array<any>) => {
+            if (selection) {
+              let attributeValue: Array<any> = this.proxyStream.getValue().
+                item[attributeName]
+              attributeValue.length = 0;
+              attributeValue.push(...selection.map((element: any) => {
+                return { id: (element as ItemProxy).item.id };
+              }));
+              
+              this.whenNonFormFieldChanges(attributeName, attributeValue);
             }
           });
         } else {

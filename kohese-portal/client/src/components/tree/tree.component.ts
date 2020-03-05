@@ -28,12 +28,13 @@ class ElementMapValue {
     this._expanded = expanded;
   }
   
-  public constructor(private _parent: any, private _depth: number) {
+  get text() {
+    return this._text;
   }
-}
-
-enum ExpansionState {
-  EXPAND, COLLAPSE
+  
+  public constructor(private _parent: any, private _depth: number,
+    private _text: string) {
+  }
 }
 
 export class Action {
@@ -176,6 +177,24 @@ export class TreeComponent implements OnInit, AfterViewInit {
     return this._elementSelectedEventEmitter;
   }
   
+  private _quickSelectElements: Array<any> = [];
+  get quickSelectElements() {
+    return this._quickSelectElements;
+  }
+  @Input('quickSelectElements')
+  set quickSelectElements(quickSelectElements: Array<any>) {
+    this._quickSelectElements = quickSelectElements;
+  }
+  
+  private _showSelections: boolean = false;
+  get showSelections() {
+    return this._showSelections;
+  }
+  @Input('showSelections')
+  set showSelections(showSelections: boolean) {
+    this._showSelections = showSelections;
+  }
+  
   private _searchTimeoutIdentifier: any;
   
   @ViewChild('elementContainer')
@@ -187,10 +206,6 @@ export class TreeComponent implements OnInit, AfterViewInit {
   
   get Array() {
     return Array;
-  }
-  
-  get ExpansionState() {
-    return ExpansionState;
   }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
@@ -220,6 +235,12 @@ export class TreeComponent implements OnInit, AfterViewInit {
       if (this._data['elementSelectionHandler']) {
         this._elementSelected = this._data['elementSelectionHandler'];
       }
+      
+      if (this._data['quickSelectElements']) {
+        this._quickSelectElements = this._data['quickSelectElements'];
+      }
+      
+      this._showSelections = this._data['showSelections'];
     }
     
     this.update(true);
@@ -243,8 +264,24 @@ export class TreeComponent implements OnInit, AfterViewInit {
   
   public ngAfterViewInit(): void {
     if (this._selection.length > 0) {
+      this.scrollElementIntoView(this._selection[0]);
+    }
+  }
+  
+  public scrollElementIntoView(element: any): void {
+    let selectionElementMapValue: ElementMapValue = this._elementMap.get(
+      element);
+    if (selectionElementMapValue) {
+      let parentElementMapValue: ElementMapValue = this._elementMap.get(
+        selectionElementMapValue.parent);
+      while (parentElementMapValue) {
+        parentElementMapValue.expanded = true;
+        parentElementMapValue = this._elementMap.get(parentElementMapValue.
+          parent);
+      }
+      
       let firstSelectedElementIndex: number = this.getDisplayedElements().
-        indexOf(this._selection[0]);
+        indexOf(element);
       if (firstSelectedElementIndex !== -1) {
         // Each element row should be 40px or 36px tall.
         this._elementContainer.nativeElement.scrollTop = (((this._actions.
@@ -277,27 +314,40 @@ export class TreeComponent implements OnInit, AfterViewInit {
     }
     
     this._searchTimeoutIdentifier = setTimeout(() => {
-      let keys: Array<any> = Array.from(this._elementMap.keys());
-      for (let j: number = 0; j < keys.length; j++) {
-        let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
-        let matches: boolean = this._getText(keys[j]).includes(searchText);
-        elementMapValue.visible = matches;
-        if (matches) {
-          if (elementMapValue.parent) {
-            let parentElementMapValue: ElementMapValue = this._elementMap.get(
-              elementMapValue.parent);
-            while (parentElementMapValue) {
-              parentElementMapValue.visible = true;
-              parentElementMapValue = this._elementMap.get(
-                parentElementMapValue.parent);
+      if (searchText) {
+        searchText = searchText.toLowerCase();
+        let keys: Array<any> = Array.from(this._elementMap.keys());
+        for (let j: number = 0; j < keys.length; j++) {
+          let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+          let matches: boolean = elementMapValue.text.toLowerCase().includes(
+            searchText);
+          elementMapValue.visible = matches;
+          elementMapValue.expanded = false;
+          if (matches) {
+            if (elementMapValue.parent) {
+              let parentElementMapValue: ElementMapValue = this._elementMap.get(
+                elementMapValue.parent);
+              while (parentElementMapValue) {
+                parentElementMapValue.visible = true;
+                parentElementMapValue.expanded = true;
+                parentElementMapValue = this._elementMap.get(
+                  parentElementMapValue.parent);
+              }
             }
           }
+        }
+      } else {
+        let keys: Array<any> = Array.from(this._elementMap.keys());
+        for (let j: number = 0; j < keys.length; j++) {
+          let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+          elementMapValue.visible = true;
+          elementMapValue.expanded = false;
         }
       }
       
       this._changeDetectorRef.markForCheck();
       this._searchTimeoutIdentifier = undefined;
-    }, 1000);
+    }, 700);
   }
   
   public getElementStyle(element: any): object {
@@ -334,10 +384,9 @@ export class TreeComponent implements OnInit, AfterViewInit {
     }
   }
   
-  public changeSingleExpansionState(element: any, expansionState:
-    ExpansionState): void {
+  public changeSingleExpansionState(element: any, expand: boolean): void {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
-    elementMapValue.expanded = (expansionState === ExpansionState.EXPAND);
+    elementMapValue.expanded = expand;
     if (!elementMapValue.expanded) {
       let descendantStack: Array<any> = [...this._getChildren(element)];
       while (descendantStack.length > 0) {
@@ -352,12 +401,12 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  public changeAllExpansionStates(expansionState: ExpansionState): void {
+  public changeAllExpansionStates(expand: boolean): void {
     let keys: Array<any> = Array.from(this._elementMap.keys());
     for (let j: number = 0; j < keys.length; j++) {
       let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
       if (elementMapValue.visible) {
-        elementMapValue.expanded = (expansionState === ExpansionState.EXPAND);
+        elementMapValue.expanded = expand;
       }
     }
     
@@ -453,7 +502,8 @@ export class TreeComponent implements OnInit, AfterViewInit {
   }
   
   private processElement(element: any, parent: any, depth: number): void {
-    this._elementMap.set(element, new ElementMapValue(parent, depth));
+    this._elementMap.set(element, new ElementMapValue(parent, depth, this.
+      _getText(element)));
     
     let children: Array<any> = this._getChildren(element);
     for (let j: number = 0; j < children.length; j++) {

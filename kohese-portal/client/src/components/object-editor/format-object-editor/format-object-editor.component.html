@@ -1,5 +1,17 @@
-<div style="width: 100%; overflow: auto; padding: 7px;" [ngStyle]="{ 'height':
-  isDialogInstance() ? '90%' : '100%' }">
+<div style="width: 100%; display: flex; flex-direction: column; overflow: auto;
+  padding: 7px;" [ngStyle]="{ 'height': isDialogInstance() ?
+  'calc(100% - 40px)' : '100%' }">
+  <ng-container *ngIf="(allowKindChange && (types.length > 1))">
+    <mat-form-field style="width: 100%;">
+      <mat-select placeholder="Kind" [(ngModel)]="selectedType">
+        <ng-container *ngFor="let typeOption of types">
+          <mat-option [value]="typeOption">
+            {{typeOption.name}}
+          </mat-option>
+        </ng-container>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
   <ng-container *ngFor="let container of formatDefinition.containers">
     <ng-container *ngIf="(container.kind === FormatContainerKind.
       REVERSE_REFERENCE_TABLE) else notReverseReferencesTable">
@@ -16,12 +28,10 @@
       <div style="display: flex;" [ngStyle]="{ 'flex-direction': ((container.
         kind === 'list') ? 'column' : 'row') }">
         <ng-container *ngFor="let attributeDefinition of container.contents">
-          <ng-container *ngIf="Array.isArray(getAttribute(attributeDefinition).
-            type) else singleValuedBlock">
-            <ng-container *ngIf="(!isDisabled || (!attributeDefinition.
-              hideEmpty || (object[attributeDefinition.propertyName.
-              attribute] && (object[attributeDefinition.propertyName.
-              attribute].length > 0))))">
+          <ng-container *ngIf="Array.isArray(selectedType.classProperties[
+            attributeDefinition.propertyName].definition.type) else
+            singleValuedBlock">
+            <ng-container *ngIf="(!isDisabled || attributeDefinition.visible)">
               <ng-container *ngIf="attributeDefinition.tableDefinition else
                 notTableBlock">
                 <h3>
@@ -33,7 +43,8 @@
                   attributeDefinition)"
                   [move]="getTableElementMovementFunction(attributeDefinition)"
                   [remove]="getTableElementRemovalFunction(
-                  attributeDefinition)" [disabled]="isDisabled">
+                  attributeDefinition)" [disabled]="(!attributeDefinition.
+                  editable || isDisabled)">
                 </table_>
               </ng-container>
               <ng-template #notTableBlock>
@@ -43,50 +54,50 @@
                       {{getAttributeRepresentation(attributeDefinition)}}
                     </h3>
                     <button mat-icon-button matTooltip="Add a value to
-                      {{attributeDefinition.propertyName.attribute}}"
-                      class="flex-right-align" [disabled]="isDisabled"
-                      (click)="addValue(attributeDefinition)">
+                      {{attributeDefinition.propertyName}}"
+                      class="flex-right-align"
+                      [disabled]="(!attributeDefinition.editable ||
+                      isDisabled)" (click)="addValue(attributeDefinition)">
                       <mat-icon class="fa fa-plus"></mat-icon>
                     </button>
                   </div>
-                  <mat-list>
+                  <div style="height: 140px; overflow-y: auto;">
                     <ng-container *ngFor="let value of object[
-                      attributeDefinition.propertyName.attribute]; let j =
-                      index">
-                      <mat-list-item>
-                        {{getStringRepresentation(j, attributeDefinition.
-                          propertyName.attribute)}}
-                        <span class="flex-right-align">
-                          <button mat-icon-button matTooltip="Edit this value"
-                            [disabled]="isDisabled" (click)="editValue(j,
-                            attributeDefinition)">
-                            <mat-icon class="fa fa-edit"></mat-icon>
-                          </button>
-                          <button mat-icon-button matTooltip="Remove this
-                            value" [disabled]="isDisabled"
-                            (click)="removeValue(j, attributeDefinition.
-                            propertyName.attribute)">
-                            <mat-icon class="fa fa-trash"></mat-icon>
-                          </button>
-                        </span>
-                      </mat-list-item>
+                      attributeDefinition.propertyName]; let j = index">
+                      <div style="display: flex; flex-direction: row;">
+                        <button mat-button
+                          matTooltip="{{getStringRepresentation(j,
+                          attributeDefinition.propertyName)}}"
+                          [disabled]="(!attributeDefinition.editable ||
+                          isDisabled)" (click)="editValue(j,
+                          attributeDefinition)" style="white-space: nowrap;
+                          overflow: hidden; text-overflow: ellipsis; width:
+                          100%; text-align: left;">
+                          {{getStringRepresentation(j, attributeDefinition.
+                            propertyName)}}
+                        </button>
+                        <button mat-icon-button matTooltip="Remove this
+                          value" [disabled]="(!attributeDefinition.
+                          editable || isDisabled)" (click)="removeValue(j,
+                          attributeDefinition.propertyName)"
+                          style="margin-left: auto;">
+                          <mat-icon class="fa fa-times"></mat-icon>
+                        </button>
+                      </div>
                     </ng-container>
-                  </mat-list>
+                  </div>
                 </div>
               </ng-template>
               <br/>
             </ng-container>
           </ng-container>
           <ng-template #singleValuedBlock>
-            <ng-container *ngIf="(!isDisabled || (!attributeDefinition.
-              hideEmpty || ((object[attributeDefinition.propertyName.
-              attribute] != null) && (object[attributeDefinition.propertyName.
-              attribute] !== ''))))">
+            <ng-container *ngIf="(!isDisabled || attributeDefinition.visible)">
               <ng-container [ngSwitch]="attributeDefinition.kind">
                 <ng-container *ngSwitchCase="'boolean'">
                   <mat-checkbox [(ngModel)]="object[attributeDefinition.
-                    propertyName.attribute]" [disabled]="isDisabled"
-                    style="width: 100%;">
+                    propertyName]" [disabled]="(!attributeDefinition.
+                    editable || isDisabled)" style="width: 100%;">
                     {{getAttributeRepresentation(attributeDefinition)}}
                   </mat-checkbox>
                 </ng-container>
@@ -95,8 +106,9 @@
                     <input matInput type="number"
                       placeholder="{{getAttributeRepresentation(
                       attributeDefinition)}}" [(ngModel)]="object[
-                      attributeDefinition.propertyName.attribute]"
-                      [disabled]="isDisabled"/>
+                      attributeDefinition.propertyName]"
+                      [disabled]="(!attributeDefinition.editable ||
+                      isDisabled)"/>
                   </mat-form-field>
                 </ng-container>
                 <ng-container *ngSwitchCase="'date'">
@@ -104,8 +116,9 @@
                     <input matInput type="date"
                       placeholder="{{getAttributeRepresentation(
                       attributeDefinition)}}" [(ngModel)]="object[
-                      attributeDefinition.propertyName.attribute]"
-                      [disabled]="isDisabled"/>
+                      attributeDefinition.propertyName]"
+                      [disabled]="(!attributeDefinition.editable ||
+                      isDisabled)"/>
                   </mat-form-field>
                 </ng-container>
                 <ng-container *ngSwitchCase="'string'">
@@ -113,26 +126,39 @@
                     <input matInput type="text"
                       placeholder="{{getAttributeRepresentation(
                       attributeDefinition)}}" [(ngModel)]="object[
-                      attributeDefinition.propertyName.attribute]"
-                      [disabled]="isDisabled"/>
+                      attributeDefinition.propertyName]"
+                      [disabled]="(!attributeDefinition.editable ||
+                      isDisabled)"/>
+                  </mat-form-field>
+                </ng-container>
+                <!-- Hopefully the case below can be removed eventually. -->
+                <ng-container *ngSwitchCase="'text'">
+                  <mat-form-field style="width: 100%;">
+                    <input matInput type="text"
+                      placeholder="{{getAttributeRepresentation(
+                      attributeDefinition)}}" [(ngModel)]="object[
+                      attributeDefinition.propertyName]"
+                      [disabled]="(!attributeDefinition.editable ||
+                      isDisabled)"/>
                   </mat-form-field>
                 </ng-container>
                 <ng-container *ngSwitchCase="'markdown'">
-                  <ng-container *ngIf="isDisabled else editableBlock">
+                  <ng-container *ngIf="(!attributeDefinition.editable ||
+                    isDisabled) else editableBlock">
                     <label style="width: 100%;">
                       {{getAttributeRepresentation(attributeDefinition)}}:
                     </label>
-                    <markdown [data]="object[attributeDefinition.propertyName.
-                      attribute]">
+                    <markdown [data]="object[attributeDefinition.
+                      propertyName]">
                     </markdown>
                   </ng-container>
                   <ng-template #editableBlock>
                     <markdown-editor [value]="object[attributeDefinition.
-                      propertyName.attribute]"
+                      propertyName]"
                       [valueIdentifier]="getAttributeRepresentation(
                       attributeDefinition)" (valueChanged)="object[
-                      attributeDefinition.propertyName.attribute] = $event"
-                      style="height: 300px;">
+                      attributeDefinition.propertyName] = $event"
+                      style="height: 250px;">
                     </markdown-editor>
                     <br/>
                   </ng-template>
@@ -143,20 +169,20 @@
                       justify-content: center;">
                       <label style="margin-bottom: unset;">
                         {{getAttributeRepresentation(attributeDefinition)}}:
-                          {{object[attributeDefinition.propertyName.
-                          attribute]}}&nbsp;
+                          {{object[attributeDefinition.propertyName]}}&nbsp;
                       </label>
                     </div>
                     <ng-container *ngFor="let transitionCandidateName of
                       getStateTransitionCandidates(attributeDefinition);
                       let j = index">
-                      <button mat-raised-button [disabled]="isDisabled"
-                        style="margin: 0px 3px 0px 3px;"
+                      <button mat-raised-button
+                        [disabled]="(!attributeDefinition.editable ||
+                        isDisabled)" style="margin: 0px 3px 0px 3px;"
                         [ngStyle]="{ 'margin-left': ((j === 0) ? 'auto' :
                         '') }" (click)="object[attributeDefinition.
-                        propertyName.attribute] = getAttribute(
-                        attributeDefinition).properties.transition[
-                        transitionCandidateName].target">
+                        propertyName] = selectedType.classProperties[
+                        attributeDefinition.propertyName].definition.
+                        properties.transition[transitionCandidateName].target">
                         {{transitionCandidateName}}
                       </button>
                     </ng-container>
@@ -166,8 +192,9 @@
                   <mat-form-field style="width: 100%;">
                     <mat-select placeholder="{{getAttributeRepresentation(
                       attributeDefinition)}}" [(ngModel)]="object[
-                      attributeDefinition.propertyName.attribute]"
-                      [disabled]="isDisabled">
+                      attributeDefinition.propertyName]"
+                      [disabled]="(!attributeDefinition.editable ||
+                      isDisabled)">
                       <ng-container *ngFor="let username of usernames">
                         <mat-option [value]="username">
                           {{username}}
@@ -177,61 +204,58 @@
                   </mat-form-field>
                 </ng-container>
                 <ng-container *ngSwitchDefault>
-                  <ng-container *ngIf="getLocalType(attributeDefinition)
-                    else globalTypeAttribute">
+                  <ng-container *ngIf="isLocalTypeAttribute(
+                    attributeDefinition.propertyName) else
+                    globalTypeAttribute">
                     <label style="width: 100%;">
                       {{getAttributeRepresentation(
                         attributeDefinition)}}:&nbsp;
                     </label>
                     <br/>
                     <format-object-editor [type]="getLocalType(
-                      attributeDefinition)" [viewModel]="getLocalTypeViewModel(
-                      attributeDefinition)" [object]="object[
-                      attributeDefinition.propertyName.attribute]"
-                      [attributes]="getLocalTypeAttributes(
-                      attributeDefinition)"
-                      [formatDefinition]="getLocalTypeFormatDefinition(
-                      attributeDefinition)" [disabled]="isDisabled">
+                      attributeDefinition)" [enclosingType]="selectedType"
+                      [object]="object[attributeDefinition.propertyName]"
+                      [formatDefinitionType]="formatDefinitionType"
+                      [disabled]="(!attributeDefinition.editable ||
+                      isDisabled)">
                     </format-object-editor>
                   </ng-container>
                   <ng-template #globalTypeAttribute>
                     <div style="width: 100%; display: flex; flex-direction:
-                      row;">
-                      <label style="width: 20%;">
+                      row; align-items: center;">
+                      <label>
                         {{getAttributeRepresentation(
                           attributeDefinition)}}:&nbsp;
                       </label>
                       <ng-container *ngIf="object[attributeDefinition.
-                        propertyName.attribute]">
+                        propertyName]">
                         <!--
                           Remove the "disabled" attribute below once ItemProxy
                           selection can be restricted by kind.
                         -->
                         <button mat-raised-button (click)="openObjectEditor(
-                          attributeDefinition.propertyName.attribute)"
-                          style="width: 60%;" [disabled]="true">
+                          attributeDefinition.propertyName)" style="width:
+                          100%; margin: 0px 3px 0px 3px;" [disabled]="true">
                           {{getStringRepresentation(undefined,
-                            attributeDefinition.propertyName.attribute)}}
+                            attributeDefinition.propertyName)}}
                         </button>
                       </ng-container>
-                      <span class="flex-right-align" style="width: 20%;
-                        display: flex; flex-direction: row;">
-                        <button mat-icon-button matTooltip="Select an object"
-                          [disabled]="isDisabled" (click)="openObjectSelector(
-                          attributeDefinition.propertyName.attribute)"
-                          class="flex-right-align">
-                          <mat-icon class="fa fa-ellipsis-h"></mat-icon>
-                        </button>
-                        <button mat-icon-button
-                          matTooltip="Remove the selection for
-                          {{attributeDefinition.propertyName.attribute}}"
-                          [disabled]="(isDisabled || (object[
-                          attributeDefinition.propertyName.attribute] ==
-                          null))" (click)="object[attributeDefinition.
-                          propertyName.attribute] = undefined">
-                          <mat-icon class="fa fa-times"></mat-icon>
-                        </button>
-                      </span>
+                      <button mat-icon-button matTooltip="Select an object"
+                        [disabled]="(!attributeDefinition.editable ||
+                        isDisabled)" (click)="openObjectSelector(
+                        attributeDefinition.propertyName)"
+                        style="margin-left: auto;">
+                        <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+                      </button>
+                      <button mat-icon-button
+                        matTooltip="Remove the selection for
+                        {{attributeDefinition.propertyName}}"
+                        [disabled]="(!attributeDefinition.editable ||
+                        isDisabled || (object[attributeDefinition.
+                        propertyName] == null))" (click)="object[
+                        attributeDefinition.propertyName] = undefined">
+                        <mat-icon class="fa fa-times"></mat-icon>
+                      </button>
                     </div>
                   </ng-template>
                 </ng-container>
@@ -244,15 +268,13 @@
   </ng-container>
 </div>
 <ng-container *ngIf="isDialogInstance()">
-  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
-    flex-direction: column;">
-    <span class="flex-right-align">
-      <button mat-raised-button (click)="close(true)">
-        Accept
-      </button>
-      <button mat-raised-button (click)="close(false)">
-        Cancel
-      </button>
-    </span>
+  <mat-dialog-actions style="height: 40px; width: 100%; display: flex;
+    flex-direction: row;">
+    <button mat-raised-button (click)="close(true)" style="margin-left: auto;">
+      Accept
+    </button>
+    <button mat-raised-button (click)="close(false)">
+      Cancel
+    </button>
   </mat-dialog-actions>
 </ng-container>

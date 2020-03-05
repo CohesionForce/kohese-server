@@ -33,8 +33,6 @@ export class JournalComponent {
   @Input('itemProxy')
   set itemProxy(itemProxy: ItemProxy) {
     this._itemProxy = itemProxy;
-    
-    
   }
   
   private _selectedParentId: string = '';

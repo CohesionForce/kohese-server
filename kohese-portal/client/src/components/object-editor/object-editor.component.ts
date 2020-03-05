@@ -6,9 +6,9 @@ import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { TreeComponent } from '../tree/tree.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
-import { ProxySelectorDialogComponent } from '../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 
 @Component({
   selector: 'object-editor',
@@ -190,17 +190,23 @@ export class ObjectEditorComponent implements OnInit {
   }
   
   public openObjectSelector(attributeName: string): void {
-    this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+    this._dialogService.openComponentDialog(TreeComponent, {
       data: {
-        type: this.getTypeName(this._attributes[attributeName].type),
-        selected: (this._copy[attributeName] ? TreeConfiguration.
-          getWorkingTree().getProxyFor(this._copy[attributeName].id) :
-          undefined)
+        root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getChildren: (element: any) => {
+          return (element as ItemProxy).children;
+        },
+        getText: (element: any) => {
+          return (element as ItemProxy).item.name;
+        },
+        selection: (this._copy[attributeName] ? [TreeConfiguration.
+          getWorkingTree().getProxyFor(this._copy[attributeName].id)] : []),
+        quickSelectElements: this._itemRepository.getRecentProxies()
       }
-    }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
-      ItemProxy) => {
-      if (itemProxy) {
-        this._copy[attributeName] = { id: itemProxy.item.id };
+    }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+      Array<any>) => {
+      if (selection) {
+        this._copy[attributeName] = { id: selection[0].item.id };
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -316,19 +322,33 @@ export class ObjectEditorComponent implements OnInit {
         let isLocalTypeInstance: boolean = (Object.keys(this.
           _dynamicTypesService.getKoheseTypes()).indexOf(type.name) === -1);
         if (!isLocalTypeInstance) {
-          this._dialogService.openComponentDialog(
-            ProxySelectorDialogComponent, {
+          this._dialogService.openComponentDialog(TreeComponent, {
             data: {
-              type: this.getTypeName(this._attributes[attributeName].type),
-              selected: (this._copy[attributeName] ? TreeConfiguration.
-                getWorkingTree().getProxyFor(this._copy[attributeName].id) :
-                undefined)
+              root: TreeConfiguration.getWorkingTree().getRootProxy(),
+              getChildren: (element: any) => {
+                return (element as ItemProxy).children;
+              },
+              getText: (element: any) => {
+                return (element as ItemProxy).item.name;
+              },
+              allowMultiselect: true,
+              showSelections: true,
+              selection: (this._copy[attributeName] ? this._object[
+                attributeName].map((reference: any) => {
+                return TreeConfiguration.getWorkingTree().getProxyFor(
+                  reference.id);
+              }) : []),
+              quickSelectElements: this._itemRepository.getRecentProxies()
             }
-          }).updateSize('70%', '70%').afterClosed().subscribe((itemProxy:
-            ItemProxy) => {
-            if (itemProxy) {
-              this._copy[attributeName].splice(index, 1,
-                { id: itemProxy.item.id });
+          }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+            Array<any>) => {
+            if (selection) {
+              this._copy[attributeName].length = 0;
+              this._copy[attributeName].push(...selection.map((element:
+                any) => {
+                return { id: (element as ItemProxy).item.id };
+              }));
+              
               this._changeDetectorRef.markForCheck();
             }
           });

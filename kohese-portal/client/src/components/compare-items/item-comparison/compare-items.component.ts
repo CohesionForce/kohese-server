@@ -9,11 +9,12 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { TreeComponent } from '../../tree/tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemCache } from '../../../../../common/src/item-cache';
 import { Compare } from '../compare.class';
 import { Comparison } from '../comparison.class';
-import { ProxySelectorDialogComponent } from '../../user-input/k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 
 @Component({
   selector: 'compare-items',
@@ -157,14 +158,22 @@ export class CompareItemsComponent implements OnInit {
   
   public openProxySelectionDialog(proxySubject: BehaviorSubject<ItemProxy>):
     void {
-    this._dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+    this._dialogService.openComponentDialog(TreeComponent, {
       data: {
-        selected: proxySubject.getValue(),
-        allowMultiSelect : false
+        root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getChildren: (element: any) => {
+          return (element as ItemProxy).children;
+        },
+        getText: (element: any) => {
+          return (element as ItemProxy).item.name;
+        },
+        selection: [proxySubject.getValue()],
+        quickSelectElements: this._itemRepository.getRecentProxies()
       }
-    }).updateSize('70%', '70%').afterClosed().subscribe((selection: any) => {
+    }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+      Array<any>) => {
       if (selection) {
-        this.proxySelectionChanged(proxySubject, selection);
+        this.proxySelectionChanged(proxySubject, selection[0]);
       }
     });
   }

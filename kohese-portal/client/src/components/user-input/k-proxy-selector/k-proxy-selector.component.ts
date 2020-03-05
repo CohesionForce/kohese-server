@@ -2,12 +2,13 @@ import { Component, Input, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@
 import { FormGroup } from '@angular/forms';
 import { UserInput } from '../user-input.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { TreeComponent } from '../../tree/tree.component';
 import { Observable ,  Subscription } from 'rxjs';
 
 import { MatAutocompleteSelectedEvent } from '@angular/material';
-import { ProxySelectorDialogComponent } from './proxy-selector-dialog/proxy-selector-dialog.component';
 
 @Component({
   selector: 'k-proxy-selector',
@@ -106,31 +107,39 @@ export class KProxySelectorComponent extends UserInput
   }
 
   openProxySelectionDialog(): void {
-    this.dialogService.openComponentDialog(ProxySelectorDialogComponent, {
+    this.dialogService.openComponentDialog(TreeComponent, {
       data: {
-        allowMultiSelect: this.allowMultiSelect,
-        selected: this.selected,
-        proxyContext: this.proxyContext
+        root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getChildren: (element: any) => {
+          return (element as ItemProxy).children;
+        },
+        getText: (element: any) => {
+          return (element as ItemProxy).item.name;
+        },
+        selection: (Array.isArray(this.selected) ? this.selected : [this.
+          selected]),
+        quickSelectElements: this.itemRepository.getRecentProxies(),
+        allowMultiselect: this.allowMultiSelect,
+        showSelections: this.allowMultiSelect
       }
-    }).updateSize('60%', '60%').afterClosed().subscribe((selected: any) => {
-      if (this.allowMultiSelect) {
-        const selectedIds = [];
-        if (selected) {
-          this.selected = selected;
+    }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+      Array<any>) => {
+      if (selection) {
+        if (this.allowMultiSelect) {
+          const selectedIds = [];
+          this.selected = selection;
           for (let i = 0; i < this.selected.length; i++) {
             selectedIds.push({ id: this.selected[i].item.id });
           }
-        }
-        this.formGroup.controls[this.fieldId].setValue(selectedIds);
-        this.formGroup.controls[this.fieldId].markAsDirty();
-      } else {
-        this.selected = selected;
-        if (this.selected) {
-          this.formGroup.controls[this.fieldId].setValue({ id: this.selected.item.id });
+          this.formGroup.controls[this.fieldId].setValue(selectedIds);
+          this.formGroup.controls[this.fieldId].markAsDirty();
         } else {
-          this.formGroup.controls[this.fieldId].setValue(undefined);
+          this.selected = selection[0];
+          this.formGroup.controls[this.fieldId].setValue({ id: this.selected[0].item.id });
+          this.formGroup.controls[this.fieldId].markAsDirty();
         }
-        this.formGroup.controls[this.fieldId].markAsDirty();
+      } else if (!this.allowMultiSelect) {
+        this.formGroup.controls[this.fieldId].setValue(undefined);
       }
     });
   }
