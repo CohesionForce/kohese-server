@@ -212,9 +212,9 @@
                         attributeDefinition)}}:&nbsp;
                     </label>
                     <br/>
-                    <format-object-editor [type]="getLocalType(
-                      attributeDefinition)" [enclosingType]="selectedType"
+                    <format-object-editor [enclosingType]="selectedType"
                       [object]="object[attributeDefinition.propertyName]"
+                      [type]="getLocalType(attributeDefinition)"
                       [formatDefinitionType]="formatDefinitionType"
                       [disabled]="(!attributeDefinition.editable ||
                       isDisabled)">

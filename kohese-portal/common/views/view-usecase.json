@@ -82,7 +82,9 @@
           ]
         }
       },
-      "defaultFormatKey": "",
+      "defaultFormatKey": {
+        "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1"
+      },
       "tableDefinitions": {}
     }
   },

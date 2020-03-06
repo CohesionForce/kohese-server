@@ -30,6 +30,25 @@ export class FormatObjectEditorComponent implements OnInit {
     this._object = object;
   }
   
+  private _enclosingType: any;
+  get enclosingType() {
+    return this._enclosingType;
+  }
+  @Input('enclosingType')
+  set enclosingType(enclosingType: any) {
+    this._enclosingType = enclosingType;
+  }
+  
+  private _formatDefinitionType: FormatDefinitionType;
+  get formatDefinitionType() {
+    return this._formatDefinitionType;
+  }
+  @Input('formatDefinitionType')
+  set formatDefinitionType(formatDefinitionType: FormatDefinitionType) {
+    this._formatDefinitionType = formatDefinitionType;
+    this._changeDetectorRef.markForCheck();
+  }
+  
   private _type: any;
   get type() {
     return this._type;
@@ -61,15 +80,6 @@ export class FormatObjectEditorComponent implements OnInit {
         return oneType.name.localeCompare(anotherType.name);
       });
     }
-  }
-  
-  private _enclosingType: any;
-  get enclosingType() {
-    return this._enclosingType;
-  }
-  @Input('enclosingType')
-  set enclosingType(enclosingType: any) {
-    this._enclosingType = enclosingType;
   }
   
   private _types: Array<any> = [];
@@ -121,16 +131,6 @@ export class FormatObjectEditorComponent implements OnInit {
         }
       }
     }
-  }
-  
-  private _formatDefinitionType: FormatDefinitionType;
-  get formatDefinitionType() {
-    return this._formatDefinitionType;
-  }
-  @Input('formatDefinitionType')
-  set formatDefinitionType(formatDefinitionType: FormatDefinitionType) {
-    this._formatDefinitionType = formatDefinitionType;
-    this._changeDetectorRef.markForCheck();
   }
   
   private _isDisabled: boolean = false;
@@ -197,6 +197,7 @@ export class FormatObjectEditorComponent implements OnInit {
     if (this.isDialogInstance()) {
       this._type = this._data['type'];
       this._object = this._data['object'];
+      this._enclosingType = this._data['enclosingType'];
       this._formatDefinitionType = this._data['formatDefinitionType'];
       this._isDisabled = this._data['disabled'];
       this._allowKindChange = this._data['allowKindChange'];
@@ -515,9 +516,9 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public getTableElements(attributeDefinition: PropertyDefinition):
     Array<any> {
-    if (this._object[attributeDefinition.propertyName]) {
-      return this._object[attributeDefinition.propertyName].map((reference:
-        { id: string }) => {
+    let value: Array<any> = this._object[attributeDefinition.propertyName];
+    if (value) {
+      return value.map((reference: { id: string }) => {
         return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
           item;
       });
@@ -532,18 +533,17 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public getTableColumns(attributeDefinition: PropertyDefinition):
     Array<string> {
-    return TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-      TreeConfiguration.getWorkingTree().getProxyFor(attributeDefinition.
-      propertyName.kind).item.classProperties[attributeDefinition.propertyName.
-      attribute].definition.type[0].toLowerCase()).item.tableDefinitions[
-      attributeDefinition['tableDefinition']].columns;
+    return TreeConfiguration.getWorkingTree().getProxyFor('view-' + this.
+      _selectedType.classProperties[attributeDefinition.propertyName].
+      definition.type[0].toLowerCase()).item.tableDefinitions[
+      attributeDefinition.tableDefinition].columns;
   }
   
   public getTableElementAdditionFunction(attributeDefinition:
     PropertyDefinition): () => Promise<Array<any>> {
     return async () => {
       let references: Array<{ id: string }> = this._object[attributeDefinition.
-        propertyName.attribute];
+        propertyName];
       let selection: any = await this._dialogService.openComponentDialog(
         TreeComponent, {
         data: {
@@ -588,7 +588,7 @@ export class FormatObjectEditorComponent implements OnInit {
     return (elements: Array<any>, referenceElement: any,
       moveBefore: boolean) => {
       let references: Array<{ id: string }> = this._object[attributeDefinition.
-        propertyName.attribute];
+        propertyName];
       for (let j: number = 0; j < elements.length; j++) {
         references.splice(references.map((reference: { id: string }) => {
           return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
@@ -620,9 +620,9 @@ export class FormatObjectEditorComponent implements OnInit {
     PropertyDefinition): (elements: Array<any>) => void {
     return (elements: Array<any>) => {
       for (let j: number = 0; j < elements.length; j++) {
-        this._object[attributeDefinition.propertyName.attribute].splice(this.
-          _object[attributeDefinition.propertyName.attribute].map((reference:
-            { id: string }) => {
+        this._object[attributeDefinition.propertyName].splice(this._object[
+          attributeDefinition.propertyName].map((reference: { id:
+          string }) => {
             return TreeConfiguration.getWorkingTree().getProxyFor(reference.
               id).item;
         }).indexOf(elements[j]), 1);
