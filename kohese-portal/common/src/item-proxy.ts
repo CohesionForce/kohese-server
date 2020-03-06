@@ -719,7 +719,7 @@ export class ItemProxy {
   cloneItemAndStripDerived() {
     let clone = this.cloneItem();
 
-    // Determine if derived properiteis need to be stripped
+    // Determine if derived properities need to be stripped
     if (this.model && this.model.item.derivedProperties && this.model.item.derivedProperties.length) {
       let derivedProperties = this.model.item.derivedProperties;
       for(let idx in derivedProperties){
@@ -1262,27 +1262,17 @@ export class ItemProxy {
       this.treeConfig.root.addChild(this.treeConfig.lostAndFound);
     }
 
-    // Determine where to insert the new child
-    var insertAt = this.children.length;
-    if (!this.item.itemIds){
-        for (var childIdx in this.children){
-            if (childProxy.item.name < this.children[childIdx].item.name ||
-               ((childProxy.item.name === this.children[childIdx].item.name) &&
-                 (childProxy.item.id < this.children[childIdx].item.id))) {
-              insertAt = childIdx;
-              break;
-            }
-          }
+    // Note: 
+    // * It is possible that this new child is the parent for an existing lost item that will soon be removed.
+    // * Since the child has already been updated, an alphabeticaly sort may result in an incorrect sorting order.
+    // * The sortChildren routine should be called instead of trying to do an alphabetical insertion.
 
-          this.children.splice(insertAt, 0, childProxy);
-          childProxy.parentProxy = this;
-          childProxy.relations.references.Item.parent = this;
-    } else {
-        this.children.push(childProxy);
-        childProxy.parentProxy = this;
-        childProxy.relations.references.Item.parent = this;
-        this.sortChildren();
-    }
+    // Insert the new child, and then sort
+    this.children.push(childProxy);
+    childProxy.parentProxy = this;
+    childProxy.relations.references.Item.parent = this;
+    this.sortChildren();
+
     // update descendant count
     var deltaCount = 1 + childProxy.descendantCount;
     this.descendantCount += deltaCount;
