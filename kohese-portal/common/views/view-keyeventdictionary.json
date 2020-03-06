@@ -75,7 +75,7 @@
             },
             {
               "propertyName": "createdBy",
-              "customLabel": "Made By",
+              "customLabel": "Created By",
               "labelOrientation": "Top",
               "kind": "user-selector",
               "visible": true,
@@ -83,7 +83,7 @@
             },
             {
               "propertyName": "createdOn",
-              "customLabel": "Made On",
+              "customLabel": "Created On",
               "labelOrientation": "Top",
               "kind": "date",
               "visible": true,
