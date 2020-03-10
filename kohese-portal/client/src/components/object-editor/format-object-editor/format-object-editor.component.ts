@@ -657,6 +657,18 @@ export class FormatObjectEditorComponent implements OnInit {
     return stateTransitionCandidates;
   }
   
+  public isObjectValid(): boolean {
+    for (let attributeName in this._selectedType.classProperties) {
+      let attributeValue: any = this._object[attributeName];
+      if (this._selectedType.classProperties[attributeName].definition.required
+        && ((attributeValue == null) || (attributeValue === ''))) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
   public close(accept: boolean): any {
     let result: any = {
       type: this._selectedType,

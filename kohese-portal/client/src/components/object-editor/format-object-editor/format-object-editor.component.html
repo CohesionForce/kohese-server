@@ -270,7 +270,8 @@
 <ng-container *ngIf="isDialogInstance()">
   <mat-dialog-actions style="height: 40px; width: 100%; display: flex;
     flex-direction: row;">
-    <button mat-raised-button (click)="close(true)" style="margin-left: auto;">
+    <button mat-raised-button [disabled]="!isObjectValid()" (click)="close(
+      true)" style="margin-left: auto;">
       Accept
     </button>
     <button mat-raised-button (click)="close(false)">
