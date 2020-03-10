@@ -90,7 +90,8 @@ export class JournalComponent {
         type: TreeConfiguration.getWorkingTree().getProxyFor('Observation').
           item,
         object: {
-          parentId: this._itemProxy.item.id
+          parentId: this._itemProxy.item.id,
+          context: [{ id: this._itemProxy.item.id }]
         },
         formatDefinitionType: FormatDefinitionType.DEFAULT,
         allowKindChange: true
