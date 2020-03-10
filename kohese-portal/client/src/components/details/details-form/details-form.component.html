@@ -45,7 +45,7 @@
               [formGroup]="formGroup" [fieldId]="property"
               [type]="type.fields[property].views['form'].inputType.options['type']"
               [fieldName]="type.fields[property].views['form'].displayName"
-              [allowMultiSelect]="type.fields[property].views['form'].inputType.options['allowMultiSelect']"
+              [allowMultiSelect]="Array.isArray(type.fields[property].type)"
               [editableStream]="editableStream" [required]="type.fields[
               property].required">
             </k-proxy-selector>
