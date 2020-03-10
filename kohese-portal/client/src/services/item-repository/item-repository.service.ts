@@ -798,7 +798,7 @@ export class ItemRepository {
     for (let j: number = 0; j < formatDefinition.containers.length; j++) {
       let formatContainer: FormatContainer = formatDefinition.containers[j];
       if (formatContainer.kind === 'column') {
-        representation += '<table>';
+        representation += '\n\n<table>';
         let headerRow: string = '<tr>';
         let bodyRow: string = '<tr>';
         
@@ -856,7 +856,7 @@ export class ItemRepository {
           
         representation += (headerRow + '</tr>' + bodyRow + '</tr>');
         
-        representation += '</table>';
+        representation += '\n</table>\n\n';
       } else {
         for (let k: number = 0; k < formatContainer.contents.length; k++) {
           let propertyDefinition: PropertyDefinition = formatContainer.

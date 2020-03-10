@@ -2,7 +2,7 @@ import { ItemProxy } from '../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../common/src/tree-configuration'
 import { TreeHashEntry, TreeHashMap, TreeHashMapDifference } from '../../../common/src/tree-hash';
 import { KoheseModel } from '../../../common/src/KoheseModel';
-describe('ItemProxy Test', function () {
+describe('ItemProxy Test:', function () {
 
   var root = TreeConfiguration.getWorkingTree().getRootProxy();
   var lostAndFound = TreeConfiguration.getWorkingTree().getProxyFor('LOST+FOUND');
@@ -702,10 +702,10 @@ describe('ItemProxy Test', function () {
     dumpHashFor(proxy);
     ItemProxy.getWorkingTree().loadingComplete();
 
-    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('ec9bb8f030a5487c5a64401002b4cb067c81d1aa');
+    expect(proxy.parentProxy.treeHashEntry.treeHash).toEqual('d66201450031ca030d30b4ad2ee3930b89a68e87');
     expect(proxy.parentProxy.treeHashEntry.childTreeHashes['test-item-id'])
-      .toEqual('53688a4a9207203c25da692d634bd58305ae1313');
-    expect(proxy.treeHashEntry.treeHash).toEqual('53688a4a9207203c25da692d634bd58305ae1313');
+      .toEqual('0b73846117b106ab2f8c73422d84d888e77aeb7c');
+    expect(proxy.treeHashEntry.treeHash).toEqual('0b73846117b106ab2f8c73422d84d888e77aeb7c');
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -720,7 +720,7 @@ describe('ItemProxy Test', function () {
     });
     console.log('::: Node A');
     console.log(thProxy.treeHashEntry);
-    expect(thProxy.treeHashEntry.treeHash).toBe('c821eb4089f0a835ab941c9b0db64f2ad32b44c7');
+    expect(thProxy.treeHashEntry.treeHash).toBe('80de90bdeb3fd9c7426a0bc6ed785c7cb54bbd80');
 
     console.log('::: Update Node');
     var copyOfItem = getCopyOfItem(thProxy);
@@ -729,20 +729,20 @@ describe('ItemProxy Test', function () {
     itemToModify.name = 'Node A Updated';
     thProxy.updateItem('Test', itemToModify);
     console.log(thProxy.treeHashEntry);
-    expect(thProxy.treeHashEntry.treeHash).toBe('2719d45fee33b0f3dbd72135fb57283b87bb321b');
+    expect(thProxy.treeHashEntry.treeHash).toBe('f7a2d79276db3f702c704ac0e4a4e8a8d18e168f');
 
 
     console.log('::: Putting back to same item');
     thProxy.updateItem('Test', copyOfItem);
     console.log(thProxy.treeHashEntry);
-    expect(thProxy.treeHashEntry.treeHash).toBe('c821eb4089f0a835ab941c9b0db64f2ad32b44c7');
+    expect(thProxy.treeHashEntry.treeHash).toBe('80de90bdeb3fd9c7426a0bc6ed785c7cb54bbd80');
 
     console.log('===');
     console.log(thProxy.document());
     console.log('===');
 
-    expect(thProxy.treeHashEntry.oid).toBe('96f356b031940440afda4aab888a66753a3dcf47');
-    expect(thProxy.treeHashEntry.treeHash).toBe('c821eb4089f0a835ab941c9b0db64f2ad32b44c7');
+    expect(thProxy.treeHashEntry.oid).toBe('a19483dd37642f37d5027710408d7ab4e78b3cd2');
+    expect(thProxy.treeHashEntry.treeHash).toBe('80de90bdeb3fd9c7426a0bc6ed785c7cb54bbd80');
 
   });
 
@@ -768,21 +768,21 @@ describe('ItemProxy Test', function () {
     });
 
     const expectedRepoAChildHashes = {
-      'AAAA-1111': '32e9a0cf54ff2a87304865fe3b99723dac910278',
+      'AAAA-1111': 'ca05c64c7626a0647a5b91f46e470458dcd1540c',
       'BBBB-BBBB': 'Repository-Mount'
     };
 
     const expectedInitialRepoBChildHashes = {};
 
     const expectedFinalRepoBChildHashes = {
-      'BBBB-1111': '7b1715172e8c5491ef5265adf78695d7ef9cb9ad'
+      'BBBB-1111': '297d3beece5a2bab98d669cfd0a16926a0e776e6'
     };
 
     dumpHashFor(repoA, 'Isolated Nested Repositories');
     dumpHashFor(a1);
     dumpHashFor(repoB);
     expect(repoA.treeHashEntry.childTreeHashes).toEqual(expectedRepoAChildHashes);
-    expect(repoA.treeHashEntry.treeHash).toEqual('f8730b5510c1d47c3082836728336cd4a68f34d5');
+    expect(repoA.treeHashEntry.treeHash).toEqual('fbd01343c44c31b0c3ae0c82bbc25568abe2ab39');
     expect(repoB.treeHashEntry.childTreeHashes).toEqual(expectedInitialRepoBChildHashes);
 
     // eslint-disable-next-line no-unused-vars
@@ -797,7 +797,7 @@ describe('ItemProxy Test', function () {
     dumpHashFor(repoB);
     // Only Repo B should have been affected
     expect(repoA.treeHashEntry.childTreeHashes).toEqual(expectedRepoAChildHashes);
-    expect(repoA.treeHashEntry.treeHash).toEqual('f8730b5510c1d47c3082836728336cd4a68f34d5');
+    expect(repoA.treeHashEntry.treeHash).toEqual('fbd01343c44c31b0c3ae0c82bbc25568abe2ab39');
     expect(repoB.treeHashEntry.childTreeHashes).toEqual(expectedFinalRepoBChildHashes);
 
   });
@@ -1123,39 +1123,39 @@ describe('ItemProxy Test', function () {
         'kind': 'Internal',
         'oid': '8109f6a5dfeea6ede032fa99d6cd1b79ef589503',
         'childTreeHashes': {
-          'Internal': '86a37e79340dfff23a1a4343311fe1b6be25069f',
-          'Internal-Lost': '2b4ecdd03862514fd881ca363ae1be6d1ba08773',
-          'Test': '67af553ac64e266aebebeb36dbcc799b350146a8',
-          'Test-Exclude': '26094ef81e18c6c30d1049d3d765d8ef9b3ed45e'
+          'Internal': '5bfff73871ada0ae731998bb73bfa92491890db1',
+          'Internal-Lost': '59d914be670803a371f403235780efec31d7401b',
+          'Test': '9d2d8454605bbe1cd2b2abfde9d8cd5038cae8d7',
+          'Test-Exclude': 'c252fe9802f9740c44b0be55e1970f9b9479d874'
         },
-        'treeHash': '42a0dde18f068ee66dd15dd4f9875e69ec66da22'
+        'treeHash': 'cc08604d484e7c7c8b0795c6e6f1fbc06a3785ae'
       },
       'Internal': {
         'kind': 'KoheseModel',
-        'oid': '41bfcee6e05f90bf24291ffef2a425a342f7357f',
+        'oid': '47cef1780d4652eca2d7e871bb6468286ee5b92e',
         'childTreeHashes': {},
-        'treeHash': '86a37e79340dfff23a1a4343311fe1b6be25069f',
+        'treeHash': '5bfff73871ada0ae731998bb73bfa92491890db1',
         'parentId': 'Model-Definitions'
       },
       'Internal-Lost': {
         'kind': 'KoheseModel',
-        'oid': 'fd7ebb59134298047ffad3bdc491246c8a8978e5',
+        'oid': '61c56d3805131930ff37fe07037248dfcd2c1d25',
         'childTreeHashes': {},
-        'treeHash': '2b4ecdd03862514fd881ca363ae1be6d1ba08773',
+        'treeHash': '59d914be670803a371f403235780efec31d7401b',
         'parentId': 'Model-Definitions'
       },
       'Test': {
         'kind': 'KoheseModel',
-        'oid': 'a28e109abe292d4cf67d3170626a097bde6e8988',
+        'oid': '95baf8a361725f7bd143fba63cfffb1d2031d422',
         'childTreeHashes': {},
-        'treeHash': '67af553ac64e266aebebeb36dbcc799b350146a8',
+        'treeHash': '9d2d8454605bbe1cd2b2abfde9d8cd5038cae8d7',
         'parentId': 'Model-Definitions'
       },
       'Test-Exclude': {
         'kind': 'KoheseModel',
-        'oid': '0967834430669111e3f071162af1d15c3f2b173f',
+        'oid': 'c8ffbec0b361ed4fb3ece6b3cfd36a39fd8ebd7c',
         'childTreeHashes': {},
-        'treeHash': '26094ef81e18c6c30d1049d3d765d8ef9b3ed45e',
+        'treeHash': 'c252fe9802f9740c44b0be55e1970f9b9479d874',
         'parentId': 'Model-Definitions'
       },
       'NV-TOP': {
