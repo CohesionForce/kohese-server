@@ -2,6 +2,13 @@ import { Injectable } from '@angular/core';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { AnalysisService } from '../../services/analysis/analysis.service';
+import { DialogService,
+  DialogComponent } from '../../services/dialog/dialog.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+
+export enum DataFormat {
+  HTML = 'HTML', CSV = 'CSV', TXT = 'TXT'
+}
 
 /* Here is where we will setup the base methods for all the analysis components */
 
@@ -14,9 +21,18 @@ export class AnalysisViewComponent extends NavigatableComponent {
   termPOSFilterCriteriaList: Array<any>;
   phrasePOSFilterCriteriaList: Array<any>;
   analysisPOSFilterName: string = 'Standard';
+  
+  get DataFormat() {
+    return DataFormat;
+  }
+  
+  get Object() {
+    return Object;
+  }
 
-  constructor(NavigationService : NavigationService,
-              protected AnalysisService : AnalysisService) {
+  constructor(NavigationService: NavigationService, protected AnalysisService:
+    AnalysisService, protected dialogService: DialogService,
+    protected itemRepository: ItemRepository) {
     super(NavigationService);
 
     this.termPOSFilterCriteriaList = Object.keys(AnalysisService.termFilterCriteria);
@@ -50,6 +66,113 @@ export class AnalysisViewComponent extends NavigatableComponent {
         this.invalidFilterRegex = false;
       }
     }
+  }
+  
+  public copy(elements: Array<any>, includePartsOfSpeech: boolean, asHtml:
+    boolean): void {
+    if (asHtml) {
+      navigator['clipboard'].writeText(this.getTableContent(elements,
+        includePartsOfSpeech, DataFormat.HTML));
+    } else {
+      navigator['clipboard'].writeText(this.getTableContent(elements,
+        includePartsOfSpeech, DataFormat.TXT));
+    }
+  }
+  
+  private getTableContent(elements: Array<any>, includePartsOfSpeech: boolean,
+    dataFormat: DataFormat): string {
+    let content: string;
+    if (dataFormat === DataFormat.HTML) {
+      content = '<table><tr><th>Element</th><th>Number Of ' +
+        'Occurrences</th>' + (includePartsOfSpeech ?
+        '<th>Parts Of Speech</th>' : '') + '</tr>';
+      
+      for (let j: number = 0; j < elements.length; j++) {
+        content += ('<tr><td>' + elements[j].text + '</td><td>' + elements[
+          j].count + '</td>' + (includePartsOfSpeech ? ('<td>' + JSON.
+          stringify(elements[j].posCount) + '</td>') : '') + '</tr>');
+      }
+      
+      content += '</table>';
+    } else if (dataFormat === DataFormat.CSV) {
+      content = 'Element,Number Of Occurrences' + (includePartsOfSpeech ?
+        ',Parts Of Speech' : '') + '\n';
+      
+      for (let j: number = 0; j < elements.length; j++) {
+        content += (elements[j].text + ',' + elements[j].count +
+          (includePartsOfSpeech ? (',\"' + JSON.stringify(elements[j].
+          posCount) + '\"') : '') + '\n');
+      }
+    } else {
+      // Limit total width to 80 characters
+      content = 'Element                   Number Of Occurrences' +
+        (includePartsOfSpeech ? '     Parts Of Speech' : '') + '\n\n';
+      
+      for (let j: number = 0; j < elements.length; j++) {
+        let element: any = elements[j];
+        let elementRemainder: string = element.text;
+        let numberOfOccurrencesRemainder: string = String(element.count);
+        let partsOfSpeechRemainder: string = JSON.stringify(element.posCount);
+        while (elementRemainder || numberOfOccurrencesRemainder ||
+          (includePartsOfSpeech && partsOfSpeechRemainder)) {
+          if (elementRemainder.length < 23) {
+            for (let k: number = elementRemainder.length; k < 23; k++) {
+              elementRemainder += ' ';
+            }
+          }
+          
+          content += elementRemainder.substring(0, 23) + '   ';
+          elementRemainder = elementRemainder.substring(23);
+          
+          if (numberOfOccurrencesRemainder.length < 23) {
+            for (let k: number = numberOfOccurrencesRemainder.length; k < 23;
+              k++) {
+              numberOfOccurrencesRemainder += ' ';
+            }
+          }
+          
+          content += numberOfOccurrencesRemainder.substring(0, 23);
+          numberOfOccurrencesRemainder = numberOfOccurrencesRemainder.
+            substring(23);
+          
+          if (includePartsOfSpeech) {
+            if (partsOfSpeechRemainder.length < 26) {
+              for (let k: number = partsOfSpeechRemainder.length; k < 26;
+                k++) {
+                partsOfSpeechRemainder += ' ';
+              }
+            }
+            
+            content += ('   ' + partsOfSpeechRemainder.substring(0, 26));
+            partsOfSpeechRemainder = partsOfSpeechRemainder.substring(26);
+          }
+          
+          content += '\n';
+        }
+        
+        content += '\n';
+      }
+    }
+    
+    return content;
+  }
+  
+  public export(elements: Array<any>, includePartsOfSpeech: boolean,
+    baseItemName: string, dataFormat: DataFormat): void {
+    this.dialogService.openInputDialog('Export', '', DialogComponent.
+      INPUT_TYPES.TEXT, 'Name', baseItemName + '_' + new Date().
+      toISOString() + '.' + dataFormat.toLowerCase(), (input: any) => {
+      return (input && (input.search(/[\/\\]/) === -1));
+    }).afterClosed().subscribe(async (name: any) => {
+      if (name) {
+        await this.itemRepository.produceReport(this.getTableContent(elements,
+          includePartsOfSpeech, dataFormat), name, 'text/markdown');
+        let downloadAnchor: any = document.createElement('a');
+        downloadAnchor.download = name;
+        downloadAnchor.href = '/producedReports/' + name;
+        downloadAnchor.click();
+      }
+    });
   }
 }
 

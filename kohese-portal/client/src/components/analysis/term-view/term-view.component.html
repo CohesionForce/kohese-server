@@ -1,8 +1,33 @@
 <div class="panel">
-  <div class="panel-heading">
+  <div class="panel-heading" style="height: 50px; display: flex;
+    flex-direction: row; align-items: center;">
     Term View - (<span *ngIf="displayedCount < filteredCount"style="font-weight:normal;">{{displayedCount}}/</span>{{filteredCount}}) Terms
-    <button mat-icon-button class="pull-right" [matMenuTriggerFor]="optionsMenu">
-      <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
+    <button mat-icon-button matTooltip="Copy table content to clipboard"
+      style="margin-left: auto;" [matMenuTriggerFor]="copyMenu">
+      <mat-icon class="fa fa-copy"></mat-icon>
+    </button>
+    <mat-menu #copyMenu="matMenu" [overlapTrigger]="false">
+      <button mat-menu-item (click)="copy(terms, showPOS, true)">
+        HTML
+      </button>
+      <button mat-menu-item (click)="copy(terms, showPOS, false)">
+        Text
+      </button>
+    </mat-menu>
+    <button mat-icon-button matTooltip="Export table content to a file"
+      [matMenuTriggerFor]="exportMenu">
+      <mat-icon class="fa fa-file-o"></mat-icon>
+    </button>
+    <mat-menu #exportMenu="matMenu" [overlapTrigger]="false">
+      <ng-container *ngFor="let format of Object.keys(DataFormat)">
+        <button mat-menu-item (click)="export(terms, showPOS, itemProxy.item.
+          name, DataFormat[format])">
+          {{DataFormat[format]}}
+        </button>
+      </ng-container>
+    </mat-menu>
+    <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
+      <mat-icon class="fa fa-gear"></mat-icon>
     </button>
     <mat-menu #optionsMenu="matMenu" [overlapTrigger]="false">
       <button mat-menu-item (click)="showPOS = !showPOS">

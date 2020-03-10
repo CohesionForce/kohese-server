@@ -60,6 +60,7 @@
     "level": "^4.0.0",
     "level-js": "^3.0.0",
     "levelup": "^3.1.1",
+    "mark.js": "^8.11.1",
     "morgan": "^1.7.0",
     "ng2-dragula": "^1.5.0",
     "ng2-file-upload": "^1.3.0",

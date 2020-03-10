@@ -811,9 +811,10 @@ function KIOItemServer(socket){
     let metaDataString: Array<string> = request.content.split('\n\n', 3);
     fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
       reportName), metaDataString.join('\n\n'), undefined);
-    if (request.format === '.md') {
+    if (request.format === 'text/markdown') {
       fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.
         reportName), request.content, undefined);
+      sendResponse();
     } else {
       let pandocProcess: any = child.spawn('pandoc', ['-f', 'commonmark',
         '-t', 'html', '-s'], undefined);
