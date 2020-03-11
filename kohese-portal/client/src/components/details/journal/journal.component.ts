@@ -4,6 +4,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { SessionService } from '../../../services/user/session.service';
 import { FormatDefinition,
   FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
@@ -81,7 +82,8 @@ export class JournalComponent {
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository, private _dialogService:
-    DialogService, private _navigationService: NavigationService) {
+    DialogService, private _navigationService: NavigationService,
+    private _sessionService: SessionService) {
   }
   
   public addEntry(): void {
@@ -91,7 +93,9 @@ export class JournalComponent {
           item,
         object: {
           parentId: this._itemProxy.item.id,
-          context: [{ id: this._itemProxy.item.id }]
+          context: [{ id: this._itemProxy.item.id }],
+          observedBy: this._sessionService.user.name,
+          observedOn: new Date().getTime()
         },
         formatDefinitionType: FormatDefinitionType.DEFAULT,
         allowKindChange: true

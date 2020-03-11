@@ -19,6 +19,8 @@ import { MockDialogService } from '../../../../mocks/services/MockDialogService'
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { SessionService } from '../../../services/user/session.service';
+import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 
 describe('Component: Journal', ()=>{
   let journalComponent: JournalComponent;
@@ -38,7 +40,8 @@ describe('Component: Journal', ()=>{
       providers: [
         {provide : DialogService, useClass: MockDialogService},
         {provide : ItemRepository, useClass: MockItemRepository},
-        { provide: NavigationService, useClass: MockNavigationService }
+        { provide: NavigationService, useClass: MockNavigationService },
+        { provide: SessionService, useClass: MockSessionService }
       ]
     }).compileComponents();
 
