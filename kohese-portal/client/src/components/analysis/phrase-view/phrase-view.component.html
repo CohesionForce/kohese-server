@@ -12,17 +12,9 @@
       </mat-icon>
     </button>
     <button mat-icon-button matTooltip="Copy table content to clipboard"
-      [matMenuTriggerFor]="copyMenu">
+      (click)="copy(phrases, showPOS)">
       <mat-icon class="fa fa-copy"></mat-icon>
     </button>
-    <mat-menu #copyMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item (click)="copy(phrases, showPOS, true)">
-        HTML
-      </button>
-      <button mat-menu-item (click)="copy(phrases, showPOS, false)">
-        Text
-      </button>
-    </mat-menu>
     <button mat-icon-button matTooltip="Export table content to a file"
       [matMenuTriggerFor]="exportMenu">
       <mat-icon class="fa fa-file-o"></mat-icon>

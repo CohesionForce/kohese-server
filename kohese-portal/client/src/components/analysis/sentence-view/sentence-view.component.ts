@@ -154,14 +154,21 @@ export class SentenceViewComponent extends AnalysisViewComponent
 
   }
   
-  public sentenceCopy(asHtml: boolean): void {
-    if (asHtml) {
-      navigator['clipboard'].writeText(this.getSentenceTableContent(DataFormat.
-        HTML));
-    } else {
-      navigator['clipboard'].writeText(this.getSentenceTableContent(DataFormat.
-        TXT));
-    }
+  public sentenceCopy(): void {
+    let copyEventListener: (clipboardEvent: ClipboardEvent) => void =
+      (clipboardEvent: ClipboardEvent) => {
+      clipboardEvent.preventDefault();
+      
+      clipboardEvent.clipboardData.setData('text/html', this.
+        getSentenceTableContent(DataFormat.HTML));
+      clipboardEvent.clipboardData.setData('text/plain', this.
+        getSentenceTableContent(DataFormat.TXT));
+      
+      document.removeEventListener('copy', copyEventListener);
+    };
+    
+    document.addEventListener('copy', copyEventListener);
+    document.execCommand('copy');
   }
   
   private getSentenceTableContent(dataFormat: DataFormat): string {

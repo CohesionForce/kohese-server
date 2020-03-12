@@ -3,17 +3,9 @@
     flex-direction: row; align-items: center;">
     Term View - (<span *ngIf="displayedCount < filteredCount"style="font-weight:normal;">{{displayedCount}}/</span>{{filteredCount}}) Terms
     <button mat-icon-button matTooltip="Copy table content to clipboard"
-      style="margin-left: auto;" [matMenuTriggerFor]="copyMenu">
+      style="margin-left: auto;" (click)="copy(terms, showPOS)">
       <mat-icon class="fa fa-copy"></mat-icon>
     </button>
-    <mat-menu #copyMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item (click)="copy(terms, showPOS, true)">
-        HTML
-      </button>
-      <button mat-menu-item (click)="copy(terms, showPOS, false)">
-        Text
-      </button>
-    </mat-menu>
     <button mat-icon-button matTooltip="Export table content to a file"
       [matMenuTriggerFor]="exportMenu">
       <mat-icon class="fa fa-file-o"></mat-icon>

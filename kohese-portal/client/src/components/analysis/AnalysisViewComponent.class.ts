@@ -68,15 +68,21 @@ export class AnalysisViewComponent extends NavigatableComponent {
     }
   }
   
-  public copy(elements: Array<any>, includePartsOfSpeech: boolean, asHtml:
-    boolean): void {
-    if (asHtml) {
-      navigator['clipboard'].writeText(this.getTableContent(elements,
-        includePartsOfSpeech, DataFormat.HTML));
-    } else {
-      navigator['clipboard'].writeText(this.getTableContent(elements,
-        includePartsOfSpeech, DataFormat.TXT));
-    }
+  public copy(elements: Array<any>, includePartsOfSpeech: boolean): void {
+    let copyEventListener: (clipboardEvent: ClipboardEvent) => void =
+      (clipboardEvent: ClipboardEvent) => {
+      clipboardEvent.preventDefault();
+      
+      clipboardEvent.clipboardData.setData('text/html', this.getTableContent(
+        elements, includePartsOfSpeech, DataFormat.HTML));
+      clipboardEvent.clipboardData.setData('text/plain', this.getTableContent(
+        elements, includePartsOfSpeech, DataFormat.TXT));
+      
+      document.removeEventListener('copy', copyEventListener);
+    };
+    
+    document.addEventListener('copy', copyEventListener);
+    document.execCommand('copy');
   }
   
   private getTableContent(elements: Array<any>, includePartsOfSpeech: boolean,
