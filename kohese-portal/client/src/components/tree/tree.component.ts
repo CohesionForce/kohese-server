@@ -120,6 +120,17 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._getText = getText;
   }
   
+  private _maySelect: (element: any) => boolean = (element: any) => {
+    return true;
+  };
+  get maySelect() {
+    return this._maySelect;
+  }
+  @Input('maySelect')
+  set maySelect(maySelect: (element: any) => boolean) {
+    this._maySelect = maySelect;
+  }
+  
   private _selection: Array<any> = [];
   get selection() {
     return this._selection;
@@ -219,6 +230,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
       this._getChildren = this._data['getChildren'];
       this._hasChildren = this._data['hasChildren'];
       this._getText = this._data['getText'];
+      
+      if (this._data['maySelect']) {
+        this._maySelect = this._data['maySelect'];
+      }
       
       if (this._data['selection']) {
         this._selection = this._data['selection'];
