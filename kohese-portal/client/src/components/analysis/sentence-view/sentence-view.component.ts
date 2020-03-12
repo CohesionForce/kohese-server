@@ -174,7 +174,8 @@ export class SentenceViewComponent extends AnalysisViewComponent
   private getSentenceTableContent(dataFormat: DataFormat): string {
     let content: string;
     if (dataFormat === DataFormat.HTML) {
-      content = '<table><tr><th>Type</th><th>Content</th></tr>';
+      content = '<table><tr><th>Category</th><th>Type</th><th>Content</th>' +
+        '</tr>';
       
       for (let j: number = 0; j < this.sentences.length; j++) {
         let type: string = this.sentences[j].displayType;
@@ -182,14 +183,15 @@ export class SentenceViewComponent extends AnalysisViewComponent
           'Sentence') && this.showSentencesInDetails) || ((this.sentences[j].
           displayLevel === 3) && this.showPhrasesInDetails) || ((this.sentences[
           j].displayLevel === 4) && this.showTokensInDetails)) {
-          content += ('<tr><td>' + type + '</td><td>' + this.sentences[j].text +
+          content += ('<tr><td>' + this.getCategory(this.sentences[j]) +
+            '</td><td>' + type + '</td><td>' + this.sentences[j].text +
             '</td></tr>');
         }
       }
       
       content += '</table>';
     } else if (dataFormat === DataFormat.CSV) {
-      content = 'Type,Content';
+      content = 'Category,Type,Content';
       
       for (let j: number = 0; j < this.sentences.length; j++) {
         let type: string = this.sentences[j].displayType;
@@ -197,12 +199,14 @@ export class SentenceViewComponent extends AnalysisViewComponent
           'Sentence') && this.showSentencesInDetails) || ((this.sentences[j].
           displayLevel === 3) && this.showPhrasesInDetails) || ((this.sentences[
           j].displayLevel === 4) && this.showTokensInDetails)) {
-          content += (type + ',\"' + this.sentences[j].text + '\"\n');
+          content += (this.getCategory(this.sentences[j]) + ',' + type + ',\"'
+            + this.sentences[j].text.replace(/"/g, '\"\"') + '\"\n');
         }
       }
     } else {
       // Limit total width to 80 characters
-      content = 'Type                                    Content\n\n';
+      content = 'Category   Type                              ' +
+        'Content\n\n';
       
       for (let j: number = 0; j < this.sentences.length; j++) {
         let type: string = this.sentences[j].displayType;
@@ -211,37 +215,51 @@ export class SentenceViewComponent extends AnalysisViewComponent
           displayLevel === 3) && this.showPhrasesInDetails) || ((this.
           sentences[j].displayLevel === 4) && this.showTokensInDetails)) {
           let sentence: any = this.sentences[j];
+          let category: string = this.getCategory(sentence);
+          for (let k: number = category.length; k < 8; k++) {
+            category += ' ';
+          }
+          
+          content += (category + '   ');
+          
           let typeRemainder: string = type;
           let contentRemainder: string = sentence.text;
           for (let k: number = (contentRemainder.length - 1); k >= 0; k--) {
             if ((contentRemainder.charAt(k) === '\n') && (k !==
               contentRemainder.length)) {
               contentRemainder = (contentRemainder.substring(0, k + 1) +
-                '                                        ' + contentRemainder.
-                substring(k + 1));
+                '                                             ' +
+                contentRemainder.substring(k + 1));
             }
           }
           
+          let afterFirstLine: boolean = false;
           while (typeRemainder || contentRemainder) {
-            if (typeRemainder.length < 37) {
-              for (let k: number = typeRemainder.length; k < 37; k++) {
+            if (afterFirstLine) {
+              content += '           ';
+            }
+            
+            if (typeRemainder.length < 31) {
+              for (let k: number = typeRemainder.length; k < 31; k++) {
                 typeRemainder += ' ';
               }
             }
             
-            content += typeRemainder.substring(0, 37) + '   ';
-            typeRemainder = typeRemainder.substring(37);
+            content += (typeRemainder.substring(0, 31) + '   ');
+            typeRemainder = typeRemainder.substring(31);
             
-            if (contentRemainder.length < 40) {
-              for (let k: number = contentRemainder.length; k < 40; k++) {
+            if (contentRemainder.length < 34) {
+              for (let k: number = contentRemainder.length; k < 34; k++) {
                 contentRemainder += ' ';
               }
             }
             
-            content += contentRemainder.substring(0, 40);
-            contentRemainder = contentRemainder.substring(40);
+            content += contentRemainder.substring(0, 34);
+            contentRemainder = contentRemainder.substring(34);
             
             content += '\n';
+            
+            afterFirstLine = true;
           }
           
           content += '\n';
@@ -284,5 +302,20 @@ export class SentenceViewComponent extends AnalysisViewComponent
         }
       }
     });
+  }
+  
+  public getCategory(element: any): string {
+    switch (element.displayLevel) {
+      case 1:
+        return 'Item';
+      case 2:
+        return 'Sentence';
+      case 3:
+        return 'Phrase';
+      case 4:
+        return 'Token';
+    }
+    
+    return '';
   }
 }

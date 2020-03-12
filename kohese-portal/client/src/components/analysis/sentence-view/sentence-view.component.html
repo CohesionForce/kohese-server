@@ -53,6 +53,7 @@
       <table id="theDetails"
         class="table tree-grid table-striped table-condensed table-hover">
         <thead>
+          <th>Category</th>
           <th style="width:20%; min-width:200px; max-width:350px">Type</th>
           <th>
             <span (click)="sort('text')">
@@ -69,6 +70,7 @@
             <tr class="level-{{listItem.displayLevel}}"
               class="tree-grid-row" id="{{listItem.displayId}}"
               (click)="highlight(listItem)">
+              <td>{{getCategory(listItem)}}</td>
               <td><span class="indented">{{listItem.displayType}}</span></td>
               <td [innerHTML]="listItem.text | highlightRegex:filterRegexHighlight:true"></td>
             </tr>
