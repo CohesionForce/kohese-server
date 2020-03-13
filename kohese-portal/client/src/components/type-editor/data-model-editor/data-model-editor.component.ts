@@ -44,7 +44,24 @@ export class DataModelEditorComponent {
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
       if (itemProxy.kind === 'KoheseModel') {
         let item: any = itemProxy.item;
-        if (item.name !== this._dataModel.name) {
+        let addType: boolean = true;
+        let kindName: string = item.name;
+        while (true) {
+          if (kindName === this._dataModel.name) {
+            addType = false;
+            break;
+          }
+          
+          let dataModelItemProxy: ItemProxy = TreeConfiguration.
+            getWorkingTree().getProxyFor(kindName);
+          if (dataModelItemProxy) {
+            kindName = dataModelItemProxy.item.base;
+          } else {
+            break;
+          }
+        }
+        
+        if (addType) {
           this._filteredKinds.push(item);
         }
         
