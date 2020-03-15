@@ -23,6 +23,7 @@ import { TableModule } from '../table/table.module';
   ],
   entryComponents: [
     ObjectEditorComponent,
+    FormatObjectEditorComponent,
     DocumentConfigurationEditorComponent
   ],
   imports: [

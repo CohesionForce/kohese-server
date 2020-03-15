@@ -97,8 +97,9 @@ export class RepositoriesComponent extends NavigatableComponent implements
       this.commitMessageInput = '<No message supplied>';
     }
 
-    this.versionControlService.commitItems([this.rootProxy], this._sessionService.getSessionUser().getValue(),
-      this.commitMessageInput).subscribe((statusMap: any) => {
+    this.versionControlService.commitItems([this.rootProxy], this.
+      _sessionService.user, this.commitMessageInput).subscribe((statusMap:
+      any) => {
         if (statusMap.error) {
           this._toastrService.error('Commit Failed', 'Version Control');
           this._notificationService.addNotifications('ERROR: Version Control - Commit Failed');

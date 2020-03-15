@@ -59,12 +59,12 @@ export class FormatPreviewComponent implements OnInit {
   }
 
   addFields() {
-    this.mockProxy[this.format.header.contents[0].propertyName.attribute] =
+    this.mockProxy[this.format.header.contents[0].propertyName] =
       'Test Header';
     for(let container of this.format.containers) {
       for(let contents of container.contents) {
-        this.mockProxy.item[contents.propertyName.attribute] = defaultValues[
-          contents.kind];
+        this.mockProxy.item[contents.propertyName] = defaultValues[contents.
+          kind];
       }
     }
   }

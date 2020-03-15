@@ -13,6 +13,7 @@ import { FormatDefinition,
   FormatDefinitionType } from '../FormatDefinition.interface';
 import { FormatContainer,
   FormatContainerKind } from '../FormatContainer.interface';
+import { PropertyDefinition } from '../PropertyDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
@@ -300,46 +301,88 @@ export class ViewModelEditorComponent {
     }).afterClosed().subscribe((name: any) => {
       if (name) {
         let id: string = (<any> Uuid).default();
-        let propertyNameObject: { kind: string, attribute: string} = {
-          kind: '',
-          attribute: ''
-        };
-        let viewModelEntry: any;
-        if (this._isLocalType) {
-          propertyNameObject.kind = this._dataModel.name;
-          propertyNameObject.attribute = Object.keys(this._dataModel.
-            properties)[0];
-          viewModelEntry = this._viewModel.viewProperties[propertyNameObject.
-            attribute].inputType;
-        } else {
-          propertyNameObject.kind = 'Item';
-          propertyNameObject.attribute = 'name';
-          viewModelEntry = TreeConfiguration.getWorkingTree().getProxyFor(
-            'view-item').item.viewProperties['name'].inputType;
-        }
-        
         let formatDefinition: FormatDefinition = {
           id: id,
           name: name,
           header: {
             kind: FormatContainerKind.HEADER,
-            contents: [{
-              propertyName: propertyNameObject,
-              customLabel: propertyNameObject.attribute,
-              hideEmpty: false,
-              labelOrientation: 'Top',
-              kind: viewModelEntry.type,
-              inputOptions: viewModelEntry
-            }]
+            contents: []
           },
           containers: []
         };
+        
+        let propertyDefinition: PropertyDefinition = {
+          propertyName: '',
+          customLabel: '',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        
+        let attribute: any;
+        if (this._isLocalType) {
+          attribute = this._dataModel.properties[Object.keys(this._dataModel.
+            properties)[0]];
+        } else {
+          attribute = this._dataModel.classProperties['name'].definition;
+        }
+        
+        propertyDefinition.propertyName = attribute.name;
+        propertyDefinition.customLabel = attribute.name;
+        
+        let attributeType: string = (Array.isArray(attribute.type) ? attribute.
+          type[0] : attribute.type); 
+        switch (attributeType) {
+          case 'boolean':
+            propertyDefinition.kind = 'boolean';
+            break;
+          case 'number':
+            propertyDefinition.kind = 'number';
+            break;
+          case 'string':
+            propertyDefinition.kind = 'text';
+            break;
+          case 'StateMachine':
+            propertyDefinition.kind = 'state-editor';
+            break;
+          case 'user-selector':
+            propertyDefinition.kind = 'user-selector';
+            break;
+        }
+        
+        if (this._isLocalType) {
+          formatDefinition.containers.push({
+            kind: FormatContainerKind.VERTICAL,
+            contents: [propertyDefinition]
+          });
+        } else {
+          formatDefinition.header.contents.push(propertyDefinition);
+        }
+        
         this._viewModel.formatDefinitions[id] = formatDefinition;
         
         this._modifiedEventEmitter.emit();
         this._changeDetectorRef.markForCheck();
       }
     });
+  }
+  
+  public getDataModel(dataModel: any): any {
+    if (dataModel.localTypes) {
+      return dataModel;
+    } else {
+      let localTypeCopy: any = JSON.parse(JSON.stringify(dataModel));
+      localTypeCopy.classProperties = {};
+      for (let attributeName in localTypeCopy.properties) {
+        localTypeCopy.classProperties[attributeName] = {
+          definedInKind: dataModel.name,
+          definition: localTypeCopy.properties[attributeName]
+        };
+      }
+      
+      return localTypeCopy;
+    }
   }
   
   public renameFormatDefinition(formatDefinitionId: string): void {
@@ -412,7 +455,8 @@ export class ViewModelEditorComponent {
       }, undefined);
     }
     
-    return true;
+    return (this._viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] !==
+      formatDefinitionId);
   }
   
   public removeFormatDefinition(formatDefinitionId: string): void {

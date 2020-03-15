@@ -6,7 +6,9 @@ import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
-import { FormatDefinitionType } from './FormatDefinition.interface';
+import { FormatDefinition,
+  FormatDefinitionType } from './FormatDefinition.interface';
+import { FormatContainerKind } from './FormatContainer.interface';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
@@ -85,7 +87,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           methods: [],
           localTypes: {}
         });
-        let formatDefinitionId: string = (<any> Uuid).default();
+        
         let viewModel: any = {
           name: name,
           modelName: name,
@@ -98,41 +100,44 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           defaultFormatKey: {},
           tableDefinitions: {}
         };
-        viewModel.formatDefinitions[formatDefinitionId] = {
-          'name': 'New definition',
-          'header': {
-            'kind': 'header',
-            'contents': [
-               {
-                 'propertyName': {
-                   kind: name,
-                   attribute: 'name'
-                 },
-                 'labelOrientation': 'Top',
-                 'kind': 'text',
-                 'customLabel': 'name'
-               }
-             ]
-           },
-          'containers': [
-            {
-              'kind': 'list',
-              'contents': [
-                {
-                   'propertyName': {
-                     kind: name,
-                     attribute: 'description'
-                   },
-                   'labelOrientation': 'Top',
-                   'kind': 'markdown',
-                   'customLabel': 'description'
-                }
-             ]
-            }
-          ],
-          'id': formatDefinitionId
+        let formatDefinitionId: string = (<any> Uuid).default();
+        let defaultFormatDefinition: FormatDefinition = {
+          id: formatDefinitionId,
+          name: 'Default Format Definition',
+          header: {
+            kind: FormatContainerKind.HEADER,
+            contents: [{
+              propertyName: 'name',
+              customLabel: 'Name',
+              labelOrientation: 'Top',
+              kind: 'text',
+              visible: true,
+              editable: true
+            }]
+          },
+          containers: [{
+            kind: FormatContainerKind.VERTICAL,
+            contents: [
+            ]
+          }]
         };
-        viewModel.defaultFormatKey[FormatDefinitionType.DOCUMENT] =
+        
+        let itemKoheseView: any = TreeConfiguration.getWorkingTree().
+          getProxyFor('view-item').item;
+        let itemDefaultFormatDefinition: FormatDefinition = itemKoheseView.
+          formatDefinitions[itemKoheseView.defaultFormatKey[
+          FormatDefinitionType.DEFAULT]];
+        let attributeEntries: Array<any> = defaultFormatDefinition.containers[
+          0].contents;
+        for (let j: number = 0; itemDefaultFormatDefinition.containers[0].
+          contents.length; j++) {
+          attributeEntries.push(JSON.parse(JSON.stringify(
+            itemDefaultFormatDefinition.containers[0].contents[j])));
+        }
+        
+        viewModel.formatDefinitions[formatDefinitionId] =
+          defaultFormatDefinition;
+        viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
           formatDefinitionId;
         let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
           upsertItem('KoheseView', viewModel);

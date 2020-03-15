@@ -81,10 +81,9 @@
               </button>
             </mat-card-title>
             <mat-card-content style="background-color: white; color: black;">
-              <format-object-editor [type]="selectedKind"
-                [viewModel]="viewModel" [object]="item"
-                [attributes]="getAttributes()"
-                [formatDefinition]="getFormatDefinition()" [disabled]="true">
+              <format-object-editor [type]="selectedKind" [object]="item"
+                [formatDefinitionType]="FormatDefinitionType.BOARD"
+                [disabled]="true">
               </format-object-editor>
             </mat-card-content>
           </mat-card>

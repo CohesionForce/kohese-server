@@ -28,10 +28,10 @@
 <br/>
 <mat-form-field style="width: 100%;">
   <mat-select placeholder="Parent Type" [ngModel]="dataModel.base"
-    (ngModelChange)="dataModel.base = $event; dataModel.parentId = $event;
-    modifiedEventEmitter.emit()" [disabled]="!editable">
+    (ngModelChange)="parentTypeSelected($event)"
+    [compareWith]="areParentTypeValuesEqual" [disabled]="!editable">
     <ng-container *ngFor="let kind of filteredKinds">
-      <mat-option [value]="kind.name">
+      <mat-option [value]="kind">
         {{kind.name}}
       </mat-option>
     </ng-container>

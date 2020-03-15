@@ -53,7 +53,7 @@ export class VersionControlService {
     return this._emitReturningObservable('VersionControl/revert', data);
   }
 
-  public commitItems(proxies: Array<ItemProxy>, committerProxy: ItemProxy,
+  public commitItems(proxies: Array<ItemProxy>, committer: any,
     commitMessage: string): Observable<any> {
     let data: {
       proxyIds: Array<string>;
@@ -62,8 +62,8 @@ export class VersionControlService {
       message: string;
     } = {
       proxyIds: [],
-      username: committerProxy.item.name,
-      email: committerProxy.item.email,
+      username: committer.name,
+      email: committer.email,
       message: commitMessage
     };
     for (let j = 0; j < proxies.length; j++) {

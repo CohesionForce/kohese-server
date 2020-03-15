@@ -52,6 +52,10 @@ export class StateSummaryDialogComponent implements OnInit {
     return this._editableSet;
   }
   
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
+  }
+  
   get TreeConfiguration() {
     return TreeConfiguration;
   }
@@ -103,27 +107,5 @@ export class StateSummaryDialogComponent implements OnInit {
   
   public navigate(itemProxy: ItemProxy): void {
     this._navigationService.addTab('Explore', { id: itemProxy.item.id });
-  }
-  
-  public getAttributes(type: any): Array<any> {
-    let attributes: Array<any> = [];
-    for (let attributeName in type.classProperties) {
-      let attribute: any = type.classProperties[attributeName].definition;
-      attribute.name = attributeName;
-      attributes.push(attribute);
-    }
-    
-    return attributes;
-  }
-  
-  public getFormatDefinition(itemProxy: ItemProxy): FormatDefinition {
-    let viewModel: any = this.getViewModel(itemProxy);
-    let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
-      viewModel.defaultFormatKey[FormatDefinitionType.CARD]];
-    if (formatDefinition) {
-      return formatDefinition;
-    }
-    
-    return viewModel.formatDefinitions[FormatDefinitionType.DOCUMENT];
   }
 }

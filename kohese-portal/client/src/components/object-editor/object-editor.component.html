@@ -65,7 +65,8 @@
           <ng-container *ngSwitchCase="'markdown'">
             <markdown-editor [value]="copy[attributeName]"
               [valueIdentifier]="getAttributeRepresentation(attributeName)"
-              (valueChanged)="copy[attributeName] = $event">
+              (valueChanged)="copy[attributeName] = $event" style="height:
+              300px;">
             </markdown-editor>
             <br/>
           </ng-container>

@@ -6,9 +6,9 @@
     <div style="display: flex; flex-direction: row;">
       <mat-form-field style="width: 100%; padding: 0px 3px 0px 3px;">
         <mat-select placeholder="Attribute" [disabled]="(isDisabled || true)"
-          [ngModel]="formatDefinition.header.contents[0].propertyName.
-          attribute" (ngModelChange)="attributeSelected($event,
-          formatDefinition.header.contents[0])">
+          [ngModel]="formatDefinition.header.contents[0].propertyName"
+          (ngModelChange)="attributeSelected($event, formatDefinition.header.
+          contents[0])">
           <ng-container *ngFor="let attribute of getSelectableAttributes()">
             <mat-option [value]="attribute.name">
               {{attribute.name}}
@@ -29,6 +29,19 @@
           <mat-option [value]="'Left'">
             Left
           </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="width: 100%; padding: 0px 3px 0px 3px;">
+        <mat-select placeholder="Type" [disabled]="isDisabled"
+          [(ngModel)]="formatDefinition.header.contents[0].kind"
+          [compareWith]="areUserInterfaceTypeValuesEqual">
+          <ng-container *ngFor="let userInterfaceType of getUserInterfaceTypes(
+            formatDefinition.header.contents[0].propertyName)">
+            <mat-option [value]="getUserInterfaceTypeValue(formatDefinition.
+              header.contents[0].propertyName, userInterfaceType)">
+              {{userInterfaceType}}
+            </mat-option>
+          </ng-container>
         </mat-select>
       </mat-form-field>
       <ng-container *ngIf="formatDefinition.header.contents[0].
@@ -91,13 +104,17 @@
       containers">
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="align-items: center;">
-            {{(formatContainer.kind === FormatContainerKind.
-              REVERSE_REFERENCE_TABLE) ? 'Reverse Reference Table' :
-              ((formatContainer.kind === FormatContainerKind.VERTICAL) ?
-              'Vertical' : 'Horizontal')}}: {{((formatContainer.contents.
-              length > 0) ? getFormatContainerPanelTitle(formatContainer) :
-              '')}}
+          <mat-panel-title style="width: calc(100% - 70px); align-items:
+            center;">
+            <span style="width: 100%; white-space: nowrap; overflow: hidden;
+              text-overflow: ellipsis;">
+              {{(formatContainer.kind === FormatContainerKind.
+                REVERSE_REFERENCE_TABLE) ? 'Reverse Reference Table' :
+                ((formatContainer.kind === FormatContainerKind.VERTICAL) ?
+                'Vertical' : 'Horizontal')}}: {{((formatContainer.contents.
+                length > 0) ? getFormatContainerPanelTitle(formatContainer) :
+                '')}}
+            </span>
           </mat-panel-title>
           <button mat-icon-button matTooltip="Remove this format container"
             class="flex-right-align" [disabled]="isDisabled"
@@ -154,9 +171,8 @@
                     <ng-template #notReverseReferencesTable>
                       <mat-select placeholder="Attribute"
                         [disabled]="isDisabled" [ngModel]="propertyDefinition.
-                        propertyName.attribute"
-                        (ngModelChange)="attributeSelected($event,
-                        propertyDefinition)"
+                        propertyName" (ngModelChange)="attributeSelected(
+                        $event, propertyDefinition)"
                         (click)="$event.stopPropagation()">
                         <ng-container *ngFor="let attribute of
                           getSelectableAttributes()">
@@ -180,16 +196,20 @@
                     propertyDefinition, false); $event.stopPropagation()">
                     <mat-icon class="fa fa-arrow-down"></mat-icon>
                   </button>
-                  <ng-container *ngIf="(formatContainer.kind !==
-                    FormatContainerKind.REVERSE_REFERENCE_TABLE)">
-                    <button mat-icon-button matTooltip="Suppress display of this
-                      attribute when its value is empty" [disabled]="isDisabled"
-                      [ngClass]="{ 'highlight': propertyDefinition.hideEmpty }"
-                      (click)="propertyDefinition.hideEmpty =
-                      !propertyDefinition.hideEmpty; $event.stopPropagation()">
-                      <mat-icon class="fa fa-eye-slash"></mat-icon>
-                    </button>
-                  </ng-container>
+                  <button mat-icon-button matTooltip="Hide this attribute"
+                    [disabled]="isDisabled" [ngClass]="{ 'highlight':
+                    !propertyDefinition.visible }" (click)="propertyDefinition.
+                    visible = !propertyDefinition.visible; $event.
+                    stopPropagation()">
+                    <mat-icon class="fa fa-eye-slash"></mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Allow this attribute to
+                    be edited" [disabled]="isDisabled"
+                    [ngClass]="{ 'highlight': propertyDefinition.editable }"
+                    (click)="propertyDefinition.editable = !propertyDefinition.
+                    editable">
+                    <mat-icon class="fa fa-pencil"></mat-icon>
+                  </button>
                   <button mat-icon-button matTooltip="Remove this entry"
                     [disabled]="isDisabled" (click)="removeAttribute(
                     formatContainer, propertyDefinition); $event.
@@ -218,6 +238,22 @@
                           <mat-option [value]="'Left'">
                             Left
                           </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <mat-form-field style="width: 100%; padding: 0px 3px 0px
+                        3px;">
+                        <mat-select placeholder="Type" [disabled]="isDisabled"
+                          [(ngModel)]="propertyDefinition.kind"
+                          [compareWith]="areUserInterfaceTypeValuesEqual">
+                          <ng-container *ngFor="let userInterfaceType of
+                            getUserInterfaceTypes(propertyDefinition.
+                            propertyName)">
+                            <mat-option [value]="getUserInterfaceTypeValue(
+                              propertyDefinition.propertyName,
+                              userInterfaceType)">
+                              {{userInterfaceType}}
+                            </mat-option>
+                          </ng-container>
                         </mat-select>
                       </mat-form-field>
                       <ng-container *ngIf="propertyDefinition.

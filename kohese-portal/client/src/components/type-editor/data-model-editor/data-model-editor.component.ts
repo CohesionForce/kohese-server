@@ -1,12 +1,17 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   ViewChild, Output, EventEmitter } from '@angular/core';
 import { MatTable } from '@angular/material';
+import * as Uuid from 'uuid/v1';
 
 import { DialogService,
   DialogComponent } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
+import { FormatDefinition,
+  FormatDefinitionType } from '../FormatDefinition.interface';
+import { FormatContainerKind } from '../FormatContainer.interface';
+import { PropertyDefinition } from '../PropertyDefinition.interface';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -166,6 +171,93 @@ export class DataModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
+  public async parentTypeSelected(parentType: any): Promise<void> {
+    let viewModelProxy: ItemProxy;
+    if (this._enclosingType) {
+      viewModelProxy = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._enclosingType.name.toLowerCase());
+    } else {
+      viewModelProxy = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._dataModel.name.toLowerCase());
+    }
+    
+    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
+      let response: any = await this._dialogService.openYesNoDialog(
+        'Display Modifications', 'All unsaved modifications to this kind ' +
+        'are to be saved if an attribute is added to this kind. Do you want ' +
+        'to proceed?').toPromise();
+      if (!response) {
+        return;
+      }
+    }
+    
+    let defaultFormatDefinition: FormatDefinition = viewModelProxy.item.
+      formatDefinitions[viewModelProxy.item.defaultFormatKey[
+      FormatDefinitionType.DEFAULT]];  
+    defaultFormatDefinition.containers[0].contents.length = 0;
+    
+    let parentTypeViewModel: any = TreeConfiguration.getWorkingTree().
+      getProxyFor('view-' + parentType.name.toLowerCase()).item;
+    let parentTypeDefaultFormatDefinition: FormatDefinition =
+      parentTypeViewModel.formatDefinitions[parentTypeViewModel.
+      defaultFormatKey[FormatDefinitionType.DEFAULT]];
+    for (let j: number = 0; j < parentTypeDefaultFormatDefinition.containers[
+      0].contents.length; j++) {
+      defaultFormatDefinition.containers[0].contents.push(JSON.parse(JSON.
+        stringify(parentTypeDefaultFormatDefinition.containers[0].contents[
+        j])));
+    }
+    
+    for (let attributeName in this._dataModel.properties) {
+      let propertyDefinition: PropertyDefinition = {
+        propertyName: attributeName,
+        customLabel: attributeName,
+        labelOrientation: 'Top',
+        kind: '',
+        visible: true,
+        editable: true
+      };
+      let attributeType: any = this._dataModel.properties[attributeName].type;
+      attributeType = (Array.isArray(attributeType) ? attributeType[0] :
+        attributeType); 
+      switch (attributeType) {
+        case 'boolean':
+          propertyDefinition.kind = 'boolean';
+          break;
+        case 'number':
+          propertyDefinition.kind = 'number';
+          break;
+        case 'string':
+          propertyDefinition.kind = 'text';
+          break;
+        case 'StateMachine':
+          propertyDefinition.kind = 'state-editor';
+          break;
+        case 'user-selector':
+          propertyDefinition.kind = 'user-selector';
+          break;
+      }
+      
+      defaultFormatDefinition.containers[0].contents.push(propertyDefinition);
+    }
+    
+    this._dataModel.base = parentType.name;
+    this._dataModel.parentId = parentType.name;
+    this._modifiedEventEmitter.emit();
+    
+    this.save();
+    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+    
+    // Re-enter edit mode
+    this._editable = true;
+    
+    this._changeDetectorRef.markForCheck();
+  }
+  
+  public areParentTypeValuesEqual(option: any, selection: string): boolean {
+    return (option.name === selection);
+  }
+  
   public async addLocalType(): Promise<void> {
     let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('view-' + this._dataModel.name.toLowerCase());
@@ -186,7 +278,7 @@ export class DataModelEditorComponent {
       if (name) {
         let dataModel: any = {
           name: name,
-          base: 'Item',
+          base: null,
           idInjection: true,
           properties: {
             name: {
@@ -216,9 +308,27 @@ export class DataModelEditorComponent {
             }
           },
           formatDefinitions: {},
-          defaultFormatKey: '',
+          defaultFormatKey: {},
           tableDefinitions: {}
         };
+        let formatDefinitionId: string = (<any> Uuid).default();
+        let defaultFormatDefinition: FormatDefinition = {
+          id: formatDefinitionId,
+          name: 'Default Format Definition',
+          header: {
+            kind: FormatContainerKind.HEADER,
+            contents: []
+          },
+          containers: [{
+            kind: FormatContainerKind.VERTICAL,
+            contents: [
+            ]
+          }]
+        };
+        viewModel.formatDefinitions[formatDefinitionId] =
+          defaultFormatDefinition;
+        viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
+          formatDefinitionId;
 
         this._dataModel.localTypes[name] = dataModel;
         viewModelProxy.item.localTypes[name] = viewModel;
@@ -288,6 +398,15 @@ export class DataModelEditorComponent {
           localTypes[this._dataModel.name] : viewModelProxy.item);
         viewModel.viewProperties[attributeObject.attributeName] =
           attributeObject.view;
+        viewModel.formatDefinitions[viewModel.defaultFormatKey[
+          FormatDefinitionType.DEFAULT]].containers[0].contents.push({
+          propertyName: attributeObject.attributeName,
+          customLabel: attributeObject.attributeName,
+          labelOrientation: 'Top',
+          kind: attributeObject.view.inputOptions.type,
+          visible: true,
+          editable: true
+        });
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
@@ -551,6 +670,14 @@ export class DataModelEditorComponent {
           'view-' + this._dataModel.name.toLowerCase()).item;
         delete this._dataModel.properties[propertyId];
         delete viewModel.viewProperties[propertyId];
+        let defaultFormatDefinition: FormatDefinition = viewModel.
+          formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
+          DEFAULT]];
+        defaultFormatDefinition.containers[0].contents.splice(
+          defaultFormatDefinition.containers[0].contents.map(
+          (propertyDefinition: PropertyDefinition) => {
+          return propertyDefinition.propertyName;
+        }).indexOf(propertyId), 1);
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModel);

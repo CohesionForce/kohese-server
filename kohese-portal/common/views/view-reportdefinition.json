@@ -8,26 +8,19 @@
   "localTypes": {},
   "viewProperties": {},
   "formatDefinitions": {
-    "260a0f00-15ec-11ea-97d2-3bae97d5d967": {
-      "id": "260a0f00-15ec-11ea-97d2-3bae97d5d967",
-      "name": "Format Definition",
+    "c3c7a3b0-5d7c-11ea-9d2a-81904e0f9ce1": {
+      "id": "c3c7a3b0-5d7c-11ea-9d2a-81904e0f9ce1",
+      "name": "Default Format Definition",
       "header": {
         "kind": "header",
         "contents": [
           {
-            "propertyName": {
-              "kind": "ReportDefinition",
-              "attribute": "name"
-            },
-            "customLabel": "name",
+            "propertyName": "name",
+            "customLabel": "Name",
             "labelOrientation": "Top",
+            "visible": true,
             "kind": "text",
-            "inputOptions": {
-              "type": "text",
-              "options": {
-                "isMultiLine": false
-              }
-            }
+            "editable": true
           }
         ]
       },
@@ -36,17 +29,124 @@
           "kind": "list",
           "contents": [
             {
-              "propertyName": {
-                "kind": "ReportDefinition",
-                "attribute": "description"
-              },
-              "customLabel": "description",
+              "propertyName": "id",
+              "customLabel": "ID",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "description",
+              "customLabel": "Description",
               "labelOrientation": "Top",
               "kind": "markdown",
-              "inputOptions": {
-                "type": "markdown",
-                "options": {}
-              }
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "tags",
+              "customLabel": "Tags",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "parentId",
+              "customLabel": "Parent",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "createdBy",
+              "customLabel": "Created By",
+              "labelOrientation": "Top",
+              "kind": "user-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "createdOn",
+              "customLabel": "Created On",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "modifiedBy",
+              "customLabel": "Modified By",
+              "labelOrientation": "Top",
+              "kind": "user-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "modifiedOn",
+              "customLabel": "Modified On",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "children",
+              "customLabel": "Children",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "entryPoints",
+              "customLabel": "entryPoints",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "typeFormats",
+              "customLabel": "typeFormats",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            }
+          ]
+        }
+      ]
+    },
+    "260a0f00-15ec-11ea-97d2-3bae97d5d967": {
+      "id": "260a0f00-15ec-11ea-97d2-3bae97d5d967",
+      "name": "Format Definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": "name",
+            "customLabel": "Name",
+            "labelOrientation": "Top",
+            "kind": "text",
+            "visible": true,
+            "editable": true
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "description",
+              "customLabel": "Description",
+              "labelOrientation": "Top",
+              "kind": "markdown",
+              "visible": true,
+              "editable": true
             }
           ]
         }
@@ -54,6 +154,7 @@
     }
   },
   "defaultFormatKey": {
+    "default": "c3c7a3b0-5d7c-11ea-9d2a-81904e0f9ce1",
     "document": "260a0f00-15ec-11ea-97d2-3bae97d5d967"
   },
   "tableDefinitions": {},

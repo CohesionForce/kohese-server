@@ -83,6 +83,10 @@ export class CategoryBoardComponent {
     return this._changeDetectorRef;
   }
   
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
+  }
+  
   get Object() {
     return Object;
   }
@@ -308,28 +312,5 @@ export class CategoryBoardComponent {
   
   public navigate(item: any): void {
     this._navigationService.addTab('Explore', { id: item.id });
-  }
-  
-  public getAttributes(): Array<any> {
-    let attributes: Array<any> = [];
-    for (let attributeName in this._selectedKind.classProperties) {
-      let attribute: any = this._selectedKind.classProperties[attributeName].
-        definition;
-      attribute.name = attributeName;
-      attributes.push(attribute);
-    }
-    
-    return attributes;
-  }
-  
-  public getFormatDefinition(): FormatDefinition {
-    let formatDefinition: FormatDefinition = this._viewModel.formatDefinitions[
-      this._viewModel.defaultFormatKey[FormatDefinitionType.BOARD]];
-    if (formatDefinition) {
-      return formatDefinition;
-    }
-    
-    return this._viewModel.formatDefinitions[this._viewModel.defaultFormatKey[
-      FormatDefinitionType.DOCUMENT]];
   }
 }

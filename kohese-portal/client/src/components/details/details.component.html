@@ -56,7 +56,11 @@
                 <history-tab [proxyStream]="proxyStream"></history-tab>
             </mat-tab>
             <mat-tab label="Journal">
-              <journal [itemProxy]="itemProxy"></journal>
+              <ng-template matTabContent>
+                <journal [itemProxy]="itemProxy" style="display: flex;
+                  flex-direction: column;">
+                </journal>
+              </ng-template>
             </mat-tab>
             <mat-tab label="Action Table"
                  *ngIf="itemProxy.children">

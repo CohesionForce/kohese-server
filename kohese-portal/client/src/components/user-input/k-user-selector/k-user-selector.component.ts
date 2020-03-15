@@ -26,20 +26,17 @@ export class KUserSelectorComponent extends UserInput implements OnInit, OnDestr
 
   ngOnInit () { 
     this.repoStagingSub = this.ItemRepository.getRepoStatusSubject().subscribe((update)=>{
-        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) { 
-            this.userProxies = this.SessionService.getUsers()
-            this.filteredProxiesSub = 
-                this.formGroup.get(this.fieldId).valueChanges.pipe(
-                    startWith(''),
-                    map((text: string) => {
-                        return this.userProxies.filter((proxy) => {
-                            return (-1 !== proxy.item.name.indexOf(text));
-                        });
-                    }),)
-                    .subscribe((filteredProxies)=> {
-                        this.filteredProxies = filteredProxies;
-                    })
-            }})
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) { 
+        this.filteredProxiesSub = this.formGroup.get(this.fieldId).
+          valueChanges.pipe(startWith(''), map((text: string) => {
+          return this.SessionService.users.filter((user: any) => {
+            return (-1 !== user.name.indexOf(text));
+          });
+        }),).subscribe((filteredProxies)=> {
+          this.filteredProxies = filteredProxies;
+        });
+      }
+    });
   }
 
 

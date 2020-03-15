@@ -1,10 +1,12 @@
 export interface PropertyDefinition {
-  propertyName: { kind: string, attribute: string };
+  /* Change type to 'string' once Reverse Reference Table PropertyDefinitions
+  are handled separately */
+  propertyName: any;
   customLabel: string;
   labelOrientation: string;
-  hideEmpty: boolean;
   kind: string;
-  inputOptions: any;
   formatDefinition?: string;
   tableDefinition?: string;
+  visible: boolean;
+  editable: boolean;
 }
