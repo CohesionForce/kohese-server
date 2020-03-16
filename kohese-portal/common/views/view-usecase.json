@@ -228,7 +228,7 @@
               "customLabel": "approvedOn",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "number",
+              "kind": "date",
               "editable": true
             },
             {

@@ -99,19 +99,19 @@
       }
     },
     "estimatedStart": {
-      "type": "number"
+      "type": "timestamp"
     },
     "estimatedCompletion": {
-      "type": "number"
+      "type": "timestamp"
     },
     "estimatedHoursEffort": {
       "type": "number"
     },
     "actualStart": {
-      "type": "number"
+      "type": "timestamp"
     },
     "actualCompletion": {
-      "type": "number"
+      "type": "timestamp"
     },
     "remainingHoursEffort": {
       "type": "number"

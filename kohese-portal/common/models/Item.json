@@ -37,7 +37,7 @@
       "name": "createdBy"
     },
     "createdOn": {
-      "type": "number",
+      "type": "timestamp",
       "name": "createdOn"
     },
     "modifiedBy": {
@@ -45,7 +45,7 @@
       "name": "modifiedBy"
     },
     "modifiedOn": {
-      "type": "number",
+      "type": "timestamp",
       "name": "modifiedOn"
     },
     "loadPending": {
