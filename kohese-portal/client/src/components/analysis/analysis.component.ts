@@ -13,7 +13,8 @@ import { AnalysisViews, AnalysisFilter } from './AnalysisViewComponent.class';
 
 @Component({
   selector: 'analysis-view',
-  templateUrl: './analysis.component.html'
+  templateUrl: './analysis.component.html',
+  styleUrls: ['./analysis.component.scss']
 })
 export class AnalysisComponent extends NavigatableComponent
   implements OnInit, OnDestroy {

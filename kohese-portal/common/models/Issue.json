@@ -102,5 +102,6 @@
     }
   },
   "acls": [],
-  "methods": []
+  "methods": [],
+  "localTypes": {}
 }

@@ -210,10 +210,17 @@ export class FormatDefinitionEditorComponent implements OnInit {
   
   public getFormatContainerPanelTitle(formatContainer: FormatContainer):
     string {
-    return formatContainer.contents.map((propertyDefinition:
-      PropertyDefinition) => {
-      return propertyDefinition.propertyName;
-    }).join(', ');
+    if (formatContainer.kind === FormatContainerKind.REVERSE_REFERENCE_TABLE) {
+      return formatContainer.contents.map((propertyDefinition:
+        PropertyDefinition) => {
+        return propertyDefinition.propertyName.attribute;
+      }).join(', ');
+    } else {
+      return formatContainer.contents.map((propertyDefinition:
+        PropertyDefinition) => {
+        return propertyDefinition.propertyName;
+      }).join(', ');
+    }
   }
   
   public addFormatContainer(formatContainerKind: FormatContainerKind): void {
@@ -232,10 +239,13 @@ export class FormatDefinitionEditorComponent implements OnInit {
     let propertyDefinition: PropertyDefinition;
     if (formatContainer.kind === FormatContainerKind.
       REVERSE_REFERENCE_TABLE) {
-      let attribute: any = this._referenceAttributes[Object.keys(this.
-        _referenceAttributes)[0]][0];
+      let kindName: string = Object.keys(this._referenceAttributes)[0];
+      let attribute: any = this._referenceAttributes[kindName][0];
       propertyDefinition = {
-        propertyName: attribute.name,
+        propertyName: {
+          kind: kindName,
+          attribute: attribute.name
+        },
         customLabel: '',
         labelOrientation: 'Top',
         kind: '',

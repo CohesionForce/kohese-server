@@ -20,6 +20,7 @@
   "validations": [],
   "relations": {},
   "acls": [],
-  "methods": []
+  "methods": [],
+  "localTypes": {}
 }
 

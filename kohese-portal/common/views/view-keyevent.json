@@ -5,48 +5,53 @@
   "createdBy": "gmckune",
   "createdOn": 1566607211956,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1572489285633,
+  "modifiedOn": 1582935312882,
   "modelName": "KeyEvent",
   "icon": "fa fa-paper-plane",
   "color": "#000000",
-  "localTypes": {},
   "viewProperties": {
     "EventName": {
       "displayName": "EventName",
       "inputType": {
         "type": "text",
         "options": {}
-      }
+      },
+      "name": "EventName"
     },
     "DetectionMechanism": {
       "displayName": "DetectionMechanism",
       "inputType": {
         "type": "text",
         "options": {}
-      }
+      },
+      "name": "DetectionMechanism"
     },
     "EventInputData": {
       "displayName": "EventInputData",
       "inputType": {
         "type": "text",
         "options": {}
-      }
+      },
+      "name": "EventInputData"
     },
     "Responses": {
       "displayName": "Responses",
       "inputType": {
         "type": "text",
         "options": {}
-      }
+      },
+      "name": "Responses"
     },
     "EventOutputData": {
       "displayName": "EventOutputData",
       "inputType": {
         "type": "text",
         "options": {}
-      }
+      },
+      "name": "EventOutputData"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "04b498d0-5d76-11ea-9d2a-81904e0f9ce1": {
       "id": "04b498d0-5d76-11ea-9d2a-81904e0f9ce1",

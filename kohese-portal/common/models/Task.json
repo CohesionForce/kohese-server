@@ -78,9 +78,20 @@
             "target": "Completed",
             "guard": {},
             "requires": []
+          },
+          "RevertToProposed": {
+            "source": "InWork",
+            "target": "Proposed",
+            "guard": {}
+          },
+          "RemoveAssignment": {
+            "source": "PendingReassign",
+            "target": "Proposed",
+            "guard": {}
           }
         }
-      }
+      },
+      "name": "taskState"
     },
     "predecessors": {
       "type": [
@@ -89,39 +100,49 @@
       "relation": {
         "kind": "Item",
         "foreignKey": "id"
-      }
+      },
+      "name": "predecessors"
     },
     "assignedTo": {
       "type": "string",
       "relation": {
         "kind": "KoheseUser",
         "foreignKey": "username"
-      }
+      },
+      "name": "assignedTo"
     },
     "estimatedStart": {
-      "type": "timestamp"
+      "type": "timestamp",
+      "name": "estimatedStart"
     },
     "estimatedCompletion": {
-      "type": "timestamp"
+      "type": "timestamp",
+      "name": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
-      "type": "number"
+      "type": "number",
+      "name": "estimatedHoursEffort"
     },
     "actualStart": {
-      "type": "timestamp"
+      "type": "timestamp",
+      "name": "actualStart"
     },
     "actualCompletion": {
-      "type": "timestamp"
+      "type": "timestamp",
+      "name": "actualCompletion"
     },
     "remainingHoursEffort": {
-      "type": "number"
+      "type": "number",
+      "name": "remainingHoursEffort"
     },
     "actualHoursEffort": {
-      "type": "number"
+      "type": "number",
+      "name": "actualHoursEffort"
     }
   },
   "validations": [],
   "relations": {},
   "acls": [],
-  "methods": []
+  "methods": [],
+  "localTypes": {}
 }
