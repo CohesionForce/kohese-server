@@ -135,7 +135,7 @@ export class KProxySelectorComponent extends UserInput
           this.formGroup.controls[this.fieldId].markAsDirty();
         } else {
           this.selected = selection[0];
-          this.formGroup.controls[this.fieldId].setValue({ id: this.selected[0].item.id });
+          this.formGroup.controls[this.fieldId].setValue({ id: this.selected.item.id });
           this.formGroup.controls[this.fieldId].markAsDirty();
         }
       } else if (!this.allowMultiSelect) {
