@@ -5,7 +5,6 @@
   "modelName": "Task",
   "icon": "fa fa-tasks",
   "color": "#008000",
-  "localTypes": {},
   "viewProperties": {
     "taskState": {
       "inputType": {
@@ -20,7 +19,8 @@
       },
       "required": false,
       "default": "Proposed",
-      "displayName": "taskState"
+      "displayName": "taskState",
+      "name": "taskState"
     },
     "assignedTo": {
       "inputType": {
@@ -29,7 +29,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "assignedTo"
+      "displayName": "assignedTo",
+      "name": "assignedTo"
     },
     "estimatedStart": {
       "inputType": {
@@ -38,7 +39,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "estimatedStart"
+      "displayName": "estimatedStart",
+      "name": "estimatedStart"
     },
     "estimatedCompletion": {
       "inputType": {
@@ -47,7 +49,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "estimatedCompletion"
+      "displayName": "estimatedCompletion",
+      "name": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
       "inputType": {
@@ -58,7 +61,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "estimatedHoursEffort"
+      "displayName": "estimatedHoursEffort",
+      "name": "estimatedHoursEffort"
     },
     "actualStart": {
       "inputType": {
@@ -67,7 +71,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "actualStart"
+      "displayName": "actualStart",
+      "name": "actualStart"
     },
     "actualCompletion": {
       "inputType": {
@@ -76,7 +81,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "actualCompletion"
+      "displayName": "actualCompletion",
+      "name": "actualCompletion"
     },
     "remainingHoursEffort": {
       "inputType": {
@@ -87,7 +93,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "remainingHoursEffort"
+      "displayName": "remainingHoursEffort",
+      "name": "remainingHoursEffort"
     },
     "actualHoursEffort": {
       "inputType": {
@@ -98,7 +105,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "actualHoursEffort"
+      "displayName": "actualHoursEffort",
+      "name": "actualHoursEffort"
     },
     "predecessors": {
       "inputType": {
@@ -111,9 +119,11 @@
       },
       "required": false,
       "default": null,
-      "displayName": "predecessors"
+      "displayName": "predecessors",
+      "name": "predecessors"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "dc8f7b20-5d7c-11ea-9d2a-81904e0f9ce1": {
       "id": "dc8f7b20-5d7c-11ea-9d2a-81904e0f9ce1",
@@ -408,7 +418,8 @@
   "defaultFormatKey": {
     "default": "dc8f7b20-5d7c-11ea-9d2a-81904e0f9ce1",
     "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
-    "card": "1b91cfb0-1798-11ea-a725-0b882dea506f"
+    "card": "1b91cfb0-1798-11ea-a725-0b882dea506f",
+    "board": "1b91cfb0-1798-11ea-a725-0b882dea506f"
   },
   "tableDefinitions": {},
   "itemIds": []
