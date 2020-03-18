@@ -118,8 +118,7 @@ export class FormatObjectEditorComponent implements OnInit {
     });
     
     for (let attributeName in this._selectedType.classProperties) {
-      if ((this._object[attributeName] == null) || (this._object[attributeName]
-        === '')) {
+      if (this._object[attributeName] == null) {
         let defaultValue: any = this._selectedType.classProperties[
           attributeName].definition.default;
         if ((defaultValue != null) && (defaultValue !== '')) {
