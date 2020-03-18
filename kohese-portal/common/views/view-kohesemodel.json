@@ -7,8 +7,107 @@
   "color": "#000000",
   "localTypes": {},
   "viewProperties": {},
-  "formatDefinitions": {},
-  "defaultFormatKey": "",
+  "formatDefinitions": {
+    "ce7b13c0-6964-11ea-80c5-0b0cc7c6ec96": {
+      "name": "Default Format Definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": "name",
+            "customLabel": "Name",
+            "labelOrientation": "Top",
+            "kind": "text",
+            "visible": true,
+            "editable": true
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "id",
+              "customLabel": "ID",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "description",
+              "customLabel": "Description",
+              "labelOrientation": "Top",
+              "kind": "markdown",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "tags",
+              "customLabel": "Tags",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "parentId",
+              "customLabel": "Parent",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "createdBy",
+              "customLabel": "Created By",
+              "labelOrientation": "Top",
+              "kind": "user-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "createdOn",
+              "customLabel": "Created On",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "modifiedBy",
+              "customLabel": "Modified By",
+              "labelOrientation": "Top",
+              "kind": "user-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "modifiedOn",
+              "customLabel": "Modified On",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "children",
+              "customLabel": "Children",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "visible": true,
+              "editable": false
+            }
+          ]
+        }
+      ],
+      "id": "ce7b13c0-6964-11ea-80c5-0b0cc7c6ec96"
+    }
+  },
+  "defaultFormatKey": {
+    "default": "ce7b13c0-6964-11ea-80c5-0b0cc7c6ec96"
+  },
   "tableDefinitions": {},
   "itemIds": []
 }
