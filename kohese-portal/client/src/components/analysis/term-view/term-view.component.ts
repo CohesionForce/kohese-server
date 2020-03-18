@@ -8,6 +8,8 @@ import { ItemProxy } from '../../../../../common/src/item-proxy'
 import { BehaviorSubject ,  Subscription ,  Observable } from 'rxjs';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
 import * as $ from 'jquery';
 import { FormControl } from '@angular/forms';
@@ -49,11 +51,11 @@ export class TermViewComponent extends AnalysisViewComponent
    private filterSubjectSubscription: Subscription;
    private proxyStreamSubscription : Subscription;
 
-   constructor(NavigationService: NavigationService,
-              AnalysisService: AnalysisService,
-              private dataProcessingService: DataProcessingService,
-              private changeRef : ChangeDetectorRef) {
-     super(NavigationService, AnalysisService);
+   constructor(NavigationService: NavigationService, AnalysisService:
+     AnalysisService, private dataProcessingService: DataProcessingService,
+     private changeRef : ChangeDetectorRef, dialogService: DialogService,
+     itemRepository: ItemRepository) {
+     super(NavigationService, AnalysisService, dialogService, itemRepository);
    }
 
   ngOnInit(): void {
