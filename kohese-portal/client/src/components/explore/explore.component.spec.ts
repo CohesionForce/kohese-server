@@ -48,6 +48,6 @@ describe('Component: Explore', ()=>{
   });
   
   it('should display details-view', () => {
-    expect(exploreComponent.proxySelected).toBeTruthy();
+    expect(exploreComponent.itemProxy).toBeTruthy();
   });
 })

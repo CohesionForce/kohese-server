@@ -8,7 +8,7 @@ import { NavigatableComponent } from '../../../../classes/NavigationComponent.cl
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MatTableDataSource } from '@angular/material';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { DetailsDialogComponent } from '../../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from '../../../details/details.component';
 import { StateInfo, StateFilterService } from '../../state-filter.service';
 
 @Component({
@@ -135,7 +135,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   }
 
   openProxyDetails(proxy: ItemProxy) {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+    this.dialogService.openComponentDialog(DetailsComponent, {
       data: {
         itemProxy: proxy
       }

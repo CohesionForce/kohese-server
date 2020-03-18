@@ -20,7 +20,6 @@ import { ActionTableModule } from "../action-table/action-table.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
 import { UserInputModule } from '../user-input/user-input.module';
-import { DetailsDialogComponent } from "./details-dialog/details-dialog.component";
 import { TextEditorModule } from '../text-editor/text-editor.module';
 import { CompareItemsModule } from '../compare-items/compare-items.module';
 import { TreeViewModule } from '../tree/tree.module';
@@ -37,11 +36,10 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     ChildrenTableComponent,
     ProxySelectorTreeComponent,
     JournalComponent,
-    DetailsFormComponent,
-    DetailsDialogComponent
+    DetailsFormComponent
   ],
   entryComponents: [
-    DetailsDialogComponent
+    DetailsComponent
   ],
   imports : [
     CommonModule,
@@ -65,8 +63,7 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     HistoryTabComponent,
     ChildrenTabComponent,
     DetailsFormComponent,
-    ProxySelectorTreeComponent,
-    DetailsDialogComponent
+    ProxySelectorTreeComponent
   ]
 })
 export class DetailsModule {}

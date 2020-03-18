@@ -3,8 +3,8 @@ import {
 } from './../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import {
-  DetailsDialogComponent
-} from './../../../details/details-dialog/details-dialog.component';
+  DetailsComponent
+} from '../../../details/details.component';
 import {
   ItemProxy
 } from './../../../../../../common/src/item-proxy';
@@ -59,7 +59,7 @@ export class KdProxySelectorComponent implements OnInit {
 
 
   openDetails(proxy) {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+    this.dialogService.openComponentDialog(DetailsComponent, {
         data: {
           itemProxy: proxy
         }

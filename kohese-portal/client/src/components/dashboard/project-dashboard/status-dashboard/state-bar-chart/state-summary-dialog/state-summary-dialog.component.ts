@@ -4,7 +4,7 @@ import { Input, Inject, ViewChild } from '@angular/core';
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../../../../services/navigation/navigation.service';
 import { DialogService } from '../../../../../../services/dialog/dialog.service';
-import { DetailsDialogComponent } from '../../../../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from '../../../../../details/details.component';
 import { FormatDefinition,
   FormatDefinitionType } from '../../../../../type-editor/FormatDefinition.interface';
 import { ItemProxy } from './../../../../../../../../common/src/item-proxy';
@@ -98,7 +98,7 @@ export class StateSummaryDialogComponent implements OnInit {
   }
   
   public displayInformation(itemProxy: ItemProxy): void {
-    this._dialogService.openComponentDialog(DetailsDialogComponent, {
+    this._dialogService.openComponentDialog(DetailsComponent, {
       data: {
         itemProxy: itemProxy
       }

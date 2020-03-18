@@ -1,4 +1,4 @@
-import { DetailsDialogComponent } from './../../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from './../../../details/details.component';
 import { DialogService } from './../../../../services/dialog/dialog.service';
 import { ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
@@ -117,7 +117,7 @@ export class ProxyTableComponent implements OnInit {
     }
 
     openProxyDetails(proxy: ItemProxy) {
-        this.dialogService.openComponentDialog(DetailsDialogComponent, {
+        this.dialogService.openComponentDialog(DetailsComponent, {
           data : {
             itemProxy : proxy
           }
