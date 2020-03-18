@@ -81,13 +81,15 @@ export class KoheseModel extends ItemProxy {
     };
 
     if (model && model.item && model.item.requiredProperties) {
-      model.item.requiredProperties.forEach((property) => {
-        if (!itemContent.hasOwnProperty(property) ||
-            itemContent[property] === null) {
-          validationResult.valid = false;
-          validationResult.missingProperties.push(property);
+      for(let property of Object.keys(model.item.classProperties)) {
+        let definition = model.item.classProperties[property].definition;
+        if (definition.required) {
+          if (!itemContent.hasOwnProperty(property) || itemContent[property] === null) {
+            validationResult.valid = false;
+            validationResult.missingProperties.push(property);
+          }
         }
-      });
+      }
     }
 
     return validationResult;
