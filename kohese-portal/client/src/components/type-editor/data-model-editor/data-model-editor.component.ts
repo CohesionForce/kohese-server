@@ -420,7 +420,7 @@ export class DataModelEditorComponent {
           propertyName: attributeObject.attributeName,
           customLabel: attributeObject.attributeName,
           labelOrientation: 'Top',
-          kind: attributeObject.view.inputOptions.type,
+          kind: attributeObject.view.inputType.type,
           visible: true,
           editable: true
         });

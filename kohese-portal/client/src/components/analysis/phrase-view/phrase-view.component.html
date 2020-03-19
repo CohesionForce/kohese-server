@@ -1,16 +1,35 @@
 <div class="panel">
-  <div class="panel-heading">Phrase View - (<span *ngIf="displayedCount < filteredCount" style="font-weight:normal;">{{displayedCount}}/</span>{{filteredCount}}) Phrases
-    <div class="pull-right">
-      <button mat-icon-button>
-        <mat-icon class="fa fa-link" style="vertical-align: top;"
-                  (click)="toggleLink()"
-                  [ngClass]="{'syncOn' : syncFilter, 'syncOff' : !syncFilter}"></mat-icon>
-      </button>
-      <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
-          <mat-icon class="fa fa-gear" style="vertical-align: top;"></mat-icon>
-      </button>
-
-    </div>
+  <div class="panel-heading" style="height: 50px; display: flex;
+    flex-direction: row; align-items: center;">
+    Phrase View - (
+    <span *ngIf="displayedCount < filteredCount" style="font-weight:normal;">
+      {{displayedCount}}/
+    </span>
+    {{filteredCount}}) Phrases
+    <button mat-icon-button style="margin-left: auto;">
+      <mat-icon class="fa fa-link" (click)="toggleLink()"
+        [ngClass]="{'syncOn' : syncFilter, 'syncOff' : !syncFilter}">
+      </mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Copy table content to clipboard"
+      (click)="copy(phrases, showPOS)">
+      <mat-icon class="fa fa-copy"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Export table content to a file"
+      [matMenuTriggerFor]="exportMenu">
+      <mat-icon class="fa fa-file-o"></mat-icon>
+    </button>
+    <mat-menu #exportMenu="matMenu" [overlapTrigger]="false">
+      <ng-container *ngFor="let format of Object.keys(DataFormat)">
+        <button mat-menu-item (click)="export(phrases, showPOS, itemProxy.item.
+          name, DataFormat[format])">
+          {{DataFormat[format]}}
+        </button>
+      </ng-container>
+    </mat-menu>
+    <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
+      <mat-icon class="fa fa-gear"></mat-icon>
+    </button>
     <mat-menu #optionsMenu="matMenu" [overlapTrigger]="false">
       <button mat-menu-item (click)="showPOS = !showPOS">
         <mat-icon *ngIf="showPOS" class="fa fa-check"></mat-icon>

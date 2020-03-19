@@ -13,6 +13,7 @@ import { VersionControlService } from '../version-control/version-control.servic
 import { FormatDefinition } from '../../components/type-editor/FormatDefinition.interface';
 import { FormatContainer } from '../../components/type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../components/type-editor/PropertyDefinition.interface';
+import { TableDefinition } from '../../components/type-editor/TableDefinition.interface';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
@@ -801,25 +802,53 @@ export class ItemRepository {
         representation += '\n\n<table>';
         let headerRow: string = '<tr>';
         let bodyRow: string = '<tr>';
-        
         for (let k: number = 0; k < formatContainer.contents.length; k++) {
           let propertyDefinition: PropertyDefinition = formatContainer.
             contents[k];
-          let value: any = koheseObject[propertyDefinition.propertyName];
-          if (value) {
-            if (propertyDefinition.labelOrientation === 'Top') {
-              headerRow += ('<th>' + propertyDefinition.customLabel +
-                '</th>');
+          if (propertyDefinition.labelOrientation === 'Top') {
+            headerRow += ('<th>' + propertyDefinition.customLabel +
+              '</th>');
+          }
+          
+          if (propertyDefinition.visible) {
+            bodyRow += '<td>';
+            if (propertyDefinition.labelOrientation === 'Left') {
+              bodyRow += ('**' + propertyDefinition.customLabel + ':** ');
             }
             
-            if (propertyDefinition.visible) {
-              bodyRow += '<td>';
-              if (propertyDefinition.labelOrientation === 'Left') {
-                bodyRow += ('**' + propertyDefinition.customLabel + ':** ');
-              }
-              
-              if ((propertyDefinition.kind === '') || (propertyDefinition.kind
-                === 'proxy-selector')) {
+            let value: any = koheseObject[propertyDefinition.propertyName];
+            if ((propertyDefinition.kind === '') || (propertyDefinition.kind
+              === 'proxy-selector')) {
+              if (propertyDefinition.tableDefinition) {
+                bodyRow += '<table><tr>';
+                let tableDefinition: TableDefinition = TreeConfiguration.
+                  getWorkingTree().getProxyFor('view-' + dataModel.
+                  classProperties[propertyDefinition.propertyName].definition.
+                  type[0].toLowerCase()).item.tableDefinitions[
+                  propertyDefinition.tableDefinition];
+                for (let l: number = 0; l < tableDefinition.columns.length;
+                  l++) {
+                  bodyRow += ('<th>' + tableDefinition.columns[l] + '</th>');
+                }
+                
+                bodyRow += '</tr>';
+                
+                for (let l: number = 0; l < value.length; l++) {
+                  let reference: any = TreeConfiguration.getWorkingTree().
+                    getProxyFor(value[l].id).item;
+                  bodyRow += '<tr>';
+                  
+                  for (let m: number = 0; m < tableDefinition.columns.length;
+                    m++) {
+                    bodyRow += '<td>' + String(reference[tableDefinition.
+                      columns[m]]) + '</td>';
+                  }
+                  
+                  bodyRow += '</tr>';
+                }
+                
+                bodyRow += '</table>';
+              } else {
                 if (propertyDefinition.formatDefinition) {
                   // Local type attribute
                   let dataModelType: any = dataModel.properties[
@@ -845,35 +874,65 @@ export class ItemRepository {
                       id).item.name;
                   }
                 }
-              } else {
-                bodyRow += value;
               }
-              
-              bodyRow += '\n\n</td>';
+            } else {
+              bodyRow += value;
             }
+            
+            bodyRow += '\n\n</td>';
           }
         }
           
         representation += (headerRow + '</tr>' + bodyRow + '</tr>');
         
         representation += '\n</table>\n\n';
-      } else {
+      } else if (formatContainer.kind === 'list') {
         for (let k: number = 0; k < formatContainer.contents.length; k++) {
           let propertyDefinition: PropertyDefinition = formatContainer.
             contents[k];
           let value: any = koheseObject[propertyDefinition.propertyName];
-          if (value) {
-            if (propertyDefinition.visible) {
-              if (propertyDefinition.labelOrientation === 'Top') {
-                representation += ('**' + propertyDefinition.customLabel +
-                  '**\n\n');
+          if (propertyDefinition.visible) {
+            if (propertyDefinition.labelOrientation === 'Top') {
+              representation += ('**' + propertyDefinition.customLabel +
+                '**\n\n');
+            } else {
+              representation += ('**' + propertyDefinition.customLabel +
+                ':** ');
+            }
+            
+            if ((propertyDefinition.kind === '') || (propertyDefinition.kind
+              === 'proxy-selector')) {
+              if (propertyDefinition.tableDefinition) {
+                representation += '\n\n<table><tr>';
+                let tableDefinition: TableDefinition = TreeConfiguration.
+                  getWorkingTree().getProxyFor('view-' + dataModel.
+                  classProperties[propertyDefinition.propertyName].definition.
+                  type[0].toLowerCase()).item.tableDefinitions[
+                  propertyDefinition.tableDefinition];
+                for (let l: number = 0; l < tableDefinition.columns.length;
+                  l++) {
+                  representation += ('<th>' + tableDefinition.columns[l] +
+                    '</th>');
+                }
+                
+                representation += '</tr>';
+                
+                for (let l: number = 0; l < value.length; l++) {
+                  let reference: any = TreeConfiguration.getWorkingTree().
+                    getProxyFor(value[l].id).item;
+                  representation += '<tr>';
+                  
+                  for (let m: number = 0; m < tableDefinition.columns.length;
+                    m++) {
+                    representation += '<td>' + String(reference[
+                      tableDefinition.columns[m]]) + '</td>';
+                  }
+                  
+                  representation += '</tr>';
+                }
+                
+                representation += '</table>\n\n';
               } else {
-                representation += ('**' + propertyDefinition.customLabel +
-                  ':** ');
-              }
-              
-              if ((propertyDefinition.kind === '') || (propertyDefinition.kind
-                === 'proxy-selector')) {
                 if (propertyDefinition.formatDefinition) {
                   // Local type attribute
                   let dataModelType: any = dataModel.properties[
@@ -918,14 +977,43 @@ export class ItemRepository {
                     }
                   }
                 }
-              } else {
-                representation += value;
               }
-              
-              representation += '\n\n';
+            } else {
+              representation += value;
+            }
+            
+            representation += '\n\n';
+          }
+        }
+      } else {
+        // Reverse reference table
+        representation += '### Reverse References For ' + formatContainer.
+          contents.map((propertyDefinition: PropertyDefinition) => {
+          return propertyDefinition.propertyName.kind + '\'s ' +
+            propertyDefinition.propertyName.attribute;
+        }).join(', ');
+        
+        representation += '\n\n<table><tr><th>Name</th></tr>';
+        
+        let reverseReferencesObject: any = TreeConfiguration.getWorkingTree().
+          getProxyFor(koheseObject.id).relations.referencedBy;
+        for (let j: number = 0; j < formatContainer.contents.length; j++) {
+          let propertyDefinition: PropertyDefinition = formatContainer.
+            contents[j];
+          if (reverseReferencesObject[propertyDefinition.propertyName.kind]) {
+            let reverseReferences: Array<any> = reverseReferencesObject[
+              propertyDefinition.propertyName.kind][propertyDefinition.
+              propertyName.attribute].map((itemProxy: ItemProxy) => {
+              return itemProxy.item;
+            });
+            for (let k: number = 0; k < reverseReferences.length; k++) {
+              representation += ('<tr><td>' + reverseReferences[k].name +
+                '</td></tr>');
             }
           }
         }
+        
+        representation += '</table>\n\n';
       }
     }
     
