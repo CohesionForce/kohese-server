@@ -351,7 +351,7 @@ export class FormatObjectEditorComponent implements OnInit {
             }
             
             return true;
-          } else {
+          /*} else {
             while (true) {
               if (elementTypeName === typeName) {
                 return true;
@@ -364,7 +364,7 @@ export class FormatObjectEditorComponent implements OnInit {
               } else {
                 break;
               }
-            }
+            }*/
           }
           
           return false;
@@ -503,7 +503,7 @@ export class FormatObjectEditorComponent implements OnInit {
               getText: (element: any) => {
                 return (element as ItemProxy).item.name;
               },
-              maySelect: (element: any) => {
+              /*maySelect: (element: any) => {
                 let typeName: string = this._selectedType.classProperties[
                   attributeName].definition.type[0];
                 let elementTypeName: string = (element as ItemProxy).kind;
@@ -526,7 +526,7 @@ export class FormatObjectEditorComponent implements OnInit {
                 }
                 
                 return false;
-              },
+              },*/
               allowMultiselect: true,
               showSelections: true,
               selection: (this._object[attributeName] ? this._object[
