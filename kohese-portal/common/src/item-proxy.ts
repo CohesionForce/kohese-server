@@ -1252,6 +1252,20 @@ export class ItemProxy {
     }
 //    console.log('::: IP: Adding child ' + childProxy.item.name + ' to ' + this.item.name);
 
+    if (this.hasAncestor(childProxy)) {
+      let oldParentId;
+      if (childProxy.parentProxy){
+        oldParentId = childProxy.parentProxy.item.id;
+      }
+
+      throw ({
+        error: 'Parent-Can-Not-Be-Descendant',
+        childId: childProxy.item.id,
+        oldParentId: oldParentId,
+        newParentId: this.item.id
+      });
+    }
+
     // Determine if this node is already attached to another parent
     if (childProxy.parentProxy) {
       childProxy.parentProxy.removeChild(childProxy);
