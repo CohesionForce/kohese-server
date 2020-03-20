@@ -65,7 +65,6 @@
         "Item"
       ],
       "required": false,
-      "default": "",
       "id": false,
       "relation": {
         "kind": "Item",
