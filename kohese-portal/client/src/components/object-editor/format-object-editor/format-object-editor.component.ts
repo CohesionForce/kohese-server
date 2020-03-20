@@ -63,15 +63,19 @@ export class FormatObjectEditorComponent implements OnInit {
       TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
         { includeOrigin: false }, (itemProxy: ItemProxy) => {
         if (itemProxy.kind === 'KoheseModel') {
-          let modelItemProxy: any = itemProxy;
-          while (modelItemProxy) {
-            if (modelItemProxy.item === this._type) {
-              this._types.push(itemProxy.item);
-              break;
+          if (this._allowKindNarrowingOnly) {
+            let modelItemProxy: any = itemProxy;
+            while (modelItemProxy) {
+              if (modelItemProxy.item === this._type) {
+                this._types.push(itemProxy.item);
+                break;
+              }
+              
+              modelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
+                modelItemProxy.item.base);
             }
-            
-            modelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-              modelItemProxy.item.base);
+          } else {
+            this._types.push(itemProxy.item);
           }
         }
       }, undefined);
@@ -121,9 +125,9 @@ export class FormatObjectEditorComponent implements OnInit {
       if (this._object[attributeName] == null) {
         let defaultValue: any = this._selectedType.classProperties[
           attributeName].definition.default;
-        if ((defaultValue != null) && (defaultValue !== '')) {
+        if (defaultValue != null) {
           this._object[attributeName] = defaultValue;
-        } else if (this._object[attributeName] == null) {
+        } else {
           if (Array.isArray(this._selectedType.classProperties[attributeName].
             definition.type)) {
             this._object[attributeName] = [];
@@ -151,6 +155,15 @@ export class FormatObjectEditorComponent implements OnInit {
   @Input('allowKindChange')
   set allowKindChange(allowKindChange: boolean) {
     this._allowKindChange = allowKindChange;
+  }
+  
+  private _allowKindNarrowingOnly: boolean = true;
+  get allowKindNarrowingOnly() {
+    return this._allowKindNarrowingOnly;
+  }
+  @Input('allowKindNarrowingOnly')
+  set allowKindNarrowingOnly(allowKindNarrowingOnly: boolean) {
+    this._allowKindNarrowingOnly = allowKindNarrowingOnly;
   }
   
   private _viewModel: any;
@@ -203,6 +216,9 @@ export class FormatObjectEditorComponent implements OnInit {
       this._formatDefinitionType = this._data['formatDefinitionType'];
       this._isDisabled = this._data['disabled'];
       this._allowKindChange = this._data['allowKindChange'];
+      if (this._data['allowKindNarrowingOnly']) {
+        this._allowKindNarrowingOnly = this._data['allowKindNarrowingOnly'];
+      }
     }
     
     if (!this._object) {

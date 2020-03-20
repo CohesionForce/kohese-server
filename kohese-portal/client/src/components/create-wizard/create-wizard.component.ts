@@ -6,7 +6,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
-
+import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
@@ -39,6 +39,10 @@ export class CreateWizardComponent extends NavigatableComponent
   }
   createFormGroup: FormGroup;
   private nonFormFieldValueMap: any = {};
+  
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
+  }
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
     protected NavigationService: NavigationService,

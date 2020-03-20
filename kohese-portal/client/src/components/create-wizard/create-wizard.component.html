@@ -3,11 +3,11 @@
     <div class="step-container">
       <mat-card>
         <mat-card-content>
-          <details-form #editor
-            [proxyStream]="proxyPlaceholderStream"
-            (formGroupUpdated)="onFormGroupUpdated($event)"
-            (nonFormFieldChanged)="whenNonFormFieldChanges($event)">
-          </details-form>
+          <format-object-editor [type]="(proxyPlaceholderStream | async).model.
+            item" [object]="(proxyPlaceholderStream | async).item"
+            [formatDefinitionType]="FormatDefinitionType.DEFAULT"
+            [allowKindChange]="true">
+          </format-object-editor>
         </mat-card-content>
         <mat-card-actions style="display: flex; flex-direction: row;">
           <button mat-button matStepperNext style="margin-left: auto;">

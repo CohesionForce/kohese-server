@@ -1,11 +1,11 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   OnDestroy, Input, Optional, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { FormGroup } from '@angular/forms';
 import { Subscription,  BehaviorSubject } from 'rxjs';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
@@ -30,9 +30,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this.proxyStream.next(this._itemProxy);
   }
   
-  /* Data */
-  private _detailsFormGroup: FormGroup;
-  nonFormFieldValueMap: any = {};
   treeConfig: TreeConfiguration;
 
   /* Observables */
@@ -46,6 +43,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
   
   get matDialogRef() {
     return this._matDialogRef;
+  }
+  
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
   }
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
@@ -91,28 +92,11 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
   
   public upsertItem(): void {
-    let item: any = this._detailsFormGroup.value;
-    for (let field in item) {
-      this._itemProxy.item[field] = item[field];
-    }
-    for (let fieldName in this.nonFormFieldValueMap) {
-      this._itemProxy.item[fieldName] = this.nonFormFieldValueMap[fieldName];
-    }
-    
     this._itemRepository.upsertItem(this._itemProxy.kind, this._itemProxy.
       item).then((updatedItemProxy: ItemProxy) => {
       this.editableStream.next(false);
       this._changeDetectorRef.markForCheck();
     });
-  }
-
-  public onFormGroupUpdated(newFormGroup: any) {
-    this._detailsFormGroup = newFormGroup;
-  }
-
-  public onNonFormFieldChanged(updatedField: any): void {
-    this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.
-      fieldValue;
   }
 
   public cancelEditing(): void {

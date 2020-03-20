@@ -42,11 +42,12 @@
       </mat-tab>
       <mat-tab label="{{(itemProxy.dirty ? 'Details*' : 'Details')}}">
         <ng-template matTabContent>
-          <details-form #editor [proxyStream]="proxyStream"
-            [editableStream]="editableStream"
-            (formGroupUpdated)="onFormGroupUpdated($event)"
-            (nonFormFieldChanged)="onNonFormFieldChanged($event)">
-          </details-form>
+          <format-object-editor [type]="(proxyStream | async).model.item"
+            [object]="(proxyStream | async).item"
+            [formatDefinitionType]="FormatDefinitionType.DEFAULT"
+            [allowKindChange]="true" [allowKindNarrowingOnly]="false"
+            [disabled]="!(editableStream | async)">
+          </format-object-editor>
         </ng-template>
       </mat-tab>
       <mat-tab label="References">

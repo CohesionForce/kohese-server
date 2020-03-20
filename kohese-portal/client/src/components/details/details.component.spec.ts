@@ -39,31 +39,11 @@ describe('Component: Details', ()=>{
     detailsComponent = detailsFixture.componentInstance;
     detailsComponent.itemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid3');
-    detailsComponent.onFormGroupUpdated({
-      value: {}
-    });
 
     detailsFixture.detectChanges();
-    
-  })
-
-  it('instantiates the details component', ()=>{
-    expect(detailsComponent).toBeTruthy(); 
-  })
-  
-  it('changes non-form fields on the input ItemProxy when changes are saved',
-    () => {
-    let fieldName: string = 'modifiedOn';
-    let fieldValue: any = new Date().getTime();
-    detailsComponent.onNonFormFieldChanged({
-      fieldName: fieldName,
-      fieldValue: fieldValue
-    });
-    detailsComponent.itemProxy = TestBed.get(ItemRepository).getProxyFor(
-      'test-uuid7');
-    spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.
-      resolve());
-    detailsComponent.upsertItem();
-    expect(detailsComponent.itemProxy.item[fieldName]).toEqual(fieldValue);
   });
-})
+
+  it('instantiates the details component', () => {
+    expect(detailsComponent).toBeTruthy(); 
+  });
+});
