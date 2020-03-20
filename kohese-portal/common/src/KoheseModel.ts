@@ -77,9 +77,12 @@ export class KoheseModel extends ItemProxy {
 
     var validationResult = {
       valid: true,
+      kind: model.item.id,
+      itemId: itemContent.id,
       missingProperties: [],
       malformedArray: [],
-      malformedNumber: []
+      malformedNumber: [],
+      invalidData: {}
     };
 
     if (model && model.item && model.item.requiredProperties) {
@@ -99,13 +102,15 @@ export class KoheseModel extends ItemProxy {
           // Detect if an array property is malformed
           if (Array.isArray(definition.type) && !Array.isArray(itemContent[property])) {
             validationResult.valid = false;
-            validationResult.malformedArray.push(property);  
+            validationResult.malformedArray.push(property);
+            validationResult.invalidData[property] = itemContent[property];
           }
 
           // Detect if number is malformed
           if (definition.type === 'number' && (typeof itemContent[property] !== 'number')) {
             validationResult.valid = false;
             validationResult.malformedNumber.push(property);  
+            validationResult.invalidData[property] = itemContent[property];
           }
         }
       }
@@ -122,6 +127,10 @@ export class KoheseModel extends ItemProxy {
 
     if (!validationResult.malformedNumber.length){
       delete validationResult.malformedNumber;
+    }
+
+    if (!Object.keys(validationResult.invalidData).length){
+      delete validationResult.invalidData;
     }
 
     return validationResult;
