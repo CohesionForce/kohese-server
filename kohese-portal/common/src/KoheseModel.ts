@@ -77,17 +77,51 @@ export class KoheseModel extends ItemProxy {
 
     var validationResult = {
       valid: true,
-      missingProperties: []
+      missingProperties: [],
+      malformedArray: [],
+      malformedNumber: []
     };
 
     if (model && model.item && model.item.requiredProperties) {
-      model.item.requiredProperties.forEach((property) => {
-        if (!itemContent.hasOwnProperty(property) ||
-            itemContent[property] === null) {
-          validationResult.valid = false;
-          validationResult.missingProperties.push(property);
+      for(let property of Object.keys(model.item.classProperties)) {
+        let definition = model.item.classProperties[property].definition;
+
+        // Detect missing properties
+        if (definition.required) {
+          if (!itemContent.hasOwnProperty(property) || itemContent[property] === null) {
+            validationResult.valid = false;
+            validationResult.missingProperties.push(property);
+          }
         }
-      });
+
+        if (itemContent.hasOwnProperty(property) && itemContent[property] !== null) {
+
+          // Detect if an array property is malformed
+          if (Array.isArray(definition.type) && !Array.isArray(itemContent[property])) {
+            validationResult.valid = false;
+            validationResult.malformedArray.push(property);  
+          }
+
+          // Detect if number is malformed
+          if (definition.type === 'number' && (typeof itemContent[property] !== 'number')) {
+            validationResult.valid = false;
+            validationResult.malformedNumber.push(property);  
+          }
+        }
+      }
+    }
+
+    // Remove empty error categories
+    if (!validationResult.missingProperties.length){
+      delete validationResult.missingProperties;
+    }
+
+    if (!validationResult.malformedArray.length){
+      delete validationResult.malformedArray;
+    }
+
+    if (!validationResult.malformedNumber.length){
+      delete validationResult.malformedNumber;
     }
 
     return validationResult;
