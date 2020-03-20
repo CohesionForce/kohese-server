@@ -241,7 +241,8 @@ export function MockDataModel () {
     }
   },
   "acls": [],
-  "methods": []
+  "methods": [],
+  "localTypes": {}
   }
 }
 
@@ -261,6 +262,7 @@ export function ItemSubclass() {
     "validations": [],
     "relations": {},
     "acls": [],
-    "methods": []
+    "methods": [],
+    "localTypes": {}
   };
 };
