@@ -87,15 +87,21 @@ export class JournalComponent {
   }
   
   public addEntry(): void {
+    let username: string = this._sessionService.user.name;
+    let timestamp: number = Date.now();
     this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
       data: {
         type: TreeConfiguration.getWorkingTree().getProxyFor('Observation').
           item,
         object: {
+          createdOn: timestamp,
+          createdBy: username,
+          modifiedOn: timestamp,
+          modifiedBy: username,
           parentId: this._itemProxy.item.id,
           context: [{ id: this._itemProxy.item.id }],
-          observedBy: this._sessionService.user.name,
-          observedOn: new Date().getTime()
+          observedBy: username,
+          observedOn: timestamp
         },
         formatDefinitionType: FormatDefinitionType.DEFAULT,
         allowKindChange: true

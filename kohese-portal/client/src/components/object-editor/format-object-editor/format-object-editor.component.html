@@ -113,12 +113,17 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'date'">
                   <mat-form-field style="width: 100%;">
-                    <input matInput type="date"
+                    <input matInput [matDatepicker]="matDatepicker"
                       placeholder="{{getAttributeRepresentation(
-                      attributeDefinition)}}" [(ngModel)]="object[
-                      attributeDefinition.propertyName]"
+                      attributeDefinition)}}" [ngModel]="getDateString(object[
+                      attributeDefinition.propertyName])"
+                      (ngModelChange)="object[attributeDefinition.propertyName]
+                      = $event.getTime()"
                       [disabled]="(!attributeDefinition.editable ||
                       isDisabled)"/>
+                    <mat-datepicker-toggle matSuffix [for]="matDatepicker">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #matDatepicker></mat-datepicker>
                   </mat-form-field>
                 </ng-container>
                 <ng-container *ngSwitchCase="'string'">

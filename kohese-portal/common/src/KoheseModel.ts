@@ -82,6 +82,7 @@ export class KoheseModel extends ItemProxy {
       missingProperties: [],
       malformedArray: [],
       malformedNumber: [],
+      malformedTimestamp: [],
       invalidData: {}
     };
 
@@ -112,6 +113,22 @@ export class KoheseModel extends ItemProxy {
             validationResult.malformedNumber.push(property);  
             validationResult.invalidData[property] = itemContent[property];
           }
+
+          // Detect if timestamp is malformed
+          if (definition.type === 'timestamp'){
+            if (typeof itemContent[property] !== 'number') {
+              validationResult.valid = false;
+              validationResult.malformedTimestamp.push(property);  
+              validationResult.invalidData[property] = itemContent[property];
+            } else {
+              if (itemContent[property] < 50000000){
+                // Detect timestamps that were entered in YYMMDD format
+                validationResult.valid = false;
+                validationResult.malformedTimestamp.push(property);  
+                validationResult.invalidData[property] = itemContent[property];  
+              }
+            }
+          }
         }
       }
     }
@@ -127,6 +144,10 @@ export class KoheseModel extends ItemProxy {
 
     if (!validationResult.malformedNumber.length){
       delete validationResult.malformedNumber;
+    }
+
+    if (!validationResult.malformedTimestamp.length){
+      delete validationResult.malformedTimestamp;
     }
 
     if (!Object.keys(validationResult.invalidData).length){

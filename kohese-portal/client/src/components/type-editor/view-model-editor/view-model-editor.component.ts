@@ -136,8 +136,7 @@ export class ViewModelEditorComponent {
       'Boolean': 'boolean'
     },
     'number': {
-      'Number': 'number',
-      'Date': 'date'
+      'Number': 'number'
     },
     'string': {
       'Text': 'text',
@@ -145,6 +144,9 @@ export class ViewModelEditorComponent {
     },
     'StateMachine': {
       'State': 'state-editor'
+    },
+    'timestamp': {
+      'Date': 'date'
     },
     'user-selector': {
       'Username': 'user-selector'
@@ -345,6 +347,9 @@ export class ViewModelEditorComponent {
             break;
           case 'StateMachine':
             propertyDefinition.kind = 'state-editor';
+            break;
+          case 'timestamp':
+            propertyDefinition.kind = 'date';
             break;
           case 'user-selector':
             propertyDefinition.kind = 'user-selector';

@@ -303,7 +303,7 @@ export class ItemProxy {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    function convertDate(property) {
+    function convertTimestamp(property) {
       if (forItem[property] === '') {
         delete forItem[property];
       } else {
@@ -353,24 +353,30 @@ export class ItemProxy {
 
       // Adjust malformed numbers
       if (validation.malformedNumber) {
-
-        if (validation.kind == 'Observation' || validation.kind === 'Issue'){
-          convertDate('observedOn');
-        }
-
         if (validation.kind == 'Action' || validation.kind === 'Task'){
-          convertDate('approvedOn');
-          convertDate('estimatedStart');
-          convertDate('estimatedCompletion');
-          convertDate('actualStart');
-          convertDate('actualCompletion');
-
           convertNumber('estimatedHoursEffort');
           convertNumber('remainingHoursEffort');
           convertNumber('actualHoursEffort');
         }
       }
+
+      // Adjust malformed timestamps
+      if (validation.malformedTimestamp) {
+        if (validation.kind == 'Observation' || validation.kind === 'Issue'){
+          convertTimestamp('observedOn');
+        }
+
+        if (validation.kind == 'Action' || validation.kind === 'Task'){
+          convertTimestamp('approvedOn');
+          convertTimestamp('estimatedStart');
+          convertTimestamp('estimatedCompletion');
+          convertTimestamp('actualStart');
+          convertTimestamp('actualCompletion');
+        }
+      }
+      
     }
+
   }
 
   //////////////////////////////////////////////////////////////////////////

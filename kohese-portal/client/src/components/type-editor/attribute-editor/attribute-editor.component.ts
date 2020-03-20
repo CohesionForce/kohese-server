@@ -109,6 +109,7 @@ export class AttributeEditorComponent implements OnInit {
     'Number': 'number',
     'Text': 'string',
     'State': 'StateMachine',
+    'Timestamp': 'timestamp',
     'Username': 'user-selector'
   };
   get fundamentalTypes() {
@@ -120,8 +121,7 @@ export class AttributeEditorComponent implements OnInit {
       'Boolean': 'boolean'
     },
     'number': {
-      'Number': 'number',
-      'Date': 'date'
+      'Number': 'number'
     },
     'string': {
       'Text': 'text',
@@ -129,6 +129,9 @@ export class AttributeEditorComponent implements OnInit {
     },
     'StateMachine': {
       'State': 'state-editor'
+    },
+    'timestamp': {
+      'Date': 'date'
     },
     'user-selector': {
       'Username': 'user-selector'
@@ -211,6 +214,8 @@ export class AttributeEditorComponent implements OnInit {
       
       if (attributeType === 'string') {
         this._view.inputType.type = 'text';
+      } else if (attributeType === 'timestamp') {
+        this._view.inputType.type = 'date';
       } else {
         this._view.inputType.type = attributeType;
       }

@@ -642,6 +642,10 @@ export class FormatObjectEditorComponent implements OnInit {
       definition.required ? '*' : ''));
   }
   
+  public getDateString(timestamp: number): string {
+    return new Date(timestamp).toISOString();
+  }
+  
   public getStateTransitionCandidates(attributeDefinition: PropertyDefinition):
     Array<string> {
     let stateTransitionCandidates: Array<string> = [];

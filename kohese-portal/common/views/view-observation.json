@@ -145,7 +145,7 @@
               "customLabel": "observedOn",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "number",
+              "kind": "date",
               "editable": true
             },
             {

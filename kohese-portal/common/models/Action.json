@@ -148,11 +148,11 @@
       "name": "associatedWorkflow"
     },
     "estimatedStart": {
-      "type": "number",
+      "type": "timestamp",
       "name": "estimatedStart"
     },
     "estimatedCompletion": {
-      "type": "number",
+      "type": "timestamp",
       "name": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
@@ -160,11 +160,11 @@
       "name": "estimatedHoursEffort"
     },
     "actualStart": {
-      "type": "number",
+      "type": "timestamp",
       "name": "actualStart"
     },
     "actualCompletion": {
-      "type": "number",
+      "type": "timestamp",
       "name": "actualCompletion"
     },
     "remainingHoursEffort": {

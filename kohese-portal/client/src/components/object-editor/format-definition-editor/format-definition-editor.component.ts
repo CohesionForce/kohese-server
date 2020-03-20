@@ -71,8 +71,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
       'Boolean': 'boolean'
     },
     'number': {
-      'Number': 'number',
-      'Date': 'date'
+      'Number': 'number'
     },
     'string': {
       'Text': 'text',
@@ -80,6 +79,9 @@ export class FormatDefinitionEditorComponent implements OnInit {
     },
     'StateMachine': {
       'State': 'state-editor'
+    },
+    'timestamp': {
+      'Date': 'date'
     },
     'user-selector': {
       'Username': 'user-selector'
@@ -181,6 +183,9 @@ export class FormatDefinitionEditorComponent implements OnInit {
       case 'StateMachine':
         userInterfaceType = 'state-editor';
         break;
+      case 'timestamp':
+        userInterfaceType = 'date';
+        break;
       case 'user-selector':
         userInterfaceType = 'user-selector';
         break;
@@ -267,6 +272,9 @@ export class FormatDefinitionEditorComponent implements OnInit {
           break;
         case 'StateMachine':
           userInterfaceType = 'state-editor';
+          break;
+        case 'timestamp':
+          userInterfaceType = 'date';
           break;
         case 'user-selector':
           userInterfaceType = 'user-selector';
