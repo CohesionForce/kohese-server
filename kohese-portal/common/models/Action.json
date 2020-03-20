@@ -115,9 +115,15 @@
             "source": "Verified",
             "target": "Closed",
             "guard": {}
+          },
+          "Revert To In Work": {
+            "source": "InVerification",
+            "target": "InWork",
+            "guard": {}
           }
         }
-      }
+      },
+      "name": "actionState"
     },
     "predecessors": {
       "type": [
@@ -126,38 +132,48 @@
       "relation": {
         "kind": "Item",
         "foreignKey": "id"
-      }
+      },
+      "name": "predecessors"
     },
     "assignedTo": {
       "type": "string",
       "relation": {
         "kind": "KoheseUser",
         "foreignKey": "username"
-      }
+      },
+      "name": "assignedTo"
     },
     "associatedWorkflow": {
-      "type": "string"
+      "type": "string",
+      "name": "associatedWorkflow"
     },
     "estimatedStart": {
-      "type": "number"
+      "type": "number",
+      "name": "estimatedStart"
     },
     "estimatedCompletion": {
-      "type": "number"
+      "type": "number",
+      "name": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
-      "type": "number"
+      "type": "number",
+      "name": "estimatedHoursEffort"
     },
     "actualStart": {
-      "type": "number"
+      "type": "number",
+      "name": "actualStart"
     },
     "actualCompletion": {
-      "type": "number"
+      "type": "number",
+      "name": "actualCompletion"
     },
     "remainingHoursEffort": {
-      "type": "number"
+      "type": "number",
+      "name": "remainingHoursEffort"
     },
     "actualHoursEffort": {
-      "type": "number"
+      "type": "number",
+      "name": "actualHoursEffort"
     }
   },
   "validations": [],
