@@ -5,7 +5,7 @@ import { FormGroup } from '@angular/forms';
 import { Subscription,  BehaviorSubject } from 'rxjs';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
@@ -123,7 +123,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     });
   }
   
-  public navigate(): void {
-    this._navigationService.addTab('Explore', { id: this._itemProxy.item.id });
+  public navigate(id: string): void {
+    this._navigationService.addTab('Explore', { id: id });
   }
 }

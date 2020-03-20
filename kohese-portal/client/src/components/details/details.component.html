@@ -5,6 +5,11 @@
       {{itemProxy.kind}} Information: {{itemProxy.item.name}}
     </span>
     <span class="pull-right item-actions">
+      <ng-container *ngIf="itemProxy.item.parentId">
+        <i class="fa fa-level-up" (click)="navigate(itemProxy.item.parentId)"
+          title="Go to Parent">
+        </i>
+      </ng-container>
       <ng-container *ngIf="editableStream.getValue() else notEditable">
         <span class="fa fa-stack">
           <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
@@ -23,6 +28,7 @@
           title="Edit">
         </i>
       </ng-template>
+      <i class="fa fa-lg fa-arrows-alt" title="Fullscreen"></i>
     </span>
   </div>
   <div style="height: calc(100% - 44px);">
@@ -128,7 +134,7 @@
   <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
     row;">
     <button mat-button matTooltip="Navigate to this Item" style="margin-left:
-      auto;" (click)="navigate()">
+      auto;" (click)="navigate(itemProxy.item.id)">
       Explore
     </button>
     <button mat-button matTooltip="Close this dialog box"
