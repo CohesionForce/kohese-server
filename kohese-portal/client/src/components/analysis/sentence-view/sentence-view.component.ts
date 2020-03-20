@@ -1,13 +1,18 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
+import * as Mark from 'mark.js';
 
-import { AnalysisViewComponent, AnalysisFilter, AnalysisViews } from '../AnalysisViewComponent.class';
+import { AnalysisViewComponent, AnalysisFilter, AnalysisViews,
+  DataFormat } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy'
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
+import { DialogService,
+  DialogComponent } from '../../../services/dialog/dialog.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
 import * as $ from 'jquery';
 
@@ -49,11 +54,11 @@ export class SentenceViewComponent extends AnalysisViewComponent
   private filterSubjectSubscription: Subscription;
   private proxyStreamSubscription : Subscription;
 
-  constructor(NavigationService: NavigationService,
-              AnalysisService: AnalysisService,
-              private dataProcessingService: DataProcessingService,
-              private changeRef : ChangeDetectorRef) {
-    super(NavigationService, AnalysisService);
+  constructor(NavigationService: NavigationService, AnalysisService:
+    AnalysisService, private dataProcessingService: DataProcessingService,
+    private changeRef : ChangeDetectorRef, dialogService: DialogService,
+    itemRepository: ItemRepository) {
+    super(NavigationService, AnalysisService, dialogService, itemRepository);
   }
 
   ngOnInit(): void {
@@ -147,5 +152,170 @@ export class SentenceViewComponent extends AnalysisViewComponent
     this.sentences = filteredList.slice(0, this.loadLimit);
     this.displayedCount = this.sentences.length;
 
+  }
+  
+  public sentenceCopy(): void {
+    let copyEventListener: (clipboardEvent: ClipboardEvent) => void =
+      (clipboardEvent: ClipboardEvent) => {
+      clipboardEvent.preventDefault();
+      
+      clipboardEvent.clipboardData.setData('text/html', this.
+        getSentenceTableContent(DataFormat.HTML));
+      clipboardEvent.clipboardData.setData('text/plain', this.
+        getSentenceTableContent(DataFormat.TXT));
+      
+      document.removeEventListener('copy', copyEventListener);
+    };
+    
+    document.addEventListener('copy', copyEventListener);
+    document.execCommand('copy');
+  }
+  
+  private getSentenceTableContent(dataFormat: DataFormat): string {
+    let content: string;
+    if (dataFormat === DataFormat.HTML) {
+      content = '<table><tr><th>Category</th><th>Type</th><th>Content</th>' +
+        '</tr>';
+      
+      for (let j: number = 0; j < this.sentences.length; j++) {
+        let type: string = this.sentences[j].displayType;
+        if (((type === 'Item') && this.showItemsInDetails) || ((type ===
+          'Sentence') && this.showSentencesInDetails) || ((this.sentences[j].
+          displayLevel === 3) && this.showPhrasesInDetails) || ((this.sentences[
+          j].displayLevel === 4) && this.showTokensInDetails)) {
+          content += ('<tr><td>' + this.getCategory(this.sentences[j]) +
+            '</td><td>' + type + '</td><td>' + this.sentences[j].text +
+            '</td></tr>');
+        }
+      }
+      
+      content += '</table>';
+    } else if (dataFormat === DataFormat.CSV) {
+      content = 'Category,Type,Content';
+      
+      for (let j: number = 0; j < this.sentences.length; j++) {
+        let type: string = this.sentences[j].displayType;
+        if (((type === 'Item') && this.showItemsInDetails) || ((type ===
+          'Sentence') && this.showSentencesInDetails) || ((this.sentences[j].
+          displayLevel === 3) && this.showPhrasesInDetails) || ((this.sentences[
+          j].displayLevel === 4) && this.showTokensInDetails)) {
+          content += (this.getCategory(this.sentences[j]) + ',' + type + ',\"'
+            + this.sentences[j].text.replace(/"/g, '\"\"') + '\"\n');
+        }
+      }
+    } else {
+      // Limit total width to 80 characters
+      content = 'Category   Type                              ' +
+        'Content\n\n';
+      
+      for (let j: number = 0; j < this.sentences.length; j++) {
+        let type: string = this.sentences[j].displayType;
+        if (((type === 'Item') && this.showItemsInDetails) || ((type ===
+          'Sentence') && this.showSentencesInDetails) || ((this.sentences[j].
+          displayLevel === 3) && this.showPhrasesInDetails) || ((this.
+          sentences[j].displayLevel === 4) && this.showTokensInDetails)) {
+          let sentence: any = this.sentences[j];
+          let category: string = this.getCategory(sentence);
+          for (let k: number = category.length; k < 8; k++) {
+            category += ' ';
+          }
+          
+          content += (category + '   ');
+          
+          let typeRemainder: string = type;
+          let contentRemainder: string = sentence.text;
+          for (let k: number = (contentRemainder.length - 1); k >= 0; k--) {
+            if ((contentRemainder.charAt(k) === '\n') && (k !==
+              contentRemainder.length)) {
+              contentRemainder = (contentRemainder.substring(0, k + 1) +
+                '                                             ' +
+                contentRemainder.substring(k + 1));
+            }
+          }
+          
+          let afterFirstLine: boolean = false;
+          while (typeRemainder || contentRemainder) {
+            if (afterFirstLine) {
+              content += '           ';
+            }
+            
+            if (typeRemainder.length < 31) {
+              for (let k: number = typeRemainder.length; k < 31; k++) {
+                typeRemainder += ' ';
+              }
+            }
+            
+            content += (typeRemainder.substring(0, 31) + '   ');
+            typeRemainder = typeRemainder.substring(31);
+            
+            if (contentRemainder.length < 34) {
+              for (let k: number = contentRemainder.length; k < 34; k++) {
+                contentRemainder += ' ';
+              }
+            }
+            
+            content += contentRemainder.substring(0, 34);
+            contentRemainder = contentRemainder.substring(34);
+            
+            content += '\n';
+            
+            afterFirstLine = true;
+          }
+          
+          content += '\n';
+        }
+      }
+    }
+    
+    return content;
+  }
+  
+  public sentenceExport(dataFormat: DataFormat): void {
+    this.dialogService.openInputDialog('Export', '', DialogComponent.
+      INPUT_TYPES.TEXT, 'Name', this.itemProxy.item.name + '_' + new Date().
+      toISOString() + '.' + dataFormat.toLowerCase(), (input: any) => {
+      return (input && (input.search(/[\/\\]/) === -1));
+    }).afterClosed().subscribe(async (name: any) => {
+      if (name) {
+        await this.itemRepository.produceReport(this.getSentenceTableContent(
+          dataFormat), name, 'text/markdown');
+        let downloadAnchor: any = document.createElement('a');
+        downloadAnchor.download = name;
+        downloadAnchor.href = '/producedReports/' + name;
+        downloadAnchor.click();
+      }
+    });
+  }
+  
+  public highlight(element: any): void {
+    let highlightContext: any = new Mark('document-row h1, document-row h2, ' +
+      'document-row h3, document-row h4, document-row h5, document-row h6, '+
+      'document-row markdown');
+    highlightContext.unmark({});
+    let scrollToFirstMatch: boolean = true;
+    highlightContext.mark(element.text, {
+      separateWordSearch: false,
+      each: (element: any) => {
+        if (scrollToFirstMatch) {
+          element.scrollIntoView();
+          scrollToFirstMatch = false;
+        }
+      }
+    });
+  }
+  
+  public getCategory(element: any): string {
+    switch (element.displayLevel) {
+      case 1:
+        return 'Item';
+      case 2:
+        return 'Sentence';
+      case 3:
+        return 'Phrase';
+      case 4:
+        return 'Token';
+    }
+    
+    return '';
   }
 }

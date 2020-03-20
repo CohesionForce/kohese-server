@@ -47,7 +47,7 @@ export class DialogService {
         validate: validate
       },
       disableClose: true
-    }).updateSize('40%', 'auto');
+    }).updateSize('40%', '250px');
   }
 
   public openSelectDialog(title: string, text: string, label: string,

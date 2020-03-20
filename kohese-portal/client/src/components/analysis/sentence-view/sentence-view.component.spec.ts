@@ -15,6 +15,10 @@ import { MockAnalysisService } from '../../../../mocks/services/MockAnalysisServ
 import { DataProcessingService } from '../../../services/data/data-processing.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { MockDataProcessingService } from '../../../../mocks/services/MockDataProcessingService';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { PipesModule } from '../../../pipes/pipes.module';
 import { MockAnalysis } from '../../../../mocks/data/MockAnalysis';
 import { AnalysisViews } from '../AnalysisViewComponent.class';
@@ -37,7 +41,9 @@ describe('Component: Sentence View', ()=>{
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: AnalysisService, useClass: MockAnalysisService},
-        {provide: DataProcessingService, useClass: MockDataProcessingService}
+        {provide: DataProcessingService, useClass: MockDataProcessingService},
+        { provide: DialogService, useClass: MockDialogService },
+        { provide: ItemRepository, useClass: MockItemRepository }
       ]
     }).compileComponents();
 

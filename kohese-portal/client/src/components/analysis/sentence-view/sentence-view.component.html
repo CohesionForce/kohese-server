@@ -1,12 +1,31 @@
 <div class="panel">
-  <div class="panel-heading">Sentence View - (<span *ngIf="displayedCount < filteredCount" style="font-weight:normal;">{{displayedCount}}/</span>{{filteredCount}}) Sentences
-    <div class="pull-right">
-        <button mat-icon-button>
-          <mat-icon class="fa fa-link" style="vertical-align: top;"
-                    (click)="toggleLink()"
-                    [ngClass]="{'syncOn' : syncFilter, 'syncOff' : !syncFilter}"></mat-icon>
+  <div class="panel-heading" style="height: 50px; display: flex;
+    flex-direction: row; align-items: center;">
+    Sentence View - (
+    <span *ngIf="displayedCount < filteredCount" style="font-weight:normal;">
+      {{displayedCount}}/
+    </span>
+    {{filteredCount}}) Sentences
+    <button mat-icon-button style="margin-left: auto;" (click)="toggleLink()">
+      <mat-icon class="fa fa-link" [ngClass]="{'syncOn' : syncFilter,
+        'syncOff' : !syncFilter}">
+      </mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Copy table content to clipboard"
+      (click)="sentenceCopy()">
+      <mat-icon class="fa fa-copy"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Export table content to a file"
+      [matMenuTriggerFor]="exportMenu">
+      <mat-icon class="fa fa-file-o"></mat-icon>
+    </button>
+    <mat-menu #exportMenu="matMenu" [overlapTrigger]="false">
+      <ng-container *ngFor="let format of Object.keys(DataFormat)">
+        <button mat-menu-item (click)="sentenceExport(DataFormat[format])">
+          {{DataFormat[format]}}
         </button>
-      </div>
+      </ng-container>
+    </mat-menu>
   </div>
   <div class="panel-body">
     <div>
@@ -34,6 +53,7 @@
       <table id="theDetails"
         class="table tree-grid table-striped table-condensed table-hover">
         <thead>
+          <th>Category</th>
           <th style="width:20%; min-width:200px; max-width:350px">Type</th>
           <th>
             <span (click)="sort('text')">
@@ -46,12 +66,15 @@
           </th>
         </thead>
         <tbody id="theDetailsBody">
-          <tr class="level-{{listItem.displayLevel}}"
-            class="tree-grid-row" id="{{listItem.displayId}}"
-            *ngFor="let listItem of sentences">
-            <td><span class="indented">{{listItem.displayType}}</span></td>
-            <td [innerHTML]="listItem.text | highlightRegex:filterRegexHighlight:true"></td>
-          </tr>
+          <ng-container *ngFor="let listItem of sentences">
+            <tr class="level-{{listItem.displayLevel}}"
+              class="tree-grid-row" id="{{listItem.displayId}}"
+              (click)="highlight(listItem)">
+              <td>{{getCategory(listItem)}}</td>
+              <td><span class="indented">{{listItem.displayType}}</span></td>
+              <td [innerHTML]="listItem.text | highlightRegex:filterRegexHighlight:true"></td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>
