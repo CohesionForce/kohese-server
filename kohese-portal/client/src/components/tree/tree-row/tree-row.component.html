@@ -1,8 +1,9 @@
 <div class="kt-item" matTooltip="{{treeRow.getText()}}"
   (click)="treeRow.rowFocused()"
-  [ngClass]="{ 'selected-border': treeRow.isRowFocused(),
-  'highlight-row': (!treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) }"
-  [ngStyle]="getIndentationStyle()">
+  [ngClass]="{ 'selected-border': treeRow.isRowFocused() }"
+  [ngStyle]="{ 'padding-left': (treeRow.depth * 31) + 'px', 'background-color':
+  ((!treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) ?
+  '#FFFFCC' : (treeRow.hasError() ? 'lightcoral' : '')) }">
   <i class="kt-icon fa"
     (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
     [ngClass]="{ 'fa-caret-down': (treeRow.hasChildren() && treeRow.expanded),
@@ -14,6 +15,11 @@
       (change)="treeRow.rowSelected()" (click)="$event.stopPropagation()"
       style="padding-top: 7px;">
     </mat-checkbox>
+  </ng-container>
+  <ng-container *ngIf="treeRow.hasError()">
+    <mat-icon class="fa fa-exclamation" style="color: darkred; padding-top:
+      5px;">
+    </mat-icon>
   </ng-container>
   <ng-container *ngIf="treeRow.getIcon()">
     <mat-icon class="kt-icon {{treeRow.getIcon()}}"></mat-icon>

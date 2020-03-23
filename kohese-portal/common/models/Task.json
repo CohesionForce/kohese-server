@@ -32,6 +32,14 @@
             "name": "Pending Reassign",
             "description": "A task that is Pending Reassign."
           },
+          "InVerification": {
+            "name": "In Verification",
+            "description": "A task that is In Verification."
+          },
+          "Verified": {
+            "name": "Verified",
+            "description": "A task that is Verified."
+          },
           "Completed": {
             "name": "Completed",
             "description": "A task that is Completed."
@@ -73,20 +81,34 @@
             "guard": {},
             "requires": []
           },
-          "Complete": {
-            "source": "InWork",
-            "target": "Completed",
-            "guard": {},
-            "requires": []
-          },
-          "RevertToProposed": {
+          "Revert To Proposed": {
             "source": "InWork",
             "target": "Proposed",
             "guard": {}
           },
-          "RemoveAssignment": {
+          "Remove Assignment": {
             "source": "PendingReassign",
             "target": "Proposed",
+            "guard": {}
+          },
+          "Request Verification": {
+            "source": "InWork",
+            "target": "InVerification",
+            "guard": {}
+          },
+          "Revert To In Work": {
+            "source": "InVerification",
+            "target": "InWork",
+            "guard": {}
+          },
+          "Verify": {
+            "source": "InVerification",
+            "target": "Verified",
+            "guard": {}
+          },
+          "Complete": {
+            "source": "Verified",
+            "target": "Completed",
             "guard": {}
           }
         }
