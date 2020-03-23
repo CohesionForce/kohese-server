@@ -54,12 +54,6 @@ export class TreeRowComponent implements OnInit {
       this.changeDetector.markForCheck();
     };
   }
-
-  public getIndentationStyle(): object {
-    return {
-      'padding-left': (this._treeRow.depth * 31) + 'px'
-    };
-  }
   
   public isActionGroup(displayableEntity: DisplayableEntity): boolean {
     return (displayableEntity instanceof ActionGroup);

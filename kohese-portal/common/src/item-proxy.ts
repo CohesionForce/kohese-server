@@ -33,6 +33,9 @@ class RelationIdMap {
   public referencedBy : {};
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const DATE_REGEX = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/i;
+
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
 //////////////////////////////////////////////////////////////////////////
@@ -106,7 +109,7 @@ export class ItemProxy {
 
     // Perform validation before proxy creation and storage in the map since invalid items should not be allowed 
     // after loading complete
-    let validationResult = ItemProxy.validateItemContent(kind, forItem, treeConfig);
+    let validationResult = ItemProxy.validateItemContent(kind, forItem, treeConfig, true);
 
     // Note: The constructor may be called for an existing item proxy.  Look for the existing proxy if it exists.
     let proxy : ItemProxy = treeConfig.proxyMap[itemId];
@@ -234,7 +237,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static validateItemContent (kind, forItem, treeConfig) : any {
+  static validateItemContent (kind, forItem, treeConfig, migrateData = false) : any {
     let validation = {
       valid : true
     };
@@ -255,10 +258,15 @@ export class ItemProxy {
         if (!validation.valid){
           // TODO Need to remove this bypass logic which is needed to load some existing data
           if(treeConfig.loading){
-            console.log('*** Error: Invalid data item');
-            console.log('Kind: ' + kind);
-            console.log(forItem);
-            console.log(validation);
+
+            if (migrateData) {
+              ItemProxy.resolveDataMigrationIssue(validation, forItem);
+              ItemProxy.validateItemContent(kind, forItem, treeConfig, false);
+            } else {
+              console.log('*** Error: Invalid data item');
+              console.log(validation);  
+            }
+        
           } else {
             throw ({
               error: 'Not-Valid',
@@ -270,6 +278,105 @@ export class ItemProxy {
       }
     }
     return validation;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static resolveDataMigrationIssue(validation, forItem) {
+
+    ////////////////////////////////////////////////////////////////////////
+    function convertReference (property) {
+      if (validation.invalidData.hasOwnProperty(property)) {
+
+        // Resolve reference that is a single UUID
+        if (UUID_REGEX.test(forItem[property])) {
+          forItem[property] = [ { id: forItem[property] } ]
+        }
+
+        // Resolve reference that is a single reference
+        if (forItem[property].id) {
+          forItem[property] = [ forItem[property] ]
+        }
+
+      }  
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    function convertTimestamp(property) {
+      if (forItem[property] === '') {
+        delete forItem[property];
+      } else {
+        if (validation.invalidData.hasOwnProperty(property)) {
+          if (DATE_REGEX.test(forItem[property])) {
+            forItem[property] = Date.parse(forItem[property]);
+          }
+        }
+      }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    function convertNumber(property) {
+      if (validation.invalidData.hasOwnProperty(property)) {
+        if (forItem[property] === '') {
+          delete forItem[property];
+        } else {
+          let convertedNumber = Number(forItem[property]);
+          if (convertedNumber !== NaN) {
+            forItem[property] = convertedNumber;
+          }  
+        }
+      }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    if (!validation.valid) {
+
+      // Adjust malformed arrays
+      if (validation.malformedArray) {
+
+        if (validation.kind == 'Observation' || validation.kind === 'Issue'){
+          convertReference('context');
+        }
+
+        if (validation.kind == 'Task') {
+          convertReference('predecessors');
+        }
+
+        if (validation.kind == 'UseCase') {
+          if (validation.invalidData.Actors) {
+            forItem.Actors = [ forItem.Actors ]
+          }  
+        }
+
+      }
+
+      // Adjust malformed numbers
+      if (validation.malformedNumber) {
+        if (validation.kind == 'Action' || validation.kind === 'Task'){
+          convertNumber('estimatedHoursEffort');
+          convertNumber('remainingHoursEffort');
+          convertNumber('actualHoursEffort');
+        }
+      }
+
+      // Adjust malformed timestamps
+      if (validation.malformedTimestamp) {
+        if (validation.kind == 'Observation' || validation.kind === 'Issue'){
+          convertTimestamp('observedOn');
+        }
+
+        if (validation.kind == 'Action' || validation.kind === 'Task'){
+          convertTimestamp('approvedOn');
+          convertTimestamp('estimatedStart');
+          convertTimestamp('estimatedCompletion');
+          convertTimestamp('actualStart');
+          convertTimestamp('actualCompletion');
+        }
+      }
+      
+    }
+
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1251,6 +1358,20 @@ export class ItemProxy {
       return;
     }
 //    console.log('::: IP: Adding child ' + childProxy.item.name + ' to ' + this.item.name);
+
+    if (this.hasAncestor(childProxy)) {
+      let oldParentId;
+      if (childProxy.parentProxy){
+        oldParentId = childProxy.parentProxy.item.id;
+      }
+
+      throw ({
+        error: 'Parent-Can-Not-Be-Descendant',
+        childId: childProxy.item.id,
+        oldParentId: oldParentId,
+        newParentId: this.item.id
+      });
+    }
 
     // Determine if this node is already attached to another parent
     if (childProxy.parentProxy) {

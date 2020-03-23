@@ -1836,6 +1836,42 @@ it('Update Tree Hash When Creating Already Existing Item', () => {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+it('Prevent Parent as Descendant', () => {
+
+  resetItemRepository();
+  defineTestModel();
+
+  // eslint-disable-next-line no-unused-vars
+  var a = new ItemProxy('Test', {
+    id: 'A',
+    name: 'A Item'
+  });
+
+  var aa = new ItemProxy('Test', {
+    id: 'AA',
+    name: 'AA Item',
+    parentId: 'A'
+  });
+
+  try {
+    a.updateItem('Test', {
+      id: 'A',
+      name: 'A Item',
+      parentId: 'AA'
+    });  
+  } catch (err) {
+    expect(err).toEqual({ error: 'Parent-Can-Not-Be-Descendant',
+    childId: 'A',
+    oldParentId: 'ROOT',
+    newParentId: 'AA' });
+  }
+  expect(a.parentProxy).toEqual(root);
+
+});
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 it('Prevent Recursion on Updating Lost+Found', () => {
 
   resetItemRepository();

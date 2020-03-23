@@ -469,6 +469,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this._filterDelayIdentifier = undefined;
     }, 1000);
   }
+  
+  protected hasError(object: any): boolean {
+    return !!(object as ItemProxy).validationError;
+  }
 
   protected target(target: any, targetingObject: any, targetPosition:
     TargetPosition): void {
