@@ -659,6 +659,10 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   public getDateString(timestamp: number): string {
+    if (timestamp === undefined) {
+      timestamp = null;
+    }
+    
     return new Date(timestamp).toISOString();
   }
   
