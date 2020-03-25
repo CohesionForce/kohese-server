@@ -64,21 +64,19 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
-      this._itemProxy = this._data['itemProxy'];
-      this.proxyStream.next(this._itemProxy);
+      this.treeConfig = TreeConfiguration.getWorkingTree();
+      this.itemProxy = this._data['itemProxy'];
     } else {
       this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe(
         (treeConfigurationObject: any) => {
         this.treeConfig = treeConfigurationObject.config;
         this.editableStream.next(false);
         if (this._itemProxy) {
-          this._itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.
+          this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.
             id);
           if (this._itemProxy) {
             this._itemRepository.registerRecentProxy(this._itemProxy);
           }
-          
-          this.proxyStream.next(this._itemProxy);
         }
         
         this._changeDetectorRef.markForCheck();

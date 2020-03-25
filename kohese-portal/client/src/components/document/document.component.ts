@@ -233,6 +233,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return Object;
   }
   
+  get TreeConfiguration() {
+    return TreeConfiguration;
+  }
+  
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
@@ -784,10 +788,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
     this._textEditor.editor.editor.dom.select('div#' + id)[0].scrollIntoView();
     let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       id);
-    /* Currently, type must be set before object, as the object setter
-    references type. */
-    this._objectEditor.type = itemProxy.model.item;
     this._objectEditor.object = itemProxy.item;
+    this._objectEditor.type = itemProxy.model.item;
     this._changeDetectorRef.markForCheck();
   }
   
@@ -875,10 +877,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
         
         let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(itemId);
-        /* Currently, type must be set before object, as the object setter
-        references type. */
-        this._objectEditor.type = itemProxy.model.item;
         this._objectEditor.object = itemProxy.item;
+        this._objectEditor.type = itemProxy.model.item;
         
         this._changeDetectorRef.markForCheck();
         

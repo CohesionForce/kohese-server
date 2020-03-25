@@ -1,12 +1,11 @@
-import { Component, OnInit, Input, Optional, Inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { MAT_DIALOG_DATA, MatStepper, MatDialogRef, MatAutocompleteSelectedEvent } from '@angular/material';
-import { FormGroup, FormControl } from '@angular/forms';
-
+import { Component, OnInit, Input, Optional, Inject,
+  ViewChild } from '@angular/core';
+import { MAT_DIALOG_DATA, MatStepper, MatDialogRef } from '@angular/material';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
+import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
@@ -37,8 +36,9 @@ export class CreateWizardComponent extends NavigatableComponent
   get proxyPlaceholderStream() {
     return this._proxyPlaceholderStream;
   }
-  createFormGroup: FormGroup;
-  private nonFormFieldValueMap: any = {};
+  
+  @ViewChild('formatObjectEditor')
+  private _formatObjectEditor: FormatObjectEditorComponent;
   
   get FormatDefinitionType() {
     return FormatDefinitionType;
@@ -75,43 +75,14 @@ export class CreateWizardComponent extends NavigatableComponent
       model: modelProxy
     };
 
-    for (let fieldName in modelProxy.item.classProperties) {
-      if (proxyPlaceholder.item[fieldName] == null) {
-        proxyPlaceholder.item[fieldName] = TreeConfiguration.getWorkingTree().
-          getProxyFor(modelProxy.item.classProperties[fieldName].
-          definedInKind).item.properties[fieldName].default;
-      }
-    }
-
     return proxyPlaceholder;
   }
 
-  onFormGroupUpdated(newFormGroup: any) {
-    this.createFormGroup = newFormGroup;
-  }
-
   createItem() {
-    let item: any = this.createFormGroup.value;
     this._isDisabled = true;
-    for (let fieldName in this.nonFormFieldValueMap) {
-      item[fieldName] = this.nonFormFieldValueMap[fieldName];
-    }
-
-    /* Set the value of each field that has an unspecified value to that
-    field's default value */
-    let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      this.proxyPlaceholderStream.getValue().kind);
-    let fields: object = modelProxy.item.classProperties;
-    for (let fieldName in fields) {
-      if (null === item[fieldName]) {
-        item[fieldName] = TreeConfiguration.getWorkingTree().getProxyFor(
-          modelProxy.item.classProperties[fieldName].definedInKind).item.
-          properties[fieldName].default;
-      }
-    }
-
-    this.itemRepository.upsertItem(this.proxyPlaceholderStream.getValue().kind,
-      item).then(() => {
+    let itemProxyPlaceholder: any = this.proxyPlaceholderStream.getValue();
+    this.itemRepository.upsertItem(this._formatObjectEditor.selectedType.name,
+      itemProxyPlaceholder.item).then(() => {
         console.log('Build Item promise resolve');
         this.MatDialogRef.close();
       }, (error) => {
@@ -129,10 +100,6 @@ export class CreateWizardComponent extends NavigatableComponent
   public clearError(): void {
     this.errorMessage = undefined;
     this._isDisabled = false;
-  }
-
-  public whenNonFormFieldChanges(updatedField: any): void {
-    this.nonFormFieldValueMap[updatedField.fieldName] = updatedField.fieldValue;
   }
 }
 

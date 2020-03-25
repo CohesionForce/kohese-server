@@ -42,9 +42,8 @@
       </mat-tab>
       <mat-tab label="{{(itemProxy.dirty ? 'Details*' : 'Details')}}">
         <ng-template matTabContent>
-          <format-object-editor [type]="(proxyStream | async).model.item"
-            [object]="(proxyStream | async).item"
-            [formatDefinitionType]="FormatDefinitionType.DEFAULT"
+          <format-object-editor [object]="itemProxy.item" [type]="itemProxy.
+            model.item" [formatDefinitionType]="FormatDefinitionType.DEFAULT"
             [allowKindChange]="true" [allowKindNarrowingOnly]="false"
             [disabled]="!(editableStream | async)">
           </format-object-editor>

@@ -87,17 +87,21 @@
     </mat-drawer-content>
     <mat-drawer #objectEditorDrawer mode="side" position="end" disableClose
       style="width: 25%;">
-      <div style="height: 5%; display: flex; flex-direction: row;">
-        <button mat-icon-button matTooltip="Save this Item"
-          class="flex-right-align" [disabled]="!objectEditor.object"
-          (click)="saveObjectEditorObject()">
-          <mat-icon class="fa fa-save"></mat-icon>
-        </button>
-      </div>
-      <format-object-editor #objectEditor
-        [formatDefinitionType]="FormatDefinitionType.DEFAULT"
-        [allowKindChange]="true" [allowKindNarrowingOnly]="false">
-      </format-object-editor>
+      <ng-container *ngIf="(documentConfigurations.length > 0)">
+        <div style="height: 5%; display: flex; flex-direction: row;">
+          <button mat-icon-button matTooltip="Save this Item"
+            class="flex-right-align" [disabled]="!objectEditor.object"
+            (click)="saveObjectEditorObject()">
+            <mat-icon class="fa fa-save"></mat-icon>
+          </button>
+        </div>
+        <format-object-editor #objectEditor [object]="documentConfiguration"
+          [type]="TreeConfiguration.getWorkingTree().getProxyFor(
+          'DocumentConfiguration').item"
+          [formatDefinitionType]="FormatDefinitionType.DEFAULT"
+          [allowKindChange]="true" [allowKindNarrowingOnly]="false">
+        </format-object-editor>
+      </ng-container>
     </mat-drawer>
   </mat-drawer-container>
   <ng-container *ngIf="isDialogInstance()">

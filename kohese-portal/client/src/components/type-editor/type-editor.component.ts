@@ -5,7 +5,7 @@ import * as Uuid from 'uuid/v1';
 import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { FormatDefinition,
   FormatDefinitionType } from './FormatDefinition.interface';
 import { FormatContainerKind } from './FormatContainer.interface';
@@ -31,8 +31,6 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     return this._koheseTypeStream;
   }
 
-  /* Subscriptions */
-  repoStatusSubscription : Subscription;
   private _treeConfigurationSubscription: Subscription;
 
   constructor(public typeService: DynamicTypesService,
@@ -41,32 +39,20 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     private _changeDetectorRef: ChangeDetectorRef) {
   }
 
-  ngOnInit(): void {
-    this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
-      .subscribe((update: any) => {
-      switch (update.state) {
-        case RepoStates.KOHESEMODELS_SYNCHRONIZED:
-        case RepoStates.SYNCHRONIZATION_SUCCEEDED:
-          this._treeConfigurationSubscription = this.itemRepository.
-            getTreeConfig().subscribe(
-            (treeConfiguration: TreeConfiguration) => {
-            this._treeConfiguration = treeConfiguration;
-            this.types = this.typeService.getKoheseTypes();
-            delete this.types['KoheseModel'];
-            delete this.types['KoheseView'];
-            this._koheseTypeStream.next(this.types[Object.keys(this.
-              types)[0]]);
-            this._changeDetectorRef.markForCheck();
-          });
-      }
+  public ngOnInit(): void {
+    this._treeConfigurationSubscription = this.itemRepository.getTreeConfig().
+      subscribe((treeConfigurationObject: any) => {
+      this._treeConfiguration = treeConfigurationObject.config;
+      this.types = this.typeService.getKoheseTypes();
+      delete this.types['KoheseModel'];
+      delete this.types['KoheseView'];
+      this._koheseTypeStream.next(this.types[Object.keys(this.types)[0]]);
+      this._changeDetectorRef.markForCheck();
     });
   }
 
-  ngOnDestroy(): void {
-    if (this._treeConfigurationSubscription) {
-      this._treeConfigurationSubscription.unsubscribe();
-    }
-    this.repoStatusSubscription.unsubscribe();
+  public ngOnDestroy(): void {
+    this._treeConfigurationSubscription.unsubscribe();
   }
 
   add(): void {
