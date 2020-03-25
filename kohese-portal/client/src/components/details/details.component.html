@@ -1,95 +1,145 @@
-
-
-<div *ngIf="itemProxy && !itemProxyError" id="details-panel" class="panel">
-    <div class="panel-heading " style="padding : 10px;">
-        <span *ngIf="itemProxy.kind">{{itemProxy.kind}} Information: {{itemProxy.item.name}} </span>
-        <span *ngIf="!itemProxy.kind">No Item Selected</span>
-        <span class="pull-right item-actions">
-            <i class="fa fa-level-up"
-                    *ngIf="itemProxy.item.parentId"
-                    (click)="navigate('Explore', {id :itemProxy.item.parentId})"
-                    title="Go to Parent"></i>
-            <i class="fa fa-lg fa-edit"
-               *ngIf="!editableStream.getValue()"
-               (click)="editableStream.next(true)"
-               title="Edit"></i>
-            <span *ngIf="editableStream.getValue()"
-                  class="fa fa-stack">
-                <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
-                   (click)="cancelEditing()"
-                   title="Cancel Edit"></i>
-                <i class="fa fa-stack-1x fa-times stacked-child"
-                   (click)="cancelEditing()"
-                   title="Cancel Edit"></i>
-            </span>
-            <i class="fa fa-lg fa-save"
-               (click)="upsertItem(detailsFormGroup.value)"
-               title=" Save"
-                    ></i>
-            <i class="fa fa-lg fa-arrows-alt"
-               (click)="navigate('Investigate', {id: itemProxy.item.id})"
-               title="Fullscreen"></i>
+<div [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 40px)' :
+  '100%' }">
+  <div class="panel-heading " style="padding : 10px;">
+    <span>
+      {{itemProxy.kind}} Information: {{itemProxy.item.name}}
+    </span>
+    <span class="pull-right item-actions">
+      <ng-container *ngIf="itemProxy.item.parentId">
+        <i class="fa fa-level-up" (click)="navigate(itemProxy.item.parentId)"
+          title="Go to Parent">
+        </i>
+      </ng-container>
+      <ng-container *ngIf="editableStream.getValue() else notEditable">
+        <span class="fa fa-stack">
+          <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
+            (click)="cancelEditing()" title="Cancel Edit">
+          </i>
+          <i class="fa fa-stack-1x fa-times stacked-child"
+            (click)="cancelEditing()" title="Cancel Edit">
+          </i>
         </span>
-    </div>
-    <div class="panel-body">
-        <!-- Nav tabs -->
-        <mat-tab-group id="details-tabs">
-            <mat-tab id="defaultTab" label="Document">
-              <document-view [proxyStream]="proxyStream"
-                [incrementalLoad]="true">
-              </document-view>
-            </mat-tab>
-            <mat-tab label="{{((detailsFormGroup && detailsFormGroup.dirty) ?
-              'Details*' : 'Details')}}">
-              <ng-template matTabContent>
-                <details-form #editor [proxyStream]="proxyStream"
-                  [editableStream]="editableStream"
-                  (formGroupUpdated)="onFormGroupUpdated($event)"
-                  (nonFormFieldChanged)="onNonFormFieldChanged($event)">
-                </details-form>
-              </ng-template>
-            </mat-tab>
-            <mat-tab label="References">
-                <references-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></references-tab>
-            </mat-tab>
-            <mat-tab label="History">
-                <history-tab [proxyStream]="proxyStream"></history-tab>
-            </mat-tab>
-            <mat-tab label="Journal">
-              <ng-template matTabContent>
-                <journal [itemProxy]="itemProxy" style="display: flex;
-                  flex-direction: column;">
-                </journal>
-              </ng-template>
-            </mat-tab>
-            <mat-tab label="Action Table"
-                 *ngIf="itemProxy.children">
-
-              <action-table [proxyStream]="proxyStream"
-                            [editableStream]="editableStream"></action-table>
-            </mat-tab>
-            <mat-tab label="Raw Data">
-                <h4>Raw Data Tab</h4>
-                <h5>{{itemProxy.kind}}: {{itemProxy.item.name}} ({{itemProxy.item.id}})</h5>
-                <h5>Id: {{itemProxy.item.id}}</h5>
-                <h5>OID: {{itemProxy.oid}}</h5>
-                <h5>Tree Hash: {{itemProxy.treeHash}}</h5>
-                <h5>Decendant Count: {{itemProxy.descendantCount}}</h5>
-                <h5 *ngIf="itemProxy.validationError">Validation Error:</h5>
-                <pre *ngIf="itemProxy.validationError">{{itemProxy.validationError | json}}</pre>
-                <h5>Item Data:</h5>
-                <pre>{{itemJson}}</pre>
-                <h5>Tree Hash Entry:</h5>
-                <pre>{{itemProxy.treeHashEntry | json}}</pre>
-                <h5>Relations:</h5>
-                <pre>{{relationIdMap | json}}</pre>
-                <h5>Version Status:</h5>
-                <pre>{{itemVCStatusJson}}</pre>
-                <h5>New History (Old Style):</h5>
-                <pre>{{itemProxy.history | json}}</pre>
-                <h5>New History (With Details):</h5>
-                <pre>{{itemProxy.newHistoryNewStyle | json}}</pre>
-            </mat-tab>
-        </mat-tab-group>
-    </div>
+        <i class="fa fa-lg fa-save" (click)="upsertItem()"
+          title="Save">
+        </i>
+      </ng-container>
+      <ng-template #notEditable>
+        <i class="fa fa-lg fa-edit" (click)="editableStream.next(true)"
+          title="Edit">
+        </i>
+      </ng-template>
+      <i class="fa fa-lg fa-arrows-alt" title="Fullscreen"></i>
+    </span>
+  </div>
+  <div style="height: calc(100% - 44px);">
+    <!-- Nav tabs -->
+    <mat-tab-group id="details-tabs">
+      <mat-tab id="defaultTab" label="Document">
+        <ng-template matTabContent>
+          <document-view [proxyStream]="proxyStream" [incrementalLoad]="true">
+          </document-view>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="{{(itemProxy.dirty ? 'Details*' : 'Details')}}">
+        <ng-template matTabContent>
+          <details-form #editor [proxyStream]="proxyStream"
+            [editableStream]="editableStream"
+            (formGroupUpdated)="onFormGroupUpdated($event)"
+            (nonFormFieldChanged)="onNonFormFieldChanged($event)">
+          </details-form>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="References">
+        <ng-template matTabContent>
+          <references-tab [proxyStream]="proxyStream"
+            [editableStream]="editableStream">
+          </references-tab>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="History">
+        <ng-template matTabContent>
+          <history-tab [proxyStream]="proxyStream"></history-tab>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Journal">
+        <ng-template matTabContent>
+          <journal [itemProxy]="itemProxy" style="display: flex;
+            flex-direction: column;">
+          </journal>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Action Table" *ngIf="itemProxy.children">
+        <ng-template matTabContent>
+          <action-table [proxyStream]="proxyStream"
+            [editableStream]="editableStream">
+          </action-table>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Raw Data">
+        <ng-template matTabContent>
+          <h4>
+            Raw Data Tab
+          </h4>
+          <h5>
+            {{itemProxy.kind}}: {{itemProxy.item.name}} ({{itemProxy.item.id}})
+          </h5>
+          <h5>
+            Id: {{itemProxy.item.id}}
+          </h5>
+          <h5>
+            OID: {{itemProxy.oid}}
+          </h5>
+          <h5>
+            Tree Hash: {{itemProxy.treeHash}}
+          </h5>
+          <h5>
+            Descendant Count: {{itemProxy.descendantCount}}
+          </h5>
+          <h5>
+            Item Data:
+          </h5>
+          <pre>{{itemProxy.document()}}</pre>
+          <ng-container *ngIf="itemProxy.validationError">
+            <h5>
+              Validation Error:
+            </h5>
+            <pre>{{itemProxy.validationError | json}}</pre>
+          </ng-container>
+          <h5>
+            Tree Hash Entry:
+          </h5>
+          <pre>{{itemProxy.treeHashEntry | json}}</pre>
+          <h5>
+            Relations:
+          </h5>
+          <pre>{{itemProxy.getRelationIdMap() | json}}</pre>
+          <h5>
+            Version Status:
+          </h5>
+          <pre>{{(itemProxy.vcStatus | json)}}</pre>
+          <h5>
+            New History (Old Style):
+          </h5>
+          <pre>{{itemProxy.history | json}}</pre>
+          <h5>
+            New History (With Details):
+          </h5>
+          <pre>{{itemProxy.newHistoryNewStyle | json}}</pre>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 </div>
+<ng-container *ngIf="isDialogInstance()">
+  <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
+    row;">
+    <button mat-button matTooltip="Navigate to this Item" style="margin-left:
+      auto;" (click)="navigate(itemProxy.item.id)">
+      Explore
+    </button>
+    <button mat-button matTooltip="Close this dialog box"
+      (click)="matDialogRef.close(undefined)">
+      Close
+    </button>
+  </mat-dialog-actions>
+</ng-container>

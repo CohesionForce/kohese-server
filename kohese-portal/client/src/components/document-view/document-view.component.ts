@@ -1,6 +1,5 @@
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { DialogService } from '../../services/dialog/dialog.service';
-import { DetailsDialogComponent } from '../details/details-dialog/details-dialog.component';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy,
          ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';

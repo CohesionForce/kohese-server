@@ -1,4 +1,4 @@
-import { DetailsDialogComponent } from './../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from './../../details/details.component';
 import { DialogService } from './../../../services/dialog/dialog.service';
 import { NavigatableComponent } from "../../../classes/NavigationComponent.class";
 import { NavigationService } from "../../../services/navigation/navigation.service";
@@ -50,7 +50,7 @@ export class AssignmentCard {
   }
 
   openProxyDetails(proxy: ItemProxy) {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+    this.dialogService.openComponentDialog(DetailsComponent, {
       data : {
         itemProxy : proxy
       }
