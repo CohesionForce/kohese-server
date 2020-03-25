@@ -121,9 +121,9 @@ export class FormatObjectEditorComponent implements OnInit {
       if (this._object[attributeName] == null) {
         let defaultValue: any = this._selectedType.classProperties[
           attributeName].definition.default;
-        if ((defaultValue != null) && (defaultValue !== '')) {
+        if (defaultValue != null) {
           this._object[attributeName] = defaultValue;
-        } else if (this._object[attributeName] == null) {
+        } else {
           if (Array.isArray(this._selectedType.classProperties[attributeName].
             definition.type)) {
             this._object[attributeName] = [];
