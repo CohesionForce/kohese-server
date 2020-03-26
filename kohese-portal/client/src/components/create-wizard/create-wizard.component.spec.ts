@@ -4,14 +4,12 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async } from '@angular/core/testing';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ServicesModule } from '../../services/services.module';
-import { MatDialogModule, MatAutocompleteSelectedEvent } from '@angular/material';
+import { MatDialogModule } from '@angular/material';
 import { MatDialogRef } from '@angular/material';
-import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import { MatStepper } from '@angular/material';
 
@@ -33,8 +31,6 @@ describe('Component: Create Wizard', ()=>{
     TestBed.configureTestingModule({
       declarations: [CreateWizardComponent],
       imports : [CommonModule,
-         FormsModule,
-         ReactiveFormsModule,
          MaterialModule,
          PipesModule,
          ServicesModule,
@@ -66,28 +62,16 @@ describe('Component: Create Wizard', ()=>{
     let closeSpy;
 
     beforeEach(()=>{
-      createWizardComponent.createFormGroup = <FormGroup> {
-        value : ItemProxy
-      }
-
       closeSpy = spyOn(TestBed.get(MatDialogRef), 'close');
 
     })
 
     it('closes the window when an item is built', async(()=>{
-      let fieldName: string = 'modifiedOn';
-      let fieldValue: any = new Date().getTime();
-      createWizardComponent.whenNonFormFieldChanges({
-        fieldName: fieldName,
-        fieldValue: fieldValue
-      });
       let buildSpy = spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve());
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();
         expect(closeSpy).toHaveBeenCalled();
-        expect(createWizardComponent.createFormGroup.value[fieldName]).
-          toEqual(fieldValue);
       })
     }))
 

@@ -71,8 +71,8 @@ export class FormatObjectEditorComponent implements OnInit {
                 break;
               }
               
-              modelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-                modelItemProxy.item.base);
+              modelItemProxy = this._itemRepository.getTreeConfig().getValue().
+                config.getProxyFor(modelItemProxy.item.base);
             }
           } else {
             this._types.push(itemProxy.item);
