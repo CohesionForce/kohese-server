@@ -17,10 +17,12 @@ import { MatStepper } from '@angular/material';
 /* Mocks */
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { MockItem } from '../../../mocks/data/MockItem';
 
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
+import { SessionService } from '../../services/user/session.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
 describe('Component: Create Wizard', ()=>{
@@ -41,7 +43,8 @@ describe('Component: Create Wizard', ()=>{
       providers : [
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: NavigationService, useClass: MockNavigationService},
-        {provide: MatDialogRef, useValue : {close: ()=>{console.log('close')}}}
+        { provide: MatDialogRef, useValue: { close: () => {} } },
+        { provide: SessionService, useClass: MockSessionService },
       ]
     })
 

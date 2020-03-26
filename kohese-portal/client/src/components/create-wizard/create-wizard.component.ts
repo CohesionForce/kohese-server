@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatStepper, MatDialogRef } from '@angular/material';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
+import { SessionService } from '../../services/user/session.service';
 import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -47,7 +48,8 @@ export class CreateWizardComponent extends NavigatableComponent
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
     protected NavigationService: NavigationService,
     private itemRepository: ItemRepository,
-    public MatDialogRef: MatDialogRef<CreateWizardComponent>) {
+    public MatDialogRef: MatDialogRef<CreateWizardComponent>,
+    private _sessionService: SessionService) {
     super(NavigationService);
   }
 
@@ -65,12 +67,18 @@ export class CreateWizardComponent extends NavigatableComponent
   }
   
   private buildProxyPlaceholder(): any {
+    let timestamp: number = Date.now();
+    let username: string = this._sessionService.user.name;
     let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       'Item');
     let proxyPlaceholder: any = {
       kind: 'Item',
       item: {
-        parentId: this._parentId
+        parentId: this._parentId,
+        createdOn: timestamp,
+        createdBy: username,
+        modifiedOn: timestamp,
+        modifiedBy: username
       },
       model: modelProxy
     };
