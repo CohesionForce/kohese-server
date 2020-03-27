@@ -646,57 +646,184 @@ export class DataModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public getAttributeUsages(attributeName: string): Array<any> {
-    let attributeUsages: Array<any> = [];
-    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
-      (itemProxy: ItemProxy) => {
-      if (itemProxy.kind === this._dataModel.name) {
-        if (Array.isArray(this._dataModel.properties[attributeName].type)) {
-          // The first check below should not be necessary.
-          if (itemProxy.item[attributeName] && itemProxy.item[attributeName].
-            length > 0) {
-            attributeUsages.push(itemProxy.item);
-          }
-        } else {
-          if (itemProxy.item[attributeName] != null) {
-            attributeUsages.push(itemProxy.item);
+  public removeAttribute(propertyId: string): void {
+    let attributeUsages: Array<ItemProxy> = [];
+    if (this._enclosingType) {
+      TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+        { includeOrigin: false }, (itemProxy: ItemProxy) => {
+        if (itemProxy.kind === this._enclosingType.name) {
+          enclosingTypeAttributeLoop: for (let attributeName in this.
+            _enclosingType.classProperties) {
+            let type: any = this._enclosingType.classProperties[attributeName].
+              definition.type;
+            let isMultivalued: boolean = Array.isArray(type);
+            type = (isMultivalued ? type[0] : type);
+            if ((type === this._dataModel.name) && itemProxy.item[
+              attributeName]) {
+              if (isMultivalued) {
+                for (let j: number = 0; j < itemProxy.item[attributeName].
+                  length; j++) {
+                  if (Array.isArray(this._dataModel.properties[propertyId].
+                    type)) {
+                    if (itemProxy.item[attributeName][j][propertyId] &&
+                      itemProxy.item[attributeName][j][propertyId].length >
+                      0) {
+                      attributeUsages.push(itemProxy);
+                      break enclosingTypeAttributeLoop;
+                    }
+                  } else if (itemProxy.item[attributeName][j][propertyId] !=
+                    null) {
+                    attributeUsages.push(itemProxy);
+                    break enclosingTypeAttributeLoop;
+                  }
+                }
+              } else {
+                if (Array.isArray(this._dataModel.properties[propertyId].type)
+                  && itemProxy.item[attributeName][propertyId] && (itemProxy.
+                  item[attributeName][propertyId].length > 0)) {
+                  attributeUsages.push(itemProxy);
+                  break enclosingTypeAttributeLoop;
+                } else if (itemProxy.item[attributeName][propertyId] !=
+                  null) {
+                  attributeUsages.push(itemProxy);
+                  break enclosingTypeAttributeLoop;
+                }
+              }
+            }
           }
         }
-      }
-    });
+      }, undefined);
+    } else {
+      TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
+        (itemProxy: ItemProxy) => {
+        if (itemProxy.kind === this._dataModel.name) {
+          if (Array.isArray(this._dataModel.properties[propertyId].type)) {
+            // The first check below should not be necessary.
+            if (itemProxy.item[propertyId] && itemProxy.item[propertyId].length
+              > 0) {
+              attributeUsages.push(itemProxy);
+            }
+          } else {
+            if (itemProxy.item[propertyId] != null) {
+              attributeUsages.push(itemProxy);
+            }
+          }
+        }
+      });
+    }
     
-    return attributeUsages;
-  }
-  
-  public removeAttribute(propertyId: string): void {
-    this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
-      'unsaved modifications to this kind are to be saved if this attribute ' +
-      'is removed. Do you want to proceed?').subscribe((choiceValue: any) => {
-      if (choiceValue) {
-        let viewModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
-          'view-' + this._dataModel.name.toLowerCase()).item;
-        delete this._dataModel.properties[propertyId];
-        delete viewModel.viewProperties[propertyId];
-        let defaultFormatDefinition: FormatDefinition = viewModel.
-          formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
-          DEFAULT]];
-        defaultFormatDefinition.containers[0].contents.splice(
-          defaultFormatDefinition.containers[0].contents.map(
-          (propertyDefinition: PropertyDefinition) => {
-          return propertyDefinition.propertyName;
-        }).indexOf(propertyId), 1);
-        
-        this.save();
-        this._itemRepository.upsertItem('KoheseView', viewModel);
-        this._attributes.splice(Object.keys(this._dataModel.properties).
-          indexOf(propertyId), 1);
-        this._attributeTable.renderRows();
-        
-        // Re-enter edit mode
-        this._editable = true;
-        
-        this._changeDetectorRef.markForCheck();
+    let removeFromModels: () => void = () => {
+      let viewModel: any;
+      if (this._enclosingType) {
+        viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+          this._enclosingType.name.toLowerCase()).item.localTypes[this.
+          _dataModel.name];
+      } else {
+        viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+          this._dataModel.name.toLowerCase()).item;
       }
-    });
+      
+      delete this._dataModel.properties[propertyId];
+      delete viewModel.viewProperties[propertyId];
+      let defaultFormatDefinition: FormatDefinition = viewModel.
+        formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
+        DEFAULT]];
+      defaultFormatDefinition.containers[0].contents.splice(
+        defaultFormatDefinition.containers[0].contents.map((propertyDefinition:
+        PropertyDefinition) => {
+        return propertyDefinition.propertyName;
+      }).indexOf(propertyId), 1);
+      
+      this.save();
+      
+      if (this._enclosingType) {
+        this._itemRepository.upsertItem('KoheseView', TreeConfiguration.
+          getWorkingTree().getProxyFor('view-' + this._enclosingType.name.
+          toLowerCase()).item);
+      } else {
+        this._itemRepository.upsertItem('KoheseView', viewModel);
+      }
+      
+      this._attributes.splice(Object.keys(this._dataModel.properties).indexOf(
+        propertyId), 1);
+      this._attributeTable.renderRows();
+      
+      // Re-enter edit mode
+      this._editable = true;
+    };
+    
+    if (attributeUsages.length === 0) {
+      this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
+        'unsaved modifications to this kind are to be saved if this ' +
+        'attribute is removed. Do you want to proceed?').subscribe(
+        (choiceValue: any) => {
+        if (choiceValue) {
+          removeFromModels();
+          this._changeDetectorRef.markForCheck();
+        }
+      });
+    } else {
+      this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
+        'unsaved modifications to this kind are to be saved if this ' +
+        'attribute is removed. Additionally, the following Items are ' +
+        'expected to have this attribute removed from them: ' +
+        attributeUsages.map((itemProxy: ItemProxy) => {
+          return itemProxy.item.name;
+        }).join(', ') + '. Do you want to proceed?').subscribe(
+        (choiceValue: any) => {
+        if (choiceValue) {
+          if (this._enclosingType) {
+            for (let j: number = 0; j < attributeUsages.length; j++) {
+              let itemProxy: ItemProxy = attributeUsages[j];
+              for (let attributeName in this._enclosingType.classProperties) {
+                let type: any = this._enclosingType.classProperties[
+                  attributeName].definition.type;
+                let isMultivalued: boolean = Array.isArray(type);
+                type = (isMultivalued ? type[0] : type);
+                if ((type === this._dataModel.name) && itemProxy.item[
+                  attributeName]) {
+                  if (isMultivalued) {
+                    for (let k: number = 0; k < itemProxy.item[attributeName].
+                      length; k++) {
+                      if (Array.isArray(this._dataModel.properties[propertyId].
+                        type)) {
+                        if (itemProxy.item[attributeName][k][propertyId] &&
+                          itemProxy.item[attributeName][k][propertyId].length >
+                          0) {
+                          delete itemProxy.item[attributeName][k][propertyId];
+                        }
+                      } else if (itemProxy.item[attributeName][k][propertyId]
+                        != null) {
+                        delete itemProxy.item[attributeName][k][propertyId];
+                      }
+                    }
+                  } else {
+                    if (Array.isArray(this._dataModel.properties[propertyId].
+                      type) && itemProxy.item[attributeName][propertyId] &&
+                      (itemProxy.item[attributeName][propertyId].length > 0)) {
+                      delete itemProxy.item[attributeName][propertyId];
+                    } else if (itemProxy.item[attributeName][propertyId] !=
+                      null) {
+                      delete itemProxy.item[attributeName][propertyId];
+                    }
+                  }
+                }
+              }
+              
+              this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+            }
+          } else {
+            for (let j: number = 0; j < attributeUsages.length; j++) {
+              let itemProxy: ItemProxy = attributeUsages[j];
+              delete itemProxy.item[propertyId];
+              this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+            }
+          }
+          
+          removeFromModels();
+          this._changeDetectorRef.markForCheck();
+        }
+      });
+    }
   }
 }

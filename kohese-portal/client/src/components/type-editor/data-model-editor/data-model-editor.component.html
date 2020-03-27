@@ -167,9 +167,8 @@
       </button>
       <mat-menu #actionMenu="matMenu" [overlapTrigger]="false">
         <button mat-menu-item matTooltip="Remove this attribute"
-          [disabled]="(!editable || (getAttributeUsages(element.name).length >
-          0) || (enclosingType && (attributes.length === 1)))"
-          (click)="removeAttribute(element.name)">
+          [disabled]="(!editable || (enclosingType && (attributes.length ===
+          1)))" (click)="removeAttribute(element.name)">
           <mat-icon class="fa fa-trash"></mat-icon>
           Remove
         </button>
