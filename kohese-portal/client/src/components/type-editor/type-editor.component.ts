@@ -2,19 +2,22 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef } from '@angular/core';
 import * as Uuid from 'uuid/v1';
 
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { DialogService,
   DialogComponent } from '../../services/dialog/dialog.service';
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { FormatDefinition,
   FormatDefinitionType } from './FormatDefinition.interface';
 import { FormatContainerKind } from './FormatContainer.interface';
-import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 
-import { BehaviorSubject ,  Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+
+interface Type {
+  dataModelItemProxy: ItemProxy;
+  viewModelItemProxy: ItemProxy;
+}
 
 @Component({
   selector: 'type-editor',
@@ -23,50 +26,55 @@ import { BehaviorSubject ,  Subscription } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TypeEditorComponent implements OnInit, OnDestroy {
-  public types: any;
-  private _treeConfiguration: TreeConfiguration;
-  private _koheseTypeStream: BehaviorSubject<KoheseType> =
-    new BehaviorSubject<KoheseType>(undefined);
-  get koheseTypeStream() {
-    return this._koheseTypeStream;
+  private _types: Array<Type> = [];
+  get types() {
+    return this._types;
+  }
+  
+  private _selectedType: Type;
+  get selectedType() {
+    return this._selectedType;
+  }
+  set selectedType(selectedType: Type) {
+    this._selectedType = selectedType;
   }
 
-  /* Subscriptions */
-  repoStatusSubscription : Subscription;
   private _treeConfigurationSubscription: Subscription;
 
-  constructor(public typeService: DynamicTypesService,
-    private dialogService: DialogService,
-    private itemRepository: ItemRepository,
-    private _changeDetectorRef: ChangeDetectorRef) {
+  public constructor(private _dynamicTypesService: DynamicTypesService,
+    private dialogService: DialogService, private itemRepository:
+    ItemRepository, private _changeDetectorRef: ChangeDetectorRef) {
   }
 
-  ngOnInit(): void {
-    this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
-      .subscribe((update: any) => {
-      switch (update.state) {
-        case RepoStates.KOHESEMODELS_SYNCHRONIZED:
-        case RepoStates.SYNCHRONIZATION_SUCCEEDED:
-          this._treeConfigurationSubscription = this.itemRepository.
-            getTreeConfig().subscribe(
-            (treeConfiguration: TreeConfiguration) => {
-            this._treeConfiguration = treeConfiguration;
-            this.types = this.typeService.getKoheseTypes();
-            delete this.types['KoheseModel'];
-            delete this.types['KoheseView'];
-            this._koheseTypeStream.next(this.types[Object.keys(this.
-              types)[0]]);
-            this._changeDetectorRef.markForCheck();
-          });
+  public ngOnInit(): void {
+    this._treeConfigurationSubscription = this.itemRepository.getTreeConfig().
+      subscribe((treeConfigurationObject: any) => {
+      if (treeConfigurationObject) {
+        treeConfigurationObject.config.getRootProxy().visitTree(
+          { includeOrigin: false }, (itemProxy: ItemProxy) => {
+          if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.name !==
+            'KoheseModel') && (itemProxy.item.name !== 'KoheseView')) {
+            this._types.push({
+              dataModelItemProxy: itemProxy,
+              viewModelItemProxy: treeConfigurationObject.config.getProxyFor(
+                'view-' + itemProxy.item.name.toLowerCase())
+            });
+          }
+        }, undefined);
+        this._types.sort((oneType: Type, anotherType: Type) => {
+          return oneType.dataModelItemProxy.item.name.localeCompare(
+            anotherType.dataModelItemProxy.item.name);
+        });
+        
+        this._selectedType = this._types[0];
+        
+        this._changeDetectorRef.markForCheck();
       }
     });
   }
 
-  ngOnDestroy(): void {
-    if (this._treeConfigurationSubscription) {
-      this._treeConfigurationSubscription.unsubscribe();
-    }
-    this.repoStatusSubscription.unsubscribe();
+  public ngOnDestroy(): void {
+    this._treeConfigurationSubscription.unsubscribe();
   }
 
   add(): void {
@@ -122,8 +130,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           }]
         };
         
-        let itemKoheseView: any = TreeConfiguration.getWorkingTree().
-          getProxyFor('view-item').item;
+        let itemKoheseView: any = this.itemRepository.getTreeConfig().
+          getValue().config.getProxyFor('view-item').item;
         let itemDefaultFormatDefinition: FormatDefinition = itemKoheseView.
           formatDefinitions[itemKoheseView.defaultFormatKey[
           FormatDefinitionType.DEFAULT]];
@@ -144,23 +152,37 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
 
         Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
           then((proxies: Array<ItemProxy>) => {
-          this.typeService.buildKoheseType(proxies[0] as KoheseModel);
+          this._types.push({
+            dataModelItemProxy: proxies[0],
+            viewModelItemProxy: proxies[1]
+          });
+          this._types.sort((oneType: Type, anotherType: Type) => {
+            return oneType.dataModelItemProxy.item.name.localeCompare(
+              anotherType.dataModelItemProxy.item.name);
+          });
+          
+          this._dynamicTypesService.buildKoheseType(proxies[0] as KoheseModel);
+          
           this._changeDetectorRef.markForCheck();
         });
       }
     });
   }
 
-  delete(): void {
-    let koheseType: KoheseType = this._koheseTypeStream.getValue();
-    this.dialogService.openYesNoDialog('Delete ' + koheseType.dataModelProxy.
-      item.name, 'Are you sure that you want to delete ' + koheseType.
-      dataModelProxy.item.name + '?').
+  public delete(): void {
+    this.dialogService.openYesNoDialog('Delete ' + this._selectedType.
+      dataModelItemProxy.item.name, 'Are you sure that you want to delete ' +
+      this._selectedType.dataModelItemProxy.item.name + '?').
       subscribe((choiceValue: any) => {
       if (choiceValue) {
-        this.itemRepository.deleteItem(koheseType.dataModelProxy, false);
-        this.itemRepository.deleteItem(koheseType.viewModelProxy, false);
-        delete this.types[koheseType.dataModelProxy.item.name];
+        this.itemRepository.deleteItem(this._selectedType.dataModelItemProxy,
+          false);
+        this.itemRepository.deleteItem(this._selectedType.viewModelItemProxy,
+          false);
+        this._types.splice(this._types.indexOf(this._selectedType), 1);
+        this._dynamicTypesService.removeKoheseType(this._selectedType.
+          dataModelItemProxy.item.name);
+        
         this._changeDetectorRef.markForCheck();
       }
     });

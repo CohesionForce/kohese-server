@@ -1,62 +1,50 @@
 <div style="height: 100%; width: 100%;">
-  <ng-container *ngIf="types">
-    <div style="height: 7%; width: 100%;">
-      <mat-form-field class="pad" style="width: 25%;">
-        <mat-select placeholder="Type" [value]="(koheseTypeStream | async)"
-          (selectionChange)="koheseTypeStream.next($event.value)">
-          <mat-option *ngFor="let type of (types | mapKey)"
-            matTooltip="{{types[type].dataModelProxy.item.description}}"
-            [value]="types[type]">
-            <ng-container *ngIf="types[type].viewModelProxy">
-              <mat-icon class="{{types[type].viewModelProxy.item.icon}}">
-              </mat-icon>
-            </ng-container>
-            {{type}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <span class="pull-right">
-        <button mat-icon-button matTooltip="Add Type" (click)="add()">
-          <mat-icon class="fa fa-plus"></mat-icon>
-        </button>
-        <button mat-icon-button matTooltip="Delete Type" (click)="delete()"
-          [disabled]="!koheseTypeStream.getValue() || koheseTypeStream.getValue().dataModelProxy.item.isMetaModel">
-          <mat-icon class="fa fa-trash"></mat-icon>
-        </button>
-      </span>
-    </div>
-    <div style="height: 93%; width: 100%;">
-      <ng-container *ngIf="(koheseTypeStream | async)">
-        <mat-tab-group class="pad" style="height: 100%; width: 100%;">
-          <mat-tab label="{{'Structure' + ((koheseTypeStream | async).
-            dataModelProxy.dirty ? '*' : '')}}">
-            <ng-template matTabContent>
-              <data-model-editor [dataModel]="(koheseTypeStream | async).
-                dataModelProxy.item" [hasUnsavedChanges]="(koheseTypeStream |
-                async).dataModelProxy.dirty" (modified)="koheseTypeStream.
-                getValue().dataModelProxy.dirty = true">
-              </data-model-editor>
-            </ng-template>
-          </mat-tab>
-          <mat-tab label="{{'Display' + ((koheseTypeStream | async).
-            viewModelProxy.dirty ? '*' : '')}}">
-            <ng-template matTabContent>
-              <view-model-editor [viewModel]="(koheseTypeStream | async).
-                viewModelProxy.item" [hasUnsavedChanges]="(koheseTypeStream |
-                async).viewModelProxy.dirty" (modified)="koheseTypeStream.
-                getValue().viewModelProxy.dirty = true"
-                [dataModel]="(koheseTypeStream | async).dataModelProxy.item">
-              </view-model-editor>
-            </ng-template>
-          </mat-tab>
-        </mat-tab-group>
-      </ng-container>
-    </div>
-  </ng-container>
-  <ng-container *ngIf="!types">
-    <h3>
-      Loading...
-      <mat-spinner diameter="20"></mat-spinner>
-    </h3>
-  </ng-container>
+  <div style="height: 7%; width: 100%;">
+    <mat-form-field class="pad" style="width: 25%;">
+      <mat-select placeholder="Type" [(ngModel)]="selectedType">
+        <mat-option *ngFor="let type of types"
+          matTooltip="{{type.dataModelItemProxy.item.description}}"
+          [value]="type">
+          <mat-icon class="{{type.viewModelItemProxy.item.icon}}">
+          </mat-icon>
+          {{type.dataModelItemProxy.item.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <span class="pull-right">
+      <button mat-icon-button matTooltip="Add Type" (click)="add()">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Delete Type" (click)="delete()"
+        [disabled]="(!selectedType || selectedType.dataModelItemProxy.item.
+        isMetaModel)">
+        <mat-icon class="fa fa-trash"></mat-icon>
+      </button>
+    </span>
+  </div>
+  <div style="height: 93%; width: 100%;">
+    <ng-container *ngIf="selectedType">
+      <mat-tab-group class="pad" style="height: 100%; width: 100%;">
+        <mat-tab label="{{'Structure' + (selectedType.dataModelItemProxy.dirty
+          ? '*' : '')}}">
+          <ng-template matTabContent>
+            <data-model-editor [dataModel]="selectedType.dataModelItemProxy.
+              item" [hasUnsavedChanges]="selectedType.dataModelItemProxy.dirty"
+              (modified)="selectedType.dataModelItemProxy.dirty = true">
+            </data-model-editor>
+          </ng-template>
+        </mat-tab>
+        <mat-tab label="{{'Display' + (selectedType.viewModelItemProxy.dirty ?
+          '*' : '')}}">
+          <ng-template matTabContent>
+            <view-model-editor [viewModel]="selectedType.viewModelItemProxy.
+              item" [hasUnsavedChanges]="selectedType.viewModelItemProxy.dirty"
+              (modified)="selectedType.viewModelItemProxy.dirty = true"
+              [dataModel]="selectedType.dataModelItemProxy.item">
+            </view-model-editor>
+          </ng-template>
+        </mat-tab>
+      </mat-tab-group>
+    </ng-container>
+  </div>
 </div>

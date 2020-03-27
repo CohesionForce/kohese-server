@@ -63,15 +63,19 @@ export class FormatObjectEditorComponent implements OnInit {
       TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
         { includeOrigin: false }, (itemProxy: ItemProxy) => {
         if (itemProxy.kind === 'KoheseModel') {
-          let modelItemProxy: any = itemProxy;
-          while (modelItemProxy) {
-            if (modelItemProxy.item === this._type) {
-              this._types.push(itemProxy.item);
-              break;
+          if (this._allowKindNarrowingOnly) {
+            let modelItemProxy: any = itemProxy;
+            while (modelItemProxy) {
+              if (modelItemProxy.item === this._type) {
+                this._types.push(itemProxy.item);
+                break;
+              }
+              
+              modelItemProxy = this._itemRepository.getTreeConfig().getValue().
+                config.getProxyFor(modelItemProxy.item.base);
             }
-            
-            modelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-              modelItemProxy.item.base);
+          } else {
+            this._types.push(itemProxy.item);
           }
         }
       }, undefined);
@@ -153,6 +157,15 @@ export class FormatObjectEditorComponent implements OnInit {
     this._allowKindChange = allowKindChange;
   }
   
+  private _allowKindNarrowingOnly: boolean = true;
+  get allowKindNarrowingOnly() {
+    return this._allowKindNarrowingOnly;
+  }
+  @Input('allowKindNarrowingOnly')
+  set allowKindNarrowingOnly(allowKindNarrowingOnly: boolean) {
+    this._allowKindNarrowingOnly = allowKindNarrowingOnly;
+  }
+  
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
@@ -203,6 +216,9 @@ export class FormatObjectEditorComponent implements OnInit {
       this._formatDefinitionType = this._data['formatDefinitionType'];
       this._isDisabled = this._data['disabled'];
       this._allowKindChange = this._data['allowKindChange'];
+      if (this._data['allowKindNarrowingOnly']) {
+        this._allowKindNarrowingOnly = this._data['allowKindNarrowingOnly'];
+      }
     }
     
     if (!this._object) {
@@ -643,6 +659,10 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   public getDateString(timestamp: number): string {
+    if (timestamp == null) {
+      return undefined;
+    }
+    
     return new Date(timestamp).toISOString();
   }
   

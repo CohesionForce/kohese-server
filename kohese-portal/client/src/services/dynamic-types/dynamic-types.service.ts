@@ -104,6 +104,10 @@ export class DynamicTypesService {
       viewModelProxyMap[dataModelProxy.item.id].item.tableDefinitions = {};
     }
   }
+  
+  public removeKoheseType(koheseTypeName: string): void {
+    delete this.koheseTypes[koheseTypeName];
+  }
 
   getViewProxyFor(modelProxy: ItemProxy): ItemProxy {
     return this.treeConfig.getProxyFor('view-' + modelProxy.item.name.toLowerCase());
