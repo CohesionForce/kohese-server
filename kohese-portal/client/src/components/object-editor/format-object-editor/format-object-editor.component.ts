@@ -659,7 +659,7 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   public getDateString(timestamp: number): string {
-    if (timestamp === null) {
+    if (timestamp == null) {
       return undefined;
     }
     
