@@ -137,7 +137,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           FormatDefinitionType.DEFAULT]];
         let attributeEntries: Array<any> = defaultFormatDefinition.containers[
           0].contents;
-        for (let j: number = 0; itemDefaultFormatDefinition.containers[0].
+        for (let j: number = 0; j < itemDefaultFormatDefinition.containers[0].
           contents.length; j++) {
           attributeEntries.push(JSON.parse(JSON.stringify(
             itemDefaultFormatDefinition.containers[0].contents[j])));
