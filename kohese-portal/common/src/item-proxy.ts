@@ -37,6 +37,116 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-
 const DATE_REGEX = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/i;
 
 //////////////////////////////////////////////////////////////////////////
+// ItemChangeHandler tracks changes to the item content and provides update
+// of dirty status.
+//////////////////////////////////////////////////////////////////////////
+const ItemChangeHandler = (target, proxy, propertyPath?) => {
+  return new Proxy(target, {
+
+    //////////////////////////////////////////////////////////////////////////
+    get: function(target, property) {
+
+      if (property === '$isProxy') {
+        return true;
+      }
+
+      // TODO: Need to return default values based on Data Model
+
+      return target[property];
+    },
+
+    //////////////////////////////////////////////////////////////////////////
+    set: function(target, property, value) {
+
+      if (property !== 'children'){
+        
+        if (!target.$dirtyFields) {
+          target.$dirtyFields = {};
+        }
+
+        // Clone the value in case it is an object
+        let clonedValue;
+        if (value) {
+          clonedValue = JSON.parse(JSON.stringify(value))
+        } else if (target[property] === null) {
+          clonedValue = null;
+        }
+
+        if (!target.$dirtyFields[property]) {
+          // Copy the original value for comparison
+          let clonedOriginalValue;
+
+          if (target[property]) {
+            clonedOriginalValue = JSON.parse(JSON.stringify(target[property]));
+          } else if (target[property] === null) {
+            clonedOriginalValue = null;
+          }
+
+          target.$dirtyFields[property] = 
+            {
+              from: clonedOriginalValue,
+              to: clonedValue
+            }
+        } else {
+          // Update to the new value
+          target.$dirtyFields[property].to = clonedValue;
+        }
+
+        // Detect if the value has been reset to its original value
+        if (target.$dirtyFields[property].to === target.$dirtyFields[property].from) {
+          delete target.$dirtyFields[property];
+          if (Object.keys(target.$dirtyFields).length === 0) {
+            delete target.$dirtyFields;
+          }
+        }
+
+        if (proxy) {
+          proxy.notifyDirtyStatus();
+        }
+      }
+
+
+      // TODO: Need to chain nested objects
+      
+      target[property] = value;
+      return true;
+    },
+
+    //////////////////////////////////////////////////////////////////////////
+    deleteProperty: function(target, property) {
+      if (property !== '$dirtyFlags' && target.hasOwnProperty(property)) {
+        if (!target.$dirtyFields) {
+          target.$dirtyFields = {};
+        }
+
+        if (!target.$dirtyFields[property]) {
+          target.$dirtyFields[property] = {
+            from: target[property]
+          }
+        } else {
+          delete target.$dirtyFields[property].to;
+        }
+
+        // Detect if the value has been reset to its original value
+        if (target.$dirtyFields[property].to === target.$dirtyFields[property].from) {
+          delete target.$dirtyFields[property];
+          if (Object.keys(target.$dirtyFields).length === 0) {
+            delete target.$dirtyFields;
+          }
+        }
+
+        if (proxy) {
+          proxy.notifyDirtyStatus();
+        }
+      }
+
+      delete target[property]
+      return true;
+    }
+  });  
+};
+
+//////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
 //////////////////////////////////////////////////////////////////////////
 
@@ -72,7 +182,17 @@ export class ItemProxy {
   public repoPath;
 
   // Needed for information calculated on the client
-  public dirty : boolean = false;
+  public external_dirty : boolean = false;
+
+  set dirty (value : boolean) {
+    // TODO: Need to evaluate remaining setting of dirty and remove
+    this.external_dirty = value;
+  }
+
+  get dirty () : boolean {
+    return this.external_dirty || this.hasDirty();
+  }
+
   private _vcStatus : VersionStatus = new VersionStatus();
   public history;
   public newHistoryNewStyle;  // TODO: Remove this after testing is complete
@@ -169,8 +289,9 @@ export class ItemProxy {
     }
 
 
-    proxy.item = {};
+    proxy.item = ItemChangeHandler({}, proxy);
     copyAttributes(forItem, proxy);
+    proxy.clearDirtyFlags();
 
     proxy.setItemKind(kind);
 
@@ -232,6 +353,20 @@ export class ItemProxy {
     }
 
     return proxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  hasDirty() : boolean {
+    return this.item.hasOwnProperty('$dirtyFields');
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  clearDirtyFlags() {
+    delete this.item.$dirtyFields;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -776,7 +911,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   checkPropertyOrder(){
     if (this.model && this.model.item && this.model.item.propertyStorageOrder) {
-      var newItem : any = {};
+      var newItem : any = ItemChangeHandler({}, this);;
       var oldKeys = Object.keys(this.item);
       for (var keyIdx in this.model.item.propertyStorageOrder){
         var key = this.model.item.propertyStorageOrder[keyIdx];
@@ -787,6 +922,13 @@ export class ItemProxy {
       if (this.item.itemIds){
         newItem.itemIds = this.item.itemIds;
       }
+      
+      if (this.item.$dirtyFields) {
+        newItem.$dirtyFields = this.item.$dirtyFields;
+      } else {
+        delete newItem.$dirtyFields;
+      }
+
       var newKeys = Object.keys(newItem);
       if (!_.isEqual(oldKeys, newKeys)){
         this.item = newItem;
@@ -1574,7 +1716,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   makeChildrenAutoOrdered() {
     if (this.childrenAreManuallyOrdered()){
-      this.item.itemIds = [];
+      delete this.item.itemIds;
       this.sortChildren();
       this.calculateTreeHash();
     }
@@ -1662,6 +1804,8 @@ export class ItemProxy {
 
     // Copy the withItem into the current proxy
     let modifications = copyAttributes(withItem, this);
+    this.clearDirtyFlags();
+
     // console.log('%%% Modifications');
     // console.log(modifications);
 
@@ -1730,6 +1874,21 @@ export class ItemProxy {
       });
     }
 
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  notifyDirtyStatus() {
+    if (!this.treeConfig.loading) {
+      this.treeConfig.changeSubject.next({
+        type: 'dirty',
+        kind: this.kind,
+        id: this.item.id,
+        dirty: this.dirty,
+        proxy: this
+      });  
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////

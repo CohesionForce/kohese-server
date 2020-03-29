@@ -44,6 +44,11 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   private _filterDelayIdentifier: any;
 
   private _images: Array<Image> = [
+    new Image('assets/icons/versioncontrol/dirty.ico', (object: any) => {
+      return 'Unsaved Changes';
+    }, false, (object: any) => {
+      return (object as ItemProxy).dirty;
+    }),
     new Image('assets/icons/versioncontrol/unstaged.ico', (object: any) => {
       return 'Unstaged' + ((object as ItemProxy).vcStatus.isNew() ? ' - New' :
         '');

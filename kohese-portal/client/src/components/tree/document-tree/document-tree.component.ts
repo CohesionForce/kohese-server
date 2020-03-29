@@ -104,6 +104,10 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
               this.refresh();
             }
             break;
+          case 'update': 
+          case 'dirty': 
+              this.refresh();
+              break;    
           case 'delete': {
               this.deleteRow(notification.id);
               this.refresh();
