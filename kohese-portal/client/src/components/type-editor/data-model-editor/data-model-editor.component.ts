@@ -754,7 +754,7 @@ export class DataModelEditorComponent {
     
     if (attributeUsages.length === 0) {
       this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
-        'unsaved modifications to this kind are to be saved if this ' +
+        'unsaved modifications to this type are to be saved if this ' +
         'attribute is removed. Do you want to proceed?').subscribe(
         (choiceValue: any) => {
         if (choiceValue) {
@@ -764,7 +764,7 @@ export class DataModelEditorComponent {
       });
     } else {
       this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
-        'unsaved modifications to this kind are to be saved if this ' +
+        'unsaved modifications to this type are to be saved if this ' +
         'attribute is removed. Additionally, the following Items are ' +
         'expected to have this attribute removed from them: ' +
         attributeUsages.map((itemProxy: ItemProxy) => {
