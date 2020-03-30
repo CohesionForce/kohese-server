@@ -7,7 +7,6 @@ import { ChildrenTabComponent } from './children-tab/children-tab.component';
 import { ProxySelectorTreeComponent } from './children-tab/proxy-selector-tree/proxy-selector-tree.component';
 import { ChildrenTableComponent } from './children-tab/children-table/children-table.component';
 import { JournalComponent } from './journal/journal.component';
-import { DetailsFormComponent } from './details-form/details-form.component';
 import { ReferencesTabComponent } from './references-tab/references-tab.component';
 import { ReferenceTableComponent } from './references-tab/reference-table/reference-table.component';
 
@@ -35,8 +34,7 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     ChildrenTabComponent,
     ChildrenTableComponent,
     ProxySelectorTreeComponent,
-    JournalComponent,
-    DetailsFormComponent
+    JournalComponent
   ],
   entryComponents: [
     DetailsComponent
@@ -62,7 +60,6 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     DetailsComponent,
     HistoryTabComponent,
     ChildrenTabComponent,
-    DetailsFormComponent,
     ProxySelectorTreeComponent
   ]
 })

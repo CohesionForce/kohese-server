@@ -1050,7 +1050,7 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  getTreeConfig(): Observable<any> {
+  public getTreeConfig(): BehaviorSubject<TreeConfigInfo> {
     return this.currentTreeConfigSubject;
   }
 
