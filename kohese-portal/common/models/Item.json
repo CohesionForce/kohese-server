@@ -29,7 +29,6 @@
     },
     "parentId": {
       "type": "string",
-      "default": "",
       "name": "parentId"
     },
     "createdBy": {

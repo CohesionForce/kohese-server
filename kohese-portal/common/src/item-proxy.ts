@@ -58,7 +58,15 @@ const ItemChangeHandler = (target, proxy, propertyPath?) => {
     //////////////////////////////////////////////////////////////////////////
     set: function(target, property, value) {
 
-      if (property !== 'children'){
+      if (target[property] === value) {
+        let pName = property.toString();
+        // console.log('$$$ Trying to set property to same value: ' + pName + ' - ' + value);
+        return true;
+      }
+
+      if (property !== 'children') {
+
+        // console.log('$$$ Trying to set property: ' + property.toString() + ' -> ' + value + '<-');
         
         if (!target.$dirtyFields) {
           target.$dirtyFields = {};
@@ -66,7 +74,7 @@ const ItemChangeHandler = (target, proxy, propertyPath?) => {
 
         // Clone the value in case it is an object
         let clonedValue;
-        if (value) {
+        if (value !== undefined) {
           clonedValue = JSON.parse(JSON.stringify(value))
         } else if (target[property] === null) {
           clonedValue = null;
@@ -114,7 +122,10 @@ const ItemChangeHandler = (target, proxy, propertyPath?) => {
 
     //////////////////////////////////////////////////////////////////////////
     deleteProperty: function(target, property) {
-      if (property !== '$dirtyFlags' && target.hasOwnProperty(property)) {
+      if (property !== '$dirtyFields' && target.hasOwnProperty(property)) {
+        
+        // console.log('$$$ Trying to delete property: ' + property.toString());
+
         if (!target.$dirtyFields) {
           target.$dirtyFields = {};
         }
@@ -1881,11 +1892,16 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   notifyDirtyStatus() {
     if (!this.treeConfig.loading) {
+      let clonedFields;
+      if (this.item.$dirtyFields) {
+        clonedFields = JSON.parse(JSON.stringify(this.item.$dirtyFields));
+      }
       this.treeConfig.changeSubject.next({
         type: 'dirty',
         kind: this.kind,
         id: this.item.id,
         dirty: this.dirty,
+        dirtyFields: clonedFields,
         proxy: this
       });  
     }
