@@ -112,7 +112,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
         // TODO: Need to throw an exception if this is attempted (for now let it happen)
       }
 
-      if (!propertyDefinition || (propertyDefinition && !propertyDefinition.definition.dervived)) {
+      if (!propertyDefinition || (propertyDefinition && !propertyDefinition.definition.derived)) {
 
         // console.log('$$$ Trying to set property: ' + property.toString() + ' -> ' + value + '<-');
         
@@ -198,7 +198,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
         provideNotification = true;
       }
 
-      delete target[property]
+      delete target[property];
 
       if (proxy && provideNotification) {
         proxy.notifyDirtyStatus();
