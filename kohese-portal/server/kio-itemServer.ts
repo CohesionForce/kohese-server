@@ -40,6 +40,10 @@ if (!fs.existsSync(_REPORTS_DIRECTORY_PATH)) {
 //////////////////////////////////////////////////////////////////////////
 ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
   console.log('+++ Received notification of change: ' + change.type);
+  if (change.type === 'dirty') {
+    return;
+  }
+
   if(change.proxy){
     console.log(change.kind);
     console.log(change.proxy.item);
@@ -74,6 +78,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
         break;
       case 'loading':
       case 'loaded':
+      case 'dirty':
       case 'reference-added':
       case 'reference-removed':
       case 'reference-reordered':

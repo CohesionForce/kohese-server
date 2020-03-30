@@ -420,8 +420,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind;  // TODO: Need to remove update of item
-    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
     return super.filter(item);
   }
 
