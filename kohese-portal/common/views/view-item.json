@@ -75,7 +75,8 @@
             "customLabel": "Name",
             "labelOrientation": "Top",
             "kind": "text",
-            "visible": true
+            "visible": true,
+            "editable": true
           }
         ]
       },

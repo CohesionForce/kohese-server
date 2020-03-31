@@ -25,8 +25,4 @@ describe('Component: tree-row', () => {
 
     fixture.detectChanges();
   });
-
-  it('calculates the correct number of pixels by which to indent', () => {
-    expect(component.getIndentationStyle()['padding-left']).toEqual('93px');
-  });
 });

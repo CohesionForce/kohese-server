@@ -1,4 +1,4 @@
-import { DetailsDialogComponent } from './../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from './../../details/details.component';
 import { DialogService } from './../../../services/dialog/dialog.service';
 import { Component, OnInit, Input } from '@angular/core';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -26,7 +26,7 @@ export class ActivityFeedComponent implements OnInit {
   }
 
   openProxyDetails(proxy: ItemProxy) {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+    this.dialogService.openComponentDialog(DetailsComponent, {
       data : {
         itemProxy : proxy
       }

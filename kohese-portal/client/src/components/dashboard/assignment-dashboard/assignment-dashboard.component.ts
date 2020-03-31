@@ -3,7 +3,7 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDet
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { DetailsDialogComponent } from '../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from '../../details/details.component';
 import { FormatDefinition,
   FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
@@ -93,7 +93,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   }
   
   public displayInformation(itemProxy: ItemProxy): void {
-    this._dialogService.openComponentDialog(DetailsDialogComponent, {
+    this._dialogService.openComponentDialog(DetailsComponent, {
       data: {
         itemProxy: itemProxy
       }

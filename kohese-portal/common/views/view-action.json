@@ -234,7 +234,7 @@
               "customLabel": "approvedOn",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "number",
+              "kind": "date",
               "editable": true
             },
             {
@@ -314,7 +314,7 @@
               "customLabel": "estimatedStart",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "number",
+              "kind": "date",
               "editable": true
             },
             {
@@ -322,7 +322,7 @@
               "customLabel": "estimatedCompletion",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "number",
+              "kind": "date",
               "editable": true
             },
             {
@@ -338,7 +338,7 @@
               "customLabel": "actualStart",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "number",
+              "kind": "date",
               "editable": true
             },
             {
@@ -346,7 +346,7 @@
               "customLabel": "actualCompletion",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "number",
+              "kind": "date",
               "editable": true
             },
             {

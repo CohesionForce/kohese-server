@@ -1,129 +1,134 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { FormGroup } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
+  OnDestroy, Input, ViewChildren, QueryList, Optional,
+  Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { Subscription,  BehaviorSubject } from 'rxjs';
 
-import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
-
-import { ItemProxy } from '../../../../common/src/item-proxy.js';
-import { SessionService } from '../../services/user/session.service';
-
-import * as commonmark from 'commonmark';
-import { HtmlRenderer, Parser } from 'commonmark';
-import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { ProxyDetailsComponent } from './ProxyDetails.Class';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
+import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
 /* This component serves as a manager for viewing proxy details in the explore view.
    It functions by retrieving an id from the route parameters and then retrieving
    the proxy from the current tree configuration object
 */
-
 @Component({
   selector: 'details-view',
   templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss']
+  styleUrls: ['./details.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
+export class DetailsComponent implements OnInit, OnDestroy {
+  private _itemProxy: ItemProxy;
+  get itemProxy() {
+    return this._itemProxy;
+  }
+  @Input('itemProxy')
+  set itemProxy(itemProxy: ItemProxy) {
+    this._itemProxy = itemProxy;
+    this.proxyStream.next(this._itemProxy);
+  }
+  
+  treeConfig: TreeConfiguration;
 
-export class DetailsComponent extends ProxyDetailsComponent
-  implements OnInit, OnDestroy {
+  /* Observables */
+  proxyStream: BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(
+    undefined);
+  editableStream: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false);
 
   /* Subscriptions */
-  routeSub: Subscription;
-
-  // why are there two
   treeConfigSub: Subscription;
-  currentTreeConfigSubscription: Subscription;
+  
+  get matDialogRef() {
+    return this._matDialogRef;
+  }
+  
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
+  }
+  
+  @ViewChildren(FormatObjectEditorComponent)
+  private _formatObjectEditorQueryList: QueryList<FormatObjectEditorComponent>;
 
-  /* Data */
-  itemProxyId: string;
-  itemProxyError: boolean;
-  itemJson: string;
-  itemVCStatusJson: string;
-  treeConfig: any;
-  relationIdMap: any;
-  itemDescriptionRendered: string;
-  initialized: boolean;
-  repoConnected: boolean = false;
-
-  constructor(protected navigationService: NavigationService,
-    private route: ActivatedRoute,
-    protected itemRepository: ItemRepository) {
-    super(navigationService, itemRepository);
+  public constructor(private _changeDetectorRef: ChangeDetectorRef,
+    @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
+    @Optional() private _matDialogRef: MatDialogRef<DetailsComponent>,
+    private _itemRepository: ItemRepository, private _navigationService:
+    NavigationService, private _dialogService: DialogService) {
   }
 
-  ngOnInit() {
-    /* Subscriptions */
-    this.routeSub = this.route.params.subscribe(params => {
-      this.itemProxyId = params['id'];
-      // If a new id has come in and the initial set up has been done
-      if (this.initialized && this.repoConnected) {
-        this.updateProxy();
-      } else {
-        this.treeConfigSub = this.currentTreeConfigSubscription = this.itemRepository.getTreeConfig()
-          .subscribe((newConfig) => {
-            this.treeConfig = newConfig.config;
-            // Unsubscribe from old tree updates
-            if (this.proxyUpdates) {
-              this.proxyUpdates.unsubscribe();
-              this.proxyUpdates = undefined;
-            }
-            this.repoConnected = true;
-            this.updateProxy();
-            this.proxyUpdates = this.treeConfig.getChangeSubject().subscribe((change) => {
-              if (this.itemProxy === change.proxy) {
-                this.proxyStream.next(change.proxy);
-                this.relationIdMap = this.itemProxy.getRelationIdMap();
-              }
-            })
-          })
-
-
-        this.initialized = true;
-      }
-    })
-    /* End Subscriptions */
+  public ngOnInit(): void {
+    if (this.isDialogInstance()) {
+      this.treeConfig = TreeConfiguration.getWorkingTree();
+      this.itemProxy = this._data['itemProxy'];
+    } else {
+      this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe(
+        (treeConfigurationObject: any) => {
+        this.treeConfig = treeConfigurationObject.config;
+        this.editableStream.next(false);
+        if (this._itemProxy) {
+          this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.
+            id);
+          if (this._itemProxy) {
+            this._itemRepository.registerRecentProxy(this._itemProxy);
+          }
+        }
+        
+        this._changeDetectorRef.markForCheck();
+      });
+    }
   }
 
-  ngOnDestroy() {
-    this.routeSub.unsubscribe();
-    if (this.treeConfigSub) {
+  public ngOnDestroy(): void {
+    if (!this.isDialogInstance()) {
       this.treeConfigSub.unsubscribe();
     }
-    if (this.proxyUpdates) {
-      this.proxyUpdates.unsubscribe();
-    }
   }
-
-  updateProxy() {
-    this.editableStream.next(false);
-    this.itemProxy = this.treeConfig.getProxyFor(this.itemProxyId);
-    if (this.itemProxy) {
-      this.itemRepository.registerRecentProxy(this.itemProxy);
-      this.relationIdMap = this.itemProxy.getRelationIdMap();
-      this.itemJson = this.itemProxy.document();
-      this.itemVCStatusJson = JSON.stringify(this.itemProxy.vcStatus, null, '  ');
-      this.itemProxyError = false;
-    } else {
-      // TODO : Throw error modal to the UI
-      this.itemProxyError = true;
-    }
-
-    this.proxyStream.next(this.itemProxy);
+  
+  public isDialogInstance(): boolean {
+    return (this._matDialogRef && (this._matDialogRef.componentInstance ===
+      this) && this._data);
   }
-
-  getProxyFor(id): any {
-    return this.treeConfig.getProxyFor(id);
-  }
-
-  removeItem(proxy: ItemProxy): void {
-    this.itemRepository.deleteItem(proxy, false)
-      .then(function () {
-        // TBD:  May need to do something special if the delete fails
+  
+  public upsertItem(): void {
+    try {
+      let kind: string;
+      let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this.
+        _formatObjectEditorQueryList.toArray();
+      if (formatObjectEditorArray.length > 0) {
+        kind = formatObjectEditorArray[0].selectedType.name;
+      } else {
+        kind = this._itemProxy.kind;
+      }
+      
+      ItemProxy.validateItemContent(kind, this._itemProxy.item,
+        TreeConfiguration.getWorkingTree());
+      this._itemRepository.upsertItem(kind, this._itemProxy.item).then(
+        (updatedItemProxy: ItemProxy) => {
+        this.editableStream.next(false);
+        this._changeDetectorRef.markForCheck();
       });
-  };
+    } catch (error) {
+      this._dialogService.openInformationDialog('Invalid Item', 'The ' +
+        'following attributes are insufficiently populated: ' + error.
+        validation.missingProperties.join(', ') + '.');
+    }
+  }
 
-
-
+  public cancelEditing(): void {
+    this._itemRepository.fetchItem(this._itemProxy).then((proxy:
+      ItemProxy) => {
+      this.editableStream.next(false);
+      this._changeDetectorRef.markForCheck();
+    });
+  }
+  
+  public navigate(id: string): void {
+    this._navigationService.addTab('Explore', { id: id });
+  }
 }

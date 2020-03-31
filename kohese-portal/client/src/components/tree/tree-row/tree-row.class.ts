@@ -98,6 +98,10 @@ export class TreeRow {
     return false;
   }
   
+  public hasError(): boolean {
+    return false;
+  }
+  
   public refresh(): void {
     // May be implemented externally
   }

@@ -3,7 +3,8 @@
   'calc(100% - 40px)' : '100%' }">
   <ng-container *ngIf="(allowKindChange && (types.length > 1))">
     <mat-form-field style="width: 100%;">
-      <mat-select placeholder="Kind" [(ngModel)]="selectedType">
+      <mat-select placeholder="Kind" [disabled]="isDisabled"
+        [(ngModel)]="selectedType">
         <ng-container *ngFor="let typeOption of types">
           <mat-option [value]="typeOption">
             {{typeOption.name}}
@@ -113,12 +114,17 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'date'">
                   <mat-form-field style="width: 100%;">
-                    <input matInput type="date"
+                    <input matInput [matDatepicker]="matDatepicker"
                       placeholder="{{getAttributeRepresentation(
-                      attributeDefinition)}}" [(ngModel)]="object[
-                      attributeDefinition.propertyName]"
+                      attributeDefinition)}}" [ngModel]="getDateString(object[
+                      attributeDefinition.propertyName])"
+                      (ngModelChange)="($event ? object[attributeDefinition.
+                      propertyName] = $event.getTime() : '')"
                       [disabled]="(!attributeDefinition.editable ||
                       isDisabled)"/>
+                    <mat-datepicker-toggle matSuffix [for]="matDatepicker">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #matDatepicker></mat-datepicker>
                   </mat-form-field>
                 </ng-container>
                 <ng-container *ngSwitchCase="'string'">

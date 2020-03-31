@@ -4,7 +4,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
-import { DetailsDialogComponent } from '../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from '../details/details.component';
 import { FormatDefinition,
   FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -303,7 +303,7 @@ export class CategoryBoardComponent {
   }
   
   public displayInformation(item: any): void {
-    this._dialogService.openComponentDialog(DetailsDialogComponent, {
+    this._dialogService.openComponentDialog(DetailsComponent, {
       data: {
         itemProxy: TreeConfiguration.getWorkingTree().getProxyFor(item.id)
       }

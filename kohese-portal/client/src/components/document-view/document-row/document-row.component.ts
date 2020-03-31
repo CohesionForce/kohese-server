@@ -6,8 +6,8 @@ import {
   ItemRepository
 } from '../../../services/item-repository/item-repository.service';
 import {
-  DetailsDialogComponent
-} from '../../details/details-dialog/details-dialog.component';
+  DetailsComponent
+} from '../../details/details.component';
 import {
   ItemProxy
 } from '../../../../../common/src/item-proxy';
@@ -77,10 +77,9 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
   }
 
   showProxyDetails(proxy: ItemProxy) {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+    this.dialogService.openComponentDialog(DetailsComponent, {
         data: {
-          itemProxy: proxy,
-          hideDocument: true
+          itemProxy: proxy
         }
       }).updateSize('80%', '80%')
       .afterClosed().subscribe((results) => {

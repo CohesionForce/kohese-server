@@ -93,7 +93,7 @@
       "type": "string"
     },
     "approvedOn": {
-      "type": "number"
+      "type": "timestamp"
     },
     "rationale": {
       "type": "string"

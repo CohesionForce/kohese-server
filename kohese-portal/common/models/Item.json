@@ -37,7 +37,7 @@
       "name": "createdBy"
     },
     "createdOn": {
-      "type": "number",
+      "type": "timestamp",
       "name": "createdOn"
     },
     "modifiedBy": {
@@ -45,7 +45,7 @@
       "name": "modifiedBy"
     },
     "modifiedOn": {
-      "type": "number",
+      "type": "timestamp",
       "name": "modifiedOn"
     },
     "loadPending": {
@@ -65,7 +65,6 @@
         "Item"
       ],
       "required": false,
-      "default": "",
       "id": false,
       "relation": {
         "kind": "Item",

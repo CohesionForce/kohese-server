@@ -292,6 +292,9 @@ export abstract class Tree {
     row.isMultiselectEnabled = () => {
       return this.isMultiselectEnabled(object);
     };
+    row.hasError = () => {
+      return this.hasError(object);
+    };
     let id: any = this.getId(object);
     this._rowMap.set(id, row);
 
@@ -571,6 +574,10 @@ export abstract class Tree {
 
   protected isMultiselectEnabled(object: any): boolean {
     return this._canMoveRows && this._inTargetingMode;
+  }
+  
+  protected hasError(object: any): boolean {
+    return false;
   }
   
   protected target(target: any, targetingObject: any, targetPosition:

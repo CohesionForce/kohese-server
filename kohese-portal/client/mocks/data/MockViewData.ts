@@ -56,6 +56,7 @@ export function MockViewData () {
   "createdOn": 1510596684590,
   "modifiedBy": "admin",
   "modifiedOn": 1517006598071,
+  "localTypes": {},
   "formatDefinitions": {
     "89324a90-a7af-11e8-8662-71e48f0160fe": {
       "name": "New definition ",
@@ -281,6 +282,9 @@ export function MockItemSubclassView() {
         "displayName": "Subclass Property"
       }
     },
-    "tableDefinitions": {}
+    "localTypes": {},
+    "formatDefinitions": {},
+    "tableDefinitions": {},
+    "defaultFormatKey": {}
   };
 }

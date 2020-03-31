@@ -103,6 +103,7 @@ export class DataModelEditorComponent {
     'Number': 'number',
     'Text': 'string',
     'State': 'StateMachine',
+    'Timestamp': 'timestamp',
     'Username': 'user-selector'
   };
   get fundamentalTypes() {
@@ -249,6 +250,9 @@ export class DataModelEditorComponent {
           break;
         case 'StateMachine':
           propertyDefinition.kind = 'state-editor';
+          break;
+        case 'timestamp':
+          propertyDefinition.kind = 'date';
           break;
         case 'user-selector':
           propertyDefinition.kind = 'user-selector';
@@ -592,6 +596,9 @@ export class DataModelEditorComponent {
       if (attributeType === 'string') {
         viewModelProxy.item.viewProperties[attribute.name].inputType.type =
           'text';
+      } else if (attributeType === 'timestamp') {
+        viewModelProxy.item.viewProperties[attribute.name].inputType.type =
+          'date';
       } else {
         viewModelProxy.item.viewProperties[attribute.name].inputType.type =
           attributeType;
