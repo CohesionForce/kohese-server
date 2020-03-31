@@ -10,7 +10,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
 import { FormatDefinition,
   FormatDefinitionType } from '../FormatDefinition.interface';
-import { FormatContainerKind } from '../FormatContainer.interface';
+import { FormatContainer,
+  FormatContainerKind } from '../FormatContainer.interface';
 import { PropertyDefinition } from '../PropertyDefinition.interface';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -723,16 +724,71 @@ export class DataModelEditorComponent {
           this._dataModel.name.toLowerCase()).item;
       }
       
+      let dataModelAttribute: any = this._dataModel.properties[propertyId];
+      let isMultivaluedReference: boolean = (dataModelAttribute.relation &&
+        Array.isArray(dataModelAttribute.type));
       delete this._dataModel.properties[propertyId];
       delete viewModel.viewProperties[propertyId];
-      let defaultFormatDefinition: FormatDefinition = viewModel.
-        formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
-        DEFAULT]];
-      defaultFormatDefinition.containers[0].contents.splice(
-        defaultFormatDefinition.containers[0].contents.map((propertyDefinition:
-        PropertyDefinition) => {
-        return propertyDefinition.propertyName;
-      }).indexOf(propertyId), 1);
+      let formatDefinitions: Array<FormatDefinition> = Object.values(viewModel.
+        formatDefinitions);
+      for (let j: number = 0; j < formatDefinitions.length; j++) {
+        for (let k: number = 0; k < formatDefinitions[j].containers.length;
+          k++) {
+          let formatContainer: FormatContainer = formatDefinitions[j].
+            containers[k];
+          if (formatContainer.kind !== FormatContainerKind.
+            REVERSE_REFERENCE_TABLE) {
+            let entryIndex: number = formatContainer.contents.map(
+              (propertyDefinition: PropertyDefinition) => {
+              return propertyDefinition.propertyName;
+            }).indexOf(propertyId);
+            if (entryIndex !== -1) {
+              formatContainer.contents.splice(entryIndex, 1);
+            }
+          }
+        }
+      }
+      
+      if (isMultivaluedReference) {
+        this._itemRepository.getTreeConfig().getValue().config.getRootProxy().
+          visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
+          if (itemProxy.kind === 'KoheseView') {
+            let shouldSave: boolean = false;
+            let formatDefinitions: Array<FormatDefinition> = Object.values(
+              itemProxy.item.formatDefinitions);
+            for (let j: number = 0; j < formatDefinitions.length; j++) {
+              for (let k: number = 0; k < formatDefinitions[j].containers.
+                length; k++) {
+                let formatContainer: FormatContainer = formatDefinitions[j].
+                  containers[k];
+                if (formatContainer.kind === FormatContainerKind.
+                  REVERSE_REFERENCE_TABLE) {
+                  let propertyDefinitions: Array<PropertyDefinition> =
+                    formatContainer.contents.filter((propertyDefinition:
+                    PropertyDefinition) => {
+                    return ((propertyDefinition.propertyName.kind === this.
+                      _dataModel.name) && (propertyDefinition.propertyName.
+                      attribute === propertyId));
+                  });
+                  if (propertyDefinitions.length > 0) {
+                    for (let l: number = 0; l < propertyDefinitions.length;
+                      l++) {
+                      formatContainer.contents.splice(formatContainer.contents.
+                        indexOf(propertyDefinitions[l]), 1);
+                    }
+                    
+                    shouldSave = true;
+                  }
+                }
+              }
+            }
+            
+            if (shouldSave) {
+              this._itemRepository.upsertItem('KoheseView', itemProxy.item);
+            }
+          }
+        }, undefined)
+      }
       
       this.save();
       
