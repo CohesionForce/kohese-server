@@ -221,8 +221,9 @@
                       <button mat-raised-button 
                         [disabled]="!isLocalTypeAttribute(attributeDefinition.
                         propertyName)" style="width: 100%; margin: 0px 3px 0px
-                        3px;" (click)="openObjectEditor(attributeDefinition,
-                        true)">
+                        3px; white-space: nowrap; overflow: hidden;
+                        text-overflow: ellipsis;" (click)="openObjectEditor(
+                        attributeDefinition, true)">
                         {{getStringRepresentation(undefined,
                           attributeDefinition.propertyName)}}
                       </button>
