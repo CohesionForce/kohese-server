@@ -2,8 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -14,10 +15,11 @@ import { Subscription } from 'rxjs';
 
 export class ExploreComponent extends NavigatableComponent
                               implements OnInit, OnDestroy {
-  proxySelected : boolean;
-  routeId : string;
+  private _itemProxy: ItemProxy;
+  get itemProxy() {
+    return this._itemProxy;
+  }
 
-  paramSubscription : Subscription;
   treeConfigSubscription : Subscription;
 
   constructor (protected NavigationService : NavigationService,
@@ -27,29 +29,18 @@ export class ExploreComponent extends NavigatableComponent
   }
 
   ngOnInit () {
-   this.paramSubscription = this.router.params.subscribe(params => {
-     console.log(params);
-     this.proxySelected = !!params['id'];
-     if (this.proxySelected) {
-      this.routeId = params['id'];
+   this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe(
+     (treeConfigurationObject: any)=>{
+     if (treeConfigurationObject) {
+       this.router.params.subscribe((params: Params) => {
+         this._itemProxy = treeConfigurationObject.config.getProxyFor(params[
+           'id']);
+       });
      }
    });
-
-   this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig)=>{
-     if (this.routeId && newConfig) {
-       if (newConfig.config.getProxyFor(this.routeId)){
-         this.proxySelected = true;
-       } else {
-         this.proxySelected = false;
-       } 
-     } else {
-       this.proxySelected = false;
-     }
-   })
   }
 
   ngOnDestroy () {
-    this.paramSubscription.unsubscribe();
     this.treeConfigSubscription.unsubscribe();
   }
 }

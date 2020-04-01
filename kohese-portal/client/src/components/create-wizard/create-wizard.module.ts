@@ -6,7 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { CreateWizardComponent } from './create-wizard.component';
 import { MaterialModule } from "../../material.module";
 import { PipesModule } from "../../pipes/pipes.module";
-import { DetailsModule } from "../../components/details/details.module";
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 import { UserInputModule } from "../user-input/user-input.module";
 
@@ -24,7 +24,7 @@ import { UserInputModule } from "../user-input/user-input.module";
     FormsModule,
     ReactiveFormsModule,
     PipesModule,
-    DetailsModule,
+    ObjectEditorModule,
     BrowserAnimationsModule,
     UserInputModule
     

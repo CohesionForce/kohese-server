@@ -5,7 +5,9 @@
       <navigator></navigator>
     </split-area>
     <split-area id="details-container" [size]="50">
-      <details-view *ngIf="proxySelected"></details-view>
+      <ng-container *ngIf="itemProxy">
+        <details-view [itemProxy]="itemProxy"></details-view>
+      </ng-container>
     </split-area>
   </split>
 </div>

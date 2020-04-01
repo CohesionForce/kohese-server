@@ -1,5 +1,5 @@
 import { ItemRepository } from './../../../services/item-repository/item-repository.service';
-import { DetailsDialogComponent } from './../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from './../../details/details.component';
 import { DialogService } from './../../../services/dialog/dialog.service';
 import { Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ItemProxy } from './../../../../../common/src/item-proxy';
@@ -26,7 +26,7 @@ export class StatefulProxyCardComponent implements OnInit {
   }
 
   openProxyDialog() {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+    this.dialogService.openComponentDialog(DetailsComponent, {
       data : {
         itemProxy : this.proxy
       }

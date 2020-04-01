@@ -11,7 +11,8 @@ import { DocumentConfigurationEditorComponent } from '../object-editor/document-
 import { TreeComponent, Action, ToggleAction } from '../tree/tree.component';
 import { CopyComponent, CopySpecifications } from '../copy/copy.component';
 import { TextEditorComponent } from '../text-editor/text-editor.component';
-import { ObjectEditorComponent } from '../object-editor/object-editor.component';
+import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
+import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 import { AttributeInsertionComponent, AttributeInsertionSpecification,
   InsertionLocation,
   HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
@@ -216,7 +217,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
   private _selectedAttributeName: string;
   
   @ViewChild('objectEditor')
-  private _objectEditor: ObjectEditorComponent;
+  private _objectEditor: FormatObjectEditorComponent;
   
   get matDialogRef() {
     return this._matDialogRef;
@@ -230,6 +231,14 @@ export class DocumentComponent implements OnInit, OnDestroy {
   
   get Object() {
     return Object;
+  }
+  
+  get TreeConfiguration() {
+    return TreeConfiguration;
+  }
+  
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
   }
   
   private static readonly _INPUT_OPENING_HIDDEN_TAG: string =
@@ -779,10 +788,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
     this._textEditor.editor.editor.dom.select('div#' + id)[0].scrollIntoView();
     let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       id);
-    /* Currently, type must be set before object, as the object setter
-    references type. */
-    this._objectEditor.type = itemProxy.model.item;
     this._objectEditor.object = itemProxy.item;
+    this._objectEditor.type = itemProxy.model.item;
     this._changeDetectorRef.markForCheck();
   }
   
@@ -870,10 +877,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
         
         let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(itemId);
-        /* Currently, type must be set before object, as the object setter
-        references type. */
-        this._objectEditor.type = itemProxy.model.item;
         this._objectEditor.object = itemProxy.item;
+        this._objectEditor.type = itemProxy.model.item;
         
         this._changeDetectorRef.markForCheck();
         

@@ -1,14 +1,5 @@
 @import '../../app.component';
 
-#details-panel {
-  height: 100%;
-  margin-bottom: 0;
-
-  > .panel-body {
-    height: calc(100% - 45px);
-  }
-}
-
 .item-actions {
 
   i {

@@ -1,5 +1,5 @@
 import { StateInfo, StateFilterService } from '../../state-filter.service';
-import { DetailsDialogComponent } from './../../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from './../../../details/details.component';
 import { DialogService } from './../../../../services/dialog/dialog.service';
 import { MatTableDataSource } from '@angular/material';
 import { ItemProxy } from './../../../../../../common/src/item-proxy';
@@ -91,7 +91,7 @@ export class StatusDashboardComponent implements OnInit, OnDestroy {
   }
 
   openProxyDetails(proxy: ItemProxy) {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+    this.dialogService.openComponentDialog(DetailsComponent, {
       data: {
         itemProxy: proxy
       }

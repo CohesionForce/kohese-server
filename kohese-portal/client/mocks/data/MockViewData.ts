@@ -282,6 +282,9 @@ export function MockItemSubclassView() {
         "displayName": "Subclass Property"
       }
     },
-    "tableDefinitions": {}
+    "localTypes": {},
+    "formatDefinitions": {},
+    "tableDefinitions": {},
+    "defaultFormatKey": {}
   };
 }

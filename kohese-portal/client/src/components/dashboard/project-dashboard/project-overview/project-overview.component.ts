@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 
 import { ItemProxy} from '../../../../../../common/src/item-proxy';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { DetailsDialogComponent } from '../../../details/details-dialog/details-dialog.component';
+import { DetailsComponent } from '../../../details/details.component';
 
 @Component({
   selector: 'project-overview',
@@ -50,7 +50,7 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
   }
 
   openProxyDetails(proxy: ItemProxy) {
-    this.dialogService.openComponentDialog(DetailsDialogComponent, {
+    this.dialogService.openComponentDialog(DetailsComponent, {
       data : {
         itemProxy : proxy
       }
