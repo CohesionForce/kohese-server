@@ -429,6 +429,34 @@ export class FormatObjectEditorComponent implements OnInit {
           }
         });
         break;
+      case 'text':
+        if (value == null) {
+          value = '';
+        }
+        
+        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
+          INPUT_TYPES.TEXT, attributeName, value, undefined).afterClosed().
+          subscribe((value: string) => {
+          if (value) {
+            this._object[attributeName].splice(index, 1, value);
+            this._changeDetectorRef.markForCheck();
+          }
+        });
+        break;
+      case 'maskedString':
+        if (value == null) {
+          value = '';
+        }
+        
+        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
+          INPUT_TYPES.MASKED_STRING, attributeName, value, undefined).
+          afterClosed().subscribe((value: string) => {
+          if (value) {
+            this._object[attributeName].splice(index, 1, value);
+            this._changeDetectorRef.markForCheck();
+          }
+        });
+        break;
       case 'markdown':
         if (value == null) {
           value = '';

@@ -8,7 +8,6 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
 @Component({
   selector: 'app-admin',
@@ -17,11 +16,6 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminComponent implements OnInit, OnDestroy {
-  private _treeConfiguration: TreeConfiguration;
-  get treeConfiguration() {
-    return this._treeConfiguration;
-  }
-  
   private _koheseUserDataModel: any;
   get koheseUserDataModel() {
     return this._koheseUserDataModel;
@@ -65,10 +59,9 @@ export class AdminComponent implements OnInit, OnDestroy {
     this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
       subscribe(async (treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
-        this._treeConfiguration = treeConfigurationObject.config;
-        this._koheseUserDataModel = this._treeConfiguration.getProxyFor(
+        this._koheseUserDataModel = treeConfigurationObject.config.getProxyFor(
           'KoheseUser').item;
-        this._koheseUserViewModel = this._treeConfiguration.getProxyFor(
+        this._koheseUserViewModel = treeConfigurationObject.config.getProxyFor(
           'view-koheseuser').item;
         this._sessionMap = await this._itemRepository.getSessionMap();
         this._changeDetectorRef.markForCheck();
@@ -91,8 +84,8 @@ export class AdminComponent implements OnInit, OnDestroy {
           createdBy: username,
           modifiedOn: timestamp,
           modifiedBy: username,
-          parentId: this._treeConfiguration.getRootProxy().getChildByName(
-            'Users').item.id
+          parentId: this._itemRepository.getTreeConfig().getValue().config.
+            getRootProxy().getChildByName('Users').item.id
         },
         formatDefinitionType: FormatDefinitionType.DEFAULT,
         allowKindChange: true
@@ -109,16 +102,17 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
   
   public save(user: any): void {
-    this._itemRepository.upsertItem(this._treeConfiguration.getProxyFor(user.
-      id).kind, user).then((returnedItemProxy: ItemProxy) => {
+    this._itemRepository.upsertItem(this._itemRepository.getTreeConfig().
+      getValue().config.getProxyFor(user.id).kind, user).then(
+      (returnedItemProxy: ItemProxy) => {
       this._changeDetectorRef.markForCheck();
     });
     this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
   }
   
   public discardChanges(user: any): void {
-    this._itemRepository.fetchItem(this._treeConfiguration.getProxyFor(user.
-      id));
+    this._itemRepository.fetchItem(this._itemRepository.getTreeConfig().
+      getValue().config.getProxyFor(user.id));
     this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
     this._changeDetectorRef.markForCheck();
   }
@@ -128,8 +122,8 @@ export class AdminComponent implements OnInit, OnDestroy {
       'sure that you want to remove ' + user.name + ' from the system?').
       subscribe((response: any) => {
       if (response) {
-        this._itemRepository.deleteItem(this._treeConfiguration.getProxyFor(user.
-          id), false).then(() => {
+        this._itemRepository.deleteItem(this._itemRepository.getTreeConfig().
+          getValue().config.getProxyFor(user.id), false).then(() => {
           this._sessionService.users.splice(this._sessionService.users.indexOf(
             user), 1);
           this._changeDetectorRef.markForCheck();

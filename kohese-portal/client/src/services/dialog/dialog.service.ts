@@ -85,7 +85,8 @@ export class DialogComponent {
     MARKDOWN: 'markdown',
     NUMBER: 'number',
     DATE: 'date',
-    TIME: 'time'
+    TIME: 'time',
+    MASKED_STRING: 'password'
   };
 
   get INPUT_TYPES() {

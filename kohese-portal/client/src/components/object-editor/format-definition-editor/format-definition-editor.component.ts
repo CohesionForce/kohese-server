@@ -75,7 +75,8 @@ export class FormatDefinitionEditorComponent implements OnInit {
     },
     'string': {
       'Text': 'text',
-      'Markdown': 'markdown'
+      'Markdown': 'markdown',
+      'Masked String': 'maskedString'
     },
     'StateMachine': {
       'State': 'state-editor'

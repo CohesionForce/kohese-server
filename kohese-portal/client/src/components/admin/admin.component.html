@@ -1,4 +1,4 @@
-<ng-container *ngIf="treeConfiguration else initializing">
+<ng-container *ngIf="sessionMap else initializing">
   <lens></lens>
   <div class="panel-heading">Admin</div>
   <div style="height: 20%;">
@@ -15,7 +15,7 @@
       </ng-container>
     </div>
   </div>
-  <div style="height: 80%;">
+  <div style="height: calc(80% - 34px);">
     <div style="height: 70px; display: flex; flex-direction: row;">
       <h2>Users</h2>
       <button mat-icon-button matTooltip="Add a user" style="margin-left:
