@@ -37,6 +37,179 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-
 const DATE_REGEX = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/i;
 
 //////////////////////////////////////////////////////////////////////////
+// ItemChangeHandler tracks changes to the item content and provides update
+// of dirty status.
+//////////////////////////////////////////////////////////////////////////
+const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
+  return new Proxy(target, {
+
+    //////////////////////////////////////////////////////////////////////////
+    get: function(target, property) {
+
+      if (property === '$isProxy') {
+        return true;
+      }
+
+      // Provide automatic return of fields required by current UI filter implementation
+      // TODO: Remove this logic when the UI filter is updated to remove this approach
+      switch (property) {
+        case 'kind':
+          if (proxy) {
+            return proxy.kind;
+          } else {
+            return undefined;
+          }
+          break;
+        case 'status':
+          if (proxy && proxy.vcStatus) {
+            return proxy.vcStatus.statusArray;
+          } else {
+            return undefined;
+          }
+          break;
+      }
+
+      // TODO: Need to return default values based on Data Model
+
+      return target[property];
+    },
+
+    //////////////////////////////////////////////////////////////////////////
+    set: function(target, property, value) {
+
+      let provideNotification = false;
+
+      if (target[property] === value) {
+        // console.log('$$$ Trying to set property to same value: ' + property.toString() + ' - ' + value);
+        return true;
+      }
+
+      // Store automatic fields without notification
+      switch (property) {
+        case 'children':
+        case '__deletedProperty':
+          target[property] = value;
+          return true;
+      }
+
+      // Store Lost-Proxy fields
+      if (proxy.kind === 'Internal-Lost') {
+        target[property] = value;
+        return true;
+      }
+
+
+      // Detect unexpected properties
+      let propertyDefinition;
+      if (proxy && proxy.model) {
+        propertyDefinition = proxy.model.item.classProperties[property];
+        if (!propertyDefinition) {
+          let trace = new Error().stack;
+          console.log('*** Trying to set invalid property: ' + property.toString());
+          console.log(trace);
+        }
+        
+        // TODO: Need to throw an exception if this is attempted (for now let it happen)
+      }
+
+      if (!propertyDefinition || (propertyDefinition && !propertyDefinition.definition.derived)) {
+
+        // console.log('$$$ Trying to set property: ' + property.toString() + ' -> ' + value + '<-');
+        
+        if (!target.$dirtyFields) {
+          target.$dirtyFields = {};
+        }
+
+        // Clone the value in case it is an object
+        let clonedValue;
+        if (value !== undefined) {
+          clonedValue = JSON.parse(JSON.stringify(value))
+        }
+
+        if (!target.$dirtyFields[property]) {
+          // Copy the original value for comparison
+          let clonedOriginalValue;
+
+          if (target[property]) {
+            clonedOriginalValue = JSON.parse(JSON.stringify(target[property]));
+          }
+
+          target.$dirtyFields[property] = 
+            {
+              from: clonedOriginalValue,
+              to: clonedValue
+            }
+        } else {
+          // Update to the new value
+          target.$dirtyFields[property].to = clonedValue;
+        }
+
+        // Detect if the value has been reset to its original value
+        if (_.isEqual(target.$dirtyFields[property].to, target.$dirtyFields[property].from)) {
+          delete target.$dirtyFields[property];
+          if (Object.keys(target.$dirtyFields).length === 0) {
+            delete target.$dirtyFields;
+          }
+        }
+
+        provideNotification = true;
+      }
+
+
+      // TODO: Need to chain nested objects
+      
+      target[property] = value;
+
+      if (proxy && provideNotification) {
+        proxy.notifyDirtyStatus();
+      }
+
+      return true;
+    },
+
+    //////////////////////////////////////////////////////////////////////////
+    deleteProperty: function(target, property) {
+      let provideNotification = false;
+
+      if (property !== '$dirtyFields' && target.hasOwnProperty(property)) {
+        
+        // console.log('$$$ Trying to delete property: ' + property.toString());
+
+        if (!target.$dirtyFields) {
+          target.$dirtyFields = {};
+        }
+
+        if (!target.$dirtyFields[property]) {
+          target.$dirtyFields[property] = {
+            from: target[property]
+          }
+        } else {
+          delete target.$dirtyFields[property].to;
+        }
+
+        // Detect if the value has been reset to its original value
+        if (_.isEqual(target.$dirtyFields[property].to, target.$dirtyFields[property].from)) {
+          delete target.$dirtyFields[property];
+          if (Object.keys(target.$dirtyFields).length === 0) {
+            delete target.$dirtyFields;
+          }
+        }
+
+        provideNotification = true;
+      }
+
+      delete target[property];
+
+      if (proxy && provideNotification) {
+        proxy.notifyDirtyStatus();
+      }
+
+      return true;
+    }
+  });  
+};
+
+//////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
 //////////////////////////////////////////////////////////////////////////
 
@@ -72,7 +245,17 @@ export class ItemProxy {
   public repoPath;
 
   // Needed for information calculated on the client
-  public dirty : boolean = false;
+  public external_dirty : boolean = false;
+
+  set dirty (value : boolean) {
+    // TODO: Need to evaluate remaining setting of dirty and remove
+    this.external_dirty = value;
+  }
+
+  get dirty () : boolean {
+    return this.external_dirty || this.hasDirty();
+  }
+
   private _vcStatus : VersionStatus = new VersionStatus();
   public history;
   public newHistoryNewStyle;  // TODO: Remove this after testing is complete
@@ -169,8 +352,9 @@ export class ItemProxy {
     }
 
 
-    proxy.item = {};
+    proxy.item = ItemChangeHandler({}, proxy);
     copyAttributes(forItem, proxy);
+    proxy.clearDirtyFlags();
 
     proxy.setItemKind(kind);
 
@@ -232,6 +416,20 @@ export class ItemProxy {
     }
 
     return proxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  hasDirty() : boolean {
+    return this.item.hasOwnProperty('$dirtyFields');
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  clearDirtyFlags() {
+    delete this.item.$dirtyFields;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -776,7 +974,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   checkPropertyOrder(){
     if (this.model && this.model.item && this.model.item.propertyStorageOrder) {
-      var newItem : any = {};
+      var newItem : any = {};;
       var oldKeys = Object.keys(this.item);
       for (var keyIdx in this.model.item.propertyStorageOrder){
         var key = this.model.item.propertyStorageOrder[keyIdx];
@@ -787,9 +985,14 @@ export class ItemProxy {
       if (this.item.itemIds){
         newItem.itemIds = this.item.itemIds;
       }
+      
+      if (this.item.$dirtyFields) {
+        newItem.$dirtyFields = this.item.$dirtyFields;
+      }
+
       var newKeys = Object.keys(newItem);
       if (!_.isEqual(oldKeys, newKeys)){
-        this.item = newItem;
+        this.item = ItemChangeHandler(newItem, this);
       }
     }
   }
@@ -1574,7 +1777,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   makeChildrenAutoOrdered() {
     if (this.childrenAreManuallyOrdered()){
-      this.item.itemIds = [];
+      delete this.item.itemIds;
       this.sortChildren();
       this.calculateTreeHash();
     }
@@ -1662,6 +1865,8 @@ export class ItemProxy {
 
     // Copy the withItem into the current proxy
     let modifications = copyAttributes(withItem, this);
+    this.clearDirtyFlags();
+
     // console.log('%%% Modifications');
     // console.log(modifications);
 
@@ -1730,6 +1935,26 @@ export class ItemProxy {
       });
     }
 
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  notifyDirtyStatus() {
+    if (!this.treeConfig.loading) {
+      let clonedFields;
+      if (this.item.$dirtyFields) {
+        clonedFields = JSON.parse(JSON.stringify(this.item.$dirtyFields));
+      }
+      this.treeConfig.changeSubject.next({
+        type: 'dirty',
+        kind: this.kind,
+        id: this.item.id,
+        dirty: this.dirty,
+        dirtyFields: clonedFields,
+        proxy: this
+      });  
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////

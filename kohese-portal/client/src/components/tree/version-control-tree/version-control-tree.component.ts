@@ -44,6 +44,11 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   private _filterDelayIdentifier: any;
 
   private _images: Array<Image> = [
+    new Image('assets/icons/versioncontrol/dirty.ico', (object: any) => {
+      return 'Unsaved Changes';
+    }, false, (object: any) => {
+      return (object as ItemProxy).dirty;
+    }),
     new Image('assets/icons/versioncontrol/unstaged.ico', (object: any) => {
       return 'Unstaged' + ((object as ItemProxy).vcStatus.isNew() ? ' - New' :
         '');
@@ -320,8 +325,6 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind; // TODO: Need to remove update of item
-    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
     return super.filter(item);
   }
 
