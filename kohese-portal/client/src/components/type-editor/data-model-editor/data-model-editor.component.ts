@@ -145,6 +145,10 @@ export class DataModelEditorComponent {
     return this._attributes;
   }
   
+  get Array() {
+    return Array;
+  }
+  
   get Object() {
     return Object;
   }
@@ -564,6 +568,12 @@ export class DataModelEditorComponent {
       attribute.type = attributeType;
     }
     
+    if (attribute.type === 'string') {
+      attribute.default = '';
+    } else {
+      delete attribute.default;
+    }
+    
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
       if (!attribute.relation) {
         attribute.relation = {
@@ -628,16 +638,16 @@ export class DataModelEditorComponent {
       selection.foreignKey));
   }
   
-  public isMultivalued(attribute: any): boolean {
-    return Array.isArray(attribute.type);
-  }
-  
   public toggleMultivaluedness(attribute: any): void {
     let type: any = attribute.type;
-    if (this.isMultivalued(attribute)) {
-      type = [type];
-    } else {
+    if (Array.isArray(type)) {
       type = type[0];
+      if (type === 'string') {
+        attribute.default = '';
+      }
+    } else {
+      type = [type];
+      delete attribute.default;
     }
 
     attribute.type = type;
