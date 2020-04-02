@@ -46,38 +46,74 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
     //////////////////////////////////////////////////////////////////////////
     get: function(target, property) {
 
-      if (property === '$isProxy') {
-        return true;
+      let path = '';
+      if (propertyPath) {
+        path = propertyPath + '.';
+      }
+      path += property.toString();
+
+      let returnValue = target[property];
+
+      if (property === 'classProperties') {
+        return returnValue;
       }
 
-      // Provide automatic return of fields required by current UI filter implementation
-      // TODO: Remove this logic when the UI filter is updated to remove this approach
-      switch (property) {
-        case 'kind':
-          if (proxy) {
-            return proxy.kind;
-          } else {
-            return undefined;
-          }
-          break;
-        case 'status':
-          if (proxy && proxy.vcStatus) {
-            return proxy.vcStatus.statusArray;
-          } else {
-            return undefined;
-          }
-          break;
+      let propertyDefinition;
+      if (proxy && proxy.model) {
+        propertyDefinition = proxy.model.item.classProperties[property];
+        if (propertyDefinition && !propertyDefinition.definition) {
+          propertyDefinition = undefined;
+        } 
       }
 
-      // TODO: Need to return default values based on Data Model
+      if (!target.hasOwnProperty(property)) {
 
-      return target[property];
+        // Detect if this is proxy Item data
+        if (property === '$isProxy') {
+          return true;
+        }
+  
+        if (propertyDefinition){
+          // Provide automatic return of fields required by current UI filter implementation
+          // TODO: Remove this logic when the UI filter is updated to remove this approach
+          switch (property) {
+            case 'kind':
+              if (proxy) {
+                return proxy.kind;
+              } else {
+                return undefined;
+              }
+              break;
+            case 'status':
+              if (proxy && proxy.vcStatus) {
+                return proxy.vcStatus.statusArray;
+              } else {
+                return undefined;
+              }
+              break;
+          }
+ 
+        }
+      }
+
+      // Wrap any nested Objects (or Arrays)
+      if (returnValue !== null && typeof returnValue === 'object' && propertyDefinition && !propertyDefinition.definition.derived) {
+        returnValue = ItemChangeHandler(returnValue, proxy, path);          
+      }
+
+      return returnValue;
     },
 
     //////////////////////////////////////////////////////////////////////////
     set: function(target, property, value) {
 
       let provideNotification = false;
+
+      let path = '';
+      if (propertyPath) {
+        path = propertyPath + '.';
+      }
+      path += property.toString();
 
       if (target[property] === value) {
         // console.log('$$$ Trying to set property to same value: ' + property.toString() + ' - ' + value);
@@ -116,8 +152,8 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
 
         // console.log('$$$ Trying to set property: ' + property.toString() + ' -> ' + value + '<-');
         
-        if (!target.$dirtyFields) {
-          target.$dirtyFields = {};
+        if (!proxy.dirtyFields) {
+          proxy.dirtyFields = {};
         }
 
         // Clone the value in case it is an object
@@ -126,7 +162,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
           clonedValue = JSON.parse(JSON.stringify(value))
         }
 
-        if (!target.$dirtyFields[property]) {
+        if (!proxy.dirtyFields[path]) {
           // Copy the original value for comparison
           let clonedOriginalValue;
 
@@ -134,21 +170,21 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
             clonedOriginalValue = JSON.parse(JSON.stringify(target[property]));
           }
 
-          target.$dirtyFields[property] = 
+          proxy.dirtyFields[path] = 
             {
               from: clonedOriginalValue,
               to: clonedValue
             }
         } else {
           // Update to the new value
-          target.$dirtyFields[property].to = clonedValue;
+          proxy.dirtyFields[path].to = clonedValue;
         }
 
         // Detect if the value has been reset to its original value
-        if (_.isEqual(target.$dirtyFields[property].to, target.$dirtyFields[property].from)) {
-          delete target.$dirtyFields[property];
-          if (Object.keys(target.$dirtyFields).length === 0) {
-            delete target.$dirtyFields;
+        if (_.isEqual(proxy.dirtyFields[path].to, proxy.dirtyFields[path].from)) {
+          delete proxy.dirtyFields[path];
+          if (Object.keys(proxy.dirtyFields).length === 0) {
+            delete proxy.dirtyFields;
           }
         }
 
@@ -171,27 +207,33 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
     deleteProperty: function(target, property) {
       let provideNotification = false;
 
-      if (property !== '$dirtyFields' && target.hasOwnProperty(property)) {
+      let path = '';
+      if (propertyPath) {
+        path = propertyPath + '.';
+      }
+      path += property.toString();
+
+      if (target.hasOwnProperty(property)) {
         
         // console.log('$$$ Trying to delete property: ' + property.toString());
 
-        if (!target.$dirtyFields) {
-          target.$dirtyFields = {};
+        if (!proxy.dirtyFields) {
+          proxy.dirtyFields = {};
         }
 
-        if (!target.$dirtyFields[property]) {
-          target.$dirtyFields[property] = {
+        if (!proxy.dirtyFields[path]) {
+          proxy.dirtyFields[path] = {
             from: target[property]
           }
         } else {
-          delete target.$dirtyFields[property].to;
+          delete proxy.dirtyFields[path].to;
         }
 
         // Detect if the value has been reset to its original value
-        if (_.isEqual(target.$dirtyFields[property].to, target.$dirtyFields[property].from)) {
-          delete target.$dirtyFields[property];
-          if (Object.keys(target.$dirtyFields).length === 0) {
-            delete target.$dirtyFields;
+        if (_.isEqual(proxy.dirtyFields[path].to, proxy.dirtyFields[path].from)) {
+          delete proxy.dirtyFields[path];
+          if (Object.keys(proxy.dirtyFields).length === 0) {
+            delete proxy.dirtyFields;
           }
         }
 
@@ -222,6 +264,7 @@ export class ItemProxy {
   public model;
   public state;
   public item;
+  public dirtyFields;
   public treeConfig : TreeConfiguration;
   public kind;
   public references;
@@ -422,14 +465,14 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   hasDirty() : boolean {
-    return this.item.hasOwnProperty('$dirtyFields');
+    return this.hasOwnProperty('dirtyFields');
   }
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   clearDirtyFlags() {
-    delete this.item.$dirtyFields;
+    delete this.dirtyFields;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -986,10 +1029,6 @@ export class ItemProxy {
         newItem.itemIds = this.item.itemIds;
       }
       
-      if (this.item.$dirtyFields) {
-        newItem.$dirtyFields = this.item.$dirtyFields;
-      }
-
       var newKeys = Object.keys(newItem);
       if (!_.isEqual(oldKeys, newKeys)){
         this.item = ItemChangeHandler(newItem, this);
@@ -1943,8 +1982,8 @@ export class ItemProxy {
   notifyDirtyStatus() {
     if (!this.treeConfig.loading) {
       let clonedFields;
-      if (this.item.$dirtyFields) {
-        clonedFields = JSON.parse(JSON.stringify(this.item.$dirtyFields));
+      if (this.dirtyFields) {
+        clonedFields = JSON.parse(JSON.stringify(this.dirtyFields));
       }
       this.treeConfig.changeSubject.next({
         type: 'dirty',
