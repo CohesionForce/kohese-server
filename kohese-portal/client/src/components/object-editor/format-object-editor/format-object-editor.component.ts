@@ -127,13 +127,6 @@ export class FormatObjectEditorComponent implements OnInit {
           attributeName].definition.default;
         if (defaultValue != null) {
           this._object[attributeName] = defaultValue;
-        } else {
-          if (Array.isArray(this._selectedType.classProperties[attributeName].
-            definition.type)) {
-            this._object[attributeName] = [];
-          } else {
-            this._object[attributeName] = null;
-          }
         }
       }
     }
@@ -363,6 +356,10 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   public addValue(attributeDefinition: PropertyDefinition): void {
+    if (this._object[attributeDefinition.propertyName] == null) {
+      this._object[attributeDefinition.propertyName] = [];
+    }
+
     this.editValue(this._object[attributeDefinition.propertyName].length,
       attributeDefinition);
   }
