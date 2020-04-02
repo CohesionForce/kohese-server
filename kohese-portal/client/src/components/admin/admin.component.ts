@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { LensService,
+  ApplicationLens } from '../../services/lens-service/lens.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
@@ -16,6 +18,11 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminComponent implements OnInit, OnDestroy {
+  private _lens: ApplicationLens;
+  get lens() {
+    return this._lens;
+  }
+  
   private _koheseUserDataModel: any;
   get koheseUserDataModel() {
     return this._koheseUserDataModel;
@@ -32,6 +39,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   private _treeConfigurationSubscription: Subscription;
+  private _lensSubscription: Subscription;
   
   private _editableSet: Array<string> = [];
   get editableSet() {
@@ -46,13 +54,18 @@ export class AdminComponent implements OnInit, OnDestroy {
     return FormatDefinitionType;
   }
   
+  get ApplicationLens() {
+    return ApplicationLens;
+  }
+  
   get Object() {
     return Object;
   }
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _sessionService: SessionService, private _itemRepository:
-    ItemRepository, private _dialogService: DialogService) {
+    ItemRepository, private _lensService: LensService, private _dialogService:
+    DialogService) {
   }
 
   public ngOnInit(): void {
@@ -67,9 +80,16 @@ export class AdminComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       }
     });
+    
+    this._lensSubscription = this._lensService.getLensSubject().subscribe(
+      (lens: ApplicationLens) => {
+      this._lens = lens;
+      this._changeDetectorRef.markForCheck();
+    });
   }
 
   public ngOnDestroy(): void {
+    this._lensSubscription.unsubscribe();
     this._treeConfigurationSubscription.unsubscribe();
   }
   
