@@ -54,7 +54,6 @@
             "string"
           ],
           "required": false,
-          "default": "",
           "id": false
         },
         "Postconditions": {
@@ -63,7 +62,6 @@
             "string"
           ],
           "required": false,
-          "default": "",
           "id": false
         },
         "Flow": {
@@ -72,7 +70,6 @@
             "KeyEvent"
           ],
           "required": false,
-          "default": "",
           "id": false,
           "relation": {
             "kind": "Item",
