@@ -60,7 +60,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
 
       let propertyDefinition;
       if (proxy && proxy.model) {
-        propertyDefinition = proxy.model.item.classProperties[property];
+        propertyDefinition = proxy.model._item.classProperties[property];
         if (propertyDefinition && !propertyDefinition.definition) {
           propertyDefinition = undefined;
         } 
@@ -98,7 +98,12 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
 
       // Wrap any nested Objects (or Arrays)
       if (returnValue !== null && typeof returnValue === 'object' && propertyDefinition && !propertyDefinition.definition.derived) {
-        returnValue = ItemChangeHandler(returnValue, proxy, path);          
+        let changeHandler = proxy.itemChangeHandlers.get(returnValue);
+        if (!changeHandler) {
+          changeHandler = ItemChangeHandler(returnValue, proxy, path);
+          proxy.itemChangeHandlers.set(returnValue, changeHandler);
+        }
+        returnValue = changeHandler;
       }
 
       return returnValue;
@@ -138,7 +143,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
       // Detect unexpected properties
       let propertyDefinition;
       if (proxy && proxy.model) {
-        propertyDefinition = proxy.model.item.classProperties[property];
+        propertyDefinition = proxy.model._item.classProperties[property];
         if (!propertyDefinition) {
           let trace = new Error().stack;
           console.log('*** Trying to set invalid property: ' + property.toString());
@@ -263,7 +268,9 @@ export class ItemProxy {
 
   public model;
   public state;
+  protected _item
   public item;
+  public itemChangeHandlers = new WeakMap();
   public dirtyFields;
   public treeConfig : TreeConfiguration;
   public kind;
@@ -379,8 +386,8 @@ export class ItemProxy {
         // Do Nothing
       }
 
-    if (proxy.item &&
-        (!proxy.item.loadPending) &&
+    if (proxy._item &&
+        (!proxy._item.loadPending) &&
         (proxy.kind !== 'Internal') &&
         (proxy.kind !== 'Internal-Lost') &&
         (proxy.kind !== 'Internal-Model')){
@@ -390,13 +397,15 @@ export class ItemProxy {
     }
 
     let loadPending;
-    if (proxy && proxy.item){
-      loadPending = proxy.item.loadPending;
+    if (proxy && proxy._item){
+      loadPending = proxy._item.loadPending;
     }
 
 
-    proxy.item = ItemChangeHandler({}, proxy);
-    copyAttributes(forItem, proxy);
+    proxy._item = {};
+    proxy.item = ItemChangeHandler(proxy._item, proxy);
+
+    proxy.copyAttributes(forItem);
     proxy.clearDirtyFlags();
 
     proxy.setItemKind(kind);
@@ -410,39 +419,39 @@ export class ItemProxy {
       return proxy;
     }
 
-    if (proxy.item.parentId && proxy.item.parentId === '') {
-      delete proxy.item.parentId;
+    if (proxy._item.parentId && proxy._item.parentId === '') {
+      delete proxy._item.parentId;
     }
 
-    var parentId = proxy.item.parentId || 'ROOT';
+    var parentId = proxy._item.parentId || 'ROOT';
 
     if (parentId.hasOwnProperty('id')){
       // parentId supplied as a reference object
       parentId = parentId.id;
-      proxy.item.parentId = parentId;
+      proxy._item.parentId = parentId;
     }
 
     var parent = proxy.treeConfig.proxyMap[parentId];
 
     if (!parent) {
       // Create the parent before it is found
-      parent = createMissingProxy('Item', 'id', parentId, proxy.treeConfig);
+      parent = ItemProxy.createMissingProxy('Item', 'id', parentId, proxy.treeConfig);
     }
 
     parent.addChild(proxy);
 
-    if (loadPending && (proxy.item.parentId !== 'LOST+FOUND') && (this.kind !==
+    if (loadPending && (proxy._item.parentId !== 'LOST+FOUND') && (this.kind !==
       'Internal') && (this.kind !== 'Internal-Model') && (this.kind !==
       'Internal-View-Model')) {
       // Remove load pending since the item has now been loaded
-      delete proxy.item.loadPending;
+      delete proxy._item.loadPending;
       this.internal = false;
     }
 
     if (proxy.children){
       proxy.sortChildren();
     } else {
-      proxy.item.children = [];
+      proxy._item.children = [];
     }
 
     proxy.calculateTreeHash();
@@ -453,7 +462,7 @@ export class ItemProxy {
       proxy.treeConfig.changeSubject.next({
         type: 'create',
         kind: proxy.kind,
-        id: proxy.item.id,
+        id: proxy._item.id,
         proxy: proxy
       });
     }
@@ -661,46 +670,46 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   calculateDerivedProperties(){
-    if (this.model && this.model.item){
-      if (this.model.item.stateProperties){
+    if (this.model && this.model._item){
+      if (this.model._item.stateProperties){
         let seperatorRequired = false;
         this.state = '';
-        for(let statePropertyIdx in this.model.item.stateProperties){
-          let stateProperty = this.model.item.stateProperties[statePropertyIdx];
+        for(let statePropertyIdx in this.model._item.stateProperties){
+          let stateProperty = this.model._item.stateProperties[statePropertyIdx];
           if(seperatorRequired){
             this.state += '/';
           }
-          this.state += this.item[stateProperty];
+          this.state += this._item[stateProperty];
           seperatorRequired = true;
         }
       }
-      if (this.model.item.calculatedProperties.length){
-        for (let cpIdx in this.model.item.calculatedProperties){
+      if (this.model._item.calculatedProperties.length){
+        for (let cpIdx in this.model._item.calculatedProperties){
           // TODO Need to expand calculation with complex calculations
-          let propertyName = this.model.item.calculatedProperties[cpIdx];
-          let property = this.model.item.properties[propertyName];
+          let propertyName = this.model._item.calculatedProperties[cpIdx];
+          let property = this.model._item.properties[propertyName];
           let calculation = property.calculated;
 
           // Note:  This only supports assignment calculations
-          this.item[propertyName] = this.item[calculation];
+          this._item[propertyName] = this._item[calculation];
         }
       }
-      if (this.model.item.idProperties){
-        for (let idIdx in this.model.item.idProperties){
-          let idName = this.model.item.idProperties[idIdx];
-          let idKind = this.model.item.classProperties[idName].definedInKind;
+      if (this.model._item.idProperties){
+        for (let idIdx in this.model._item.idProperties){
+          let idName = this.model._item.idProperties[idIdx];
+          let idKind = this.model._item.classProperties[idName].definedInKind;
           this.treeConfig.addIdMap(idKind, idName, this);
         }
       }
 
       // Calculate derived children attribute
-      this.item.children = this.getOrderedChildIdsAsReferences();
+      this._item.children = this.getOrderedChildIdsAsReferences();
 
       // Calculate derived validation errors
       if (this.validationError) {
-        this.item.hasValidationError = true;
+        this._item.hasValidationError = true;
       } else {
-        delete this.item.hasValidationError;
+        delete this._item.hasValidationError;
       }
     }
   }
@@ -744,12 +753,12 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateReferences(){
-    // console.log('$$$ Updating References for: ' + this.item.id);
+    // console.log('$$$ Updating References for: ' + this._item.id);
     let oldReferences = this.getRelationIdMap().references || {};
-    if (this.model && this.model.item && this.model.item.relationProperties){
-      for(let relationPropertyIdx in this.model.item.relationProperties){
-        let relationProperty = this.model.item.relationProperties[relationPropertyIdx];
-        let relationPropertyDefn = this.model.item.classProperties[relationProperty].definition;
+    if (this.model && this.model._item && this.model._item.relationProperties){
+      for(let relationPropertyIdx in this.model._item.relationProperties){
+        let relationProperty = this.model._item.relationProperties[relationPropertyIdx];
+        let relationPropertyDefn = this.model._item.classProperties[relationProperty].definition;
 
         let foreignKeyDefn;
         if (typeof relationPropertyDefn.relation === 'object'){
@@ -761,8 +770,8 @@ export class ItemProxy {
           continue;
         }
 
-        if (this.item){
-          let relationValue = this.item[relationProperty];
+        if (this._item){
+          let relationValue = this._item[relationProperty];
           let oldRelationIds = [];
           let newRelationIds = [];
           if (oldReferences &&
@@ -793,13 +802,13 @@ export class ItemProxy {
 
               if(valueUpdated){
                 // console.log('==================');
-                // console.log(JSON.stringify(this.item, null, '  '));
+                // console.log(JSON.stringify(this._item, null, '  '));
                 // console.log('%%% Updating reference style for ' + relationProperty);
                 // console.log(JSON.stringify(relationValue, null, '  '));
                 // console.log(JSON.stringify(updatedRelationValue, null, '  '));
-                this.item[relationProperty] = updatedRelationValue;
+                this._item[relationProperty] = updatedRelationValue;
                 // console.log('-----------------');
-                // console.log(JSON.stringify(this.item, null, '  '));
+                // console.log(JSON.stringify(this._item, null, '  '));
               }
               relationList = updatedRelationValue;
             } else {
@@ -809,13 +818,13 @@ export class ItemProxy {
               if(!foreignKeyDefn && !relationValue.hasOwnProperty('id')){
                 // Update the property to have the correct reference style
                 // console.log('==================');
-                // console.log(JSON.stringify(this.item, null, '  '));
+                // console.log(JSON.stringify(this._item, null, '  '));
                 // console.log('%%% Updating reference style for ' + relationProperty + ' from ' + relationValue);
                 relationValue = {id: relationValue};
-                this.item[relationProperty] = relationValue;
+                this._item[relationProperty] = relationValue;
                 // console.log(relationValue);
                 // console.log('-----------------');
-                // console.log(JSON.stringify(this.item, null, '  '));
+                // console.log(JSON.stringify(this._item, null, '  '));
               }
 
               relationList = [ relationValue ];
@@ -831,18 +840,18 @@ export class ItemProxy {
               if (foreignKeyDefn){
                 refProxy = this.treeConfig.getProxyByProperty(foreignKeyDefn.kind, foreignKeyDefn.foreignKey, refId);
                 if (!refProxy){
-                  createMissingProxy(foreignKeyDefn.kind, foreignKeyDefn.foreignKey, refId, this.treeConfig);
+                  ItemProxy.createMissingProxy(foreignKeyDefn.kind, foreignKeyDefn.foreignKey, refId, this.treeConfig);
                   refProxy = this.treeConfig.getProxyFor(refId);
                 }
               } else {
                 refProxy = this.treeConfig.getProxyFor(refId);
                 if(!refProxy){
-                  createMissingProxy('Item', 'id', refId, this.treeConfig);
+                  ItemProxy.createMissingProxy('Item', 'id', refId, this.treeConfig);
                   refProxy = this.treeConfig.getProxyFor(refId);
                 }
               }
               if (refProxy){
-                newRelationIds.push(refProxy.item.id);
+                newRelationIds.push(refProxy._item.id);
                 this.addReference(refProxy, relationProperty, isSingle);
               }
             }
@@ -910,7 +919,7 @@ export class ItemProxy {
           type: 'reference-added',
           relation: 'forProperty',
           kind: this.kind,
-          id: toProxy.item.id,
+          id: toProxy._item.id,
           proxy: toProxy
         });
       }
@@ -928,7 +937,7 @@ export class ItemProxy {
 
     if (isSingle){
       if (this.relations.references[this.kind][forProperty] === toProxy){
-        // console.log('%%% Removing reference to ' + toProxy.item.id);
+        // console.log('%%% Removing reference to ' + toProxy._item.id);
         delete this.relations.references[this.kind][forProperty];
       }
     } else {
@@ -938,7 +947,7 @@ export class ItemProxy {
 
       let proxyArrayIdx = this.relations.references[this.kind][forProperty].indexOf(toProxy);
       if (proxyArrayIdx > -1){
-        // console.log('%%% Removing reference from array for ' + toProxy.item.id);
+        // console.log('%%% Removing reference from array for ' + toProxy._item.id);
         this.relations.references[this.kind][forProperty].splice(proxyArrayIdx, 1);
       }
     }
@@ -953,14 +962,14 @@ export class ItemProxy {
 
     let proxyIdx = toProxy.relations.referencedBy[this.kind][forProperty].indexOf(this);
     if (proxyIdx > -1){
-      // console.log('%%% Removing reference from array for ' + toProxy.item.id);
+      // console.log('%%% Removing reference from array for ' + toProxy._item.id);
       toProxy.relations.referencedBy[this.kind][forProperty].splice(proxyIdx, 1);
       if(!this.treeConfig.loading){
         this.treeConfig.changeSubject.next({
           type: 'reference-removed',
           relation: 'forProperty',
           kind: this.kind,
-          id: toProxy.item.id,
+          id: toProxy._item.id,
           proxy: toProxy
         });
       }
@@ -981,7 +990,7 @@ export class ItemProxy {
         if (Array.isArray(relationList)){
           if (kindKey !== 'Item' && relationKey !== 'children'){
             for(let index = 0; index < relationList.length; index++){
-              console.log('>>> Remove reference:  ' + relationList[index].item.id);
+              console.log('>>> Remove reference:  ' + relationList[index]._item.id);
               this.removeReference(relationList[index], relationKey, false);
             }
           }  
@@ -1008,7 +1017,7 @@ export class ItemProxy {
     if (TreeConfiguration.koheseModelDefn){
       this.model = TreeConfiguration.koheseModelDefn.getModelProxyFor(kind);
     } else {
-      this.treeConfig.proxyHasDeferredModelAssociation[this.item.id] = this;
+      this.treeConfig.proxyHasDeferredModelAssociation[this._item.id] = this;
     }
   }
 
@@ -1016,22 +1025,23 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   checkPropertyOrder(){
-    if (this.model && this.model.item && this.model.item.propertyStorageOrder) {
+    if (this.model && this.model._item && this.model._item.propertyStorageOrder) {
       var newItem : any = {};;
-      var oldKeys = Object.keys(this.item);
-      for (var keyIdx in this.model.item.propertyStorageOrder){
-        var key = this.model.item.propertyStorageOrder[keyIdx];
-        if (this.item.hasOwnProperty(key)) {
-          newItem[key] = this.item[key];
+      var oldKeys = Object.keys(this._item);
+      for (var keyIdx in this.model._item.propertyStorageOrder){
+        var key = this.model._item.propertyStorageOrder[keyIdx];
+        if (this._item.hasOwnProperty(key)) {
+          newItem[key] = this._item[key];
         }
       }
-      if (this.item.itemIds){
-        newItem.itemIds = this.item.itemIds;
+      if (this._item.itemIds){
+        newItem.itemIds = this._item.itemIds;
       }
       
       var newKeys = Object.keys(newItem);
       if (!_.isEqual(oldKeys, newKeys)){
-        this.item = ItemChangeHandler(newItem, this);
+        this._item = newItem;
+        this.item = ItemChangeHandler(this._item, this);
       }
     }
   }
@@ -1041,7 +1051,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   validateItem(){
 
-    return ItemProxy.validateItemContent(this.kind, this.item, this.treeConfig);
+    return ItemProxy.validateItemContent(this.kind, this._item, this.treeConfig);
 
   }
 
@@ -1050,7 +1060,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   document() {
     this.checkPropertyOrder();
-    return JSON.stringify(this.item, null, '  ');
+    return JSON.stringify(this._item, null, '  ');
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1058,7 +1068,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   cloneItem() {
     this.checkPropertyOrder();
-    let clone = JSON.parse(JSON.stringify(this.item));
+    let clone = JSON.parse(JSON.stringify(this._item));
     return clone;
   }
 
@@ -1069,8 +1079,8 @@ export class ItemProxy {
     let clone = this.cloneItem();
 
     // Determine if derived properities need to be stripped
-    if (this.model && this.model.item.derivedProperties && this.model.item.derivedProperties.length) {
-      let derivedProperties = this.model.item.derivedProperties;
+    if (this.model && this.model._item.derivedProperties && this.model._item.derivedProperties.length) {
+      let derivedProperties = this.model._item.derivedProperties;
       for(let idx in derivedProperties){
         let key = derivedProperties[idx];
         delete clone[key];
@@ -1092,7 +1102,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   calculateOID() {
     // Skip placeholder nodes that haven't been loaded yet
-    if (!this.item){
+    if (!this._item){
       return;
     }
 
@@ -1111,7 +1121,7 @@ export class ItemProxy {
   calculateTreeHash(deferredRollup : boolean = false, toOID?, toTreeHashEntry?) {
 
     // Don't calculateTreeHash during initial load
-    if (!this.item || (this.treeConfig.loading && !deferredRollup)){
+    if (!this._item || (this.treeConfig.loading && !deferredRollup)){
       this.deferTreeHash = true;
       return;
     }
@@ -1134,17 +1144,17 @@ export class ItemProxy {
       var childProxy = this.children[childIdx];
       switch(childProxy.kind){
         case 'Repository':
-          treeHashEntry.childTreeHashes[childProxy.item.id] = 'Repository-Mount';
+          treeHashEntry.childTreeHashes[childProxy._item.id] = 'Repository-Mount';
           break;
         case 'Internal':
-          treeHashEntry.childTreeHashes[childProxy.item.id] = 'Internal';
+          treeHashEntry.childTreeHashes[childProxy._item.id] = 'Internal';
           break;
         default:
           if(childProxy.deferTreeHash){
             this.deferTreeHash = true;
             return;
           }
-          treeHashEntry.childTreeHashes[childProxy.item.id] = childProxy.treeHash;
+          treeHashEntry.childTreeHashes[childProxy._item.id] = childProxy.treeHash;
       }
     }
 
@@ -1156,13 +1166,13 @@ export class ItemProxy {
       treeHashEntry.treeHash = this.treeHash;
 
       // Add the parentId to the treeHash entry
-      if (this.item.parentId){
-        treeHashEntry.parentId = this.item.parentId;
+      if (this._item.parentId){
+        treeHashEntry.parentId = this._item.parentId;
       }
 
       let diff = TreeHashEntry.diff(toTreeHashEntry, treeHashEntry);
       if (!diff.match) {
-        console.log('!!! TreeHashEntry did not match expected: ' + this.item.id + ' - ' + this.item.name);
+        console.log('!!! TreeHashEntry did not match expected: ' + this._item.id + ' - ' + this._item.name);
         console.log(diff);
         delete treeHashEntry.treeHash;
         delete treeHashEntry.parentId;
@@ -1181,8 +1191,8 @@ export class ItemProxy {
       treeHashEntry.treeHash = this.treeHash;
 
       // Add the parentId to the treeHash entry
-      if (this.item.parentId){
-        treeHashEntry.parentId = this.item.parentId;
+      if (this._item.parentId){
+        treeHashEntry.parentId = this._item.parentId;
       }
     }
 
@@ -1268,7 +1278,7 @@ export class ItemProxy {
   getTreeHashMap() : TreeHashMap {
     var treeHashMap = {};
     this.visitTree({excludeKind : ['Repository', 'Internal']}, (proxy) => {
-      treeHashMap [proxy.item.id] = proxy.treeHashEntry;
+      treeHashMap [proxy._item.id] = proxy.treeHashEntry;
     });
     return treeHashMap;
   }
@@ -1332,7 +1342,7 @@ export class ItemProxy {
   getRepositoryProxy() {
     var proxy = this;
 
-    while (proxy && proxy.kind !== 'Repository' && proxy.item.id !== 'ROOT'){
+    while (proxy && proxy.kind !== 'Repository' && proxy._item.id !== 'ROOT'){
       proxy = proxy.parentProxy;
     }
     return proxy;
@@ -1344,7 +1354,7 @@ export class ItemProxy {
   getChildByName(name) {
     for ( var childIdx in this.children) {
       var child = this.children[childIdx];
-      if (child.item.name === name) {
+      if (child._item.name === name) {
         return child;
       }
     }
@@ -1384,6 +1394,7 @@ export class ItemProxy {
    */
   visitTree(flags, doBefore, doAfter?){
 
+    // console.log('### visitTree - begin');
     var includeOrigin = (flags && flags.hasOwnProperty('includeOrigin')) ? flags.includeOrigin : true;
     var excludeKind = (flags && flags.hasOwnProperty('excludeKind')) ? flags.excludeKind : [];
     var before = doBefore ? doBefore : () => {};
@@ -1413,6 +1424,7 @@ export class ItemProxy {
     if (includeOrigin){
       after(this);
     }
+    // console.log('### visitTree - end');
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1507,7 +1519,7 @@ export class ItemProxy {
       childIndent = '| ' + thisIndent;
     }
 
-    console.log('=== ' + thisIndent + this.item.id + ' - ' + this.item.name +
+    console.log('=== ' + thisIndent + this._item.id + ' - ' + this._item.name +
         ' - ' + this.kind + ' <' + this.constructor.name + '>');
 
     for ( var childIdx in this.children) {
@@ -1520,8 +1532,8 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   dumpProxyNameAndDescription() {
-    console.log(this.item.name);
-    console.log(this.item.description);
+    console.log(this._item.name);
+    console.log(this._item.description);
 
     for ( var childIdx in this.children) {
       var childProxy = this.children[childIdx];
@@ -1576,11 +1588,11 @@ export class ItemProxy {
           if (Array.isArray(relationList)){
             relationIdMap[refTypeKey][kindKey][relationKey] = [];
             for(let index = 0; index < relationList.length; index++){
-              relationIdMap[refTypeKey][kindKey][relationKey].push(relationList[index].item.id);
+              relationIdMap[refTypeKey][kindKey][relationKey].push(relationList[index]._item.id);
             }
           } else {
             if (relationList){
-              relationIdMap[refTypeKey][kindKey][relationKey] = relationList.item.id;
+              relationIdMap[refTypeKey][kindKey][relationKey] = relationList._item.id;
             } else {
               relationIdMap[refTypeKey][kindKey][relationKey] = null;
             }
@@ -1596,22 +1608,22 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   addChild(childProxy) {
     if (childProxy.parentProxy === this) {
-//      console.log('::: IP: Child ' + childProxy.item.name + ' already associated with ' + this.item.name);
+//      console.log('::: IP: Child ' + childProxy._item.name + ' already associated with ' + this._item.name);
       return;
     }
-//    console.log('::: IP: Adding child ' + childProxy.item.name + ' to ' + this.item.name);
+//    console.log('::: IP: Adding child ' + childProxy._item.name + ' to ' + this._item.name);
 
     if (this.hasAncestor(childProxy)) {
       let oldParentId;
       if (childProxy.parentProxy){
-        oldParentId = childProxy.parentProxy.item.id;
+        oldParentId = childProxy.parentProxy._item.id;
       }
 
       throw ({
         error: 'Parent-Can-Not-Be-Descendant',
-        childId: childProxy.item.id,
+        childId: childProxy._item.id,
         oldParentId: oldParentId,
-        newParentId: this.item.id
+        newParentId: this._item.id
       });
     }
 
@@ -1647,7 +1659,7 @@ export class ItemProxy {
     }
 
     // Update derived children attribute
-    this.item.children = this.getOrderedChildIdsAsReferences();
+    this._item.children = this.getOrderedChildIdsAsReferences();
 
     // Notify about change is not loading
     if(!this.treeConfig.loading){
@@ -1655,7 +1667,7 @@ export class ItemProxy {
         type: 'reference-added',
         relation: 'children',
         kind: this.kind,
-        id: this.item.id,
+        id: this._item.id,
         proxy: this
       });
     }
@@ -1666,10 +1678,10 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   removeChild(childProxy) {
-    // console.log('::: IP: Removing child ' + proxy.item.name + ' from ' +
-    // this.item.name);
+    // console.log('::: IP: Removing child ' + proxy._item.name + ' from ' +
+    // this._item.name);
     this.children = _.reject(this.children, function(proxy : ItemProxy) {
-      return childProxy.item.id === proxy.item.id;
+      return childProxy._item.id === proxy._item.id;
     });
 
     delete childProxy.parentProxy;
@@ -1697,7 +1709,7 @@ export class ItemProxy {
     this.calculateTreeHash();
 
     // Update derived children attribute
-    this.item.children = this.getOrderedChildIdsAsReferences();
+    this._item.children = this.getOrderedChildIdsAsReferences();
 
     // Notify about change is not loading
     if(!this.treeConfig.loading){
@@ -1705,7 +1717,7 @@ export class ItemProxy {
         type: 'reference-removed',
         relation: 'children',
         kind: this.kind,
-        id: this.item.id,
+        id: this._item.id,
         proxy: this
       });
     }
@@ -1716,23 +1728,23 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   sortChildren() {
     let orderBeforeSort = this.getOrderedChildIds();
-    if (!this.item.itemIds || this.item.itemIds.length === 0){
+    if (!this._item.itemIds || this._item.itemIds.length === 0){
       this.children.sort(function(a, b){
-        if (a.item.name > b.item.name) { return 1; }
-        if (a.item.name < b.item.name) { return -1; }
-        if (a.item.name === b.item.name) {
-          if (a.item.id > b.item.id) { return 1; }
-          if (a.item.id < b.item.id) { return -1; }
+        if (a._item.name > b._item.name) { return 1; }
+        if (a._item.name < b._item.name) { return -1; }
+        if (a._item.name === b._item.name) {
+          if (a._item.id > b._item.id) { return 1; }
+          if (a._item.id < b._item.id) { return -1; }
         }
         return 0;
       });
     } else {
       // Sort by itemIds list if it is present
-      var itemIds = this.item.itemIds;
+      var itemIds = this._item.itemIds;
 
       this.children.sort(function(a, b) {
-        var aIndex = itemIds.indexOf(a.item.id);
-        var bIndex = itemIds.indexOf(b.item.id);
+        var aIndex = itemIds.indexOf(a._item.id);
+        var bIndex = itemIds.indexOf(b._item.id);
         if (aIndex < 0) {
           aIndex = itemIds.length;
         }
@@ -1740,14 +1752,14 @@ export class ItemProxy {
           bIndex = itemIds.length;
           // Detect when both items are not in the list
           if (aIndex === bIndex) {
-            if (a.item.name > b.item.name){
+            if (a._item.name > b._item.name){
               aIndex++;
-            } else if (a.item.name < b.item.name) {
+            } else if (a._item.name < b._item.name) {
               bIndex++;
             } else {
               // Names are the same, so sort on the id
-              if (a.item.id > b.item.id) { aIndex++; }
-              if (a.item.id < b.item.id) { bIndex++; }
+              if (a._item.id > b._item.id) { aIndex++; }
+              if (a._item.id < b._item.id) { bIndex++; }
             }
           }
         }
@@ -1758,14 +1770,14 @@ export class ItemProxy {
       });
     }
     let orderAfterSort = this.getOrderedChildIds();
-    this.item.children = this.getOrderedChildIdsAsReferences();
+    this._item.children = this.getOrderedChildIdsAsReferences();
     if (!_.isEqual(orderBeforeSort, orderAfterSort)){
       if (!this.treeConfig.loading){
         this.treeConfig.changeSubject.next({
           type: 'reference-reordered',
           relation: 'children',
           kind: this.kind,
-          id: this.item.id,
+          id: this._item.id,
           proxy: this
         });
       }
@@ -1776,7 +1788,7 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   childrenAreManuallyOrdered() {
-    return (this.item.itemIds && this.item.itemIds.length > 0);
+    return (this._item.itemIds && this._item.itemIds.length > 0);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -1795,6 +1807,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   makeChildrenManualOrdered() {
     if (!this.childrenAreManuallyOrdered()){
+      // Need to make this change on the proxied item
       this.item.itemIds = this.getOrderedChildIds();
       this.sortChildren();
       this.calculateTreeHash();
@@ -1807,7 +1820,7 @@ export class ItemProxy {
   updateChildrenManualOrder() {
     if (this.childrenAreManuallyOrdered()){
       console.log('::: Updating child order');
-      this.item.itemIds = this.getOrderedChildIds();
+      this._item.itemIds = this.getOrderedChildIds();
     }
   }
 
@@ -1816,6 +1829,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   makeChildrenAutoOrdered() {
     if (this.childrenAreManuallyOrdered()){
+      // Need to make this change on the proxied item
       delete this.item.itemIds;
       this.sortChildren();
       this.calculateTreeHash();
@@ -1828,7 +1842,7 @@ export class ItemProxy {
   getOrderedChildIds() {
     var childIds = [];
     for (var i = 0; i < this.children.length; i++) {
-      childIds.push(this.children[i].item.id);
+      childIds.push(this.children[i]._item.id);
     }
     return childIds;
   }
@@ -1839,7 +1853,7 @@ export class ItemProxy {
   getOrderedChildIdsAsReferences() {
     var childIdRefs = [];
     for (var i = 0; i < this.children.length; i++) {
-      childIdRefs.push({ id: this.children[i].item.id});
+      childIdRefs.push({ id: this.children[i]._item.id});
     }
     return childIdRefs;
   }
@@ -1869,7 +1883,7 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   updateItem(modelKind, withItem) {
-//    console.log('!!! Updating ' + modelKind + ' - ' + this.item.id);
+//    console.log('!!! Updating ' + modelKind + ' - ' + this._item.id);
 
     let validationResult = ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
 
@@ -1895,7 +1909,7 @@ export class ItemProxy {
     }
 
     // Determine if itemIds array changed
-    var itemIdsChanged = (withItem.itemIds !== this.item.itemIds);
+    var itemIdsChanged = (withItem.itemIds !== this._item.itemIds);
 
     if (withItem.parentId && withItem.parentId.hasOwnProperty('id')){
       // parentId supplied as a reference object
@@ -1903,7 +1917,7 @@ export class ItemProxy {
     }
 
     // Copy the withItem into the current proxy
-    let modifications = copyAttributes(withItem, this);
+    let modifications = this.copyAttributes(withItem);
     this.clearDirtyFlags();
 
     // console.log('%%% Modifications');
@@ -1924,18 +1938,18 @@ export class ItemProxy {
 
 
     if (this.children.length === 0){
-      this.item.children = [];
+      this._item.children = [];
     }
     
     // Determine if the parent changed
     var oldParentId = '';
     if (this.parentProxy) {
-      oldParentId = this.parentProxy.item.id;
+      oldParentId = this.parentProxy._item.id;
     }
 
     var newParentId = withItem.parentId || 'ROOT';
 
-    if (newParentId === 'ROOT' && this.item.id === 'ROOT' ){
+    if (newParentId === 'ROOT' && this._item.id === 'ROOT' ){
       // Prevent infinite loop when the ROOT is passed as part of sync
       newParentId = oldParentId;
     }
@@ -1952,7 +1966,7 @@ export class ItemProxy {
       }
 
       if (!newParentProxy) {
-        newParentProxy = createMissingProxy('Item', 'id', newParentId, this.treeConfig);
+        newParentProxy = ItemProxy.createMissingProxy('Item', 'id', newParentId, this.treeConfig);
       }
 
       newParentProxy.addChild(this);
@@ -1969,7 +1983,7 @@ export class ItemProxy {
       this.treeConfig.changeSubject.next({
         type: 'update',
         kind: this.kind,
-        id: this.item.id,
+        id: this._item.id,
         proxy: this
       });
     }
@@ -1988,7 +2002,7 @@ export class ItemProxy {
       this.treeConfig.changeSubject.next({
         type: 'dirty',
         kind: this.kind,
-        id: this.item.id,
+        id: this._item.id,
         dirty: this.dirty,
         dirtyFields: clonedFields,
         proxy: this
@@ -2000,13 +2014,13 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   deleteItem(deleteDescendants: boolean = false) {
-    var byId = this.item.id;
+    var byId = this._item.id;
 
     // console.log('::: Deleting proxy for ' + byId);
 
     var attemptToDeleteRestrictedNode = (
-      (this.item.id === this.treeConfig.lostAndFound.item.id) ||
-      (this.item.id === this.treeConfig.root.item.id));
+      (this._item.id === this.treeConfig.lostAndFound._item.id) ||
+      (this._item.id === this.treeConfig.root._item.id));
 
     // Unlink from parent
     if (this.parentProxy && !attemptToDeleteRestrictedNode) {
@@ -2022,14 +2036,14 @@ export class ItemProxy {
         childProxy.deleteItem(deleteDescendants);
       });
       if (attemptToDeleteRestrictedNode){
-        // console.log('::: -> Not removing restricted node:' + this.item.name);
+        // console.log('::: -> Not removing restricted node:' + this._item.name);
       } else {
         // console.log('::: -> Removing all references');
         if (!this.treeConfig.loading){
           this.treeConfig.changeSubject.next({
             type: 'delete',
             kind: this.kind,
-            id: this.item.id,
+            id: this._item.id,
             proxy: this
           });
         }
@@ -2044,22 +2058,22 @@ export class ItemProxy {
             this.treeConfig.changeSubject.next({
               type: 'delete',
               kind: this.kind,
-              id: this.item.id,
+              id: this._item.id,
               proxy: this
             });
           }
-          createMissingProxy('Item', 'id', byId, this.treeConfig);
+          ItemProxy.createMissingProxy('Item', 'id', byId, this.treeConfig);
         }
       } else {
         if (attemptToDeleteRestrictedNode){
-          // console.log('::: -> Not removing ' + this.item.name);
+          // console.log('::: -> Not removing ' + this._item.name);
         } else {
           // console.log('::: -> Removing all references');
           if (!this.treeConfig.loading){
             this.treeConfig.changeSubject.next({
               type: 'delete',
               kind: this.kind,
-              id: this.item.id,
+              id: this._item.id,
               proxy: this
             });
           }
@@ -2069,68 +2083,73 @@ export class ItemProxy {
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   public toString(): string {
-    return this.item.name;
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function createMissingProxy(forKind, forKey, forId, treeConfig) {
-  var lostProxy = new ItemProxy('Internal-Lost', {
-    id : forId,
-    name : 'Lost Item: ' + forKind + ' with ' + forKey + ' of ' + forId,
-    description : 'Found node(s) referencing this node.',
-    parentId : 'LOST+FOUND',
-    loadPending: true
-  }, treeConfig);
-  lostProxy.internal = true;
-
-  return lostProxy;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function copyAttributes(fromItem, toProxy : ItemProxy) {
-  let modifications = {};
-
-  // Copy attributes proxy
-  for ( var fromKey in fromItem) {
-    if (fromItem.hasOwnProperty(fromKey) && (fromKey.charAt(0) !== '$') &&
-        !_.isEqual(fromItem[fromKey], toProxy.item[fromKey])) {
-      // console.log('!!! Updating ' + fromKey);
-      modifications[fromKey] = {
-        from: toProxy.item[fromKey],
-        to: fromItem[fromKey]
-      };
-      toProxy.item[fromKey] = fromItem[fromKey];
-    }
+    return this._item.name;
   }
 
-  let dataModel = toProxy.model; 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private static createMissingProxy(forKind, forKey, forId, treeConfig) {
+    var lostProxy = new ItemProxy('Internal-Lost', {
+      id : forId,
+      name : 'Lost Item: ' + forKind + ' with ' + forKey + ' of ' + forId,
+      description : 'Found node(s) referencing this node.',
+      parentId : 'LOST+FOUND',
+      loadPending: true
+    }, treeConfig);
+    lostProxy.internal = true;
 
-  // Check for unexpected values
-  for ( var toKey in toProxy.item) {
-    let isDerivedAttribute = (dataModel && dataModel.item.classProperties && dataModel.item.classProperties[toKey] 
-      && dataModel.item.classProperties[toKey].definition.derived);
-    if (!isDerivedAttribute && toKey !== '__deletedProperty' && (toKey.charAt(0) !== '$') 
-        && toProxy.item.hasOwnProperty(toKey)
-        && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey))) 
-    {
-      // console.log('!!! Deleted Property: ' + toKey + ' in ' + toProxy.item.name);
-      if (!toProxy.item.__deletedProperty) {
-        toProxy.item.__deletedProperty = {};
+    return lostProxy;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private copyAttributes(fromItem) {
+    let modifications = {};
+
+    // Copy attributes proxy
+    for ( var fromKey in fromItem) {
+      if (fromItem.hasOwnProperty(fromKey) && (fromKey.charAt(0) !== '$') &&
+          !_.isEqual(fromItem[fromKey], this._item[fromKey])) {
+        // console.log('!!! Updating ' + fromKey);
+        modifications[fromKey] = {
+          from: this._item[fromKey],
+          to: fromItem[fromKey]
+        };
+        this._item[fromKey] = fromItem[fromKey];
       }
-      modifications[toKey] = {
-        from: toProxy.item[toKey],
-        to: fromItem[toKey]
-      };
-      toProxy.item.__deletedProperty[toKey] = toProxy.item[toKey];
-      delete toProxy.item[toKey];
     }
+
+    let dataModel = this.model; 
+
+    // Check for unexpected values
+    for ( var toKey in this._item) {
+      let isDerivedAttribute = (dataModel && dataModel._item.classProperties && dataModel._item.classProperties[toKey] 
+        && dataModel._item.classProperties[toKey].definition.derived);
+      if (!isDerivedAttribute && toKey !== '__deletedProperty' && (toKey.charAt(0) !== '$') 
+          && this._item.hasOwnProperty(toKey)
+          && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey))) 
+      {
+        // console.log('!!! Deleted Property: ' + toKey + ' in ' + this._item.name);
+        if (!this._item.__deletedProperty) {
+          this._item.__deletedProperty = {};
+        }
+        modifications[toKey] = {
+          from: this._item[toKey],
+          to: fromItem[toKey]
+        };
+        this._item.__deletedProperty[toKey] = this._item[toKey];
+        delete this._item[toKey];
+      }
+    }
+    return modifications;
   }
-  return modifications;
+
 }
+
+
