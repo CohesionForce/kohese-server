@@ -93,7 +93,7 @@
         </button>
       </ng-container>
       <ng-container *ngIf="(Object.values(fundamentalTypes).indexOf(
-        isMultivalued(element) ? element.type[0] : element.type) === -1)">
+        Array.isArray(element.type) ? element.type[0] : element.type) === -1)">
         <mat-form-field style="width: 180px; padding: 0px 5px 0px 5px;">
           <mat-select placeholder="Reference Attribute"
             [ngModel]="element.relation" (ngModelChange)="element.
@@ -118,7 +118,7 @@
       Is Multivalued
     </mat-header-cell>
     <mat-cell *matCellDef="let element" style="flex: 0 0 80px;">
-      <mat-checkbox [ngModel]="isMultivalued(element)"
+      <mat-checkbox [ngModel]="Array.isArray(element.type)"
         (ngModelChange)="toggleMultivaluedness(element)"
         [disabled]="!editable">
       </mat-checkbox>
@@ -154,7 +154,7 @@
       <mat-form-field style="width: 100%;">
         <input matInput type="text" [ngModel]="element.default"
           (ngModelChange)="element.default = $event; modifiedEventEmitter.
-          emit()" [disabled]="!editable"/>
+          emit()" [disabled]="(!editable || (element.type !== 'string'))"/>
       </mat-form-field>
     </mat-cell>
   </ng-container>

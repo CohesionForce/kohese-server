@@ -27,6 +27,10 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   @Input('object')
   set object(object: any) {
+    if (!object) {
+      object = {};
+    }
+    
     this._object = object;
   }
   
@@ -47,43 +51,6 @@ export class FormatObjectEditorComponent implements OnInit {
   set formatDefinitionType(formatDefinitionType: FormatDefinitionType) {
     this._formatDefinitionType = formatDefinitionType;
     this._changeDetectorRef.markForCheck();
-  }
-  
-  private _type: any;
-  get type() {
-    return this._type;
-  }
-  @Input('type')
-  set type(type: any) {
-    this._type = type;
-    this.selectedType = this._type;
-    
-    this._types.length = 0;
-    if (this._allowKindChange) {
-      TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
-        { includeOrigin: false }, (itemProxy: ItemProxy) => {
-        if (itemProxy.kind === 'KoheseModel') {
-          if (this._allowKindNarrowingOnly) {
-            let modelItemProxy: any = itemProxy;
-            while (modelItemProxy) {
-              if (modelItemProxy.item === this._type) {
-                this._types.push(itemProxy.item);
-                break;
-              }
-              
-              modelItemProxy = this._itemRepository.getTreeConfig().getValue().
-                config.getProxyFor(modelItemProxy.item.base);
-            }
-          } else {
-            this._types.push(itemProxy.item);
-          }
-        }
-      }, undefined);
-    
-      this._types.sort((oneType: any, anotherType: any) => {
-        return oneType.name.localeCompare(anotherType.name);
-      });
-    }
   }
   
   private _types: Array<any> = [];
@@ -159,6 +126,43 @@ export class FormatObjectEditorComponent implements OnInit {
     this._allowKindNarrowingOnly = allowKindNarrowingOnly;
   }
   
+  private _type: any;
+  get type() {
+    return this._type;
+  }
+  @Input('type')
+  set type(type: any) {
+    this._type = type;
+    this.selectedType = this._type;
+    
+    this._types.length = 0;
+    if (this._allowKindChange) {
+      this._itemRepository.getTreeConfig().getValue().config.getRootProxy().
+        visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
+        if (itemProxy.kind === 'KoheseModel') {
+          if (this._allowKindNarrowingOnly) {
+            let modelItemProxy: any = itemProxy;
+            while (modelItemProxy) {
+              if (modelItemProxy.item === this._type) {
+                this._types.push(itemProxy.item);
+                break;
+              }
+              
+              modelItemProxy = this._itemRepository.getTreeConfig().getValue().
+                config.getProxyFor(modelItemProxy.item.base);
+            }
+          } else {
+            this._types.push(itemProxy.item);
+          }
+        }
+      }, undefined);
+    
+      this._types.sort((oneType: any, anotherType: any) => {
+        return oneType.name.localeCompare(anotherType.name);
+      });
+    }
+  }
+  
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
@@ -203,22 +207,16 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
-      this._type = this._data['type'];
-      this._object = this._data['object'];
-      this._enclosingType = this._data['enclosingType'];
-      this._formatDefinitionType = this._data['formatDefinitionType'];
-      this._isDisabled = this._data['disabled'];
-      this._allowKindChange = this._data['allowKindChange'];
+      this.object = this._data['object'];
+      this.enclosingType = this._data['enclosingType'];
+      this.formatDefinitionType = this._data['formatDefinitionType'];
+      this.isDisabled = this._data['disabled'];
+      this.allowKindChange = this._data['allowKindChange'];
       if (this._data['allowKindNarrowingOnly']) {
-        this._allowKindNarrowingOnly = this._data['allowKindNarrowingOnly'];
+        this.allowKindNarrowingOnly = this._data['allowKindNarrowingOnly'];
       }
+      this.type = this._data['type'];
     }
-    
-    if (!this._object) {
-      this._object = {};
-    }
-    
-    this.type = this._type;
     
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree({
       includeOrigin: false
@@ -271,12 +269,13 @@ export class FormatObjectEditorComponent implements OnInit {
       definition;
     let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
       0] : attribute.type);
-    return this._selectedType.localTypes[typeName];
+    return (this._selectedType.localTypes && this._selectedType.localTypes[
+      typeName]);
   }
   
-  public getLocalType(propertyDefinition: PropertyDefinition): any {
-    let attribute: any = this._selectedType.classProperties[propertyDefinition.
-      propertyName].definition;
+  private getLocalType(attributeName: string): any {
+    let attribute: any = this._selectedType.classProperties[attributeName].
+      definition;
     let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
       0] : attribute.type);
     let localTypeCopy: any = JSON.parse(JSON.stringify(this._selectedType.
@@ -292,42 +291,33 @@ export class FormatObjectEditorComponent implements OnInit {
     return localTypeCopy;
   }
   
-  public getLocalTypeViewModel(propertyDefinition: PropertyDefinition): any {
-    let attribute: any = this._selectedType.classProperties[propertyDefinition.
-      propertyName].definition;
-    let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
-      0] : attribute.type);
-    return this._viewModel.localTypes[typeName];
-  }
-  
-  public getLocalTypeAttributes(propertyDefinition: PropertyDefinition):
-    Array<any> {
-    let attributes: Array<any> = [];
-    let localType: any = this.getLocalType(propertyDefinition);
-    for (let attributeName in localType.properties) {
-      attributes.push(localType.properties[attributeName]);
-    }
-    
-    return attributes;
-  }
-  
-  public getLocalTypeFormatDefinition(propertyDefinition: PropertyDefinition):
-    FormatDefinition {
-    return this.getLocalTypeViewModel(propertyDefinition).formatDefinitions[
-      propertyDefinition.formatDefinition];
-  }
-  
-  public openObjectEditor(attributeName: string): void {
-    let value: any = this._object[attributeName];
+  public openObjectEditor(propertyDefinition: PropertyDefinition,
+    useExistingValue: boolean): void {
+    let value: any = this._object[propertyDefinition.propertyName];
+    let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
+      propertyDefinition.propertyName);
     this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
       data: {
-        object: (value ? TreeConfiguration.getWorkingTree().getProxyFor(value.
-          id).item : value),
-        type: this.getType(attributeName)
+        object: (useExistingValue ? (isLocalTypeAttribute ? value : (value ?
+          this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+          value.id).item : value)) : undefined),
+        enclosingType: (isLocalTypeAttribute ? this._selectedType : undefined),
+        formatDefinitionType: this._formatDefinitionType,
+        disabled: (!propertyDefinition.editable || this._isDisabled ||
+          !isLocalTypeAttribute),
+        type: (isLocalTypeAttribute ? this.getLocalType(propertyDefinition.
+          propertyName) : this._itemRepository.getTreeConfig().getValue().
+          config.getProxyFor(propertyDefinition.propertyName).item)
       }
-    }).updateSize('80%', '80%').afterClosed().subscribe((result: any) => {
-      if (result.object) {
-        this._itemRepository.upsertItem(result.type.name, result.object);
+    }).updateSize('90%', '90%').afterClosed().subscribe((result: any) => {
+      if (result) {
+        if (isLocalTypeAttribute) {
+          this._object[propertyDefinition.propertyName] = result.object;
+        } else {
+          this._itemRepository.upsertItem(result.type.name, result.object);
+        }
+        
+        this._changeDetectorRef.markForCheck();
       }
     });
   }
@@ -369,8 +359,10 @@ export class FormatObjectEditorComponent implements OnInit {
     let attributeName: string = attributeDefinition.propertyName;
     const DIALOG_TITLE: string = 'Specify Value';
     let value: any = this._object[attributeName][index];
-    switch (this.getTypeName(this._selectedType.classProperties[
-      attributeDefinition.propertyName].definition.type)) {
+    let type: any = this._selectedType.classProperties[attributeDefinition.
+      propertyName].definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    switch (type) {
       case 'boolean':
         if (value == null) {
           value = false;
@@ -469,8 +461,25 @@ export class FormatObjectEditorComponent implements OnInit {
         });
         break;
       default:
-        let type: any = this.getType(attributeName);
-        if (!this._enclosingType) {
+        let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
+          attributeName);
+        if (isLocalTypeAttribute) {
+          this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
+            data: {
+              object: value,
+              enclosingType: this._selectedType,
+              formatDefinitionType: this._formatDefinitionType,
+              disabled: (!attributeDefinition.editable || this._isDisabled),
+              type: this.getLocalType(attributeDefinition.propertyName)
+            }
+          }).updateSize('90%', '90%').afterClosed().subscribe((result:
+            any) => {
+            if (result) {
+              this._object[attributeName].splice(index, 1, result.object);
+              this._changeDetectorRef.markForCheck();
+            }
+          });
+        } else {
           this._dialogService.openComponentDialog(TreeComponent, {
             data: {
               root: TreeConfiguration.getWorkingTree().getRootProxy(),
@@ -501,32 +510,12 @@ export class FormatObjectEditorComponent implements OnInit {
               this._changeDetectorRef.markForCheck();
             }
           });
-        } else {
-          this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
-            data: {
-              object: ((!value || this._enclosingType) ? value :
-                TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
-              type: type
-            }
-          }).updateSize('80%', '80%').afterClosed().subscribe((result:
-            any) => {
-            if (result.object) {
-              if (this._enclosingType) {
-                this._object[attributeName].splice(index, 1, result.object);
-                this._changeDetectorRef.markForCheck();
-              } else {
-                this._itemRepository.upsertItem(result.type.name, result.
-                  object);
-              }
-            }
-          });
         }
     }
   }
   
   public removeValue(index: number, attributeName: string): void {
     this._object[attributeName].splice(index, 1);
-    this._changeDetectorRef.markForCheck();
   }
   
   public getTableElements(attributeDefinition: PropertyDefinition):
@@ -728,33 +717,12 @@ export class FormatObjectEditorComponent implements OnInit {
           representation = value.id;
         }
       } else {
-        representation = value[Object.keys(value)[0]];
+        let firstAttributeName: string = Object.keys(value)[0];
+        representation = firstAttributeName + ': ' + String(value[
+          firstAttributeName]);
       }
     }
     
     return representation;
-  }
-  
-  private getTypeName(typeValue: any): string {
-    let type: string;
-    if (Array.isArray(typeValue)) {
-      type = typeValue[0];
-    } else {
-      type = typeValue;
-    }
-    
-    return type;
-  }
-  
-  private getType(attributeName: string): any {
-    let typeName: string = this.getTypeName(this._selectedType.classProperties[
-      attributeName].definition.type);
-    for (let localTypeName in this._selectedType.localTypes) {
-      if (localTypeName === typeName) {
-        return this._selectedType.localTypes[localTypeName];
-      }
-    }
-    
-    return TreeConfiguration.getWorkingTree().getProxyFor(typeName).item;
   }
 }

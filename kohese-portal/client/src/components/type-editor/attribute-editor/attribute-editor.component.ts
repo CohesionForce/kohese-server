@@ -31,7 +31,6 @@ export class AttributeEditorComponent implements OnInit {
     name: this._attributeName,
     type: 'boolean',
     required: false,
-    default: '',
     id: false
   };
   get attribute() {
@@ -78,21 +77,6 @@ export class AttributeEditorComponent implements OnInit {
   
   get dynamicTypesService() {
     return this._dynamicTypesService;
-  }
-  
-  get multivalued() {
-    return Array.isArray(this._attribute.type);
-  }
-  set multivalued(multivalued: boolean) {
-    let type: any = this._attribute.type;
-    if (multivalued) {
-      type = [type];
-    } else {
-      type = type[0];
-    }
-
-    this._attribute.type = type;
-    this._changeDetectorRef.markForCheck();
   }
   
   private _idAttributes: any = {};
@@ -142,6 +126,10 @@ export class AttributeEditorComponent implements OnInit {
     _fundamentalTypes));
   get attributeTypes() {
     return this._attributeTypes;
+  }
+  
+  get Array() {
+    return Array;
   }
   
   get Object() {
@@ -198,6 +186,12 @@ export class AttributeEditorComponent implements OnInit {
       this._attribute.type = [attributeType];
     } else {
       this._attribute.type = attributeType;
+    }
+    
+    if (this._attribute.type === 'string') {
+      this._attribute.default = '';
+    } else {
+      delete this._attribute.default;
     }
     
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
@@ -307,6 +301,21 @@ export class AttributeEditorComponent implements OnInit {
     } else {
       return (option === selection);
     }
+  }
+  
+  public toggleMultivaluedness(): void {
+    let type: any = this._attribute.type;
+    if (Array.isArray(type)) {
+      type = type[0];
+      if (type === 'string') {
+        this._attribute.default = '';
+      }
+    } else {
+      type = [type];
+      delete this._attribute.default;
+    }
+
+    this._attribute.type = type;
   }
   
   public close(accept: boolean): void {
