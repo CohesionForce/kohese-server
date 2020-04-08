@@ -90,8 +90,13 @@ export class ReportsComponent implements OnInit {
   }
 
   public getReportInformation(reportObject: any): void {
-    this._dialogService.openInformationDialog('Report Information',
+    if (reportObject.metaContent) {
+      this._dialogService.openInformationDialog('Report Information',
       '\n' + reportObject.metaContent.split('\n\n').join('\n'));
+    } else {
+      this._dialogService.openInformationDialog('Report Information',
+      '\nReport metadata is not available.');
+    }
   }
 
   private updateReportList(): void {
