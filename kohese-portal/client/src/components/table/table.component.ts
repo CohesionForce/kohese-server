@@ -2,9 +2,6 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, OnInit, Input, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, Sort } from '@angular/material';
 
-import { DialogService } from '../../services/dialog/dialog.service';
-import { TreeComponent } from '../tree/tree.component';
-
 @Component({
   selector: 'table_',
   templateUrl: './table.component.html',
@@ -19,15 +16,6 @@ export class TableComponent implements OnInit {
   @Input('rows')
   set rows(rows: Array<any>) {
     this._rows = rows;
-  }
-  
-  private _getName: (element: any) => string;
-  get getName() {
-    return this._getName;
-  }
-  @Input('getName')
-  set getName(getName: (element: any) => string) {
-    this._getName = getName;
   }
   
   private _columns: Array<string>;
@@ -123,29 +111,31 @@ export class TableComponent implements OnInit {
   @ViewChild('table')
   private _table: any;
   
+  get changeDetectorRef() {
+    return this._changeDetectorRef;
+  }
+  
   get matDialogRef() {
     return this._matDialogRef;
   }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<TableComponent>,
-    private _dialogService: DialogService) {
+    @Optional() private _matDialogRef: MatDialogRef<TableComponent>) {
   }
   
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
-      this._rows = this._data['rows'];
-      this._getName = this._data['getName'];
+      this.rows = this._data['rows'];
       
       if (this._data['columns']) {
-        this._columns = this._data['columns'];
+        this.columns = this._data['columns'];
       }
       
-      this._add = this._data['add'];
-      this._edit = this._data['edit'];
-      this._move = this._data['move'];
-      this._remove = this._data['remove'];
+      this.add = this._data['add'];
+      this.edit = this._data['edit'];
+      this.move = this._data['move'];
+      this.remove = this._data['remove'];
     }
     
     if (!this._columns) {
@@ -156,14 +146,11 @@ export class TableComponent implements OnInit {
           return (attributeNames.indexOf(attributeName) !== -1);
         });
       }
-      
-      let nameIndex: number = this._columns.indexOf('name');
-      if (nameIndex !== -1) {
-        this._columns.splice(nameIndex, 1);
-      }
-      
-      this._columns.unshift('name');
     }
+    
+    let concatenatedColumnNames: string = this._columns.join();
+    this._columns.unshift(concatenatedColumnNames + 'selection');
+    this._columns.push(concatenatedColumnNames + 'menu');
   }
   
   public isDialogInstance(): boolean {
@@ -171,91 +158,53 @@ export class TableComponent implements OnInit {
       this) && this._data;
   }
   
-  public moveElements(elements: Array<any>): void {
-    let selectedMoveLocation: string;
-    let locations: Array<string> = ['Before', 'After'];
-    this._dialogService.openComponentDialog(TreeComponent, {
-      data: {
-        root: undefined,
-        getChildren: (element: any) => {
-          if (element === undefined) {
-            return this._rows.filter((rowElement: any) => {
-              return (elements.indexOf(rowElement) === -1);
-            });
-          } else {
-            return [];
-          }
-        },
-        getText: (element: any) => {
-          return this._getName(element);
-        },
-        elementSelectionHandler: (element: any) => {
-          this._dialogService.openSelectDialog('Move Location', 'Please ' +
-            'select a move location:', 'Move Location', locations[0],
-            locations).afterClosed().subscribe((selectedLocation:
-            string) => {
-            if (selectedLocation) {
-              selectedMoveLocation = selectedLocation;
-            } else {
-              selectedMoveLocation = locations[0];
-            }
-          });
-        }
-      }
-    }).updateSize('80%', '80%').afterClosed().subscribe((selection:
-      Array<any>) => {
-      if (selection) {
-        this._move(elements, selection[0], (selectedMoveLocation === locations[
-          0]));
-        for (let j: number = 0; j < elements.length; j++) {
-          this._rows.splice(this._rows.indexOf(elements[j]), 1);
-        }
-        this._rows.splice(this._rows.indexOf(selection[0]) +
-          ((selectedMoveLocation === locations[0]) ? 0 : 1), 0, ...elements);
-        this._table.renderRows();
-        this._changeDetectorRef.markForCheck();
-      }
-    });
-  }
-  
-  public changeSelectionOfAll(select: boolean): void {
-    this._selection.length = 0;
-    if (select) {
-      this._selection.push(...this._rows);
-    }
-    
-    this._changeDetectorRef.markForCheck();
-  }
-  
   public sort(sortInformation: Sort): void {
-    if (sortInformation.active === 'name') {
-      this._rows.sort((oneElement: any, anotherElement: any) => {
-        let comparison: number = this._getName(oneElement).localeCompare(this.
-          _getName(anotherElement));
-        return ((sortInformation.direction === 'desc') ? -comparison :
-          comparison);
-      });
-    } else {
-      this._rows.sort((oneElement: any, anotherElement: any) => {
-        let comparison: number = String(oneElement[sortInformation.active]).
-          localeCompare(String(anotherElement[sortInformation.active]));
-        return ((sortInformation.direction === 'desc') ? -comparison :
-          comparison);
-      });
-    }
+    this._rows.sort((oneElement: any, anotherElement: any) => {
+      let comparison: number = String(oneElement[sortInformation.active]).
+        localeCompare(String(anotherElement[sortInformation.active]));
+      return ((sortInformation.direction === 'desc') ? -comparison :
+        comparison);
+    });
     
     this._table.renderRows();
   }
   
-  public toggleSelection(row: any): void {
+  public toggleAllSelected(select: boolean): void {
+    this._selection.length = 0;
+    if (select) {
+      this._selection.push(...this._rows);
+    }
+  }
+  
+  public toggleSelected(row: any): void {
     let index: number = this._selection.indexOf(row);
     if (index === -1) {
       this._selection.push(row);
     } else {
       this._selection.splice(index, 1);
     }
-    
-    this._changeDetectorRef.markForCheck();
+  }
+  
+  public getMoveDataTransferValue(row: any): string {
+    if (this._selection.length > 0) {
+      let indices: Array<number> = this._selection.map((element: any) => {
+        return this._rows.indexOf(element);
+      });
+      if (this._selection.indexOf(row) === -1) {
+        indices.push(this._rows.indexOf(row));
+      }
+      
+      indices.sort();
+      return JSON.stringify(indices);
+    } else {
+      return JSON.stringify([this._rows.indexOf(row)]);
+    }
+  }
+  
+  public getRowsFromDataTransfer(dataTransferValue: string): Array<any> {
+    let indices: Array<number> = JSON.parse(dataTransferValue);
+    return indices.map((index: number) => {
+      return this._rows[index];
+    });
   }
 }
-

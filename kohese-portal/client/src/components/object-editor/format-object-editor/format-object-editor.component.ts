@@ -262,10 +262,6 @@ export class FormatObjectEditorComponent implements OnInit {
     return references;
   }
   
-  public getReverseReferenceName(element: any): string {
-    return element.name;
-  }
-  
   public isLocalTypeAttribute(attributeName: string): boolean {
     let attribute: any = this._selectedType.classProperties[attributeName].
       definition;
@@ -540,10 +536,6 @@ export class FormatObjectEditorComponent implements OnInit {
     }
     
     return [];
-  }
-  
-  public getTableElementName(element: any): string {
-    return element.name;
   }
   
   public getTableColumns(attributeDefinition: PropertyDefinition):
