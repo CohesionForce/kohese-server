@@ -22,24 +22,6 @@
       "default": "Observed",
       "displayName": "issueState"
     },
-    "observedOn": {
-      "inputType": {
-        "type": "date",
-        "options": {}
-      },
-      "required": false,
-      "default": null,
-      "displayName": "observedOn"
-    },
-    "observedBy": {
-      "inputType": {
-        "type": "user-selector",
-        "options": {}
-      },
-      "required": false,
-      "default": null,
-      "displayName": "observedBy"
-    },
     "analysisAction": {
       "inputType": {
         "type": "proxy-selector",
@@ -52,19 +34,6 @@
       "required": true,
       "default": null,
       "displayName": "analysisAction"
-    },
-    "context": {
-      "inputType": {
-        "type": "proxy-selector",
-        "options": {
-          "allowMultiSelect": false,
-          "type": "Item",
-          "useAdvancedSelector": false
-        }
-      },
-      "required": true,
-      "default": null,
-      "displayName": "context"
     },
     "resolutionActions": {
       "inputType": {
