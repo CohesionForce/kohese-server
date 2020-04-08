@@ -52,15 +52,13 @@
           "name": "PathName",
           "type": "string",
           "required": false,
-          "id": false,
-          "default": ""
+          "id": false
         },
         "PathDescription": {
           "name": "PathDescription",
           "type": "string",
           "required": false,
-          "id": false,
-          "default": ""
+          "id": false
         },
         "Preconditions": {
           "name": "Preconditions",
