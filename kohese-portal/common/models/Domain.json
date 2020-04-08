@@ -5,25 +5,10 @@
   "createdBy": "gmckune",
   "createdOn": 1586302904721,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586302986671,
+  "modifiedOn": 1586375436637,
   "base": "Decision",
   "idInjection": true,
-  "properties": {
-    "DomainName": {
-      "name": "DomainName",
-      "type": "string",
-      "required": false,
-      "id": false,
-      "default": ""
-    },
-    "DomainDescription": {
-      "name": "DomainDescription",
-      "type": "string",
-      "required": false,
-      "id": false,
-      "default": ""
-    }
-  },
+  "properties": {},
   "validations": [],
   "relations": {},
   "acls": [],

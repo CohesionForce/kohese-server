@@ -5,28 +5,11 @@
   "createdBy": "gmckune",
   "createdOn": 1586302904733,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586302986789,
+  "modifiedOn": 1586375436725,
   "modelName": "Domain",
-  "icon": "",
+  "icon": "fa fa-book",
   "color": "#000000",
-  "viewProperties": {
-    "DomainName": {
-      "name": "DomainName",
-      "displayName": "DomainName",
-      "inputType": {
-        "type": "text",
-        "options": {}
-      }
-    },
-    "DomainDescription": {
-      "name": "DomainDescription",
-      "displayName": "DomainDescription",
-      "inputType": {
-        "type": "text",
-        "options": {}
-      }
-    }
-  },
+  "viewProperties": {},
   "localTypes": {},
   "formatDefinitions": {
     "56ecc900-7929-11ea-9d30-c7b5e0ffd284": {
@@ -183,22 +166,6 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
-              "editable": true
-            },
-            {
-              "propertyName": "DomainName",
-              "customLabel": "DomainName",
-              "labelOrientation": "Top",
-              "kind": "text",
-              "visible": true,
-              "editable": true
-            },
-            {
-              "propertyName": "DomainDescription",
-              "customLabel": "DomainDescription",
-              "labelOrientation": "Top",
-              "kind": "text",
-              "visible": true,
               "editable": true
             }
           ]

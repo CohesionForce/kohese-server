@@ -5,25 +5,10 @@
   "createdBy": "gmckune",
   "createdOn": 1586302647375,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586302766888,
+  "modifiedOn": 1586372358125,
   "base": "Decision",
   "idInjection": true,
-  "properties": {
-    "ActorName": {
-      "name": "ActorName",
-      "type": "string",
-      "required": false,
-      "id": false,
-      "default": ""
-    },
-    "ActorDescription": {
-      "name": "ActorDescription",
-      "type": "string",
-      "required": false,
-      "id": false,
-      "default": ""
-    }
-  },
+  "properties": {},
   "validations": [],
   "relations": {},
   "acls": [],

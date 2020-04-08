@@ -5,28 +5,11 @@
   "createdBy": "gmckune",
   "createdOn": 1586302647398,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586302767010,
+  "modifiedOn": 1586373219340,
   "modelName": "Actor",
-  "icon": "",
+  "icon": "fa fa-male",
   "color": "#000000",
-  "viewProperties": {
-    "ActorName": {
-      "name": "ActorName",
-      "displayName": "ActorName",
-      "inputType": {
-        "type": "text",
-        "options": {}
-      }
-    },
-    "ActorDescription": {
-      "name": "ActorDescription",
-      "displayName": "ActorDescription",
-      "inputType": {
-        "type": "text",
-        "options": {}
-      }
-    }
-  },
+  "viewProperties": {},
   "localTypes": {},
   "formatDefinitions": {
     "bd8898c0-7928-11ea-a214-1bab319abe04": {
@@ -183,22 +166,6 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
-              "editable": true
-            },
-            {
-              "propertyName": "ActorName",
-              "customLabel": "ActorName",
-              "labelOrientation": "Top",
-              "kind": "text",
-              "visible": true,
-              "editable": true
-            },
-            {
-              "propertyName": "ActorDescription",
-              "customLabel": "ActorDescription",
-              "labelOrientation": "Top",
-              "kind": "text",
-              "visible": true,
               "editable": true
             }
           ]
