@@ -5,10 +5,36 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169859,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1572491077359,
+  "modifiedOn": 1586376785990,
   "modelName": "UseCase",
-  "icon": "fa fa-tasks",
+  "icon": "fa fa-lemon-o",
   "color": "#000000",
+  "viewProperties": {
+    "Actors": {
+      "displayName": "Actors",
+      "inputType": {
+        "type": "text",
+        "options": {}
+      },
+      "name": "Actors"
+    },
+    "BasicPath": {
+      "displayName": "BasicPath",
+      "inputType": {
+        "type": "",
+        "options": {}
+      },
+      "name": "BasicPath"
+    },
+    "AlternativePaths": {
+      "displayName": "AlternativePaths",
+      "inputType": {
+        "type": "",
+        "options": {}
+      },
+      "name": "AlternativePaths"
+    }
+  },
   "localTypes": {
     "FlowOfEvents": {
       "name": "FlowOfEvents",
@@ -16,6 +42,22 @@
       "icon": "",
       "color": "#000000",
       "viewProperties": {
+        "PathName": {
+          "name": "PathName",
+          "displayName": "PathName",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
+        "PathDescription": {
+          "name": "PathDescription",
+          "displayName": "PathDescription",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
         "Preconditions": {
           "name": "Preconditions",
           "displayName": "Preconditions",
@@ -54,6 +96,22 @@
               "kind": "list",
               "contents": [
                 {
+                  "propertyName": "PathName",
+                  "customLabel": "PathName",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "PathDescription",
+                  "customLabel": "PathDescription",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
                   "propertyName": "Preconditions",
                   "customLabel": "Preconditions",
                   "labelOrientation": "Top",
@@ -86,32 +144,6 @@
         "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1"
       },
       "tableDefinitions": {}
-    }
-  },
-  "viewProperties": {
-    "Actors": {
-      "displayName": "Actors",
-      "inputType": {
-        "type": "text",
-        "options": {}
-      },
-      "name": "Actors"
-    },
-    "BasicPath": {
-      "displayName": "BasicPath",
-      "inputType": {
-        "type": "",
-        "options": {}
-      },
-      "name": "BasicPath"
-    },
-    "AlternativePaths": {
-      "displayName": "AlternativePaths",
-      "inputType": {
-        "type": "",
-        "options": {}
-      },
-      "name": "AlternativePaths"
     }
   },
   "formatDefinitions": {
@@ -331,6 +363,26 @@
               "customLabel": "Actors",
               "labelOrientation": "Top",
               "kind": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "BasicPath",
+              "customLabel": "BasicPath",
+              "labelOrientation": "Top",
+              "kind": "",
+              "formatDefinition": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "AlternativePaths",
+              "customLabel": "AlternativePaths",
+              "labelOrientation": "Top",
+              "kind": "",
+              "formatDefinition": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             }
