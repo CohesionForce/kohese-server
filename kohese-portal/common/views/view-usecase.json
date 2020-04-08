@@ -5,9 +5,9 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169859,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586303804768,
+  "modifiedOn": 1586376785990,
   "modelName": "UseCase",
-  "icon": "fa fa-tasks",
+  "icon": "fa fa-lemon-o",
   "color": "#000000",
   "viewProperties": {
     "Actors": {
@@ -363,6 +363,26 @@
               "customLabel": "Actors",
               "labelOrientation": "Top",
               "kind": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "BasicPath",
+              "customLabel": "BasicPath",
+              "labelOrientation": "Top",
+              "kind": "",
+              "formatDefinition": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "AlternativePaths",
+              "customLabel": "AlternativePaths",
+              "labelOrientation": "Top",
+              "kind": "",
+              "formatDefinition": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             }
