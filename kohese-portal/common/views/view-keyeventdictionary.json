@@ -5,11 +5,10 @@
   "createdBy": "gmckune",
   "createdOn": 1572491164827,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1572826394102,
+  "modifiedOn": 1586376069127,
   "modelName": "KeyEventDictionary",
-  "icon": "fa fa-tasks",
+  "icon": "fa fa-th-list",
   "color": "#000000",
-  "localTypes": {},
   "viewProperties": {
     "KeyEvents": {
       "displayName": "KeyEvents",
@@ -20,6 +19,7 @@
       "name": "KeyEvents"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "815abbc0-5d77-11ea-9d2a-81904e0f9ce1": {
       "id": "815abbc0-5d77-11ea-9d2a-81904e0f9ce1",
