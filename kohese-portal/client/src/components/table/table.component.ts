@@ -24,6 +24,16 @@ export class TableComponent implements OnInit {
   }
   @Input('columns')
   set columns(columns: Array<string>) {
+    if (!columns) {
+      columns = Object.keys(this._rows[0]);
+      for (let j: number = 1; j < this._rows.length; j++) {
+        let attributeNames: Array<string> = Object.keys(this._rows[j]);
+        columns = columns.filter((attributeName: string) => {
+          return (attributeNames.indexOf(attributeName) !== -1);
+        });
+      }
+    }
+    
     this._columns = columns;
   }
   
@@ -127,30 +137,12 @@ export class TableComponent implements OnInit {
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this.rows = this._data['rows'];
-      
-      if (this._data['columns']) {
-        this.columns = this._data['columns'];
-      }
-      
+      this.columns = this._data['columns'];
       this.add = this._data['add'];
       this.edit = this._data['edit'];
       this.move = this._data['move'];
       this.remove = this._data['remove'];
     }
-    
-    if (!this._columns) {
-      this._columns = Object.keys(this._rows[0]);
-      for (let j: number = 1; j < this._rows.length; j++) {
-        let attributeNames: Array<string> = Object.keys(this._rows[j]);
-        this._columns = this._columns.filter((attributeName: string) => {
-          return (attributeNames.indexOf(attributeName) !== -1);
-        });
-      }
-    }
-    
-    let concatenatedColumnNames: string = this._columns.join();
-    this._columns.unshift(concatenatedColumnNames + 'selection');
-    this._columns.push(concatenatedColumnNames + 'menu');
   }
   
   public isDialogInstance(): boolean {
@@ -183,6 +175,11 @@ export class TableComponent implements OnInit {
     } else {
       this._selection.splice(index, 1);
     }
+  }
+  
+  public getDisplayColumnIdentifiers(): Array<string> {
+    return [this._columns.join() + 'selection', ...this._columns, this.
+      _columns.join() + 'menu'];
   }
   
   public getMoveDataTransferValue(row: any): string {

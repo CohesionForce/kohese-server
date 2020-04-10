@@ -17,11 +17,12 @@
   </div>
   <mat-table #table matSort [dataSource]="rows"
     style="height: calc(100% - 50px); overflow: auto;">
-    <ng-container matColumnDef="{{columns[0]}}">
+    <ng-container matColumnDef="{{columns.join() + 'selection'}}">
       <mat-header-cell *matHeaderCellDef style="flex: 0 0 64px;">
-        <mat-checkbox [ngModel]="(selection.length === rows.length)"
-          (ngModelChange)="toggleAllSelected($event)" [disabled]="(isDisabled
-          || (!move && !remove))" style="padding: 7px;">
+        <mat-checkbox [ngModel]="((rows.length !== 0) && (selection.length ===
+          rows.length))" (ngModelChange)="toggleAllSelected($event)"
+          [disabled]="(isDisabled || (!move && !remove) || (rows.length ===
+          0))" style="padding: 7px;">
         </mat-checkbox>
       </mat-header-cell>
       <mat-cell *matCellDef="let element" style="flex: 0 0 64px;">
@@ -31,7 +32,7 @@
         </mat-checkbox>
       </mat-cell>
     </ng-container>
-    <ng-container *ngFor="let column of columns.slice(1, columns.length - 1)">
+    <ng-container *ngFor="let column of columns">
       <ng-container matColumnDef="{{column}}">
         <mat-header-cell *matHeaderCellDef>
           {{column}}
@@ -41,7 +42,7 @@
         </mat-cell>
       </ng-container>
     </ng-container>
-    <ng-container matColumnDef="{{columns[columns.length - 1]}}">
+    <ng-container matColumnDef="{{columns.join() + 'menu'}}">
       <mat-header-cell *matHeaderCellDef style="flex: 0 0 64px;">
       </mat-header-cell>
       <mat-cell *matCellDef="let element" style="flex: 0 0 64px;">
@@ -65,9 +66,11 @@
         </mat-menu>
       </mat-cell>
     </ng-container>
-    <mat-header-row *matHeaderRowDef="columns; sticky: true"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: columns" draggable="{{!!move}}"
-      (dragstart)="$event.dataTransfer.setData('rows',
+    <mat-header-row *matHeaderRowDef="getDisplayColumnIdentifiers(); sticky:
+      true">
+    </mat-header-row>
+    <mat-row *matRowDef="let row; columns: getDisplayColumnIdentifiers()"
+      draggable="{{!!move}}" (dragstart)="$event.dataTransfer.setData('rows',
       getMoveDataTransferValue(row)); $event.dataTransfer.dropEffect = 'move';
       changeDetectorRef.detach()" (dragend)="changeDetectorRef.reattach();
       changeDetectorRef.markForCheck()" (dragover)="$event.preventDefault();
