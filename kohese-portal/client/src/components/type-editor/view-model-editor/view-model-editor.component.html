@@ -182,9 +182,7 @@
         <ng-template matExpansionPanelContent>
           <format-definition-editor [formatDefinition]="formatDefinition"
             [dataModel]="getDataModel(dataModel)" [viewModel]="viewModel"
-            [attributes]="getAttributes()" [disabled]="(!editable ||
-            (viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] ===
-            formatDefinition.id))">
+            [attributes]="getAttributes()" [disabled]="!editable">
           </format-definition-editor>
         </ng-template>
       </mat-expansion-panel>

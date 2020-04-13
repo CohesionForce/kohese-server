@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
   Input, OnInit } from '@angular/core';
 
-import { FormatDefinition } from '../../type-editor/FormatDefinition.interface';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { FormatContainer,
   FormatContainerKind } from '../../type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
@@ -16,15 +17,6 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormatDefinitionEditorComponent implements OnInit {
-  private _formatDefinition: FormatDefinition;
-  get formatDefinition() {
-    return this._formatDefinition;
-  }
-  @Input('formatDefinition')
-  set formatDefinition(formatDefinition: FormatDefinition) {
-    this._formatDefinition = formatDefinition;
-  }
-  
   private _dataModel: any;
   get dataModel() {
     return this._dataModel;
@@ -41,6 +33,18 @@ export class FormatDefinitionEditorComponent implements OnInit {
   @Input('viewModel')
   set viewModel(viewModel: any) {
     this._viewModel = viewModel;
+  }
+  
+  private _formatDefinition: FormatDefinition;
+  get formatDefinition() {
+    return this._formatDefinition;
+  }
+  @Input('formatDefinition')
+  set formatDefinition(formatDefinition: FormatDefinition) {
+    this._formatDefinition = formatDefinition;
+    
+    this._isDefaultFormatDefinition = (this._viewModel.defaultFormatKey[
+      FormatDefinitionType.DEFAULT] === this._formatDefinition.id);
   }
   
   private _attributes: Array<any>;
@@ -64,6 +68,11 @@ export class FormatDefinitionEditorComponent implements OnInit {
   @Input('disabled')
   set isDisabled(isDisabled: boolean) {
     this._isDisabled = isDisabled;
+  }
+  
+  private _isDefaultFormatDefinition: boolean;
+  get isDefaultFormatDefinition() {
+    return this._isDefaultFormatDefinition;
   }
   
   private _userInterfaceTypes: any = {
