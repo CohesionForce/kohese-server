@@ -116,6 +116,17 @@ that does not require duplicated storage (except the working tree).
 git clone -s [source-repo] [new-repo]
 ```
 
+## To reset origin to be original origin
+When a repo is cloned as a shared local repo, the origin will be set to the source local repo.
+
+```
+* Determine what the remote url is
+git remote -v
+* If it is the local repo, then execute the above command in the original local repo
+git remote set-url origin [remote url]
+* Verify the origin is updated
+```
+
 ---
 # Manage Bundles
 
