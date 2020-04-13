@@ -15,14 +15,14 @@
     <mat-icon class="fa fa-question-circle"></mat-icon>
   </button>
 </div>
-<mat-form-field style="height: calc(50% - 25px); width: 100%;">
-  <textarea matInput #textArea placeholder="Markdown" columns="80" rows="3"
-    [ngModel]="formattedValue" (ngModelChange)="updateValue($event)"
-    (paste)="addImagesToMarkdown(textArea.selectionStart, $event.
-    clipboardData.files)">
+<mat-form-field style="width: 100%;">
+  <textarea matInput #textArea placeholder="Markdown" columns="80"
+    cdkTextareaAutosize [ngModel]="formattedValue"
+    (ngModelChange)="updateValue($event)" (paste)="addImagesToMarkdown(
+    textArea.selectionStart, $event.clipboardData.files)">
   </textarea>
 </mat-form-field>
-<div style="height: calc(50% - 25px); width: 100%; overflow: auto;">
+<div style="width: 100%;">
   Preview:
   <markdown [data]="value"></markdown>
 </div>
