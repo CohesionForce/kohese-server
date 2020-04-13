@@ -128,8 +128,14 @@ git bundle create [file.bundle] [from]..[to]
 		
 ## To load bundle on target machine
 ```
-git bundle verify [file.bundle]  
-git fetch [file.bundle] master:master
+git bundle verify [file.bundle]
+    Note: This will return the ref that is required as the base
+git checkout [required ref]
+    Note: This will checkout a detached HEAD
+git bundle list-heads [file.bundle]
+    Note: This will list the branch that is in the bundle
+git checkout -b [branch]
+git pull [file.bundle] [branch]
 ```
 
 --- 
