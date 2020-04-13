@@ -674,8 +674,14 @@ async function populateCache(): Promise<any> {
 
   await _cache.loadCachedObjects();
   let headCommit: string;
+  let workingWorkspace: Workspace;
+  let workingWorkspaceHashes = {};
   try {
     headCommit = await _cache.getRef('HEAD');
+    workingWorkspace = await _cache.getWorkspace('Working');
+    for (let repo in workingWorkspace) {
+      workingWorkspaceHashes[repo] = workingWorkspace[repo].treeHash;
+    }
   } catch (error) {
     headCommit = '';
   }
@@ -693,7 +699,9 @@ async function populateCache(): Promise<any> {
         timestamp: {
           requestTime: requestTime
         },
-        headCommit: headCommit
+        incrementalCacheLoad: incrementalCacheLoad,
+        headCommit: headCommit,
+        workingWorkspaceHashes: workingWorkspaceHashes
       }, (response) => {
         const responseReceiptTime = Date.now();
         const timestamp = response.timestamp;
@@ -705,6 +713,11 @@ async function populateCache(): Promise<any> {
           console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey] - requestTime));
         }
         console.log('$$$ Fetched Item Cache');
+        if (response.incrementalDataToLoad){
+          if (response.incrementalDataToLoad.HEAD){
+            _cache.cacheRef('HEAD', response.incrementalDataToLoad.HEAD);
+          }
+        }
         resolve();
       });
     });

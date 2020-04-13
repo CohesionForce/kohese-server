@@ -164,6 +164,40 @@ export class CacheAnalysis {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  async detectMissingWorkspaceData(selectedWorkspaceId?) {
+    let workspaceMap = this.cache.getWorkspaces();
+    for (let [workspaceId, workspace] of Array.from(workspaceMap.entries())) {
+      if (!selectedWorkspaceId || (selectedWorkspaceId && (workspaceId === selectedWorkspaceId))){
+        await this.evaluateTreeRoots(workspace);
+      }
+    };
+
+    return this.getMissingData();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async detectMissingRefData() {
+    let refMap = this.cache.getRefs();
+    for (let [refId, commitId] of Array.from(refMap.entries())) {
+      let commit = await this.cache.getCommit(commitId);
+      if (!commit){
+        this.missingCacheData.commit[commitId] = {
+          commitId: commitId
+        };
+        this.missingCacheData.found = true;
+      } else {
+        await this.evaluateCommit(commitId, commit);
+      }
+    };
+
+    return this.getMissingData();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   async detectMissingCommitData(selectedCommitId?) {
     let kCommitMap = this.cache.getCommits();
     for (let [commitId, commit] of Array.from(kCommitMap.entries())) {
@@ -215,6 +249,8 @@ export class CacheAnalysis {
     this.markBlobsAsEvaluated();
     await this.detectMissingTreeData();
     await this.detectMissingCommitData();
+    await this.detectMissingWorkspaceData();
+    await this.detectMissingRefData();
     return this.getMissingData();
   }
 
