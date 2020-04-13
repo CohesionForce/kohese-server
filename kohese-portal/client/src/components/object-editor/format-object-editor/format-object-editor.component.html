@@ -93,7 +93,7 @@
             </ng-container>
           </ng-container>
           <ng-template #singleValuedBlock>
-            <ng-container *ngIf="(!isDisabled || attributeDefinition.visible)">
+            <ng-container *ngIf="attributeDefinition.visible">
               <ng-container [ngSwitch]="attributeDefinition.kind">
                 <ng-container *ngSwitchCase="'boolean'">
                   <mat-checkbox [(ngModel)]="object[attributeDefinition.
@@ -141,6 +141,16 @@
                 <ng-container *ngSwitchCase="'text'">
                   <mat-form-field style="width: 100%;">
                     <input matInput type="text"
+                      placeholder="{{getAttributeRepresentation(
+                      attributeDefinition)}}" [(ngModel)]="object[
+                      attributeDefinition.propertyName]"
+                      [disabled]="(!attributeDefinition.editable ||
+                      isDisabled)"/>
+                  </mat-form-field>
+                </ng-container>
+                <ng-container *ngSwitchCase="'maskedString'">
+                  <mat-form-field style="width: 100%;">
+                    <input matInput type="password"
                       placeholder="{{getAttributeRepresentation(
                       attributeDefinition)}}" [(ngModel)]="object[
                       attributeDefinition.propertyName]"
