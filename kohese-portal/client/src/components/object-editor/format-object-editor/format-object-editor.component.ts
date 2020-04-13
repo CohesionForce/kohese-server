@@ -299,31 +299,6 @@ export class FormatObjectEditorComponent implements OnInit {
     return localTypeCopy;
   }
   
-  public getLocalTypeViewModel(propertyDefinition: PropertyDefinition): any {
-    let attribute: any = this._selectedType.classProperties[propertyDefinition.
-      propertyName].definition;
-    let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
-      0] : attribute.type);
-    return this._viewModel.localTypes[typeName];
-  }
-  
-  public getLocalTypeAttributes(propertyDefinition: PropertyDefinition):
-    Array<any> {
-    let attributes: Array<any> = [];
-    let localType: any = this.getLocalType(propertyDefinition);
-    for (let attributeName in localType.properties) {
-      attributes.push(localType.properties[attributeName]);
-    }
-    
-    return attributes;
-  }
-  
-  public getLocalTypeFormatDefinition(propertyDefinition: PropertyDefinition):
-    FormatDefinition {
-    return this.getLocalTypeViewModel(propertyDefinition).formatDefinitions[
-      propertyDefinition.formatDefinition];
-  }
-  
   public openObjectEditor(attributeName: string): void {
     let value: any = this._object[attributeName];
     this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
@@ -719,23 +694,49 @@ export class FormatObjectEditorComponent implements OnInit {
     
     let representation: string = String(value);
     if (representation === String({})) {
-      if (value.name) {
-        representation = value.name;
-      } else if (value.id) {
-        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(value.id);
-        if (itemProxy) {
-          // References
-          representation = itemProxy.item.name;
+      let isLocalTypeAttribute: boolean = (!this._enclosingType && this.
+        isLocalTypeAttribute(attributeName));
+      if (isLocalTypeAttribute) {
+        if (value.name) {
+          return value.name;
+        } else if (value.id) {
+          return value.id;
         } else {
-          representation = value.id;
+          let type: any = this._selectedType.classProperties[attributeName].
+            definition.type;
+          type = (Array.isArray(type) ? type[0] : type);
+          let viewModel: any = this._viewModel.localTypes[type];
+          let formatDefinitionId: string = viewModel.defaultFormatKey[this.
+            _formatDefinitionType];
+          if (!formatDefinitionId) {
+            formatDefinitionId = viewModel.defaultFormatKey[
+              FormatDefinitionType.DEFAULT];
+          }
+          let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
+            formatDefinitionId];
+          for (let j: number = 0; j < formatDefinition.containers.length;
+            j++) {
+            if ((formatDefinition.containers.length > 0) && (formatDefinition.
+              containers[0].kind !== FormatContainerKind.
+              REVERSE_REFERENCE_TABLE) && (formatDefinition.containers[0].
+              contents.length > 0)) {
+              let propertyDefinition: PropertyDefinition = formatDefinition.
+                containers[0].contents[0];
+              return propertyDefinition.customLabel + ': ' + String(value[
+                propertyDefinition.propertyName]);
+            }
+          }
+          
+          let firstAttributeName: string = Object.keys(value)[0];
+          return firstAttributeName + ': ' + String(value[firstAttributeName]);
         }
       } else {
-        representation = value[Object.keys(value)[0]];
+        return TreeConfiguration.getWorkingTree().getProxyFor(value.id).item.
+          name;
       }
+    } else {
+      return representation;
     }
-    
-    return representation;
   }
   
   private getTypeName(typeValue: any): string {
