@@ -10,7 +10,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
 import { FormatDefinition,
   FormatDefinitionType } from '../FormatDefinition.interface';
-import { FormatContainerKind } from '../FormatContainer.interface';
+import { FormatContainer,
+  FormatContainerKind } from '../FormatContainer.interface';
 import { PropertyDefinition } from '../PropertyDefinition.interface';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -656,57 +657,169 @@ export class DataModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public getAttributeUsages(attributeName: string): Array<any> {
-    let attributeUsages: Array<any> = [];
-    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
-      (itemProxy: ItemProxy) => {
-      if (itemProxy.kind === this._dataModel.name) {
-        if (Array.isArray(this._dataModel.properties[attributeName].type)) {
-          // The first check below should not be necessary.
-          if (itemProxy.item[attributeName] && itemProxy.item[attributeName].
-            length > 0) {
-            attributeUsages.push(itemProxy.item);
-          }
-        } else {
-          if (itemProxy.item[attributeName] != null) {
-            attributeUsages.push(itemProxy.item);
+  public removeAttribute(propertyId: string): void {
+    let viewModel: any;
+    if (this._enclosingType) {
+      viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._enclosingType.name.toLowerCase()).item.localTypes[this.
+        _dataModel.name];
+    } else {
+      viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._dataModel.name.toLowerCase()).item;
+    }
+    
+    /* paths Element format: [<View Model>, <FormatDefinition ID>,
+    <FormatContainer index>, <PropertyDefinition index>] */
+    let paths: Array<Array<any>> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getRootProxy().
+      visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseView') && (itemProxy.item !==
+        viewModel)) {
+        let formatDefinitions: Array<FormatDefinition> = Object.values(
+          itemProxy.item.formatDefinitions);
+        for (let j: number = 0; j < formatDefinitions.length; j++) {
+          for (let k: number = 0; k < formatDefinitions[j].containers.
+            length; k++) {
+            let formatContainer: FormatContainer = formatDefinitions[j].
+              containers[k];
+            if (formatContainer.kind === FormatContainerKind.
+              REVERSE_REFERENCE_TABLE) {
+              let propertyDefinitions: Array<PropertyDefinition> =
+                formatContainer.contents.filter((propertyDefinition:
+                PropertyDefinition) => {
+                return ((propertyDefinition.propertyName.kind === this.
+                  _dataModel.name) && (propertyDefinition.propertyName.
+                  attribute === propertyId));
+              });
+              if (propertyDefinitions.length > 0) {
+                for (let l: number = 0; l < propertyDefinitions.length;
+                  l++) {
+                  paths.push([itemProxy.item, formatDefinitions[j].id, k,
+                    formatContainer.contents.indexOf(propertyDefinitions[l])]);
+                }
+              }
+            } else {
+              let isSubtype: boolean = false;
+              let dataModelItemProxy: ItemProxy = this._itemRepository.
+                getTreeConfig().getValue().config.getProxyFor(itemProxy.item.
+                modelName);
+              while (dataModelItemProxy) {
+                if (dataModelItemProxy.item === this._dataModel) {
+                  isSubtype = true;
+                  break;
+                }
+                
+                dataModelItemProxy = this._itemRepository.getTreeConfig().
+                  getValue().config.getProxyFor(dataModelItemProxy.item.base);
+              }
+              
+              if (isSubtype) {
+                let entryIndex: number = formatContainer.contents.map(
+                  (propertyDefinition: PropertyDefinition) => {
+                  return propertyDefinition.propertyName;
+                }).indexOf(propertyId);
+                if (entryIndex !== -1) {
+                  paths.push([itemProxy.item, formatDefinitions[j].id, k,
+                    entryIndex]);
+                }
+              }
+            }
           }
         }
       }
-    });
+    }, undefined);
     
-    return attributeUsages;
-  }
-  
-  public removeAttribute(propertyId: string): void {
-    this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
-      'unsaved modifications to this kind are to be saved if this attribute ' +
-      'is removed. Do you want to proceed?').subscribe((choiceValue: any) => {
-      if (choiceValue) {
-        let viewModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
-          'view-' + this._dataModel.name.toLowerCase()).item;
-        delete this._dataModel.properties[propertyId];
-        delete viewModel.viewProperties[propertyId];
-        let defaultFormatDefinition: FormatDefinition = viewModel.
-          formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
-          DEFAULT]];
-        defaultFormatDefinition.containers[0].contents.splice(
-          defaultFormatDefinition.containers[0].contents.map(
-          (propertyDefinition: PropertyDefinition) => {
-          return propertyDefinition.propertyName;
-        }).indexOf(propertyId), 1);
-        
-        this.save();
-        this._itemRepository.upsertItem('KoheseView', viewModel);
-        this._attributes.splice(Object.keys(this._dataModel.properties).
-          indexOf(propertyId), 1);
-        this._attributeTable.renderRows();
-        
-        // Re-enter edit mode
-        this._editable = true;
-        
-        this._changeDetectorRef.markForCheck();
+    let removeFromModels: () => void = () => {
+      delete this._dataModel.properties[propertyId];
+      delete viewModel.viewProperties[propertyId];
+      let formatDefinitions: Array<FormatDefinition> = Object.values(viewModel.
+        formatDefinitions);
+      for (let j: number = 0; j < formatDefinitions.length; j++) {
+        for (let k: number = 0; k < formatDefinitions[j].containers.length;
+          k++) {
+          let formatContainer: FormatContainer = formatDefinitions[j].
+            containers[k];
+          if (formatContainer.kind === FormatContainerKind.
+            REVERSE_REFERENCE_TABLE) {
+            let propertyDefinitions: Array<PropertyDefinition> =
+              formatContainer.contents.filter((propertyDefinition:
+              PropertyDefinition) => {
+              return ((propertyDefinition.propertyName.kind === this.
+                _dataModel.name) && (propertyDefinition.propertyName.attribute
+                === propertyId));
+            });
+            if (propertyDefinitions.length > 0) {
+              for (let l: number = 0; l < propertyDefinitions.length; l++) {
+                formatContainer.contents.splice(formatContainer.contents.
+                  indexOf(propertyDefinitions[l]), 1);
+              }
+            }
+          } else {
+            let entryIndex: number = formatContainer.contents.map(
+              (propertyDefinition: PropertyDefinition) => {
+              return propertyDefinition.propertyName;
+            }).indexOf(propertyId);
+            if (entryIndex !== -1) {
+              formatContainer.contents.splice(entryIndex, 1);
+            }
+          }
+        }
       }
-    });
+      
+      this.save();
+      
+      if (this._enclosingType) {
+        this._itemRepository.upsertItem('KoheseView', TreeConfiguration.
+          getWorkingTree().getProxyFor('view-' + this._enclosingType.name.
+          toLowerCase()).item);
+      } else {
+        this._itemRepository.upsertItem('KoheseView', viewModel);
+      }
+      
+      this._attributes.splice(Object.keys(this._dataModel.properties).indexOf(
+        propertyId), 1);
+      this._attributeTable.renderRows();
+      
+      // Re-enter edit mode
+      this._editable = true;
+    };
+    
+    if (paths.length === 0) {
+      this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
+        'unsaved modifications to this type are to be saved if this ' +
+        'attribute is removed. Do you want to proceed?').subscribe(
+        (choiceValue: any) => {
+        if (choiceValue) {
+          removeFromModels();
+          this._changeDetectorRef.markForCheck();
+        }
+      });
+    } else {
+      this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
+        'unsaved modifications to this type are to be saved if this ' +
+        'attribute is removed. Additionally, the following types are ' +
+        'expected to have one or more Format Definition entries removed: ' +
+        paths.map((path: Array<any>) => {
+          return path[0].name;
+        }).filter((viewModelName: string, index: number, source:
+          Array<string>) => {
+          return (source.indexOf(viewModelName) === index);
+        }).join(', ') + '. Do you want to proceed?').subscribe(
+        (choiceValue: any) => {
+        if (choiceValue) {
+          for (let j: number = 0; j < paths.length; j++) {
+            let propertyDefinitions: Array<PropertyDefinition> = (paths[j][0][
+              'formatDefinitions'][String(paths[j][1])]['containers'][
+              (paths[j][2] as number)][
+              'contents'] as Array<PropertyDefinition>);
+            propertyDefinitions.splice((paths[j][3] as number), 1);
+            this._itemRepository.upsertItem('KoheseView', paths[j][0]);
+          }
+          
+          removeFromModels();
+          this._changeDetectorRef.markForCheck();
+        }
+      });
+    }
   }
 }

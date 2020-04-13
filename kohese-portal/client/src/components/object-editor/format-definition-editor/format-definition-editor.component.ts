@@ -105,7 +105,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
       item: this._dataModel
     } as ItemProxy);
     do {
-      typeNames.push(dataModelItemProxy.item.base);
+      typeNames.push(dataModelItemProxy.item.name);
       dataModelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
         dataModelItemProxy.item.base);
     } while (dataModelItemProxy);
