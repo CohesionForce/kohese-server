@@ -20,8 +20,7 @@
         Reverse References For {{getReverseReferenceTableHeaderContent(
           container)}}
       </h3>
-      <table_ [rows]="getReverseReferences(container)"
-        [getName]="getReverseReferenceName" [columns]="['name']"
+      <table_ [rows]="getReverseReferences(container)" [columns]="['name']"
         [disabled]="true">
       </table_>
     </ng-container>
@@ -39,9 +38,8 @@
                   {{getAttributeRepresentation(attributeDefinition)}}
                 </h3>
                 <table_ [rows]="getTableElements(attributeDefinition)"
-                  [getName]="getTableElementName" [columns]="getTableColumns(
-                  attributeDefinition)" [add]="getTableElementAdditionFunction(
-                  attributeDefinition)"
+                  [columns]="getTableColumns(attributeDefinition)"
+                  [add]="getTableElementAdditionFunction(attributeDefinition)"
                   [move]="getTableElementMovementFunction(attributeDefinition)"
                   [remove]="getTableElementRemovalFunction(
                   attributeDefinition)" [disabled]="(!attributeDefinition.
