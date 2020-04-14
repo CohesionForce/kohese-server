@@ -17,7 +17,7 @@
 </div>
 <mat-form-field style="width: 100%;">
   <textarea matInput #textArea placeholder="Markdown" columns="80"
-    cdkTextareaAutosize [ngModel]="formattedValue"
+    cdkTextareaAutosize style="padding: unset;" [ngModel]="formattedValue"
     (ngModelChange)="updateValue($event)" (paste)="addImagesToMarkdown(
     textArea.selectionStart, $event.clipboardData.files)">
   </textarea>
