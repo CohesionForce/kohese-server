@@ -1,10 +1,8 @@
 <h1 mat-dialog-title style="height: 40px; width: 100%;">{{data.title}}</h1>
-<mat-dialog-content style="height: calc(100% - 100px); width: 100%; overflow:
+<mat-dialog-content style="height: calc(100% - 124px); width: 100%; overflow:
   auto;">
   <ng-container *ngIf="data.text">
-    <pre style="font-family: Roboto, 'Helvetica Neue', sans-serif">
-      {{data.text}}
-    </pre>
+    {{data.text}}
   </ng-container>
   <ng-container *ngIf="data.fieldName">
     <ng-container *ngIf="data.text">
@@ -45,24 +43,22 @@
     </ng-container>
   </ng-container>
 </mat-dialog-content>
-<mat-dialog-actions style="height: 40px; width: 100%;">
+<mat-dialog-actions style="height: 64px; width: 100%;">
   <ng-container *ngIf="data.fieldName">
-    <span class="dialog-actions">
-      <button mat-button [disabled]="(data.validate ? !data.validate(data.
-        value) : false)" [mat-dialog-close]="data.value">
-        Accept
-      </button>
-      <button mat-button [mat-dialog-close]="">
-        Cancel
-      </button>
-    </span>
+    <button mat-button [disabled]="(data.validate ? !data.validate(data.
+      value) : false)" style="margin-left: auto;" [mat-dialog-close]="data.
+      value">
+      Accept
+    </button>
+    <button mat-button [mat-dialog-close]="">
+      Cancel
+    </button>
   </ng-container>
   <ng-container *ngIf="!data.fieldName">
-    <span class="dialog-actions">
-      <button *ngFor="let label of data.buttonLabels; let j = index"
-        mat-button [mat-dialog-close]="j">
-        {{label}}
-      </button>
-    </span>
+    <button *ngFor="let label of data.buttonLabels; let j = index"
+      mat-button [ngStyle]="{ 'margin-left': ((j === 0) ? 'auto' : '') }"
+      [mat-dialog-close]="j">
+      {{label}}
+    </button>
   </ng-container>
 </mat-dialog-actions>

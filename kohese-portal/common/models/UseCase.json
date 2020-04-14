@@ -6,7 +6,7 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169840,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1572491077313,
+  "modifiedOn": 1586303804458,
   "base": "Decision",
   "idInjection": true,
   "properties": {
@@ -48,13 +48,24 @@
       "base": "Item",
       "idInjection": true,
       "properties": {
+        "PathName": {
+          "name": "PathName",
+          "type": "string",
+          "required": false,
+          "id": false
+        },
+        "PathDescription": {
+          "name": "PathDescription",
+          "type": "string",
+          "required": false,
+          "id": false
+        },
         "Preconditions": {
           "name": "Preconditions",
           "type": [
             "string"
           ],
           "required": false,
-          "default": "",
           "id": false
         },
         "Postconditions": {
@@ -63,7 +74,6 @@
             "string"
           ],
           "required": false,
-          "default": "",
           "id": false
         },
         "Flow": {
@@ -72,7 +82,6 @@
             "KeyEvent"
           ],
           "required": false,
-          "default": "",
           "id": false,
           "relation": {
             "kind": "Item",

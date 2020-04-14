@@ -1,68 +1,19 @@
 {
-  "id": "view-issue",
-  "name": "Issue View Model",
-  "parentId": "view-observation",
-  "modelName": "Issue",
-  "icon": "fa fa-exclamation-circle",
-  "color": "#ff0000",
+  "id": "view-domain",
+  "name": "Domain",
+  "parentId": "view-item",
+  "createdBy": "gmckune",
+  "createdOn": 1586302904733,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1586375436725,
+  "modelName": "Domain",
+  "icon": "fa fa-book",
+  "color": "#000000",
+  "viewProperties": {},
   "localTypes": {},
-  "viewProperties": {
-    "issueState": {
-      "inputType": {
-        "type": "state-editor",
-        "options": {
-          "options": [
-            "Observed",
-            "In Analysis",
-            "No Action"
-          ]
-        }
-      },
-      "required": false,
-      "default": "Observed",
-      "displayName": "issueState"
-    },
-    "analysisAction": {
-      "inputType": {
-        "type": "proxy-selector",
-        "options": {
-          "allowMultiSelect": false,
-          "type": "Item",
-          "useAdvancedSelector": false
-        }
-      },
-      "required": true,
-      "default": null,
-      "displayName": "analysisAction"
-    },
-    "resolutionActions": {
-      "inputType": {
-        "type": "proxy-selector",
-        "options": {
-          "allowMultiSelect": true,
-          "type": "Item",
-          "useAdvancedSelector": false
-        }
-      },
-      "required": true,
-      "default": null,
-      "displayName": "resolutionActions"
-    },
-    "response": {
-      "inputType": {
-        "type": "text",
-        "options": {
-          "isMultiLine": true
-        }
-      },
-      "required": false,
-      "default": "",
-      "displayName": "response"
-    }
-  },
   "formatDefinitions": {
-    "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1": {
-      "id": "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1",
+    "56ecc900-7929-11ea-9d30-c7b5e0ffd284": {
+      "id": "56ecc900-7929-11ea-9d30-c7b5e0ffd284",
       "name": "Default Format Definition",
       "header": {
         "kind": "header",
@@ -71,8 +22,8 @@
             "propertyName": "name",
             "customLabel": "Name",
             "labelOrientation": "Top",
-            "visible": true,
             "kind": "text",
+            "visible": true,
             "editable": true
           }
         ]
@@ -107,7 +58,7 @@
             },
             {
               "propertyName": "parentId",
-              "customLabel": "Work Context",
+              "customLabel": "Parent",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "visible": true,
@@ -154,102 +105,76 @@
               "editable": false
             },
             {
-              "propertyName": "observedBy",
-              "customLabel": "observedBy",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "text",
-              "editable": true
-            },
-            {
-              "propertyName": "observedOn",
-              "customLabel": "observedOn",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "date",
-              "editable": true
-            },
-            {
-              "propertyName": "context",
-              "customLabel": "context",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "",
-              "editable": true
-            },
-            {
-              "propertyName": "issueState",
-              "customLabel": "issueState",
+              "propertyName": "decisionState",
+              "customLabel": "decisionState",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "state-editor",
               "editable": true
             },
             {
-              "propertyName": "analysisAction",
-              "customLabel": "analysisAction",
+              "propertyName": "approvedBy",
+              "customLabel": "approvedBy",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "text",
               "editable": true
             },
             {
-              "propertyName": "resolutionActions",
-              "customLabel": "resolutionActions",
+              "propertyName": "approvedOn",
+              "customLabel": "approvedOn",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "date",
+              "editable": true
+            },
+            {
+              "propertyName": "rationale",
+              "customLabel": "rationale",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "text",
+              "editable": true
+            },
+            {
+              "propertyName": "alternatives",
+              "customLabel": "alternatives",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
               "editable": true
             },
             {
-              "propertyName": "response",
-              "customLabel": "response",
+              "propertyName": "costImpact",
+              "customLabel": "costImpact",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "text",
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "scheduleImpact",
+              "customLabel": "scheduleImpact",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "otherImpacts",
+              "customLabel": "otherImpacts",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
               "editable": true
             }
           ]
         }
       ]
-    },
-    "89324a90-a7af-11e8-8662-71e48f0160fe": {
-      "name": "New definition ",
-      "header": {
-        "kind": "header",
-        "contents": [
-          {
-            "propertyName": "name",
-            "customLabel": "Name",
-            "labelOrientation": "Top",
-            "kind": "text",
-            "visible": true,
-            "editable": true
-          }
-        ]
-      },
-      "containers": [
-        {
-          "kind": "list",
-          "contents": [
-            {
-              "propertyName": "description",
-              "customLabel": "Description",
-              "labelOrientation": "Top",
-              "kind": "markdown",
-              "visible": true,
-              "editable": true
-            }
-          ]
-        }
-      ],
-      "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
     }
   },
   "defaultFormatKey": {
-    "default": "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1",
-    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    "default": "56ecc900-7929-11ea-9d30-c7b5e0ffd284"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }

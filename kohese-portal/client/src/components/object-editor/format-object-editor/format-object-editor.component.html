@@ -208,60 +208,63 @@
                   </mat-form-field>
                 </ng-container>
                 <ng-container *ngSwitchDefault>
-                  <ng-container *ngIf="isLocalTypeAttribute(
-                    attributeDefinition.propertyName) else
-                    globalTypeAttribute">
-                    <label style="width: 100%;">
+                  <div style="width: 100%; display: flex; flex-direction:
+                    row; align-items: center;">
+                    <label>
                       {{getAttributeRepresentation(
                         attributeDefinition)}}:&nbsp;
                     </label>
-                    <br/>
-                    <format-object-editor [enclosingType]="selectedType"
-                      [object]="object[attributeDefinition.propertyName]"
-                      [type]="getLocalType(attributeDefinition)"
-                      [formatDefinitionType]="formatDefinitionType"
-                      [disabled]="(!attributeDefinition.editable ||
-                      isDisabled)">
-                    </format-object-editor>
-                  </ng-container>
-                  <ng-template #globalTypeAttribute>
-                    <div style="width: 100%; display: flex; flex-direction:
-                      row; align-items: center;">
-                      <label>
-                        {{getAttributeRepresentation(
-                          attributeDefinition)}}:&nbsp;
-                      </label>
-                      <ng-container *ngIf="object[attributeDefinition.
+                    <ng-container *ngIf="object[attributeDefinition.
+                      propertyName]">
+                      <button mat-raised-button 
+                        [disabled]="!isLocalTypeAttribute(attributeDefinition.
+                        propertyName)" style="width: 100%; margin: 0px 3px 0px
+                        3px; white-space: nowrap; overflow: hidden;
+                        text-overflow: ellipsis;" (click)="openObjectEditor(
+                        attributeDefinition, true)">
+                        {{getStringRepresentation(undefined,
+                          attributeDefinition.propertyName)}}
+                      </button>
+                    </ng-container>
+                    <ng-container *ngIf="isLocalTypeAttribute(
+                      attributeDefinition.propertyName) else
+                      globalTypeAttribute">
+                      <ng-container *ngIf="!object[attributeDefinition.
                         propertyName]">
-                        <!--
-                          Remove the "disabled" attribute below once ItemProxy
-                          selection can be restricted by kind.
-                        -->
-                        <button mat-raised-button (click)="openObjectEditor(
-                          attributeDefinition.propertyName)" style="width:
-                          100%; margin: 0px 3px 0px 3px;" [disabled]="true">
-                          {{getStringRepresentation(undefined,
-                            attributeDefinition.propertyName)}}
+                        <button mat-icon-button matTooltip="Set a value for
+                          {{attributeDefinition.propertyName}}"
+                          [disabled]="(!attributeDefinition.editable ||
+                          isDisabled)" style="margin-left: auto;"
+                          (click)="openObjectEditor(attributeDefinition,
+                          false)">
+                          <mat-icon class="fa fa-plus"></mat-icon>
                         </button>
                       </ng-container>
-                      <button mat-icon-button matTooltip="Select an object"
+                    </ng-container>
+                    <ng-template #globalTypeAttribute>
+                      <button mat-icon-button matTooltip="Select an Item"
                         [disabled]="(!attributeDefinition.editable ||
                         isDisabled)" (click)="openObjectSelector(
                         attributeDefinition.propertyName)"
                         style="margin-left: auto;">
                         <mat-icon class="fa fa-ellipsis-h"></mat-icon>
                       </button>
+                    </ng-template>
+                    <ng-container *ngIf="(!isLocalTypeAttribute(
+                      attributeDefinition.propertyName) || object[
+                      attributeDefinition.propertyName])">
                       <button mat-icon-button
                         matTooltip="Remove the selection for
                         {{attributeDefinition.propertyName}}"
-                        [disabled]="(!attributeDefinition.editable ||
-                        isDisabled || (object[attributeDefinition.
-                        propertyName] == null))" (click)="object[
+                        [disabled]="(!attributeDefinition.editable || isDisabled
+                        || (object[attributeDefinition.propertyName] == null))"
+                        [ngStyle]="{ 'margin-left': (object[attributeDefinition.
+                        propertyName] ? 'auto' : '') }" (click)="object[
                         attributeDefinition.propertyName] = undefined">
                         <mat-icon class="fa fa-times"></mat-icon>
                       </button>
-                    </div>
-                  </ng-template>
+                    </ng-container>
+                  </div>
                 </ng-container>
               </ng-container>
             </ng-container>

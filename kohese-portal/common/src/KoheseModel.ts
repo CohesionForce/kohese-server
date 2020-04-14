@@ -60,7 +60,7 @@ export class KoheseModel extends ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   deleteItem() {
-    let itemId = this.item.id;
+    let itemId = this._item.id;
     console.log('::: Deleting KoheseModel: ' + itemId);
     if (modelMap[itemId]){
       delete modelMap[itemId];
@@ -77,7 +77,7 @@ export class KoheseModel extends ItemProxy {
 
     var validationResult = {
       valid: true,
-      kind: model.item.id,
+      kind: model._item.id,
       itemId: itemContent.id,
       missingProperties: [],
       malformedArray: [],
@@ -86,9 +86,9 @@ export class KoheseModel extends ItemProxy {
       invalidData: {}
     };
 
-    if (model && model.item && model.item.requiredProperties) {
-      for(let property of Object.keys(model.item.classProperties)) {
-        let definition = model.item.classProperties[property].definition;
+    if (model && model._item && model._item.requiredProperties) {
+      for(let property of Object.keys(model._item.classProperties)) {
+        let definition = model._item.classProperties[property].definition;
 
         // Detect missing properties
         if (definition.required) {
@@ -184,51 +184,51 @@ export class KoheseModel extends ItemProxy {
 
     for(var index in models){
       let modelProxy = models[index];
-      let kind = modelProxy.item.name;
+      let kind = modelProxy._item.name;
       console.log('::: Processing Model Properties ' + kind);
 
-      let propertyOrder = _.clone(modelProxy.parentProxy.item.propertyOrder) || [];
-      modelProxy.item.propertyOrder = propertyOrder.concat(Object.keys(modelProxy.item.properties));
+      let propertyOrder = _.clone(modelProxy.parentProxy._item.propertyOrder) || [];
+      modelProxy._item.propertyOrder = propertyOrder.concat(Object.keys(modelProxy._item.properties));
 
-      let propertyStorageOrder = _.clone(modelProxy.parentProxy.item.propertyStorageOrder) || [];
+      let propertyStorageOrder = _.clone(modelProxy.parentProxy._item.propertyStorageOrder) || [];
 
-      if (modelProxy.item.invertItemOrder){
-        modelProxy.item.propertyStorageOrder = Object.keys(modelProxy.item.properties).concat(propertyStorageOrder);
+      if (modelProxy._item.invertItemOrder){
+        modelProxy._item.propertyStorageOrder = Object.keys(modelProxy._item.properties).concat(propertyStorageOrder);
       } else {
-        modelProxy.item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy.item.properties));
+        modelProxy._item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy._item.properties));
       }
 
-      modelProxy.item.classProperties = _.clone(modelProxy.parentProxy.item.classProperties) || {};
-      modelProxy.item.requiredProperties = _.clone(modelProxy.parentProxy.item.requiredProperties) || [];
-      modelProxy.item.derivedProperties = _.clone(modelProxy.parentProxy.item.derivedProperties) || [];
-      modelProxy.item.calculatedProperties = _.clone(modelProxy.parentProxy.item.calculatedProperties) || [];
-      modelProxy.item.stateProperties = _.clone(modelProxy.parentProxy.item.stateProperties) || [];
-      modelProxy.item.relationProperties = _.clone(modelProxy.parentProxy.item.relationProperties) || [];
-      modelProxy.item.idProperties = _.clone(modelProxy.parentProxy.item.idProperties) || [];
+      modelProxy._item.classProperties = _.clone(modelProxy.parentProxy._item.classProperties) || {};
+      modelProxy._item.requiredProperties = _.clone(modelProxy.parentProxy._item.requiredProperties) || [];
+      modelProxy._item.derivedProperties = _.clone(modelProxy.parentProxy._item.derivedProperties) || [];
+      modelProxy._item.calculatedProperties = _.clone(modelProxy.parentProxy._item.calculatedProperties) || [];
+      modelProxy._item.stateProperties = _.clone(modelProxy.parentProxy._item.stateProperties) || [];
+      modelProxy._item.relationProperties = _.clone(modelProxy.parentProxy._item.relationProperties) || [];
+      modelProxy._item.idProperties = _.clone(modelProxy.parentProxy._item.idProperties) || [];
 
-      for (var property in modelProxy.item.properties){
-        var propertySettings = modelProxy.item.properties[property];
-        modelProxy.item.classProperties[property] = {
+      for (var property in modelProxy._item.properties){
+        var propertySettings = modelProxy._item.properties[property];
+        modelProxy._item.classProperties[property] = {
           definedInKind: kind,
           definition: propertySettings
         };
         if (propertySettings.required){
-          modelProxy.item.requiredProperties.push(property);
+          modelProxy._item.requiredProperties.push(property);
         }
         if (propertySettings.derived){
-          modelProxy.item.derivedProperties.push(property);
+          modelProxy._item.derivedProperties.push(property);
           if(propertySettings.calculated){
-            modelProxy.item.calculatedProperties.push(property);
+            modelProxy._item.calculatedProperties.push(property);
           }
         }
         if (propertySettings.type && (propertySettings.type ==='StateMachine')){
-          modelProxy.item.stateProperties.push(property);
+          modelProxy._item.stateProperties.push(property);
         }
         if (propertySettings.relation){
-          modelProxy.item.relationProperties.push(property);
+          modelProxy._item.relationProperties.push(property);
         }
         if (propertySettings.id){
-          modelProxy.item.idProperties.push(property);
+          modelProxy._item.idProperties.push(property);
         }
       }
     }
@@ -261,8 +261,8 @@ export class KoheseModel extends ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   getPropertyDetails(propertyName:string) {
     let property = undefined;
-    if (this.item.classProperties[propertyName]){
-      property = this.item.classProperties[propertyName]
+    if (this._item.classProperties[propertyName]){
+      property = this._item.classProperties[propertyName]
     }
     return property;
   }
