@@ -30,6 +30,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   @Input('itemProxy')
   set itemProxy(itemProxy: ItemProxy) {
     this._itemProxy = itemProxy;
+    this._itemRepository.getHistoryFor(this.itemProxy);
     this.proxyStream.next(this._itemProxy);
   }
   

@@ -85,7 +85,6 @@ export class ChildrenTableComponent extends NavigatableComponent
             indexOf(dropTarget) + 1, 0, proxyToMove);
 
           this.childrenStream.next(parentProxy.children);
-          parentProxy.dirty = true;
           parentProxy.updateChildrenManualOrder();
         }
       }

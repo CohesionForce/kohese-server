@@ -29,7 +29,8 @@
         <br/>
       </ng-container>
       <ng-container *ngIf="(Object.values(fundamentalTypes).indexOf(
-        multivalued ? attribute.type[0] : attribute.type) === -1)">
+        Array.isArray(attribute.type) ? attribute.type[0] : attribute.type) ===
+        -1)">
         <mat-form-field style="width: 100%;">
           <mat-select placeholder="Reference Attribute"
             [ngModel]="attribute.relation" (ngModelChange)="attribute.
@@ -59,7 +60,8 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-checkbox class="field-option" [(ngModel)]="multivalued">
+      <mat-checkbox class="field-option" [ngModel]="Array.isArray(attribute.
+        type)" (ngModelChange)="toggleMultivaluedness()">
         Multivalued
       </mat-checkbox>
       <br/>
@@ -74,7 +76,8 @@
       <br/>
       <mat-form-field style="width: 100%;">
         <textarea matInput placeholder="Default Value" rows="3" cols="80"
-          [(ngModel)]="attribute.default">
+          [(ngModel)]="attribute.default" [disabled]="(attribute.type !==
+          'string')">
         </textarea>
       </mat-form-field>
       <br/>

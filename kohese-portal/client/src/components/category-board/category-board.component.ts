@@ -90,10 +90,33 @@ export class CategoryBoardComponent {
   get Object() {
     return Object;
   }
+
+  private _treeConfigurationSubscription;
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _navigationService: NavigationService, private _itemRepository:
     ItemRepository, private _dialogService: DialogService) {
+  }
+
+  public ngOnInit(): void {
+    this._treeConfigurationSubscription = TreeConfiguration.getWorkingTree().
+      getChangeSubject().subscribe((notification: any) => {
+        switch (notification.type) {
+          case 'create':
+          case 'update': 
+          case 'dirty': 
+          case 'delete': {
+            this._changeDetectorRef.markForCheck();
+            break;
+          }
+        }
+      });
+  }
+
+  public ngOnDestroy(): void {
+    if (this._treeConfigurationSubscription) {
+      this._treeConfigurationSubscription.unsubscribe();
+    }
   }
   
   public getBoardKinds(): Array<any> {

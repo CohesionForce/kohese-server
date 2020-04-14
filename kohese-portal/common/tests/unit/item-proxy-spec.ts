@@ -610,7 +610,7 @@ describe('ItemProxy Test:', function () {
     d.makeChildrenAutoOrdered();
     dump('Auto Ordered');
     expect(getChildIds(d)).toBe(expectArray);
-    expect(d.item.itemIds.length).toBe(0);
+    expect(d.item.itemIds).toBe(undefined);
 
 
     expectArray = JSON.stringify(['de', 'da', 'da1', 'daa', 'dab', 'dac', 'dd', 'dn', 'dz1', 'dz2', 'dz3', 'db']);
@@ -814,15 +814,16 @@ describe('ItemProxy Test:', function () {
       id: 'id-1a1a1a'
     };
 
-    // eslint-disable-next-line no-unused-vars
     var object1b = {
       id: 'id_1a1a1a',
       name: 'Some Content'
     };
 
     var obj1a = new ItemProxy('Test', object1a);
+    var obj1b = new ItemProxy('Test', object1b);
 
     expect(Object.keys(obj1a.item)).toEqual(['id', 'name', 'children']);
+    expect(Object.keys(obj1b.item)).toEqual(['id', 'name', 'children']);
 
   });
 

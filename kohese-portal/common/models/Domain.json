@@ -1,0 +1,17 @@
+{
+  "id": "Domain",
+  "name": "Domain",
+  "parentId": "Decision",
+  "createdBy": "gmckune",
+  "createdOn": 1586302904721,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1586375436637,
+  "base": "Decision",
+  "idInjection": true,
+  "properties": {},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": [],
+  "localTypes": {}
+}
