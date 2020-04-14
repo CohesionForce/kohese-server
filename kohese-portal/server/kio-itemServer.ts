@@ -202,34 +202,44 @@ function KIOItemServer(socket){
 
     let itemCache = ItemCache.getItemCache();
     let headCommit = await itemCache.getRef('HEAD');
+    let incrementalDataToLoad;
 
     if (headCommit !== request.headCommit){
-      console.log('### Preparing BulkCacheUpdate Messages: ' + request.headCommit + ' -> ' + headCommit);
-      let objectMap = itemCache.getObjectMap();
-      sendBulkCacheUpdate('metadata', objectMap['metadata']);
-      sendBulkCacheUpdate('refMap', objectMap['refMap']);
-      sendBulkCacheUpdate('tagMap', objectMap['tagMap']);
-      sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
-      for (let key in objectMap.kTreeMapChunks) {
-        sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
+      if (request.incrementalCacheLoad && request.headCommit) {
+        console.log('### Providing incrementalDataToLoad: ' + request.headCommit + ' -> ' + headCommit);
+        incrementalDataToLoad = {
+          HEAD: headCommit
+        }
+      } else {
+        console.log('### Preparing BulkCacheUpdate Messages: ' + request.headCommit + ' -> ' + headCommit);
+        let objectMap = itemCache.getObjectMap();
+        sendBulkCacheUpdate('metadata', objectMap['metadata']);
+        sendBulkCacheUpdate('refMap', objectMap['refMap']);
+        sendBulkCacheUpdate('tagMap', objectMap['tagMap']);
+        sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
+        for (let key in objectMap.kTreeMapChunks) {
+          sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
+        }
+        for (let key in objectMap.blobMapChunks) {
+          sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
+        }
+        console.log('### Sent BulkCacheUpdate Messages');
       }
-      for (let key in objectMap.blobMapChunks) {
-        sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
-      }
-      console.log('### Sent BulkCacheUpdate Messages');
     } else {
       console.log('### Item Cache is already in sync');
     }
 
-    let response = {
+    let response : any = {
       timestamp: {
         requestTime: request.timestamp.requestTime,
         requestReceiptTime: requestReceiptTime,
-        responseTransmitTime: null
+        responseTransmitTime: Date.now()
       }
     };
 
-    response.timestamp.responseTransmitTime = Date.now();
+    if (incrementalDataToLoad){
+      response.incrementalDataToLoad = incrementalDataToLoad;
+    }
 
     console.log('::: Sending getItemCache response');
     sendResponse(response);
