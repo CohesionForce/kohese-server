@@ -5,19 +5,11 @@
   "createdBy": "gmckune",
   "createdOn": 1566607211956,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586376051303,
+  "modifiedOn": 1586900905257,
   "modelName": "KeyEvent",
   "icon": "fa fa-key",
   "color": "#000000",
   "viewProperties": {
-    "EventName": {
-      "displayName": "EventName",
-      "inputType": {
-        "type": "text",
-        "options": {}
-      },
-      "name": "EventName"
-    },
     "DetectionMechanism": {
       "displayName": "DetectionMechanism",
       "inputType": {
@@ -210,14 +202,6 @@
               "editable": true
             },
             {
-              "propertyName": "EventName",
-              "customLabel": "EventName",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "text",
-              "editable": true
-            },
-            {
               "propertyName": "DetectionMechanism",
               "customLabel": "DetectionMechanism",
               "labelOrientation": "Top",
@@ -281,10 +265,11 @@
               "editable": true
             },
             {
-              "propertyName": "EventName",
-              "customLabel": "EventName",
+              "propertyName": "name",
+              "customLabel": "name",
               "labelOrientation": "Top",
               "kind": "text",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             },
@@ -335,7 +320,7 @@
       "id": "b1090aa0-fb86-11e9-be56-311e0135452a",
       "name": "KeyEventInfo",
       "columns": [
-        "EventName",
+        "name",
         "DetectionMechanism",
         "EventInputData",
         "Responses",

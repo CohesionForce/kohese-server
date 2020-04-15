@@ -6,16 +6,10 @@
   "createdBy": "gmckune",
   "createdOn": 1566607211922,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586306303766,
+  "modifiedOn": 1586900797128,
   "base": "Decision",
   "idInjection": true,
   "properties": {
-    "EventName": {
-      "type": "string",
-      "required": false,
-      "id": true,
-      "name": "EventName"
-    },
     "DetectionMechanism": {
       "type": "string",
       "required": false,
