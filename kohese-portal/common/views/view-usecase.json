@@ -5,7 +5,7 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169859,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586376785990,
+  "modifiedOn": 1587074533594,
   "modelName": "UseCase",
   "icon": "fa fa-lemon-o",
   "color": "#000000",
@@ -13,7 +13,7 @@
     "Actors": {
       "displayName": "Actors",
       "inputType": {
-        "type": "text",
+        "type": "",
         "options": {}
       },
       "name": "Actors"
@@ -120,18 +120,18 @@
                   "editable": true
                 },
                 {
-                  "propertyName": "Postconditions",
-                  "customLabel": "Postconditions",
-                  "labelOrientation": "Top",
-                  "kind": "text",
-                  "visible": true,
-                  "editable": true
-                },
-                {
                   "propertyName": "Flow",
                   "customLabel": "Flow",
                   "labelOrientation": "Top",
                   "kind": "",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "Postconditions",
+                  "customLabel": "Postconditions",
+                  "labelOrientation": "Top",
+                  "kind": "text",
                   "visible": true,
                   "editable": true
                 }
