@@ -760,9 +760,9 @@ export class ItemProxy {
         let relationProperty = this.model._item.relationProperties[relationPropertyIdx];
         let relationPropertyDefn = this.model._item.classProperties[relationProperty].definition;
 
-        let foreignKeyDefn;
+        let relationDefn;
         if (typeof relationPropertyDefn.relation === 'object'){
-          foreignKeyDefn = relationPropertyDefn.relation;
+          relationDefn = relationPropertyDefn.relation;
         }
 
         // Ignore relation for children
@@ -791,7 +791,7 @@ export class ItemProxy {
               let valueUpdated = false;
               for(let idx in relationValue){
                 let thisRelationValue = relationValue[idx];
-                if (!foreignKeyDefn && !thisRelationValue.hasOwnProperty('id')){
+                if (!relationDefn && !thisRelationValue.hasOwnProperty('id')){
                   valueUpdated = true;
                   // console.log('%%% Updating reference style for ' + relationProperty + ' from ' + thisRelationValue);
                   thisRelationValue = {id: thisRelationValue};
@@ -815,7 +815,7 @@ export class ItemProxy {
               isSingle = true;
 
               // Check for reference style
-              if(!foreignKeyDefn && !relationValue.hasOwnProperty('id')){
+              if(!relationDefn && !relationValue.hasOwnProperty('id')){
                 // Update the property to have the correct reference style
                 // console.log('==================');
                 // console.log(JSON.stringify(this._item, null, '  '));
@@ -837,10 +837,10 @@ export class ItemProxy {
               }
 
               let refProxy;
-              if (foreignKeyDefn){
-                refProxy = this.treeConfig.getProxyByProperty(foreignKeyDefn.kind, foreignKeyDefn.foreignKey, refId);
-                if (!refProxy){
-                  ItemProxy.createMissingProxy(foreignKeyDefn.kind, foreignKeyDefn.foreignKey, refId, this.treeConfig);
+              if (relationDefn){
+                refProxy = this.treeConfig.getProxyByProperty(relationDefn.kind, relationDefn.foreignKey, refId);
+                if (!refProxy && !relationDefn.contained){
+                  ItemProxy.createMissingProxy(relationDefn.kind, relationDefn.foreignKey, refId, this.treeConfig);
                   refProxy = this.treeConfig.getProxyFor(refId);
                 }
               } else {
