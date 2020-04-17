@@ -876,102 +876,103 @@ export class ItemRepository {
             }
             
             let value: any = koheseObject[propertyDefinition.propertyName];
-            if ((propertyDefinition.kind === '') || (propertyDefinition.kind
-              === 'proxy-selector')) {
-              if (propertyDefinition.tableDefinition) {
-                if (isVerticalFormatContainer) {
-                  body += '\n\n<table><tr>';
-                } else {
-                  body += '<table><tr>';
-                }
-                
-                let tableDefinition: TableDefinition;
-                let typeName: string = dataModel.classProperties[
-                  propertyDefinition.propertyName].definition.type[0];
-                let isLocalTypeAttribute: boolean = (globalTypeNames.indexOf(
-                  typeName) === -1);
-                if (isLocalTypeAttribute) {
-                  tableDefinition = viewModel.localTypes[typeName].
-                    tableDefinitions[propertyDefinition.tableDefinition];
-                } else {
-                  tableDefinition = TreeConfiguration.getWorkingTree().
-                    getProxyFor('view-' + typeName.toLowerCase()).item.
-                    tableDefinitions[propertyDefinition.tableDefinition];
-                }
-                
-                for (let l: number = 0; l < tableDefinition.columns.length;
-                  l++) {
-                  body += ('<th>' + tableDefinition.columns[l] + '</th>');
-                }
-                
-                body += '</tr>';
-                
-                for (let l: number = 0; l < value.length; l++) {
-                  let reference: any;
-                  if (isLocalTypeAttribute) {
-                    reference = value[l];
+            if (value != null) {
+              if ((propertyDefinition.kind === '') || (propertyDefinition.kind
+                === 'proxy-selector')) {
+                if (propertyDefinition.tableDefinition) {
+                  if (isVerticalFormatContainer) {
+                    body += '\n\n<table><tr>';
                   } else {
-                    reference = TreeConfiguration.getWorkingTree().
-                      getProxyFor(value[l].id).item;
+                    body += '<table><tr>';
                   }
                   
-                  body += '<tr>';
+                  let tableDefinition: TableDefinition;
+                  let typeName: string = dataModel.classProperties[
+                    propertyDefinition.propertyName].definition.type[0];
+                  let isLocalTypeAttribute: boolean = (globalTypeNames.indexOf(
+                    typeName) === -1);
+                  if (isLocalTypeAttribute) {
+                    tableDefinition = viewModel.localTypes[typeName].
+                      tableDefinitions[propertyDefinition.tableDefinition];
+                  } else {
+                    tableDefinition = TreeConfiguration.getWorkingTree().
+                      getProxyFor('view-' + typeName.toLowerCase()).item.
+                      tableDefinitions[propertyDefinition.tableDefinition];
+                  }
                   
-                  for (let m: number = 0; m < tableDefinition.columns.length;
-                    m++) {
-                    body += ('<td>' + String(reference[tableDefinition.columns[
-                      m]]) + '</td>');
+                  for (let l: number = 0; l < tableDefinition.columns.length;
+                    l++) {
+                    body += ('<th>' + tableDefinition.columns[l] + '</th>');
                   }
                   
                   body += '</tr>';
-                }
-                
-                body += '</table>';
-                if (isVerticalFormatContainer) {
-                  body += '\n\n';
-                }
-              } else {
-                let type: any = dataModel.classProperties[propertyDefinition.
-                  propertyName].definition.type;
-                type = (Array.isArray(type) ? type[0] : type);
-                if ((propertyDefinition.propertyName !== 'parentId') &&
-                  (globalTypeNames.indexOf(type) === -1)) {
-                  /* The below condition is present to avoid errors caused by
-                  attributes typed "object". */
-                  if (dataModel.localTypes[type]) {
-                    // Local type attribute
-                    let localTypeDataModelCopy: any = JSON.parse(JSON.
-                      stringify(dataModel.localTypes[type]));
-                    localTypeDataModelCopy.classProperties = {};
-                    for (let attributeName in localTypeDataModelCopy.
-                      properties) {
-                      localTypeDataModelCopy.classProperties[attributeName] = {
-                        definedInKind: type,
-                        definition: localTypeDataModelCopy.properties[
-                          attributeName]
-                      };
+                  
+                  for (let l: number = 0; l < value.length; l++) {
+                    let reference: any;
+                    if (isLocalTypeAttribute) {
+                      reference = value[l];
+                    } else {
+                      reference = TreeConfiguration.getWorkingTree().
+                        getProxyFor(value[l].id).item;
                     }
-                    let localTypeViewModel: any = viewModel.localTypes[type];
                     
-                    if (Array.isArray(value)) {
-                      for (let l: number = 0; l < value.length; l++) {
-                        body += this.getMarkdownRepresentation(value[l],
+                    body += '<tr>';
+                    
+                    for (let m: number = 0; m < tableDefinition.columns.length;
+                      m++) {
+                      body += ('<td>' + String(reference[tableDefinition.
+                        columns[m]]) + '</td>');
+                    }
+                    
+                    body += '</tr>';
+                  }
+                  
+                  body += '</table>';
+                  if (isVerticalFormatContainer) {
+                    body += '\n\n';
+                  }
+                } else {
+                  let type: any = dataModel.classProperties[propertyDefinition.
+                    propertyName].definition.type;
+                  type = (Array.isArray(type) ? type[0] : type);
+                  if ((propertyDefinition.propertyName !== 'parentId') &&
+                    (globalTypeNames.indexOf(type) === -1)) {
+                    /* The below condition is present to avoid errors caused by
+                    attributes typed "object". */
+                    if (dataModel.localTypes[type]) {
+                      // Local type attribute
+                      let localTypeDataModelCopy: any = JSON.parse(JSON.
+                        stringify(dataModel.localTypes[type]));
+                      localTypeDataModelCopy.classProperties = {};
+                      for (let attributeName in localTypeDataModelCopy.
+                        properties) {
+                        localTypeDataModelCopy.classProperties[attributeName] =
+                          {
+                          definedInKind: type,
+                          definition: localTypeDataModelCopy.properties[
+                            attributeName]
+                        };
+                      }
+                      let localTypeViewModel: any = viewModel.localTypes[type];
+                      
+                      if (Array.isArray(value)) {
+                        for (let l: number = 0; l < value.length; l++) {
+                          body += this.getMarkdownRepresentation(value[l],
+                            localTypeDataModelCopy, localTypeViewModel,
+                            localTypeViewModel.formatDefinitions[
+                            localTypeViewModel.defaultFormatKey[
+                            FormatDefinitionType.DEFAULT]]);
+                        }
+                      } else {
+                        body += this.getMarkdownRepresentation(value,
                           localTypeDataModelCopy, localTypeViewModel,
                           localTypeViewModel.formatDefinitions[
                           localTypeViewModel.defaultFormatKey[
                           FormatDefinitionType.DEFAULT]]);
                       }
-                    } else {
-                      body += this.getMarkdownRepresentation(value,
-                        localTypeDataModelCopy, localTypeViewModel,
-                        localTypeViewModel.formatDefinitions[
-                        localTypeViewModel.defaultFormatKey[
-                        FormatDefinitionType.DEFAULT]]);
                     }
-                  }
-                } else {
-                  // Global type attribute
-                  if (value) {
+                  } else {
+                    // Global type attribute
                     if (Array.isArray(value)) {
                       let stringComponents: Array<string> = [];
                       for (let l: number = 0; l < value.length; l++) {
@@ -1003,9 +1004,9 @@ export class ItemRepository {
                     }
                   }
                 }
+              } else {
+                body += value;
               }
-            } else {
-              body += value;
             }
             
             body += '\n\n'
