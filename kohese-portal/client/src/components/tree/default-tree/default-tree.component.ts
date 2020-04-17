@@ -146,9 +146,14 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
               ItemProxy) => {
               let viewModel: any = TreeConfiguration.getWorkingTree().
                 getProxyFor('view-' + itemProxy.kind.toLowerCase()).item;
+              let formatDefinitionId: string = viewModel.defaultFormatKey[
+                FormatDefinitionType.DOCUMENT];
+              if (!formatDefinitionId) {
+                formatDefinitionId = viewModel.defaultFormatKey[
+                  FormatDefinitionType.DEFAULT];
+              }
               let formatDefinition: FormatDefinition = viewModel.
-                formatDefinitions[viewModel.defaultFormatKey[
-                FormatDefinitionType.DEFAULT]];
+                formatDefinitions[formatDefinitionId];
               for (let j: number = 0; j < itemProxy.getDepthFromAncestor(
                 object as ItemProxy); j++) {
                 initialContent += '#';
