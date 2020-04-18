@@ -6,16 +6,20 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169840,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586303804458,
+  "modifiedOn": 1587074473129,
   "base": "Decision",
   "idInjection": true,
   "properties": {
     "Actors": {
       "name": "Actors",
       "type": [
-        "string"
+        "Actor"
       ],
-      "required": false
+      "required": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     },
     "BasicPath": {
       "name": "BasicPath",
