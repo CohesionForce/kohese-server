@@ -327,6 +327,24 @@
               "kind": "markdown",
               "visible": true,
               "editable": true
+            },
+            {
+              "propertyName": "assignedTo",
+              "customLabel": "Assigned To",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "taskState",
+              "customLabel": "Task State",
+              "labelOrientation": "Left",
+              "kind": "state-editor",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
             }
           ]
         }
@@ -403,6 +421,15 @@
               "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
             },
             {
+              "propertyName": "assignedTo",
+              "customLabel": "Assigned To",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
               "propertyName": "taskState",
               "customLabel": "Task State",
               "labelOrientation": "Top",
@@ -421,6 +448,5 @@
     "card": "1b91cfb0-1798-11ea-a725-0b882dea506f",
     "board": "1b91cfb0-1798-11ea-a725-0b882dea506f"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }
