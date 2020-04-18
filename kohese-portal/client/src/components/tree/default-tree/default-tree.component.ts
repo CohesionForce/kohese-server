@@ -146,9 +146,37 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
               ItemProxy) => {
               let viewModel: any = TreeConfiguration.getWorkingTree().
                 getProxyFor('view-' + itemProxy.kind.toLowerCase()).item;
-              let formatDefinition: FormatDefinition = viewModel.
-                formatDefinitions[viewModel.defaultFormatKey[
-                FormatDefinitionType.DEFAULT]];
+              let formatDefinition: FormatDefinition;
+              let formatDefinitionId: string = viewModel.defaultFormatKey[
+                FormatDefinitionType.DOCUMENT];
+              if (formatDefinitionId) {
+                formatDefinition = viewModel.formatDefinitions[
+                  formatDefinitionId];
+              } else {
+                let treeConfiguration: TreeConfiguration = this.
+                  _itemRepository.getTreeConfig().getValue().config;
+                let dataModelItemProxy: ItemProxy = itemProxy.model;
+                while (dataModelItemProxy) {
+                  let ancestorViewModel: any = treeConfiguration.getProxyFor(
+                    'view-' + dataModelItemProxy.item.name.toLowerCase()).item;
+                  formatDefinitionId = ancestorViewModel.defaultFormatKey[
+                    FormatDefinitionType.DOCUMENT];
+                  if (formatDefinitionId) {
+                    formatDefinition = ancestorViewModel.formatDefinitions[
+                      formatDefinitionId];
+                    break;
+                  }
+                  
+                  dataModelItemProxy = treeConfiguration.getProxyFor(
+                    dataModelItemProxy.item.base);
+                }
+                
+                if (!formatDefinition) {
+                  formatDefinition = viewModel.formatDefinitions[viewModel.
+                    defaultFormatKey[FormatDefinitionType.DEFAULT]];
+                }
+              }
+              
               for (let j: number = 0; j < itemProxy.getDepthFromAncestor(
                 object as ItemProxy); j++) {
                 initialContent += '#';

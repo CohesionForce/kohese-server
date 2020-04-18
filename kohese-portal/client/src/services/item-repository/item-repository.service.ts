@@ -954,21 +954,25 @@ export class ItemRepository {
                         };
                       }
                       let localTypeViewModel: any = viewModel.localTypes[type];
+                      let formatDefinitionId: string = localTypeViewModel.
+                        defaultFormatKey[FormatDefinitionType.DOCUMENT];
+                      if (!formatDefinitionId) {
+                        formatDefinitionId = localTypeViewModel.
+                          defaultFormatKey[FormatDefinitionType.DEFAULT];
+                      }
                       
                       if (Array.isArray(value)) {
                         for (let l: number = 0; l < value.length; l++) {
                           body += this.getMarkdownRepresentation(value[l],
                             localTypeDataModelCopy, localTypeViewModel,
                             localTypeViewModel.formatDefinitions[
-                            localTypeViewModel.defaultFormatKey[
-                            FormatDefinitionType.DEFAULT]]);
+                            formatDefinitionId]);
                         }
                       } else {
                         body += this.getMarkdownRepresentation(value,
                           localTypeDataModelCopy, localTypeViewModel,
                           localTypeViewModel.formatDefinitions[
-                          localTypeViewModel.defaultFormatKey[
-                          FormatDefinitionType.DEFAULT]]);
+                          formatDefinitionId]);
                       }
                     }
                   } else {
