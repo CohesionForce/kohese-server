@@ -71,6 +71,19 @@
             }
           }
         }
+      },
+      "name": "issueState"
+    },
+    "relatedIssues": {
+      "name": "relatedIssues",
+      "type": [
+        "Issue"
+      ],
+      "required": false,
+      "id": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
       }
     },
     "analysisAction": {
@@ -78,7 +91,8 @@
       "relation": {
         "kind": "Item",
         "foreignKey": "id"
-      }
+      },
+      "name": "analysisAction"
     },
     "resolutionActions": {
       "type": [
@@ -87,10 +101,12 @@
       "relation": {
         "kind": "Item",
         "foreignKey": "id"
-      }
+      },
+      "name": "resolutionActions"
     },
     "response": {
-      "type": "string"
+      "type": "string",
+      "name": "response"
     }
   },
   "validations": [],
