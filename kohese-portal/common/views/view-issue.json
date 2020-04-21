@@ -22,6 +22,14 @@
       "displayName": "issueState",
       "name": "issueState"
     },
+    "relatedIssues": {
+      "name": "relatedIssues",
+      "displayName": "Related Issues",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
+    },
     "analysisAction": {
       "inputType": {
         "type": "proxy-selector",
@@ -52,7 +60,7 @@
     },
     "response": {
       "inputType": {
-        "type": "text",
+        "type": "markdown",
         "options": {
           "isMultiLine": true
         }
@@ -190,6 +198,14 @@
               "editable": true
             },
             {
+              "propertyName": "relatedIssues",
+              "customLabel": "relatedIssues",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": true
+            },
+            {
               "propertyName": "analysisAction",
               "customLabel": "analysisAction",
               "labelOrientation": "Top",
@@ -210,7 +226,7 @@
               "customLabel": "response",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "text",
+              "kind": "markdown",
               "editable": true
             }
           ]
