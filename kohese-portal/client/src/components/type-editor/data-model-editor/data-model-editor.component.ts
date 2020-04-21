@@ -3,8 +3,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
 import { MatTable } from '@angular/material';
 import * as Uuid from 'uuid/v1';
 
-import { DialogService,
-  DialogComponent } from '../../../services/dialog/dialog.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
@@ -14,6 +13,8 @@ import { FormatContainer,
   FormatContainerKind } from '../FormatContainer.interface';
 import { PropertyDefinition } from '../PropertyDefinition.interface';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
+import { InputDialogKind,
+  InputDialogComponent } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
@@ -191,7 +192,7 @@ export class DataModelEditorComponent {
       let response: any = await this._dialogService.openYesNoDialog(
         'Display Modifications', 'All unsaved modifications to this kind ' +
         'are to be saved if an attribute is added to this kind. Do you want ' +
-        'to proceed?').toPromise();
+        'to proceed?');
       if (!response) {
         return;
       }
@@ -274,52 +275,58 @@ export class DataModelEditorComponent {
       let response: any = await this._dialogService.openYesNoDialog(
         'Display Modifications', 'All unsaved modifications to this kind ' +
         'are to be saved if a local type is added to this kind. Do you want ' +
-        'to proceed?').toPromise();
+        'to proceed?');
       if (!response) {
         return;
       }
     }
     
-    this._dialogService.openInputDialog('Add Local Type', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', 'Local Type', (input: any) => {
-      return !!input;
-    }).afterClosed().subscribe((name: string) => {
-      if (name) {
+    this._dialogService.openComponentsDialog([{
+      component: InputDialogComponent,
+      matDialogData: {
+        inputDialogConfiguration: {
+          title: 'Local Type',
+          text: '',
+          fieldName: 'Name',
+          value: 'Local Type',
+          validate: (input: any) => {
+            return !!input;
+          },
+          inputDialogKind: InputDialogKind.STRING
+        }
+      },
+      label: 'Name'
+    }, {
+      component: AttributeEditorComponent,
+      matDialogData: {},
+      label: 'Attribute'
+    }], { data: {} }).updateSize('90%', '90%').afterClosed().subscribe(
+      (results: Array<any>) => {
+      if (results) {
         let dataModel: any = {
-          name: name,
+          name: results[0],
           base: null,
           idInjection: true,
-          properties: {
-            name: {
-              name: 'name',
-              type: 'string'
-            }
-          },
+          properties: {},
           validations: [],
           relations: {},
           acls: [],
           methods: []
         };
+        dataModel.properties[results[1].attribute.name] = results[1].attribute;
         
         let viewModel: any = {
-          name: name,
-          modelName: name,
+          name: results[0],
+          modelName: results[0],
           icon: '',
           color: '#000000',
-          viewProperties: {
-            name: {
-              name: 'name',
-              displayName: 'Name',
-              inputType: {
-                type: 'text',
-                options: {}
-              }
-            }
-          },
+          viewProperties: {},
           formatDefinitions: {},
           defaultFormatKey: {},
           tableDefinitions: {}
         };
+        viewModel.viewProperties[results[1].attribute.name] = results[1].view;
+        
         let formatDefinitionId: string = (<any> Uuid).default();
         let defaultFormatDefinition: FormatDefinition = {
           id: formatDefinitionId,
@@ -330,17 +337,50 @@ export class DataModelEditorComponent {
           },
           containers: [{
             kind: FormatContainerKind.VERTICAL,
-            contents: [
-            ]
+            contents: []
           }]
         };
+        
+        let propertyDefinition: PropertyDefinition = {
+          propertyName: results[1].attribute.name,
+          customLabel: results[1].view.displayName,
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        let type: any = results[1].attribute.type;
+        type = (Array.isArray(type) ? type[0] : type); 
+        switch (type) {
+          case 'boolean':
+            propertyDefinition.kind = 'boolean';
+            break;
+          case 'number':
+            propertyDefinition.kind = 'number';
+            break;
+          case 'string':
+            propertyDefinition.kind = 'text';
+            break;
+          case 'StateMachine':
+            propertyDefinition.kind = 'state-editor';
+            break;
+          case 'timestamp':
+            propertyDefinition.kind = 'date';
+            break;
+          case 'user-selector':
+            propertyDefinition.kind = 'user-selector';
+            break;
+        }
+        defaultFormatDefinition.containers[0].contents.push(
+          propertyDefinition);
+        
         viewModel.formatDefinitions[formatDefinitionId] =
           defaultFormatDefinition;
         viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
           formatDefinitionId;
 
-        this._dataModel.localTypes[name] = dataModel;
-        viewModelProxy.item.localTypes[name] = viewModel;
+        this._dataModel.localTypes[results[0]] = dataModel;
+        viewModelProxy.item.localTypes[results[0]] = viewModel;
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
@@ -353,26 +393,24 @@ export class DataModelEditorComponent {
     });
   }
   
-  public removeLocalType(name: string): void {
-    this._dialogService.openYesNoDialog('Remove ' + name, 'All ' +
-      'unsaved modifications to this kind are to be saved if this local ' +
-      'type is removed. Do you want to proceed?').subscribe((choiceValue:
-      any) => {
-      if (choiceValue) {
-        let viewModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
-          'view-' + this._dataModel.name.toLowerCase()).item;
-        delete this._dataModel.localTypes[name];
-        delete viewModel.localTypes[name];
-        
-        this.save();
-        this._itemRepository.upsertItem('KoheseView', viewModel);
-        
-        // Re-enter edit mode
-        this._editable = true;
-        
-        this._changeDetectorRef.markForCheck();
-      }
-    });
+  public async removeLocalType(name: string): Promise<void> {
+    let choiceValue: any = await this._dialogService.openYesNoDialog(
+      'Remove ' + name, 'All unsaved modifications to this kind are to be ' +
+      'saved if this local type is removed. Do you want to proceed?');
+    if (choiceValue) {
+      let viewModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
+        'view-' + this._dataModel.name.toLowerCase()).item;
+      delete this._dataModel.localTypes[name];
+      delete viewModel.localTypes[name];
+      
+      this.save();
+      this._itemRepository.upsertItem('KoheseView', viewModel);
+      
+      // Re-enter edit mode
+      this._editable = true;
+      
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
   public async addAttribute(): Promise<void> {
@@ -389,37 +427,38 @@ export class DataModelEditorComponent {
       let response: any = await this._dialogService.openYesNoDialog(
         'Display Modifications', 'All unsaved modifications to this kind ' +
         'are to be saved if an attribute is added to this kind. Do you want ' +
-        'to proceed?').toPromise();
+        'to proceed?');
       if (!response) {
         return;
       }
     }
     
-    this._dialogService.openComponentDialog(AttributeEditorComponent, {
-      data: {
+    this._dialogService.openComponentsDialog([{
+      component: AttributeEditorComponent,
+      matDialogData: {
         type: this._dataModel
       }
-    }).afterClosed().subscribe((attributeObject: any) => {
-      if (attributeObject) {
-        this._dataModel.properties[attributeObject.attributeName] =
-          attributeObject.attribute;
+    }], { data: {} }).afterClosed().subscribe((results: Array<any>) => {
+      if (results) {
+        this._dataModel.properties[results[0].attribute.name] =
+          results[0].attribute;
         let viewModel: any = (this._enclosingType ? viewModelProxy.item.
           localTypes[this._dataModel.name] : viewModelProxy.item);
-        viewModel.viewProperties[attributeObject.attributeName] =
-          attributeObject.view;
+        viewModel.viewProperties[results[0].attribute.name] =
+          results[0].view;
         viewModel.formatDefinitions[viewModel.defaultFormatKey[
           FormatDefinitionType.DEFAULT]].containers[0].contents.push({
-          propertyName: attributeObject.attributeName,
-          customLabel: attributeObject.attributeName,
+          propertyName: results[0].attribute.name,
+          customLabel: results[0].view.displayName,
           labelOrientation: 'Top',
-          kind: attributeObject.view.inputType.type,
+          kind: results[0].view.inputType.type,
           visible: true,
           editable: true
         });
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
-        this._attributes.push(attributeObject.attribute);
+        this._attributes.push(results[0].attribute);
         this._attributeTable.renderRows();
         
         // Re-enter edit mode
@@ -557,7 +596,7 @@ export class DataModelEditorComponent {
       let response: any = await this._dialogService.openYesNoDialog(
         'Display Modifications', 'All unsaved modifications to this kind ' +
         'are to be saved if an attribute is added to this kind. Do you want ' +
-        'to proceed?').toPromise();
+        'to proceed?');
       if (!response) {
         return;
       }
@@ -657,7 +696,7 @@ export class DataModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public removeAttribute(propertyId: string): void {
+  public async removeAttribute(propertyId: string): Promise<void> {
     let viewModel: any;
     if (this._enclosingType) {
       viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
@@ -785,41 +824,37 @@ export class DataModelEditorComponent {
     };
     
     if (paths.length === 0) {
-      this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
-        'unsaved modifications to this type are to be saved if this ' +
-        'attribute is removed. Do you want to proceed?').subscribe(
-        (choiceValue: any) => {
-        if (choiceValue) {
-          removeFromModels();
-          this._changeDetectorRef.markForCheck();
-        }
-      });
+      let choiceValue: any = await this._dialogService.openYesNoDialog(
+        'Remove ' + propertyId, 'All unsaved modifications to this type are ' +
+        'to be saved if this attribute is removed. Do you want to proceed?');
+      if (choiceValue) {
+        removeFromModels();
+        this._changeDetectorRef.markForCheck();
+      }
     } else {
-      this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
-        'unsaved modifications to this type are to be saved if this ' +
-        'attribute is removed. Additionally, the following types are ' +
-        'expected to have one or more Format Definition entries removed: ' +
-        paths.map((path: Array<any>) => {
+      let choiceValue: any = await this._dialogService.openYesNoDialog(
+        'Remove ' + propertyId, 'All unsaved modifications to this type are ' +
+        'to be saved if this attribute is removed. Additionally, the ' +
+        'following types are expected to have one or more Format Definition ' +
+        'entries removed: ' + paths.map((path: Array<any>) => {
           return path[0].name;
-        }).filter((viewModelName: string, index: number, source:
-          Array<string>) => {
-          return (source.indexOf(viewModelName) === index);
-        }).join(', ') + '. Do you want to proceed?').subscribe(
-        (choiceValue: any) => {
-        if (choiceValue) {
-          for (let j: number = 0; j < paths.length; j++) {
-            let propertyDefinitions: Array<PropertyDefinition> = (paths[j][0][
-              'formatDefinitions'][String(paths[j][1])]['containers'][
-              (paths[j][2] as number)][
-              'contents'] as Array<PropertyDefinition>);
-            propertyDefinitions.splice((paths[j][3] as number), 1);
-            this._itemRepository.upsertItem('KoheseView', paths[j][0]);
-          }
-          
-          removeFromModels();
-          this._changeDetectorRef.markForCheck();
+      }).filter((viewModelName: string, index: number, source:
+        Array<string>) => {
+        return (source.indexOf(viewModelName) === index);
+      }).join(', ') + '. Do you want to proceed?');
+      if (choiceValue) {
+        for (let j: number = 0; j < paths.length; j++) {
+          let propertyDefinitions: Array<PropertyDefinition> = (paths[j][0][
+          'formatDefinitions'][String(paths[j][1])]['containers'][
+            (paths[j][2] as number)][
+            'contents'] as Array<PropertyDefinition>);
+          propertyDefinitions.splice((paths[j][3] as number), 1);
+          this._itemRepository.upsertItem('KoheseView', paths[j][0]);
         }
-      });
+        
+        removeFromModels();
+        this._changeDetectorRef.markForCheck();
+      }
     }
   }
 }

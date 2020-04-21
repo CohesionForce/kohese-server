@@ -1,0 +1,82 @@
+<ng-container *ngIf="(configurationInstanceMap.size > 1) else
+  singleComponent">
+  <mat-horizontal-stepper [linear]="true" style="height: 100%;">
+    <ng-template matStepperIcon="edit">
+      <mat-icon class="fa fa-pencil mat-step-icon-content"></mat-icon>
+    </ng-template>
+    <ng-container *ngFor="let componentDialogConfiguration of Array.from(
+      configurationInstanceMap.keys()); let componentDialogConfigurationIndex =
+      index">
+      <mat-step [completed]="configurationInstanceMap.get(
+        componentDialogConfiguration)?.isValid()">
+        <ng-template matStepLabel>
+          {{componentDialogConfiguration.label}}
+        </ng-template>
+        <div style="height: calc(100% - 40px);">
+          <ng-template dynamic-component></ng-template>
+        </div>
+        <div style="height: 40px; width: 100%; display: flex; flex-direction:
+          row;">
+          <button mat-button style="margin-left: auto;" (click)="matDialogRef.
+            close(undefined)">
+            Cancel
+          </button>
+          <ng-container *ngIf="(componentDialogConfigurationIndex ===
+            (configurationInstanceMap.size - 1)) else notLastComponent">
+            <ng-container *ngIf="(componentDialogConfigurationIndex !== 0)">
+              <button mat-button matStepperPrevious>
+                Back
+              </button>
+            </ng-container>
+            <button mat-button [disabled]="((values.length === 0) ||
+              !areAllComponentsValid())" (click)="values[
+              componentDialogConfigurationIndex] = configurationInstanceMap.
+              get(componentDialogConfiguration).close(true); matDialogRef.
+              close(values)">
+              Accept
+            </button>
+          </ng-container>
+          <ng-template #notLastComponent>
+            <ng-container *ngIf="(componentDialogConfigurationIndex !== 0)">
+              <button mat-button matStepperPrevious>
+                Back
+              </button>
+            </ng-container>
+            <button mat-button matStepperNext
+              [disabled]="!configurationInstanceMap.get(
+              componentDialogConfiguration)?.isValid()" (click)="values[
+              componentDialogConfigurationIndex] = configurationInstanceMap.
+              get(componentDialogConfiguration).close(true)">
+              Next
+            </button>
+          </ng-template>
+        </div>
+      </mat-step>
+    </ng-container>
+  </mat-horizontal-stepper>
+</ng-container>
+<ng-template #singleComponent>
+  <ng-container *ngFor="let componentDialogConfiguration of Array.from(
+    configurationInstanceMap.keys())">
+    <div style="height: calc(100% - 40px);">
+      <ng-template dynamic-component></ng-template>
+    </div>
+    <div style="height: 40px; width: 100%; display: flex; flex-direction:
+      row;">
+      <ng-container *ngIf="(!buttonLabels || buttonLabels.acceptLabel)">
+        <button mat-button [disabled]="!configurationInstanceMap.get(
+          componentDialogConfiguration)?.isValid()" style="margin-left:
+          auto;" (click)="matDialogRef.close([configurationInstanceMap.get(
+          componentDialogConfiguration).close(true)])">
+          {{(buttonLabels ? buttonLabels.acceptLabel : 'Accept')}}
+        </button>
+      </ng-container>
+      <button mat-button [ngStyle]="{ 'margin-left': ((!buttonLabels ||
+        buttonLabels.acceptLabel) ? '' : 'auto') }"
+        (click)="matDialogRef.close([configurationInstanceMap.get(
+        componentDialogConfiguration).close(false)])">
+        {{(buttonLabels ? buttonLabels.cancelLabel : 'Cancel')}}
+      </button>
+    </div>
+  </ng-container>
+</ng-template>

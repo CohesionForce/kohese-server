@@ -111,19 +111,20 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     let deleteAction: Action = new Action('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
       return !(object as ItemProxy).internal;
-      }, (object: any) => {
-        this._dialogService.openCustomTextDialog('Confirm Deletion',
-        'Are you sure you want to delete ' + (object as ItemProxy).item.name + '?', [
-        'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
-
-        if (result) {
-          if (object === this.rootSubject.getValue()) {
-            this.rootSubject.next(this.getParent(object));
-          }
-          this.rowFocused(undefined);
-          this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
+    }, async (object: any) => {
+      let result: any = await this._dialogService.openDropdownDialog('Remove ' +
+        'Descendants', 'Do you also want to remove all descendants of ' +
+        (object as ItemProxy).item.name + '?', '', 'No', (value: any) => {
+        return true;
+      }, ['Yes', 'No']);
+      if (result) {
+        if (object === this.rootSubject.getValue()) {
+          this.rootSubject.next(this.getParent(object));
         }
-      });
+        this.rowFocused(undefined);
+        this._itemRepository.deleteItem((object as ItemProxy), (result ===
+          'Yes'));
+      }
     });
     this.rootMenuActions.unshift(deleteAction);
     this.menuActions.unshift(deleteAction);

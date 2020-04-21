@@ -1,0 +1,9 @@
+@import '../../../app.component';
+
+/deep/ .mat-horizontal-content-container {
+  height: calc(100% - 72px);
+}
+
+/deep/ .mat-horizontal-stepper-content {
+  height: 100%;
+}

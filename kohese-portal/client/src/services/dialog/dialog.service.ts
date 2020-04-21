@@ -1,98 +1,100 @@
-import { Injectable, Component, Inject, TemplateRef } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material';
 import { ComponentType } from '@angular/cdk/portal';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { Observable } from 'rxjs';
+
+import { SimpleDialogComponent } from '../../components/dialog/simple-dialog/simple-dialog.component';
+import { InputDialogComponent, InputDialogKind, KindInputDialogConfiguration,
+  DropdownDialogConfiguration } from '../../components/dialog/input-dialog/input-dialog.component';
+import { ComponentDialogComponent, ComponentDialogConfiguration,
+  ButtonLabels } from '../../components/dialog/component-dialog/component-dialog.component';
 
 @Injectable()
 export class DialogService {
-  constructor(private dialog: MatDialog) {
+  public constructor(private dialog: MatDialog) {
+  }
+  
+  public openConfirmDialog(title: string, text: string): Promise<any> {
+    return this.openSimpleDialog(title, text, undefined);
   }
 
-  openConfirmDialog(title: string, text: string): Observable<any> {
-    return this.openCustomTextDialog(title, text, ['Cancel', 'OK']);
+  public openYesNoDialog(title: string, text: string): Promise<any> {
+    return this.openSimpleDialog(title, text, {
+      acceptLabel: 'Yes',
+      cancelLabel: 'No'
+    });
   }
 
-  openYesNoDialog(title: string, text: string): Observable<any> {
-    return this.openCustomTextDialog(title, text, ['No', 'Yes']);
+  public openInformationDialog(title: string, text: string): Promise<any> {
+    return this.openSimpleDialog(title, text, { cancelLabel: 'Close' });
   }
 
-  openInformationDialog(title: string, text: string): Observable<any> {
-    return this.openCustomTextDialog(title, text, ['OK']);
-  }
-
-  openCustomTextDialog(title: string, text: string, buttonLabels: Array<string>): Observable<any> {
-    return this.dialog.open(DialogComponent, {
-      data: {
+  private openSimpleDialog(title: string, text: string, buttonLabels:
+    ButtonLabels): Promise<any> {
+    return this.openComponentsDialog([{
+      component: SimpleDialogComponent,
+      matDialogData: {
         title: title,
-        text: text,
-        buttonLabels: buttonLabels
-      },
-      disableClose: true
-    }).updateSize('40%', 'auto').afterClosed();
+        text: text
+      }
+    }], { data: { buttonLabels: buttonLabels } }).updateSize('40%', 'auto').
+      afterClosed().toPromise();
   }
 
-  openInputDialog(title: string, text: string, type: string, fieldName: string,
-    initialValue: any, validate: (input: any) => boolean):
-    MatDialogRef<DialogComponent> {
-    if (initialValue == null) {
-      initialValue = '';
+  public openInputDialog(title: string, text: string, inputDialogKind:
+    InputDialogKind, fieldName: string, defaultValue: any, validate: (value:
+    any) => boolean): Promise<any> {
+    let kindInputDialogConfiguration: KindInputDialogConfiguration = {
+      title: title,
+      text: text,
+      fieldName: fieldName,
+      value: defaultValue,
+      validate: validate,
+      inputDialogKind: inputDialogKind
+    };
+    
+    return this.openComponentsDialog([{
+      component: InputDialogComponent,
+      matDialogData: {
+        inputDialogConfiguration: kindInputDialogConfiguration
+      }
+    }], { data: {} }).updateSize('40%', '250px').afterClosed().toPromise();
+  }
+
+  public openDropdownDialog(title: string, text: string, label: string,
+    defaultValue: any, validate: (value: any) => boolean, options: Array<any>):
+    Promise<any> {
+    if (options.indexOf(defaultValue) === -1) {
+      defaultValue = options[0];
     }
-    return this.dialog.open(DialogComponent, {
-      data: {
-        title: title,
-        text: text,
-        inputType: type,
-        fieldName: fieldName,
-        value: initialValue,
-        validate: validate
-      },
-      disableClose: true
-    }).updateSize('40%', '250px');
+    
+    let dropdownDialogConfiguration: DropdownDialogConfiguration = {
+      title: title,
+      text: text,
+      fieldName: label,
+      value: defaultValue,
+      validate: validate,
+      options: options
+    };
+    
+    return this.openComponentsDialog([{
+      component: InputDialogComponent,
+      matDialogData: {
+        inputDialogConfiguration: dropdownDialogConfiguration
+      }
+    }], { data: {} }).updateSize('40%', 'auto').afterClosed().toPromise();
+  }
+  
+  public openComponentDialog<T>(component: ComponentType<T>,
+    dialogConfiguration: any): MatDialogRef<T> {
+    return this.dialog.open(component, dialogConfiguration);
   }
 
-  public openSelectDialog(title: string, text: string, label: string,
-    initialValue: any, options: Array<any>):
-    MatDialogRef<DialogComponent> {
-    if (initialValue == null) {
-      initialValue = options[0];
-    }
-    return this.dialog.open(DialogComponent, {
-      data: {
-        title: title,
-        text: text,
-        fieldName: label,
-        value: initialValue,
-        options: options
-      },
-      disableClose: true
-    }).updateSize('40%', 'auto');
-  }
-
-  openComponentDialog<T>(component: ComponentType<T> | TemplateRef<T>, config : any): MatDialogRef<T> {
-    config.disableClose = true;
-    return this.dialog.open(component, config);
-  }
-}
-
-@Component({
-  templateUrl: 'dialog.component.html',
-  styleUrls: ['./dialog.component.scss']
-})
-export class DialogComponent {
-  public static readonly INPUT_TYPES: any = {
-    TEXT: 'text',
-    MULTILINE_TEXT: 'multilineText',
-    MARKDOWN: 'markdown',
-    NUMBER: 'number',
-    DATE: 'date',
-    TIME: 'time',
-    MASKED_STRING: 'password'
-  };
-
-  get INPUT_TYPES() {
-    return DialogComponent.INPUT_TYPES;
-  }
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+  public openComponentsDialog(componentDialogConfigurations:
+    Array<ComponentDialogConfiguration>, dialogConfiguration: any):
+    MatDialogRef<ComponentDialogComponent> {
+    dialogConfiguration.disableClose = true;
+    dialogConfiguration.data.componentDialogConfigurations =
+      componentDialogConfigurations;
+    return this.dialog.open(ComponentDialogComponent, dialogConfiguration);
   }
 }

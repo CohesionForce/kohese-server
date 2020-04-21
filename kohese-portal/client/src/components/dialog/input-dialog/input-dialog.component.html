@@ -1,0 +1,70 @@
+<h3 style="height: 40px; width: 100%;">
+  {{inputDialogConfiguration.title}}
+</h3>
+<div style="height: calc(100% - 48px); width: 100%; overflow: auto;">
+  <ng-container *ngIf="inputDialogConfiguration.text">
+    {{inputDialogConfiguration.text}}
+    <br/>
+    <br/>
+  </ng-container>
+  <ng-container *ngIf="inputDialogConfiguration['inputDialogKind'] else
+    dropdownDialogConfiguration">
+    <ng-container [ngSwitch]="inputDialogConfiguration['inputDialogKind']">
+      <ng-container *ngSwitchCase="InputDialogKind.BOOLEAN">
+        <mat-checkbox [(ngModel)]="inputDialogConfiguration.value" style="width:
+          100%;">
+          {{inputDialogConfiguration.fieldName}}
+        </mat-checkbox>
+      </ng-container>
+      <ng-container *ngSwitchCase="InputDialogKind.NUMBER">
+        <mat-form-field style="width: 100%;">
+          <input matInput type="number" placeholder="{{inputDialogConfiguration.
+            fieldName}}" [(ngModel)]="inputDialogConfiguration.value"/>
+        </mat-form-field>
+      </ng-container>
+      <ng-container *ngSwitchCase="InputDialogKind.DATE">
+        <mat-form-field style="width: 100%;">
+          <input matInput [matDatepicker]="matDatepicker"
+            placeholder="{{inputDialogConfiguration.fieldName}}"
+            [ngModel]="getDateString(inputDialogConfiguration.value)"
+            (ngModelChange)="($event ? inputDialogConfiguration.value = $event.
+            getTime() : '')"/>
+          <mat-datepicker-toggle matSuffix [for]="matDatepicker">
+          </mat-datepicker-toggle>
+          <mat-datepicker #matDatepicker></mat-datepicker>
+        </mat-form-field>
+      </ng-container>
+      <ng-container *ngSwitchCase="InputDialogKind.TIME">
+        <mat-form-field style="width: 100%;">
+          <input matInput type="time" placeholder="{{inputDialogConfiguration.
+            fieldName}}" [(ngModel)]="inputDialogConfiguration.value"/>
+        </mat-form-field>
+      </ng-container>
+      <ng-container *ngSwitchCase="InputDialogKind.STRING">
+        <mat-form-field style="width: 100%;">
+          <input matInput type="text" placeholder="{{inputDialogConfiguration.
+            fieldName}}" [(ngModel)]="inputDialogConfiguration.value"/>
+        </mat-form-field>
+      </ng-container>
+      <ng-container *ngSwitchCase="InputDialogKind.MARKDOWN">
+        <markdown-editor [value]="inputDialogConfiguration.value"
+          [valueIdentifier]="inputDialogConfiguration.fieldName"
+          (valueChanged)="inputDialogConfiguration.value = $event">
+        </markdown-editor>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+  <ng-template #dropdownDialogConfiguration>
+    <mat-form-field style="width: 100%;">
+      <mat-select placeholder="{{inputDialogConfiguration.fieldName}}"
+        [(ngModel)]="inputDialogConfiguration.value">
+        <ng-container *ngFor="let option of inputDialogConfiguration.
+          options">
+          <mat-option [value]="option">
+            {{option}}
+          </mat-option>
+        </ng-container>
+      </mat-select>
+    </mat-form-field>
+  </ng-template>
+</div>

@@ -3,8 +3,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject ,  Subscription } from 'rxjs';
 
-import { DialogService,
-  DialogComponent } from '../../../services/dialog/dialog.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Action } from '../tree-row/tree-row.component';
@@ -117,17 +116,16 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       'fa fa-trash', (object: any) => {
       return (!(object instanceof AddRowObject) && !this._localInTargetingMode && (
         object !== this.rootSubject.getValue()));
-      }, (object: any) => {
+      }, async (object: any) => {
       if (object instanceof FilterCriteriaConnection) {
-        this._dialogService.openYesNoDialog('Delete Elements Recursively',
-          'Deleting this connection should delete all descendants of this ' +
-          'connection also. Are you sure that you want to proceed?').subscribe(
-          (response: any) => {
-          if (response) {
-            this.deleteElement(object as FilterElement);
-            this.refresh();
-          }
-        });
+        let response: any = await this._dialogService.openYesNoDialog(
+          'Delete Elements Recursively', 'Deleting this connection should ' +
+          'delete all descendants of this connection also. Are you sure ' +
+          'that you want to proceed?');
+        if (response) {
+          this.deleteElement(object as FilterElement);
+          this.refresh();
+        }
       } else {
         this.deleteElement(object as FilterElement);
         this.refresh();
@@ -268,21 +266,20 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     }
   }
 
-  public deleteSelectedElements(): void {
+  public async deleteSelectedElements(): Promise<void> {
     let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
     if (!this.areSelectedElementsCriteria()) {
-      this._dialogService.openYesNoDialog('Delete Elements Recursively',
-        'One or more connections are selected. Deleting connections should ' +
-        'delete all descendants of those connections also. Are you sure ' +
-        'that you want to proceed?').subscribe((response: any) => {
-        if (response) {
-          for (let j: number = 0; j < selectedObjects.length; j++) {
-            this.deleteElement(selectedObjects[j] as FilterElement);
-          }
-          
-          this.deselectAll();
+      let response: any = await this._dialogService.openYesNoDialog('Delete ' +
+        'Elements Recursively', 'One or more connections are selected. ' +
+        'Deleting connections should delete all descendants of those ' +
+        'connections also. Are you sure that you want to proceed?');
+      if (response) {
+        for (let j: number = 0; j < selectedObjects.length; j++) {
+          this.deleteElement(selectedObjects[j] as FilterElement);
         }
-      });
+        
+        this.deselectAll();
+      }
     } else {
       for (let j: number = 0; j < selectedObjects.length; j++) {
         this.deleteElement(selectedObjects[j] as FilterElement);

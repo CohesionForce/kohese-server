@@ -2,14 +2,14 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   Input, Optional, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
-import { DialogService,
-  DialogComponent } from '../../../services/dialog/dialog.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatDefinition,
   FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { FormatContainer,
   FormatContainerKind } from '../../type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
+import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 import { TreeComponent } from '../../tree/tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -350,8 +350,8 @@ export class FormatObjectEditorComponent implements OnInit {
       attributeDefinition);
   }
   
-  public editValue(index: number, attributeDefinition: PropertyDefinition):
-    void {
+  public async editValue(index: number, attributeDefinition:
+    PropertyDefinition): Promise<void> {
     let attributeName: string = attributeDefinition.propertyName;
     const DIALOG_TITLE: string = 'Specify Value';
     let value: any = this._object[attributeName][index];
@@ -363,126 +363,109 @@ export class FormatObjectEditorComponent implements OnInit {
         if (value == null) {
           value = false;
         }
-        this._dialogService.openSelectDialog(DIALOG_TITLE, '',
-          attributeName, value, [true, false]).afterClosed().subscribe(
-          (value: boolean) => {
-          if (value != null) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE, '',
+          attributeName, value, undefined, [true, false]);
+        if (value != null) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'number':
         if (value == null) {
           value = 0;
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.NUMBER, attributeName, value, undefined).afterClosed().
-          subscribe((value: number) => {
-          if (value != null) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.NUMBER, attributeName, value, undefined);
+        if (value != null) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'date':
         if (value == null) {
           value = new Date().getTime();
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.DATE, attributeName, value, undefined).afterClosed().
-          subscribe((value: number) => {
-          if (value != null) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.DATE, attributeName, value, undefined);
+        if (value != null) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'string':
         if (value == null) {
           value = '';
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.TEXT, attributeName, value, undefined).afterClosed().
-          subscribe((value: string) => {
-          if (value) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.STRING, attributeName, value, undefined);
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'text':
         if (value == null) {
           value = '';
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.TEXT, attributeName, value, undefined).afterClosed().
-          subscribe((value: string) => {
-          if (value) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.STRING, attributeName, value, undefined);
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'maskedString':
         if (value == null) {
           value = '';
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.MASKED_STRING, attributeName, value, undefined).
-          afterClosed().subscribe((value: string) => {
-          if (value) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.MASKED_STRING, attributeName, value, undefined);
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'markdown':
         if (value == null) {
           value = '';
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.MARKDOWN, attributeName, value, undefined).afterClosed().
-          subscribe((value: string) => {
-          if (value) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.MARKDOWN, attributeName, value, undefined);
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'state-editor':
-        this._dialogService.openSelectDialog(DIALOG_TITLE, attributeName +
-          ': ' + this._object[attributeName], 'Target', value, this.
-          getStateTransitionCandidates(attributeDefinition).map(
-          (transitionCandidateName: string) => {
+        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE,
+          attributeName + ': ' + this._object[attributeName], 'Target', value,
+          undefined, this.getStateTransitionCandidates(attributeDefinition).
+          map((transitionCandidateName: string) => {
           return this._selectedType.classProperties[attributeName].definition.
             properties.transition[transitionCandidateName].target;
-        })).afterClosed().subscribe((value: string) => {
-          if (value) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        }));
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'user-selector':
         if (value == null) {
           value = 'admin';
         }
         
-        this._dialogService.openSelectDialog(DIALOG_TITLE, '',
-          attributeName, value, this._usernames).afterClosed().subscribe(
-          (value: string) => {
-          if (value != null) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE, '',
+          attributeName, value, undefined, this._usernames);
+        if (value != null) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       default:
         let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(

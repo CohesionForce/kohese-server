@@ -42,7 +42,6 @@ describe('Component: attribute-editor', ()=>{
 
     fixture = TestBed.createComponent(AttributeEditorComponent);
     component = fixture.componentInstance;
-    component.attributeName = 'name';
     fixture.detectChanges();
   });
   

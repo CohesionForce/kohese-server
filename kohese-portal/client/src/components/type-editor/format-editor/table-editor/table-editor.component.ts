@@ -90,7 +90,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  addColumn() {
+  public async addColumn(): Promise<void> {
     let attributeNames: Array<string> = [];
     for (let j: number = 0; j < this._attributes.length; j++) {
       if (this._tableDefinition.columns.indexOf(this._attributes[j].name) ===
@@ -99,14 +99,13 @@ export class TableEditorComponent implements OnInit, OnDestroy {
       }
     }
     
-    this.dialogService.openSelectDialog('Add Column', '', 'Attribute',
-      attributeNames[0], attributeNames).afterClosed().subscribe(
-      (newColumn) => {
-        if (newColumn) {
-          this._tableDefinition.columns.push(newColumn);
-          this.changeDetectorRef.markForCheck();
-        }
-      });
+    let newColumn: any = await this.dialogService.openDropdownDialog(
+      'Add Column', '', 'Attribute', attributeNames[0], undefined,
+      attributeNames);
+    if (newColumn) {
+      this._tableDefinition.columns.push(newColumn);
+      this.changeDetectorRef.markForCheck();
+    }
   }
   
   public moveAttribute(attributeName: string, moveUp: boolean): void {
@@ -118,20 +117,18 @@ export class TableEditorComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.markForCheck();
   }
 
-  addExpandedProperty(colNum: number) {
+  public async addExpandedProperty(colNum: number): Promise<void> {
     let attributeNames: Array<string> = this._attributes.map((attribute:
       any) => {
       return attribute.name;
     });
-    this.dialogService.openSelectDialog('Add Column', '', 'Attribute',
-      attributeNames[0], attributeNames).afterClosed().subscribe((newProp) => {
-        if (newProp) {
-          const columnName = 'column' + colNum;
-          this._tableDefinition.expandedFormat[columnName].push(newProp);
-          console.log(this);
-          this.changeDetectorRef.markForCheck();
-        }
-      });
+    let newProp: any = await this.dialogService.openDropdownDialog('Add ' +
+      'Column', '', 'Attribute', attributeNames[0], undefined, attributeNames);
+    if (newProp) {
+      const columnName = 'column' + colNum;
+      this._tableDefinition.expandedFormat[columnName].push(newProp);
+      this.changeDetectorRef.markForCheck();
+    }
   }
 
   removeExpandedProperty(property, colNum) {
