@@ -3,10 +3,10 @@
   "name": "KoheseView View Model",
   "parentId": "view-item",
   "modelName": "KoheseView",
-  "icon": "",
+  "icon": "fa fa-desktop",
   "color": "#000000",
-  "localTypes": {},
   "viewProperties": {},
+  "localTypes": {},
   "formatDefinitions": {
     "03cf44b0-6965-11ea-80c5-0b0cc7c6ec96": {
       "name": "Default Format Definition",
@@ -108,6 +108,5 @@
   "defaultFormatKey": {
     "default": "03cf44b0-6965-11ea-80c5-0b0cc7c6ec96"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }
