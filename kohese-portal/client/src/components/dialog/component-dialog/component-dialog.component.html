@@ -7,8 +7,10 @@
     <ng-container *ngFor="let componentDialogConfiguration of Array.from(
       configurationInstanceMap.keys()); let componentDialogConfigurationIndex =
       index">
-      <mat-step [completed]="configurationInstanceMap.get(
-        componentDialogConfiguration)?.isValid()">
+      <mat-step [completed]="(configurationInstanceMap.get(
+        componentDialogConfiguration) && (!configurationInstanceMap.get(
+        componentDialogConfiguration).isValid || configurationInstanceMap.get(
+        componentDialogConfiguration).isValid()))">
         <ng-template matStepLabel>
           {{componentDialogConfiguration.label}}
         </ng-template>
@@ -43,10 +45,13 @@
               </button>
             </ng-container>
             <button mat-button matStepperNext
-              [disabled]="!configurationInstanceMap.get(
-              componentDialogConfiguration)?.isValid()" (click)="values[
-              componentDialogConfigurationIndex] = configurationInstanceMap.
-              get(componentDialogConfiguration).close(true)">
+              [disabled]="!(configurationInstanceMap.get(
+              componentDialogConfiguration) && (!configurationInstanceMap.get(
+              componentDialogConfiguration).isValid ||
+              configurationInstanceMap.get(componentDialogConfiguration).
+              isValid()))" (click)="values[componentDialogConfigurationIndex] =
+              configurationInstanceMap.get(componentDialogConfiguration).close(
+              true)">
               Next
             </button>
           </ng-template>
@@ -64,8 +69,10 @@
     <div style="height: 40px; width: 100%; display: flex; flex-direction:
       row;">
       <ng-container *ngIf="(!buttonLabels || buttonLabels.acceptLabel)">
-        <button mat-button [disabled]="!configurationInstanceMap.get(
-          componentDialogConfiguration)?.isValid()" style="margin-left:
+        <button mat-button [disabled]="!(configurationInstanceMap.get(
+          componentDialogConfiguration) && (!configurationInstanceMap.get(
+          componentDialogConfiguration).isValid || configurationInstanceMap.
+          get(componentDialogConfiguration).isValid()))" style="margin-left:
           auto;" (click)="matDialogRef.close([configurationInstanceMap.get(
           componentDialogConfiguration).close(true)])">
           {{(buttonLabels ? buttonLabels.acceptLabel : 'Accept')}}
