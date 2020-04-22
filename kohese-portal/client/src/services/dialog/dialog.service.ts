@@ -28,19 +28,19 @@ export class DialogService {
     return this.openSimpleDialog(title, text, { cancelLabel: 'Close' });
   }
 
-  private openSimpleDialog(title: string, text: string, buttonLabels:
+  private async openSimpleDialog(title: string, text: string, buttonLabels:
     ButtonLabels): Promise<any> {
-    return this.openComponentsDialog([{
+    return (await this.openComponentsDialog([{
       component: SimpleDialogComponent,
       matDialogData: {
         title: title,
         text: text
       }
     }], { data: { buttonLabels: buttonLabels } }).updateSize('40%', 'auto').
-      afterClosed().toPromise();
+      afterClosed().toPromise())[0];
   }
 
-  public openInputDialog(title: string, text: string, inputDialogKind:
+  public async openInputDialog(title: string, text: string, inputDialogKind:
     InputDialogKind, fieldName: string, defaultValue: any, validate: (value:
     any) => boolean): Promise<any> {
     let kindInputDialogConfiguration: KindInputDialogConfiguration = {
@@ -52,15 +52,15 @@ export class DialogService {
       inputDialogKind: inputDialogKind
     };
     
-    return this.openComponentsDialog([{
+    return (await this.openComponentsDialog([{
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: kindInputDialogConfiguration
       }
-    }], { data: {} }).updateSize('40%', '250px').afterClosed().toPromise();
+    }], { data: {} }).updateSize('40%', '250px').afterClosed().toPromise())[0];
   }
 
-  public openDropdownDialog(title: string, text: string, label: string,
+  public async openDropdownDialog(title: string, text: string, label: string,
     defaultValue: any, validate: (value: any) => boolean, options: Array<any>):
     Promise<any> {
     if (options.indexOf(defaultValue) === -1) {
@@ -76,12 +76,12 @@ export class DialogService {
       options: options
     };
     
-    return this.openComponentsDialog([{
+    return (await this.openComponentsDialog([{
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: dropdownDialogConfiguration
       }
-    }], { data: {} }).updateSize('40%', 'auto').afterClosed().toPromise();
+    }], { data: {} }).updateSize('40%', 'auto').afterClosed().toPromise())[0];
   }
   
   public openComponentDialog<T>(component: ComponentType<T>,
