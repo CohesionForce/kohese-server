@@ -266,6 +266,7 @@ function storeModelAnalysis(analysisInstance){
 
     var repo = proxy.getRepositoryProxy();
     var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
+    kdbFS.createDirIfMissing(path.dirname(analysisPath));
 
     kdbFS.storeJSONDoc(analysisPath, analysisInstance);
 
