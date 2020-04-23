@@ -80,8 +80,8 @@
       </ng-container>
       <button mat-button [ngStyle]="{ 'margin-left': ((!buttonLabels ||
         buttonLabels.acceptLabel) ? '' : 'auto') }"
-        (click)="matDialogRef.close([configurationInstanceMap.get(
-        componentDialogConfiguration).close(false)])">
+        (click)="configurationInstanceMap.get(componentDialogConfiguration).
+        close(false); matDialogRef.close(undefined)">
         {{(buttonLabels ? buttonLabels.cancelLabel : 'Cancel')}}
       </button>
     </div>
