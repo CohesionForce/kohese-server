@@ -264,10 +264,12 @@ function storeModelAnalysis(analysisInstance){
   if (proxy) {
     console.log('::: Storing analysis for ' + proxy.item.id + ' - ' + proxy.item.name);
 
-    var repo = proxy.getRepositoryProxy();
-    var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
+    let repo = proxy.getRepositoryProxy();
+    let analysisDir = determineRepoStoragePath(repo) + '/Analysis';
+    checkAndCreateDir(analysisDir, true);
 
-    kdbFS.storeJSONDoc(analysisPath, analysisInstance);
+    let analysisFilePath =  analysisDir + '/' + modelInstanceId + '.json';
+    kdbFS.storeJSONDoc(analysisFilePath, analysisInstance);
 
   } else {
     console.log('*** No item found for analysis instance: ' + modelInstanceId);
