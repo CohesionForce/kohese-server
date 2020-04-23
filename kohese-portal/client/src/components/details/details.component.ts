@@ -129,7 +129,11 @@ export class DetailsComponent implements OnInit, OnDestroy {
     });
   }
   
-  public navigate(id: string): void {
-    this._navigationService.addTab('Explore', { id: id });
+  public navigate(id: string, openNewTab: boolean): void {
+    if (openNewTab) {
+      this._navigationService.addTab('Explore', { id: id });
+    } else {
+      this._navigationService.navigate('Explore', { id: id });
+    }
   }
 }
