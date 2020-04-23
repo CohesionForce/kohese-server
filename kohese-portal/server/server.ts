@@ -64,10 +64,12 @@ if (require.main === module) {
           }
       }
     } catch (err) {
-      console.log('*** Error while initializing: ' + err);
+      console.log('*** Error while initializing server: ' + err);
       console.log(err.stack)
     }
+  }).catch((err) => {
+    console.log('*** Error while initializing kdb: ' + err);
+    console.log(err.stack)
   });
-
 
   }
