@@ -118,6 +118,15 @@ export class TableComponent implements OnInit {
     this._isDisabled = isDisabled;
   }
   
+  private _hideUserInteractionElements: boolean = false;
+  get hideUserInteractionElements() {
+    return this._hideUserInteractionElements;
+  }
+  @Input('hideUserInteractionElements')
+  set hideUserInteractionElements(hideUserInteractionElements: boolean) {
+    this._hideUserInteractionElements = hideUserInteractionElements;
+  }
+  
   @ViewChild('table')
   private _table: any;
   

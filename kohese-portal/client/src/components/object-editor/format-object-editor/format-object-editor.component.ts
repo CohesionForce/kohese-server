@@ -641,10 +641,11 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public getAttributeRepresentation(attributeDefinition: PropertyDefinition):
     string {
+    // Only customLabel should be used in the first part of the statement below
     return ((attributeDefinition.customLabel ? attributeDefinition.
       customLabel : attributeDefinition.propertyName) +
-      (this._selectedType.classProperties[attributeDefinition.propertyName].
-      definition.required ? '*' : ''));
+      (!this._isDisabled && this._selectedType.classProperties[
+      attributeDefinition.propertyName].definition.required ? '*' : ''));
   }
   
   public getDateString(timestamp: number): string {
