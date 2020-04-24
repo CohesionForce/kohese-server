@@ -86,6 +86,7 @@
                 [ngClass]="{ 'highlight': (selection.indexOf(element) !==
                 -1) }" style="white-space: nowrap; overflow: hidden;
                 text-overflow: ellipsis; width: 100%; text-align: left;">
+                <mat-icon class="{{elementMap.get(element).icon}}"></mat-icon>
                 {{elementMap.get(element).text}}
               </button>
               <ng-container *ngFor="let action of actions; let j = index">

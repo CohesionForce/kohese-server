@@ -95,6 +95,11 @@ export class KdProxySelectorComponent implements OnInit {
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
+        getIcon: (element: any) => {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+            item.icon;
+        },
         selection: (Array.isArray(selected) ? selected : [selected]),
         quickSelectElements: this._itemRepository.getRecentProxies(),
         allowMultiselect: this.multiselect,
