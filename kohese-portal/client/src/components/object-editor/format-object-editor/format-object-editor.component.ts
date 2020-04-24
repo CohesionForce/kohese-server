@@ -723,6 +723,10 @@ export class FormatObjectEditorComponent implements OnInit {
       value = this._object[attributeName];
     }
     
+    if (!this._enclosingType && (attributeName === 'parentId')) {
+      return TreeConfiguration.getWorkingTree().getProxyFor(value).item.name;
+    }
+    
     let representation: string = String(value);
     if (representation === String({})) {
       let isLocalTypeAttribute: boolean = (!this._enclosingType && this.
