@@ -137,18 +137,17 @@ export class AdminComponent implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
-  public remove(user: any): void {
-    this._dialogService.openYesNoDialog('Remove ' + user.name, 'Are you ' +
-      'sure that you want to remove ' + user.name + ' from the system?').
-      subscribe((response: any) => {
-      if (response) {
-        this._itemRepository.deleteItem(this._itemRepository.getTreeConfig().
-          getValue().config.getProxyFor(user.id), false).then(() => {
-          this._sessionService.users.splice(this._sessionService.users.indexOf(
-            user), 1);
-          this._changeDetectorRef.markForCheck();
-        });
-      }
-    });
+  public async remove(user: any): Promise<void> {
+    let response: any = await this._dialogService.openYesNoDialog('Remove ' +
+      user.name, 'Are you sure that you want to remove ' + user.name +
+      ' from the system?');
+    if (response) {
+      this._itemRepository.deleteItem(this._itemRepository.getTreeConfig().
+        getValue().config.getProxyFor(user.id), false).then(() => {
+        this._sessionService.users.splice(this._sessionService.users.indexOf(
+          user), 1);
+        this._changeDetectorRef.markForCheck();
+      });
+    }
   }
 }

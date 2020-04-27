@@ -3,8 +3,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
 import * as Uuid from 'uuid/v1';
 import { MatTable } from '@angular/material';
 
-import { DialogService,
-  DialogComponent } from '../../../services/dialog/dialog.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { IconSelectorComponent } from '../icon-selector/icon-selector.component';
 import { FormatPreviewComponent } from '../format-editor/format-preview/format-preview.component';
@@ -14,6 +13,7 @@ import { FormatDefinition,
 import { FormatContainer,
   FormatContainerKind } from '../FormatContainer.interface';
 import { PropertyDefinition } from '../PropertyDefinition.interface';
+import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
@@ -249,45 +249,44 @@ export class ViewModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public addTableDefinition(): void {
-    this._dialogService.openInputDialog('Add Table Definition', '',
-      DialogComponent.INPUT_TYPES.TEXT, 'Name', '', (input: any) => {
+  public async addTableDefinition(): Promise<void> {
+    let name: any = await this._dialogService.openInputDialog('Add Table ' +
+      'Definition', '', InputDialogKind.STRING, 'Name', '', (input: any) => {
       return !!input;
-    }).afterClosed().subscribe((name: any) => {
-      if (name) {
-        let id: string = (<any> Uuid).default();
-        this._viewModel.tableDefinitions[id] = {
-          id: id,
-          name: name,
-          columns: [],
-          expandedFormat: {
-            column1: [],
-            column2: [],
-            column3: [],
-            column4: []
-          }
-        };
-        
-        this._modifiedEventEmitter.emit();
-        this._changeDetectorRef.markForCheck();
-      }
     });
+    if (name) {
+      let id: string = (<any> Uuid).default();
+      this._viewModel.tableDefinitions[id] = {
+        id: id,
+        name: name,
+        columns: [],
+        expandedFormat: {
+          column1: [],
+          column2: [],
+          column3: [],
+          column4: []
+        }
+      };
+      
+      this._modifiedEventEmitter.emit();
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
-  public renameTableDefinition(tableDefinitionId: string): void {
+  public async renameTableDefinition(tableDefinitionId: string):
+    Promise<void> {
     let tableDefinition: TableDefinition = this._viewModel.tableDefinitions[
       tableDefinitionId];
-    this._dialogService.openInputDialog('Rename ' + tableDefinition.name, '',
-      DialogComponent.INPUT_TYPES.TEXT, 'Name', tableDefinition.name, (input:
-      any) => {
+    let name: any = await this._dialogService.openInputDialog('Rename ' +
+      tableDefinition.name, '', InputDialogKind.STRING, 'Name', tableDefinition.
+      name, (input: any) => {
       return !!input;
-    }).afterClosed().subscribe((name: any) => {
-      if (name) {
-        tableDefinition.name = name;
-        this._modifiedEventEmitter.emit();
-        this._changeDetectorRef.markForCheck();
-      }
     });
+    if (name) {
+      tableDefinition.name = name;
+      this._modifiedEventEmitter.emit();
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
   public removeTableDefinition(tableDefinitionId: string): void {
@@ -296,81 +295,80 @@ export class ViewModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public addFormatDefinition(): void {
-    this._dialogService.openInputDialog('Add Format Definition', '',
-      DialogComponent.INPUT_TYPES.TEXT, 'Name', '', (input: any) => {
+  public async addFormatDefinition(): Promise<void> {
+    let name: any = await this._dialogService.openInputDialog('Add Format ' +
+      'Definition', '', InputDialogKind.STRING, 'Name', '', (input: any) => {
       return !!input;
-    }).afterClosed().subscribe((name: any) => {
-      if (name) {
-        let id: string = (<any> Uuid).default();
-        let formatDefinition: FormatDefinition = {
-          id: id,
-          name: name,
-          header: {
-            kind: FormatContainerKind.HEADER,
-            contents: []
-          },
-          containers: []
-        };
-        
-        let propertyDefinition: PropertyDefinition = {
-          propertyName: '',
-          customLabel: '',
-          labelOrientation: 'Top',
-          kind: '',
-          visible: true,
-          editable: true
-        };
-        
-        let attribute: any;
-        if (this._isLocalType) {
-          attribute = this._dataModel.properties[Object.keys(this._dataModel.
-            properties)[0]];
-        } else {
-          attribute = this._dataModel.classProperties['name'].definition;
-        }
-        
-        propertyDefinition.propertyName = attribute.name;
-        propertyDefinition.customLabel = attribute.name;
-        
-        let attributeType: string = (Array.isArray(attribute.type) ? attribute.
-          type[0] : attribute.type); 
-        switch (attributeType) {
-          case 'boolean':
-            propertyDefinition.kind = 'boolean';
-            break;
-          case 'number':
-            propertyDefinition.kind = 'number';
-            break;
-          case 'string':
-            propertyDefinition.kind = 'text';
-            break;
-          case 'StateMachine':
-            propertyDefinition.kind = 'state-editor';
-            break;
-          case 'timestamp':
-            propertyDefinition.kind = 'date';
-            break;
-          case 'user-selector':
-            propertyDefinition.kind = 'user-selector';
-            break;
-        }
-        
-        if (this._isLocalType) {
-          formatDefinition.containers.push({
-            kind: FormatContainerKind.VERTICAL,
-            contents: [propertyDefinition]
-          });
-        } else {
-          formatDefinition.header.contents.push(propertyDefinition);
-        }
-        
-        this._viewModel.formatDefinitions[id] = formatDefinition;
-        
-        this._modifiedEventEmitter.emit();
-        this._changeDetectorRef.markForCheck();
-      }
     });
+    if (name) {
+      let id: string = (<any> Uuid).default();
+      let formatDefinition: FormatDefinition = {
+        id: id,
+        name: name,
+        header: {
+          kind: FormatContainerKind.HEADER,
+          contents: []
+        },
+        containers: []
+      };
+      
+      let propertyDefinition: PropertyDefinition = {
+        propertyName: '',
+        customLabel: '',
+        labelOrientation: 'Top',
+        kind: '',
+        visible: true,
+        editable: true
+      };
+      
+      let attribute: any;
+      if (this._isLocalType) {
+        attribute = this._dataModel.properties[Object.keys(this._dataModel.
+          properties)[0]];
+      } else {
+        attribute = this._dataModel.classProperties['name'].definition;
+      }
+      
+      propertyDefinition.propertyName = attribute.name;
+      propertyDefinition.customLabel = attribute.name;
+      
+      let attributeType: string = (Array.isArray(attribute.type) ? attribute.
+        type[0] : attribute.type); 
+      switch (attributeType) {
+        case 'boolean':
+          propertyDefinition.kind = 'boolean';
+          break;
+        case 'number':
+          propertyDefinition.kind = 'number';
+          break;
+        case 'string':
+          propertyDefinition.kind = 'text';
+          break;
+        case 'StateMachine':
+          propertyDefinition.kind = 'state-editor';
+          break;
+        case 'timestamp':
+          propertyDefinition.kind = 'date';
+          break;
+        case 'user-selector':
+          propertyDefinition.kind = 'user-selector';
+          break;
+      }
+      
+      if (this._isLocalType) {
+        formatDefinition.containers.push({
+          kind: FormatContainerKind.VERTICAL,
+          contents: [propertyDefinition]
+        });
+      } else {
+        formatDefinition.header.contents.push(propertyDefinition);
+      }
+      
+      this._viewModel.formatDefinitions[id] = formatDefinition;
+      
+      this._modifiedEventEmitter.emit();
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
   public getDataModel(dataModel: any): any {
@@ -390,20 +388,20 @@ export class ViewModelEditorComponent {
     }
   }
   
-  public renameFormatDefinition(formatDefinitionId: string): void {
+  public async renameFormatDefinition(formatDefinitionId: string):
+    Promise<void> {
     let formatDefinition: FormatDefinition = this._viewModel.formatDefinitions[
       formatDefinitionId];
-    this._dialogService.openInputDialog('Rename ' + formatDefinition.name, '',
-      DialogComponent.INPUT_TYPES.TEXT, 'Name', formatDefinition.name, (input:
-      any) => {
+    let name: any = await this._dialogService.openInputDialog('Rename ' +
+      formatDefinition.name, '', InputDialogKind.STRING, 'Name', formatDefinition.
+      name, (input: any) => {
       return !!input;
-    }).afterClosed().subscribe((name: any) => {
-      if (name) {
-        formatDefinition.name = name;
-        this._modifiedEventEmitter.emit();
-        this._changeDetectorRef.markForCheck();
-      }
     });
+    if (name) {
+      formatDefinition.name = name;
+      this._modifiedEventEmitter.emit();
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
   public previewFormatDefinition(formatDefinitionId: string): void {

@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  Optional, Inject, Input } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  Input } from '@angular/core';
 
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { Dialog } from '../../dialog/Dialog.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
@@ -15,20 +15,9 @@ import { StateMachineEditorComponent } from '../../state-machine-editor/state-ma
   styleUrls: ['./attribute-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AttributeEditorComponent implements OnInit {
-  private _attributeName: string = '';
-  get attributeName() {
-    return this._attributeName;
-  }
-  @Input('attributeName')
-  set attributeName(attributeName: string) {
-    this._attributeName = attributeName;
-    this._attribute.name = this._attributeName;
-    this._view.name = this._attributeName;
-  }
-  
+export class AttributeEditorComponent implements OnInit, Dialog {
   private _attribute: any = {
-    name: this._attributeName,
+    name: '',
     type: 'boolean',
     required: false,
     id: false
@@ -50,9 +39,9 @@ export class AttributeEditorComponent implements OnInit {
     this._type = type;
   }
   
-  private _view: any  = {
-    name: this._attributeName,
-    displayName: this._attributeName,
+  private _view: any = {
+    name: '',
+    displayName: '',
     inputType: {
       type: 'boolean',
       options: {}
@@ -82,10 +71,6 @@ export class AttributeEditorComponent implements OnInit {
   private _idAttributes: any = {};
   get idAttributes() {
     return this._idAttributes;
-  }
-  
-  get data() {
-    return this._data;
   }
   
   private _fundamentalTypes: any = {
@@ -136,27 +121,12 @@ export class AttributeEditorComponent implements OnInit {
     return Object;
   }
   
-  public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<AttributeEditorComponent>,
-    private _changeDetectorRef: ChangeDetectorRef,
+  public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dynamicTypesService: DynamicTypesService, private _dialogService:
     DialogService) {
   }
   
   public ngOnInit(): void {
-    if (this._data) {
-      this._type = this._data['type'];
-      if (this._data['attribute']) {
-        this._attributeName = this._data['attributeName'];
-        this._attribute = this._data['attribute'];
-        this._view = this._data['view'];
-      }
-      
-      if (this._data['editable'] === false) {
-        this._editable = false;
-      }
-    }
-    
     let koheseTypes: any = this._dynamicTypesService.getKoheseTypes();
     for (let typeName in koheseTypes) {
       this._attributeTypes[typeName] = typeName;
@@ -318,11 +288,19 @@ export class AttributeEditorComponent implements OnInit {
     this._attribute.type = type;
   }
   
-  public close(accept: boolean): void {
-    this._matDialogRef.close(accept ? {
-        attributeName: this._attributeName,
+  public isValid(): boolean {
+    return !!this._attribute.name;
+  }
+  
+  public close(value: any): any {
+    let result: any;
+    if (value) {
+      result = {
         attribute: this._attribute,
         view: this._view
-      } : undefined);
+      };
+    }
+    
+    return result;
   }
 }

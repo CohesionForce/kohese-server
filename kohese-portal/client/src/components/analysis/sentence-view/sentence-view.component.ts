@@ -10,9 +10,9 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { ItemProxy } from '../../../../../common/src/item-proxy'
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
-import { DialogService,
-  DialogComponent } from '../../../services/dialog/dialog.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 
 import * as $ from 'jquery';
 
@@ -270,21 +270,20 @@ export class SentenceViewComponent extends AnalysisViewComponent
     return content;
   }
   
-  public sentenceExport(dataFormat: DataFormat): void {
-    this.dialogService.openInputDialog('Export', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', this.itemProxy.item.name + '_' + new Date().
+  public async sentenceExport(dataFormat: DataFormat): Promise<void> {
+    let name: any = await this.dialogService.openInputDialog('Export', '',
+      InputDialogKind.STRING, 'Name', this.itemProxy.item.name + '_' + new Date().
       toISOString() + '.' + dataFormat.toLowerCase(), (input: any) => {
       return (input && (input.search(/[\/\\]/) === -1));
-    }).afterClosed().subscribe(async (name: any) => {
-      if (name) {
-        await this.itemRepository.produceReport(this.getSentenceTableContent(
-          dataFormat), name, 'text/markdown');
-        let downloadAnchor: any = document.createElement('a');
-        downloadAnchor.download = name;
-        downloadAnchor.href = '/producedReports/' + name;
-        downloadAnchor.click();
-      }
     });
+    if (name) {
+      await this.itemRepository.produceReport(this.getSentenceTableContent(
+        dataFormat), name, 'text/markdown');
+      let downloadAnchor: any = document.createElement('a');
+      downloadAnchor.download = name;
+      downloadAnchor.href = '/producedReports/' + name;
+      downloadAnchor.click();
+    }
   }
   
   public highlight(element: any): void {

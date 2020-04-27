@@ -353,21 +353,19 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
 
-  public removeSelectedDocumentConfiguration(): void {
-    this._dialogService.openYesNoDialog('Remove ' + this.
-      _documentConfiguration.name, 'Are you sure that you want to ' +
-      'remove ' + this._documentConfiguration.name + '?').subscribe(
-      async (result: any) => {
-      if (result) {
-        await this._itemRepository.deleteItem(TreeConfiguration.
-          getWorkingTree().getProxyFor(this._documentConfiguration.id),
-          false);
-        this._documentConfigurations.splice(this._documentConfigurations.
-          indexOf(this._documentConfiguration), 1);
-        this._documentConfiguration = undefined;
-        this._changeDetectorRef.markForCheck();
-      }
-    });
+  public async removeSelectedDocumentConfiguration(): Promise<void> {
+    let result: any = await this._dialogService.openYesNoDialog('Remove ' +
+      this._documentConfiguration.name, 'Are you sure that you want to ' +
+      'remove ' + this._documentConfiguration.name + '?');
+    if (result) {
+      await this._itemRepository.deleteItem(TreeConfiguration.
+        getWorkingTree().getProxyFor(this._documentConfiguration.id),
+        false);
+      this._documentConfigurations.splice(this._documentConfigurations.
+        indexOf(this._documentConfiguration), 1);
+      this._documentConfiguration = undefined;
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
   public customizeEditor(editor: any): void {
@@ -660,17 +658,15 @@ export class DocumentComponent implements OnInit, OnDestroy {
           return children;
         },
         getText: this._getDocumentComponentText,
-        elementSelectionHandler: (element: any) => {
-          this._dialogService.openSelectDialog('Move Location', 'Please ' +
-            'select a move location:', 'Move Location', locations[2],
-            locations).afterClosed().subscribe((selectedLocation:
-            string) => {
-            if (selectedLocation) {
-              selectedMoveLocation = selectedLocation;
-            } else {
-              selectedMoveLocation = locations[2];
-            }
-          });
+        elementSelectionHandler: async (element: any) => {
+          let selectedLocation: any = await this._dialogService.
+            openDropdownDialog('Move Location', 'Please select a move ' +
+            'location:', 'Move Location', locations[2], undefined, locations);
+          if (selectedLocation) {
+            selectedMoveLocation = selectedLocation;
+          } else {
+            selectedMoveLocation = locations[2];
+          }
         }
       }
     }).updateSize('80%', '80%').afterClosed().subscribe((selection:
@@ -711,8 +707,8 @@ export class DocumentComponent implements OnInit, OnDestroy {
     });
   }
   
-  public removeDocumentComponents(documentComponents:
-    Array<DocumentComponent>): void {
+  public async removeDocumentComponents(documentComponents:
+    Array<DocumentComponent>): Promise<void> {
     if ((documentComponents.length === 1) && (documentComponents[0].childIds.
       length === 0)) {
       let documentComponent: DocumentComponent = documentComponents[0];
@@ -729,58 +725,59 @@ export class DocumentComponent implements OnInit, OnDestroy {
       this._outlineTree.update(true);
       this._changeDetectorRef.markForCheck();
     } else {
-      this._dialogService.openCustomTextDialog('Remove Descendants', 'Do ' +
-        'you want to remove the descendants of the selected components also?',
-        ['Cancel', 'Yes', 'No']).subscribe((response: any) => {
-        if (response) {
-          for (let j: number = 0; j < documentComponents.length; j++) {
-            let documentComponent: DocumentComponent = documentComponents[j];
-            if (response === 1) {
-              let documentComponentStack: Array<DocumentComponent> = [
-                ...documentComponent.childIds.map((childId: string) => {
+      let response: any = await this._dialogService.openDropdownDialog(
+        'Remove Descendants', 'Do you also want to remove all descendants ' +
+        'of the selected components also?', '', 'No', (value: any) => {
+        return true;
+      }, ['Yes', 'No']);
+      if (response) {
+        for (let j: number = 0; j < documentComponents.length; j++) {
+          let documentComponent: DocumentComponent = documentComponents[j];
+          if (response === 'Yes') {
+            let documentComponentStack: Array<DocumentComponent> = [
+              ...documentComponent.childIds.map((childId: string) => {
+              return this._documentConfiguration.components[childId];
+            })];
+            while (documentComponentStack.length > 0) {
+              let descendant: DocumentComponent = documentComponentStack.
+                shift();
+              documentComponentStack.push(...descendant.childIds.map(
+                (childId: string) => {
                 return this._documentConfiguration.components[childId];
-              })];
-              while (documentComponentStack.length > 0) {
-                let descendant: DocumentComponent = documentComponentStack.
-                  shift();
-                documentComponentStack.push(...descendant.childIds.map(
-                  (childId: string) => {
-                  return this._documentConfiguration.components[childId];
-                }));
-                delete this._documentConfiguration.components[descendant.id];
-              }
-            } else {
-              /* Since descendants are not to be removed, move all descendants
-              up one level. */
-              if (documentComponent.parentId !== null) {
-                let parent: DocumentComponent = this._documentConfiguration.
-                  components[documentComponent.parentId];
-                parent.childIds.splice(parent.childIds.indexOf(
-                  documentComponent.id), 0, ...documentComponent.childIds);
-              }
-              for (let j: number = 0; j < documentComponent.childIds.length;
-                j++) {
-                this._documentConfiguration.components[documentComponent.
-                  childIds[j]].parentId = documentComponent.parentId;
-              }
+              }));
+              delete this._documentConfiguration.components[descendant.id];
             }
-            
+          } else {
+            /* Since descendants are not to be removed, move all descendants
+            up one level. */
             if (documentComponent.parentId !== null) {
               let parent: DocumentComponent = this._documentConfiguration.
                 components[documentComponent.parentId];
               parent.childIds.splice(parent.childIds.indexOf(
-                documentComponent.id), 1);
+                documentComponent.id), 0, ...documentComponent.childIds);
             }
-            delete this._documentConfiguration.components[documentComponent.
-              id];
+            for (let j: number = 0; j < documentComponent.childIds.length;
+              j++) {
+              this._documentConfiguration.components[documentComponent.
+                childIds[j]].parentId = documentComponent.parentId;
+            }
           }
           
-          this.buildDocument(false);
-          this._textEditor.editor.editor.setDirty(true);
-          this._outlineTree.update(true);
-          this._changeDetectorRef.markForCheck();
+          if (documentComponent.parentId !== null) {
+            let parent: DocumentComponent = this._documentConfiguration.
+              components[documentComponent.parentId];
+            parent.childIds.splice(parent.childIds.indexOf(
+              documentComponent.id), 1);
+          }
+          delete this._documentConfiguration.components[documentComponent.
+            id];
         }
-      });
+        
+        this.buildDocument(false);
+        this._textEditor.editor.editor.setDirty(true);
+        this._outlineTree.update(true);
+        this._changeDetectorRef.markForCheck();
+      }
     }
   }
   
@@ -1054,7 +1051,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   
-  private insert(insertionIdentifier: string): void {
+  private async insert(insertionIdentifier: string): Promise<void> {
     if (insertionIdentifier) {
       let insertionPositions: Array<string> = ['Before', 'After'];
       for (let j: number = 0; j < this._outlineTree.selection.length; j++) {
@@ -1071,50 +1068,49 @@ export class DocumentComponent implements OnInit, OnDestroy {
         
         let selectedAttributeIndex: number = attributeNames.indexOf(this.
           _selectedAttributeName);
-        this._dialogService.openSelectDialog('Select Insertion Position',
-          'Please select where you want to insert the value of ' +
-          insertionIdentifier + ' in relation to the selected attribute:',
-          'Insertion Position', insertionPositions[1], insertionPositions).
-          afterClosed().subscribe((insertionPosition: string) => {
-          if (insertionPosition) {
-            for (let j: number = 0; j < selectedAttributeIndex; j++) {
-              intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
-                j]];
-            }
-            
-            let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-              getProxyFor(documentComponent.id);
-            if (insertionPosition === insertionPositions[0]) {
-              intermediateMap[insertionIdentifier] = itemProxy.item[
-                insertionIdentifier];
-              intermediateMap[attributeNames[selectedAttributeIndex]] =
-                attributeMap[attributeNames[selectedAttributeIndex]];
-            } else {
-              intermediateMap[attributeNames[selectedAttributeIndex]] =
-                attributeMap[attributeNames[selectedAttributeIndex]];
-              intermediateMap[insertionIdentifier] = itemProxy.item[
-                insertionIdentifier];
-            }
-            
-            for (let j: number = selectedAttributeIndex + 1; j <
-              attributeNames.length; j++) {
-              intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
-                j]];
-            }
-            
-            for (let attributeName in attributeMap) {
-              delete attributeMap[attributeName];
-            }
-            
-            for (let attributeName in intermediateMap) {
-              attributeMap[attributeName] = intermediateMap[attributeName];
-            }
-            
-            this.buildDocument(false);
-            this._textEditor.editor.editor.setDirty(true);
-            this._changeDetectorRef.markForCheck();
+        let insertionPosition: any = await this._dialogService.
+          openDropdownDialog('Select Insertion Position', 'Please select ' +
+          'where you want to insert the value of ' + insertionIdentifier +
+          ' in relation to the selected attribute:', 'Insertion Position',
+          insertionPositions[1], undefined, insertionPositions);
+        if (insertionPosition) {
+          for (let j: number = 0; j < selectedAttributeIndex; j++) {
+            intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
+              j]];
           }
-        });
+          
+          let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+            getProxyFor(documentComponent.id);
+          if (insertionPosition === insertionPositions[0]) {
+            intermediateMap[insertionIdentifier] = itemProxy.item[
+              insertionIdentifier];
+            intermediateMap[attributeNames[selectedAttributeIndex]] =
+              attributeMap[attributeNames[selectedAttributeIndex]];
+          } else {
+            intermediateMap[attributeNames[selectedAttributeIndex]] =
+              attributeMap[attributeNames[selectedAttributeIndex]];
+            intermediateMap[insertionIdentifier] = itemProxy.item[
+              insertionIdentifier];
+          }
+          
+          for (let j: number = selectedAttributeIndex + 1; j <
+            attributeNames.length; j++) {
+            intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
+              j]];
+          }
+          
+          for (let attributeName in attributeMap) {
+            delete attributeMap[attributeName];
+          }
+          
+          for (let attributeName in intermediateMap) {
+            attributeMap[attributeName] = intermediateMap[attributeName];
+          }
+          
+          this.buildDocument(false);
+          this._textEditor.editor.editor.setDirty(true);
+          this._changeDetectorRef.markForCheck();
+        }
       }
     } else {
       this._dialogService.openComponentDialog(AttributeInsertionComponent, {

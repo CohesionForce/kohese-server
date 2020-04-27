@@ -1,16 +1,10 @@
 import { ReportService } from './reports/report.service';
 /* Core */
-import { NgModule } from "@angular/core/";
-import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core/';
 import { RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule} from '@angular/forms';
-
-/* 3rd Party */
-import { ToastrModule } from 'ngx-toastr';
-import { MarkdownModule } from 'ngx-markdown';
 
 /* Custom */
-import { MarkdownEditorModule } from '../components/markdown-editor/markdown-editor.module';
+import { DialogModule } from '../components/dialog/dialog.module';
 import { ItemRepository } from './item-repository/item-repository.service';
 import { SocketService } from './socket/socket.service';
 import { SessionService } from './user/session.service';
@@ -22,10 +16,9 @@ import { ImportService } from './import/import.service';
 import { UploadService } from './upload/upload.service';
 import { NotificationService} from './notifications/notification.service';
 import { DataProcessingService } from './data/data-processing.service';
-import { DialogService, DialogComponent } from './dialog/dialog.service';
+import { DialogService } from './dialog/dialog.service';
 import { StateService } from './state/state.service';
 import { LensService } from './lens-service/lens.service';
-import { MaterialModule } from "../material.module";
 import { ProjectService } from "./project-service/project.service";
 import { LogService } from "./log/log.service";
 
@@ -34,25 +27,13 @@ import { LogService } from "./log/log.service";
 import { InitializeLogs } from './item-repository/item-repository.registry'
 
 @NgModule({
-  declarations: [
-    DialogComponent
-  ],
-  imports : [
-    CommonModule,
-    ToastrModule,
-    MarkdownModule.forChild(),
-    MaterialModule,
+  declarations: [],
+  imports: [
     RouterModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MarkdownEditorModule
+    DialogModule
   ],
-  exports : [
-    DialogComponent
-  ],
-  entryComponents: [
-    DialogComponent
-  ],
+  exports : [],
+  entryComponents: [],
   providers: [
     ItemRepository,
     SocketService,
@@ -73,5 +54,8 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
     ReportService
   ]
 })
-export class ServicesModule {}
+export class ServicesModule {
+  public constructor() {
+  }
+}
 

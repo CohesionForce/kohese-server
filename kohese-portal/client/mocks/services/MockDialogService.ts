@@ -1,41 +1,29 @@
-
-import {of as observableOf,  Observable } from 'rxjs';
-
+import { of as observableOf } from 'rxjs';
 
 import { TreeConfiguration } from '../../../common/src/tree-configuration';
 
 export class MockDialogService {
-  public readonly INPUT_TYPES: any = {
-    TEXT: 'text',
-    MULTILINE_TEXT: 'multilineText',
-    DATE: 'date',
-    TIME: 'time'
-  };
-  
-  constructor () {
-
+  public constructor() {
   }
   
-  public openYesNoDialog(title: string, text: string): Observable<any> {
-    return observableOf(1);
+  public openYesNoDialog(title: string, text: string): Promise<any> {
+    return Promise.resolve(true);
+  }
+  
+  public openInformationDialog(title: string, text: string): Promise<any> {
+    return Promise.resolve(undefined);
   }
   
   public openInputDialog(title: string, text: string, type: string,
-    fieldName: string, initialValue: string): any {
-    return {
-      afterClosed: () => {
-        return observableOf(fieldName);
-      }
-    };
+    fieldName: string, defaultValue: string, validate: (value:
+    any) => boolean): Promise<any> {
+    return Promise.resolve(fieldName);
   }
   
-  public openSelectDialog(title: string, text: string, label: string,
-    initialValue: string, options: Array<string>): any {
-    return {
-      afterClosed: () => {
-        return observableOf(options[0]);
-      }
-    };
+  public openDropdownDialog(title: string, text: string, label: string,
+    defaultValue: string, validate: (value: any) => boolean, options:
+    Array<string>): Promise<any> {
+    return Promise.resolve(options[0]);
   }
 
   public openComponentDialog(componentReference: any, data: any): any {
