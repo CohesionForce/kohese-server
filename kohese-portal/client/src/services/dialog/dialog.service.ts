@@ -30,14 +30,19 @@ export class DialogService {
 
   private async openSimpleDialog(title: string, text: string, buttonLabels:
     ButtonLabels): Promise<any> {
-    return (await this.openComponentsDialog([{
+    let results: Array<any> = await this.openComponentsDialog([{
       component: SimpleDialogComponent,
       matDialogData: {
         title: title,
         text: text
       }
     }], { data: { buttonLabels: buttonLabels } }).updateSize('40%', 'auto').
-      afterClosed().toPromise())[0];
+      afterClosed().toPromise();
+    if (results) {
+      return results[0];
+    } else {
+      return undefined;
+    }
   }
 
   public async openInputDialog(title: string, text: string, inputDialogKind:
@@ -52,12 +57,17 @@ export class DialogService {
       inputDialogKind: inputDialogKind
     };
     
-    return (await this.openComponentsDialog([{
+    let results: Array<any> = await this.openComponentsDialog([{
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: kindInputDialogConfiguration
       }
-    }], { data: {} }).updateSize('40%', '250px').afterClosed().toPromise())[0];
+    }], { data: {} }).updateSize('40%', '250px').afterClosed().toPromise(); 
+    if (results) {
+      return results[0];
+    } else {
+      return undefined;
+    }
   }
 
   public async openDropdownDialog(title: string, text: string, label: string,
@@ -76,12 +86,17 @@ export class DialogService {
       options: options
     };
     
-    return (await this.openComponentsDialog([{
+    let results: Array<any> = await this.openComponentsDialog([{
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: dropdownDialogConfiguration
       }
-    }], { data: {} }).updateSize('40%', 'auto').afterClosed().toPromise())[0];
+    }], { data: {} }).updateSize('40%', 'auto').afterClosed().toPromise();
+    if (results) {
+      return results[0];
+    } else {
+      return undefined;
+    }
   }
   
   public openComponentDialog<T>(component: ComponentType<T>,
