@@ -57,6 +57,11 @@
       "required": true,
       "name": "methods"
     },
+    "classLocalTypes": {
+      "type": "object",
+      "derived": true,
+      "name": "classLocalTypes"
+    },
     "classProperties": {
       "type": "object",
       "derived": true,
