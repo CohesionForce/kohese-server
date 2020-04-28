@@ -415,19 +415,72 @@ export class DataModelEditorComponent {
   
   public async addAttribute(): Promise<void> {
     let viewModelProxy: ItemProxy;
+    let treeConfiguration: TreeConfiguration = this._itemRepository.
+      getTreeConfig().getValue().config;
     if (this._enclosingType) {
-      viewModelProxy = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        this._enclosingType.name.toLowerCase());
+      viewModelProxy = treeConfiguration.getProxyFor('view-' + this.
+        _enclosingType.name.toLowerCase());
     } else {
-      viewModelProxy = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        this._dataModel.name.toLowerCase());
+      viewModelProxy = treeConfiguration.getProxyFor('view-' + this._dataModel.
+        name.toLowerCase());
     }
     
-    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
-      let response: any = await this._dialogService.openYesNoDialog(
-        'Display Modifications', 'All unsaved modifications to this kind ' +
-        'are to be saved if an attribute is added to this kind. Do you want ' +
-        'to proceed?');
+    let subtypeViewModels: Array<any> = [];
+    if (!this._enclosingType) {
+      treeConfiguration.getRootProxy().visitTree({ includeOrigin: false },
+        (itemProxy: ItemProxy) => {
+        if ((itemProxy.kind === 'KoheseView') && (itemProxy !==
+          viewModelProxy)) {
+          let dataModelItemProxy: ItemProxy = treeConfiguration.
+            getProxyFor(itemProxy.item.modelName);
+          while (dataModelItemProxy) {
+            if (dataModelItemProxy.item === this._dataModel) {
+              subtypeViewModels.push(itemProxy.item);
+              break;
+            }
+            
+            dataModelItemProxy = treeConfiguration.getProxyFor(
+              dataModelItemProxy.item.base);
+          }
+        }
+      }, undefined);
+      
+      subtypeViewModels.sort((oneViewModel: any, anotherViewModel: any) => {
+        return oneViewModel.modelName.localeCompare(anotherViewModel.
+          modelName);
+      });
+    }
+    
+    let title: string = '';
+    let text: string = '';
+    if (this._hasUnsavedChanges || viewModelProxy.dirty || (subtypeViewModels.
+      length > 0)) {
+      if (this._hasUnsavedChanges || viewModelProxy.dirty) {
+        title += 'Display Modifications';
+        text += 'All unsaved modifications to this kind are to be saved if ' +
+          'an attribute is added to this kind.';
+        if (subtypeViewModels.length > 0) {
+          title += ' And Additional Type Modification';
+          text += ' The following additional types are expected to have an ' +
+            'entry added to their default Format Definition upon a new ' +
+            'attribute being added to the selected type, as well: ' +
+            subtypeViewModels.map((viewModel: any) => {
+            return viewModel.modelName;
+          }).join(', ') + '.';
+        }
+      } else {
+        title += 'Additional Type Modification';
+        text += 'The following additional types are expected to have an ' +
+          'entry added to their default Format Definition upon a new ' +
+          'attribute being added to the selected type: ' + subtypeViewModels.
+          map((viewModel: any) => {
+          return viewModel.modelName;
+        }).join(', ') + '.';
+      }
+      
+      text += ' Do you want to proceed?';
+      let response: any = await this._dialogService.openYesNoDialog(title,
+        text);
       if (!response) {
         return;
       }
@@ -440,21 +493,42 @@ export class DataModelEditorComponent {
       }
     }], { data: {} }).afterClosed().subscribe((results: Array<any>) => {
       if (results) {
+        /* Get attribute names before adding the new attribute so that
+        insertionIndex below is calculated correctly */
+        let attributeNames: Array<string> = Object.keys(this._dataModel.
+          properties);
+        
         this._dataModel.properties[results[0].attribute.name] =
           results[0].attribute;
         let viewModel: any = (this._enclosingType ? viewModelProxy.item.
           localTypes[this._dataModel.name] : viewModelProxy.item);
         viewModel.viewProperties[results[0].attribute.name] =
           results[0].view;
-        viewModel.formatDefinitions[viewModel.defaultFormatKey[
-          FormatDefinitionType.DEFAULT]].containers[0].contents.push({
+        let propertyDefinition: PropertyDefinition = {
           propertyName: results[0].attribute.name,
           customLabel: results[0].view.displayName,
           labelOrientation: 'Top',
           kind: results[0].view.inputType.type,
           visible: true,
           editable: true
-        });
+        };
+        viewModel.formatDefinitions[viewModel.defaultFormatKey[
+          FormatDefinitionType.DEFAULT]].containers[0].contents.push(
+          propertyDefinition);
+        
+        for (let j: number = 0; j < subtypeViewModels.length; j++) {
+          let defaultFormatDefinition: FormatDefinition = subtypeViewModels[j].
+            formatDefinitions[subtypeViewModels[j].defaultFormatKey[
+            FormatDefinitionType.DEFAULT]];
+          let insertionIndex: number = defaultFormatDefinition.
+            containers[0].contents.map((definition:
+            PropertyDefinition) => {
+            return definition.propertyName;
+          }).indexOf(attributeNames[attributeNames.length - 1]);
+          defaultFormatDefinition.containers[0].contents.splice(
+            insertionIndex + 1, 0, propertyDefinition);
+          this._itemRepository.upsertItem('KoheseView', subtypeViewModels[j]);
+        }
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
