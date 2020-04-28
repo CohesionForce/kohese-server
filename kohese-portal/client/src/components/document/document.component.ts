@@ -453,6 +453,11 @@ export class DocumentComponent implements OnInit, OnDestroy {
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
+        getIcon: (element: any) => {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+            item.icon;
+        },
         allowMultiselect: true,
         actions: [new ToggleAction('Include descendants', 'fa fa-arrow-down',
           (element: any) => {
