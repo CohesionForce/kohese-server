@@ -25,7 +25,7 @@ export class KoheseModel extends ItemProxy {
     }
 
     if (forItem.id && !forItem.loadPending && (forItem.id !== forItem.name)) {
-      throw new Error('KoheseModel id must match name');
+      throw new Error('KoheseModel id must match name: ' + forItem.id);
     }
 
     if (forItem.parentId){
@@ -198,6 +198,7 @@ export class KoheseModel extends ItemProxy {
         modelProxy._item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy._item.properties));
       }
 
+      modelProxy._item.classLocalTypes = _.clone(modelProxy.parentProxy._item.classLocalTypes) || {};
       modelProxy._item.classProperties = _.clone(modelProxy.parentProxy._item.classProperties) || {};
       modelProxy._item.requiredProperties = _.clone(modelProxy.parentProxy._item.requiredProperties) || [];
       modelProxy._item.derivedProperties = _.clone(modelProxy.parentProxy._item.derivedProperties) || [];
@@ -205,6 +206,44 @@ export class KoheseModel extends ItemProxy {
       modelProxy._item.stateProperties = _.clone(modelProxy.parentProxy._item.stateProperties) || [];
       modelProxy._item.relationProperties = _.clone(modelProxy.parentProxy._item.relationProperties) || [];
       modelProxy._item.idProperties = _.clone(modelProxy.parentProxy._item.idProperties) || [];
+
+      for (let dataType in modelProxy._item.localTypes){
+        let localTypeSettings = modelProxy._item.localTypes[dataType];
+        modelProxy._item.classLocalTypes[dataType] = {
+          definedInKind: kind,
+          definition: localTypeSettings
+        };
+
+        let classLocalType = modelProxy._item.classLocalTypes[dataType]
+        let classLocalParentType : any = {};  // TODO: Consider if LDT inheritance should be supported
+
+        for (var property in localTypeSettings.properties){
+          var propertySettings = localTypeSettings.properties[property];
+          classLocalType.requiredProperties = _.clone(classLocalParentType.requiredProperties) || [];
+          classLocalType.derivedProperties = _.clone(classLocalParentType.derivedProperties) || [];
+          classLocalType.calculatedProperties = _.clone(classLocalParentType.calculatedProperties) || [];
+          classLocalType.stateProperties = _.clone(classLocalParentType.stateProperties) || [];
+          classLocalType.relationProperties = _.clone(classLocalParentType.relationProperties) || [];
+          classLocalType.idProperties = _.clone(classLocalParentType.idProperties) || [];
+    
+          if (propertySettings.derived){
+            classLocalType.derivedProperties.push(property);
+            if(propertySettings.calculated){
+              classLocalType.calculatedProperties.push(property);
+            }
+          }
+          // TODO: Can a LDT have StateMachine
+          if (propertySettings.type && (propertySettings.type ==='StateMachine')){
+            classLocalType.stateProperties.push(property);
+          }
+          if (propertySettings.relation){
+            classLocalType.relationProperties.push(property);
+          }
+          if (propertySettings.id){
+            classLocalType.idProperties.push(property);
+          }
+        }
+      }
 
       for (var property in modelProxy._item.properties){
         var propertySettings = modelProxy._item.properties[property];
