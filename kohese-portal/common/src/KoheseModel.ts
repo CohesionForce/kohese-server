@@ -1,5 +1,5 @@
 'use strict'; //Required for use of 'class'
-import { ItemProxy }  from './item-proxy';
+import { ItemProxy, KoheseModelInterface }  from './item-proxy';
 import { TreeConfiguration } from './tree-configuration';
 import * as  _ from 'underscore';
 
@@ -7,7 +7,7 @@ import * as  _ from 'underscore';
 let modelMap = {
 };
 
-export class KoheseModel extends ItemProxy {
+export class KoheseModel extends ItemProxy implements KoheseModelInterface {
 
   static modelsDefined : boolean = false;
 
@@ -217,15 +217,22 @@ export class KoheseModel extends ItemProxy {
         let classLocalType = modelProxy._item.classLocalTypes[dataType]
         let classLocalParentType : any = {};  // TODO: Consider if LDT inheritance should be supported
 
+        classLocalType.classProperties = _.clone(classLocalParentType.classProperties) || {};
+        classLocalType.requiredProperties = _.clone(classLocalParentType.requiredProperties) || [];
+        classLocalType.derivedProperties = _.clone(classLocalParentType.derivedProperties) || [];
+        classLocalType.calculatedProperties = _.clone(classLocalParentType.calculatedProperties) || [];
+        classLocalType.stateProperties = _.clone(classLocalParentType.stateProperties) || [];
+        classLocalType.relationProperties = _.clone(classLocalParentType.relationProperties) || [];
+        classLocalType.idProperties = _.clone(classLocalParentType.idProperties) || [];
+        
         for (var property in localTypeSettings.properties){
           var propertySettings = localTypeSettings.properties[property];
-          classLocalType.requiredProperties = _.clone(classLocalParentType.requiredProperties) || [];
-          classLocalType.derivedProperties = _.clone(classLocalParentType.derivedProperties) || [];
-          classLocalType.calculatedProperties = _.clone(classLocalParentType.calculatedProperties) || [];
-          classLocalType.stateProperties = _.clone(classLocalParentType.stateProperties) || [];
-          classLocalType.relationProperties = _.clone(classLocalParentType.relationProperties) || [];
-          classLocalType.idProperties = _.clone(classLocalParentType.idProperties) || [];
-    
+
+          classLocalType.classProperties[property] = {
+            definedInKind: kind,
+            definition: propertySettings
+          };
+  
           if (propertySettings.derived){
             classLocalType.derivedProperties.push(property);
             if(propertySettings.calculated){
