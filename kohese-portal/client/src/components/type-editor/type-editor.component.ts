@@ -52,8 +52,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       if (treeConfigurationObject) {
         treeConfigurationObject.config.getRootProxy().visitTree(
           { includeOrigin: false }, (itemProxy: ItemProxy) => {
-          if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.name !==
-            'KoheseModel') && (itemProxy.item.name !== 'KoheseView')) {
+          if (itemProxy.kind === 'KoheseModel') {
             this._types.push({
               dataModelItemProxy: itemProxy,
               viewModelItemProxy: treeConfigurationObject.config.getProxyFor(
