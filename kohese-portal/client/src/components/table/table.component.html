@@ -1,43 +1,35 @@
 <div style="width: 100%;" [ngStyle]="{ 'height': isDialogInstance() ? '90%' :
   '100%' }">
-  <ng-container *ngIf="!hideUserInteractionElements">
-    <div style="height: 50px; display: flex; flex-direction: row;">
-      <ng-container *ngIf="add">
-        <button mat-icon-button matTooltip="Add elements" [disabled]="isDisabled"
-          (click)="add()" class="flex-right-align">
-          <mat-icon class="fa fa-plus"></mat-icon>
-        </button>
-      </ng-container>
-      <ng-container *ngIf="remove">
-        <button mat-icon-button matTooltip="Remove the selected elements"
-          [disabled]="(isDisabled || (selection.length === 0))"
-          (click)="remove(selection)">
-          <mat-icon class="fa fa-times"></mat-icon>
-        </button>
-      </ng-container>
-    </div>
-  </ng-container>
+  <div style="height: 50px; display: flex; flex-direction: row;">
+    <ng-container *ngIf="add">
+      <button mat-icon-button matTooltip="Add elements" [disabled]="isDisabled"
+        (click)="add()" class="flex-right-align">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="remove">
+      <button mat-icon-button matTooltip="Remove the selected elements"
+        [disabled]="(isDisabled || (selection.length === 0))"
+        (click)="remove(selection)">
+        <mat-icon class="fa fa-times"></mat-icon>
+      </button>
+    </ng-container>
+  </div>
   <mat-table #table matSort [dataSource]="rows"
-    style="overflow: auto;" [ngStyle]="{ 'height': (hideUserInteractionElements
-    ? '100%' : 'calc(100% - 50px)') }">
+    style="height: calc(100% - 50px); overflow: auto;">
     <ng-container matColumnDef="{{columns.join() + 'selection'}}">
       <mat-header-cell *matHeaderCellDef style="flex: 0 0 64px;">
-        <ng-container *ngIf="!hideUserInteractionElements">
-          <mat-checkbox [ngModel]="((rows.length !== 0) && (selection.length
-            === rows.length))" (ngModelChange)="toggleAllSelected($event)"
-            [disabled]="(isDisabled || (!move && !remove) || (rows.length ===
-            0))" style="padding: 7px;">
-          </mat-checkbox>
-        </ng-container>
+        <mat-checkbox [ngModel]="((rows.length !== 0) && (selection.length ===
+          rows.length))" (ngModelChange)="toggleAllSelected($event)"
+          [disabled]="(isDisabled || (!move && !remove) || (rows.length ===
+          0))" style="padding: 7px;">
+        </mat-checkbox>
       </mat-header-cell>
       <mat-cell *matCellDef="let element" style="flex: 0 0 64px;">
-        <ng-container *ngIf="!hideUserInteractionElements">
-          <mat-checkbox [ngModel]="(selection.indexOf(element) !== -1)"
-            (ngModelChange)="toggleSelected(element)"
-            [disabled]="(isDisabled || (!move && !remove))" style="padding:
-            7px;">
-          </mat-checkbox>
-        </ng-container>
+        <mat-checkbox [ngModel]="(selection.indexOf(element) !== -1)"
+          (ngModelChange)="toggleSelected(element)" [disabled]="(isDisabled ||
+          (!move && !remove))" style="padding: 7px;">
+        </mat-checkbox>
       </mat-cell>
     </ng-container>
     <ng-container *ngFor="let column of columns">
@@ -54,39 +46,37 @@
       <mat-header-cell *matHeaderCellDef style="flex: 0 0 64px;">
       </mat-header-cell>
       <mat-cell *matCellDef="let element" style="flex: 0 0 64px;">
-        <ng-container *ngIf="!hideUserInteractionElements">
-          <button mat-icon-button [disabled]="isDisabled"
-            [matMenuTriggerFor]="rowMenu">
-            <mat-icon class="fa fa-bars"></mat-icon>
-          </button>
-          <mat-menu #rowMenu="matMenu" [overlapTrigger]="false">
-            <ng-container *ngIf="edit">
-              <button mat-menu-item (click)="edit(element)">
-                <mat-icon class="fa fa-edit"></mat-icon>
-                Edit
-              </button>
-            </ng-container>
-            <ng-container *ngIf="remove">
-              <button mat-menu-item (click)="remove([element])">
-                <mat-icon class="fa fa-times"></mat-icon>
-                Remove
-              </button>
-            </ng-container>
-          </mat-menu>
-        </ng-container>
+        <button mat-icon-button [disabled]="isDisabled"
+          [matMenuTriggerFor]="rowMenu">
+          <mat-icon class="fa fa-bars"></mat-icon>
+        </button>
+        <mat-menu #rowMenu="matMenu" [overlapTrigger]="false">
+          <ng-container *ngIf="edit">
+            <button mat-menu-item (click)="edit(element)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+              Edit
+            </button>
+          </ng-container>
+          <ng-container *ngIf="remove">
+            <button mat-menu-item (click)="remove([element])">
+              <mat-icon class="fa fa-times"></mat-icon>
+              Remove
+            </button>
+          </ng-container>
+        </mat-menu>
       </mat-cell>
     </ng-container>
     <mat-header-row *matHeaderRowDef="getDisplayColumnIdentifiers(); sticky:
       true">
     </mat-header-row>
     <mat-row *matRowDef="let row; columns: getDisplayColumnIdentifiers()"
-      [draggable]="(!isDisabled && move && !hideUserInteractionElements)"
-      (dragstart)="$event.dataTransfer.setData('rows',
-      getMoveDataTransferValue(row)); $event.dataTransfer.dropEffect = 'move';
-      changeDetectorRef.detach()" (dragend)="changeDetectorRef.reattach();
-      changeDetectorRef.markForCheck()" (dragover)="$event.preventDefault();
-      $event.currentTarget.style['border-top'] = ''; $event.currentTarget.
-      style['border-bottom'] = ''; ((($event.offsetY / $event.currentTarget.
+      [draggable]="(!isDisabled && move)" (dragstart)="$event.dataTransfer.
+      setData('rows', getMoveDataTransferValue(row)); $event.dataTransfer.
+      dropEffect = 'move'; changeDetectorRef.detach()"
+      (dragend)="changeDetectorRef.reattach(); changeDetectorRef.
+      markForCheck()" (dragover)="$event.preventDefault(); $event.
+      currentTarget.style['border-top'] = ''; $event.currentTarget.style[
+      'border-bottom'] = ''; ((($event.offsetY / $event.currentTarget.
       offsetHeight) < 0.5) ? $event.currentTarget.style['border-top'] =
       'dashed' : $event.currentTarget.style['border-bottom'] = 'dashed')"
       (dragleave)="$event.currentTarget.style['border-top'] = ''; $event.
