@@ -3,107 +3,130 @@
   "name": "KoheseModel",
   "parentId": "Item",
   "base": "Item",
-  "idInjection": false,
   "isMetaModel": true,
+  "idInjection": false,
   "invertItemOrder": false,
   "properties": {
     "base": {
       "type": "string",
-      "required": true
+      "required": true,
+      "name": "base"
     },
     "isMetaModel": {
       "type": "boolean",
-      "default": false
+      "name": "isMetaModel"
     },
     "idInjection": {
       "type": "boolean",
-      "required": true
+      "required": true,
+      "name": "idInjection"
     },
     "invertItemOrder": {
       "type": "boolean",
-      "required": false
+      "required": false,
+      "name": "invertItemOrder"
     },
     "properties": {
       "type": "object",
-      "required": true
+      "required": true,
+      "name": "properties"
     },
     "validations": {
       "type": [
         "object"
       ],
-      "required": true
+      "required": true,
+      "name": "validations"
     },
     "relations": {
       "type": "object",
-      "required": true
+      "required": true,
+      "name": "relations"
     },
     "acls": {
       "type": [
         "object"
       ],
-      "required": true
+      "required": true,
+      "name": "acls"
     },
     "methods": {
       "type": [
         "object"
       ],
-      "required": true
+      "required": true,
+      "name": "methods"
+    },
+    "classLocalTypes": {
+      "type": "object",
+      "derived": true,
+      "name": "classLocalTypes"
     },
     "classProperties": {
       "type": "object",
-      "derived": true
+      "derived": true,
+      "name": "classProperties"
     },
     "propertyOrder": {
       "type": [
         "string"
       ],
-      "derived": true
+      "derived": true,
+      "name": "propertyOrder"
     },
     "propertyStorageOrder": {
       "type": [
         "string"
       ],
-      "derived": true
+      "derived": true,
+      "name": "propertyStorageOrder"
     },
     "requiredProperties": {
       "type": [
         "string"
       ],
-      "derived": true
+      "derived": true,
+      "name": "requiredProperties"
     },
     "derivedProperties": {
       "type": [
         "string"
       ],
-      "derived": true
+      "derived": true,
+      "name": "derivedProperties"
     },
     "calculatedProperties": {
       "type": [
         "string"
       ],
-      "derived": true
+      "derived": true,
+      "name": "calculatedProperties"
     },
     "stateProperties": {
       "type": [
         "string"
       ],
-      "derived": true
+      "derived": true,
+      "name": "stateProperties"
     },
     "relationProperties": {
       "type": [
         "string"
       ],
-      "derived": true
+      "derived": true,
+      "name": "relationProperties"
     },
     "idProperties": {
       "type": [
         "string"
       ],
-      "derived": true
+      "derived": true,
+      "name": "idProperties"
     },
     "localTypes": {
       "type": "object",
-      "required": true
+      "required": true,
+      "name": "localTypes"
     }
   },
   "validations": [],

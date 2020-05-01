@@ -328,6 +328,11 @@ export class FormatObjectEditorComponent implements OnInit {
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
+        getIcon: (element: any) => {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+            item.icon;
+        },
         selection: (this._object[attributeName] ? [TreeConfiguration.
           getWorkingTree().getProxyFor(this._object[attributeName].id)] : []),
         quickSelectElements: this._itemRepository.getRecentProxies()
@@ -496,6 +501,11 @@ export class FormatObjectEditorComponent implements OnInit {
               getText: (element: any) => {
                 return (element as ItemProxy).item.name;
               },
+              getIcon: (element: any) => {
+                return this._itemRepository.getTreeConfig().getValue().config.
+                  getProxyFor('view-' + (element as ItemProxy).kind.
+                  toLowerCase()).item.icon;
+              },
               allowMultiselect: true,
               showSelections: true,
               selection: (this._object[attributeName] ? this._object[
@@ -560,6 +570,11 @@ export class FormatObjectEditorComponent implements OnInit {
           },
           getText: (element: any) => {
             return (element as ItemProxy).item.name;
+          },
+          getIcon: (element: any) => {
+            return this._itemRepository.getTreeConfig().getValue().config.
+              getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+              item.icon;
           },
           selection: references.map((reference: { id: string }) => {
             return TreeConfiguration.getWorkingTree().getProxyFor(reference.
@@ -705,6 +720,10 @@ export class FormatObjectEditorComponent implements OnInit {
       value = this._object[attributeName][index];
     } else {
       value = this._object[attributeName];
+    }
+    
+    if (!this._enclosingType && (attributeName === 'parentId')) {
+      return TreeConfiguration.getWorkingTree().getProxyFor(value).item.name;
     }
     
     let representation: string = String(value);

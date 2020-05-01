@@ -3,6 +3,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../tree/tree.component';
@@ -36,7 +37,8 @@ export class DocumentConfigurationEditorComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef:
     MatDialogRef<DocumentConfigurationEditorComponent>,
-    private _dialogService: DialogService) {
+    private _dialogService: DialogService, private _itemRepository:
+    ItemRepository) {
   }
   
   public ngOnInit(): void {
@@ -75,6 +77,11 @@ export class DocumentConfigurationEditorComponent implements OnInit {
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
+        getIcon: (element: any) => {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+            item.icon;
+        },
         selection: (this._copy.parentId ? [TreeConfiguration.getWorkingTree().
           getProxyFor(this._copy.parentId)] : [])
       }
@@ -100,6 +107,11 @@ export class DocumentConfigurationEditorComponent implements OnInit {
         },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
+        },
+        getIcon: (element: any) => {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+            item.icon;
         },
         allowMultiselect: true,
         selection: components

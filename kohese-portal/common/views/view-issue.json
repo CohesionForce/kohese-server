@@ -5,7 +5,6 @@
   "modelName": "Issue",
   "icon": "fa fa-exclamation-circle",
   "color": "#ff0000",
-  "localTypes": {},
   "viewProperties": {
     "issueState": {
       "inputType": {
@@ -20,7 +19,16 @@
       },
       "required": false,
       "default": "Observed",
-      "displayName": "issueState"
+      "displayName": "issueState",
+      "name": "issueState"
+    },
+    "relatedIssues": {
+      "name": "relatedIssues",
+      "displayName": "Related Issues",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
     },
     "analysisAction": {
       "inputType": {
@@ -33,7 +41,8 @@
       },
       "required": true,
       "default": null,
-      "displayName": "analysisAction"
+      "displayName": "analysisAction",
+      "name": "analysisAction"
     },
     "resolutionActions": {
       "inputType": {
@@ -46,20 +55,23 @@
       },
       "required": true,
       "default": null,
-      "displayName": "resolutionActions"
+      "displayName": "resolutionActions",
+      "name": "resolutionActions"
     },
     "response": {
       "inputType": {
-        "type": "text",
+        "type": "markdown",
         "options": {
           "isMultiLine": true
         }
       },
       "required": false,
       "default": "",
-      "displayName": "response"
+      "displayName": "response",
+      "name": "response"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1": {
       "id": "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1",
@@ -186,6 +198,14 @@
               "editable": true
             },
             {
+              "propertyName": "relatedIssues",
+              "customLabel": "relatedIssues",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": true
+            },
+            {
               "propertyName": "analysisAction",
               "customLabel": "analysisAction",
               "labelOrientation": "Top",
@@ -206,7 +226,7 @@
               "customLabel": "response",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "text",
+              "kind": "markdown",
               "editable": true
             }
           ]
@@ -239,6 +259,33 @@
               "kind": "markdown",
               "visible": true,
               "editable": true
+            },
+            {
+              "propertyName": "observedBy",
+              "customLabel": "Observed By",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "observedOn",
+              "customLabel": "Observed On",
+              "labelOrientation": "Left",
+              "kind": "date",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "issueState",
+              "customLabel": "Issue State",
+              "labelOrientation": "Left",
+              "kind": "state-editor",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
             }
           ]
         }
@@ -248,8 +295,9 @@
   },
   "defaultFormatKey": {
     "default": "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1",
-    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "card": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "board": "89324a90-a7af-11e8-8662-71e48f0160fe"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }

@@ -104,9 +104,9 @@
               "propertyName": "components",
               "customLabel": "components",
               "labelOrientation": "Top",
-              "visible": true,
+              "visible": false,
               "kind": "",
-              "editable": true
+              "editable": false
             },
             {
               "propertyName": "delineated",

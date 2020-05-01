@@ -527,6 +527,7 @@ export class KDBCache extends LevelCache {
         console.log('::: Storing new commit data to level repository');
         await kdbCache.saveAllPendingWrites();
       }).catch(function (err) {
+        console.log('*** Error: ' + JSON.stringify(err));
         console.log(err.stack);
       });
     }
@@ -749,6 +750,9 @@ export class KDBCache extends LevelCache {
 
       var item = await this.getBlob(oid);
 
+      if (!item){
+        console.log('*** Could not find blob for: ' + kindFile + ' - ' + oid);
+      }
       var proxy = new ItemProxy(kind, item, treeConfig);
       let koid = proxy.oid;
 

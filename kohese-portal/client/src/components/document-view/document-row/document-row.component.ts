@@ -75,6 +75,14 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
       this.changeRef.markForCheck();
     })
   }
+  
+  public async discardChanges(): Promise<void> {
+    await this.itemRepository.fetchItem(this.docInfo.proxy);
+    this.row.editable = false;
+    /* Not needed, but added with hope that this component will be made to use
+    ChangeDetectionStrategy.OnPush */
+    this.changeRef.markForCheck();
+  }
 
   showProxyDetails(proxy: ItemProxy) {
     this.dialogService.openComponentDialog(DetailsComponent, {
