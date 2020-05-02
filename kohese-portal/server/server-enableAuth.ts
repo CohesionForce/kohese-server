@@ -1,4 +1,5 @@
 import { ItemProxy } from '../common/src/item-proxy';
+var kdb = require('./kdb');
 
 var usersProxy : ItemProxy;
 
@@ -38,6 +39,9 @@ function checkAndCreateUsersItem() {
       modifiedBy: 'admin',
       modifiedOn: now
     });
+    kdb.storeModelInstance(usersProxy, true).then((status) => {
+      console.log('::: Users Item written to disk');
+    });
   } else {
     console.log('::: Users Item already exists');
     console.log(JSON.stringify(usersProxy.cloneItemAndStripDerived(),null,'  '));
@@ -65,6 +69,9 @@ function checkAndCreateAdminAccount() {
        createdOn: now,
        modifiedBy: 'admin',
        modifiedOn: now
+    });
+    kdb.storeModelInstance(adminProxy, true).then((status) => {
+      console.log('::: Admin user written to disk');
     });
   } else {
     console.log('::: Admin account already exists');
