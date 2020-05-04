@@ -1,13 +1,13 @@
 <div style="width: 100%; display: flex; flex-direction: column; overflow: auto;
   padding: 7px;" [ngStyle]="{ 'height': isDialogInstance() ?
   'calc(100% - 40px)' : '100%' }">
-  <ng-container *ngIf="(allowKindChange && (types.length > 1))">
-    <ng-container *ngIf="isDisabled else kindSelectionEnabled">
-      <label>
-        Kind: {{selectedType.name}}
-      </label>
-    </ng-container>
-    <ng-template #kindSelectionEnabled>
+  <ng-container *ngIf="isDisabled else enabled">
+    <markdown [data]="itemRepository.getMarkdownRepresentation(object,
+      selectedType, viewModel, formatDefinitionType, 0, false)">
+    </markdown>
+  </ng-container>
+  <ng-template #enabled>
+    <ng-container *ngIf="(allowKindChange && (types.length > 1))">
       <mat-form-field style="width: 100%;">
         <mat-select placeholder="Kind" [(ngModel)]="selectedType">
           <ng-container *ngFor="let typeOption of types">
@@ -17,82 +17,41 @@
           </ng-container>
         </mat-select>
       </mat-form-field>
-    </ng-template>
-  </ng-container>
-  <ng-container *ngFor="let container of formatDefinition.containers">
-    <ng-container *ngIf="(container.kind === FormatContainerKind.
-      REVERSE_REFERENCE_TABLE) else notReverseReferencesTable">
-      <!-- labelOrientation is not specifiable for reverse reference tables,
-      so display the label above the table. -->
-      <div style="display: flex; flex-direction: column;">
-        <div style="width: 100%;">
-          <label>
-            Reverse References For {{getReverseReferenceTableHeaderContent(
-              container)}}:
-          </label>
-        </div>
-      </div>
-      <table_ [rows]="getReverseReferences(container)" [columns]="['name']"
-        [disabled]="true" [hideUserInteractionElements]="true">
-      </table_>
     </ng-container>
-    <ng-template #notReverseReferencesTable>
-      <div style="display: flex;" [ngStyle]="{ 'flex-direction': ((container.
-        kind === 'list') ? 'column' : 'row') }">
-        <ng-container *ngFor="let attributeDefinition of container.contents">
-          <ng-container *ngIf="Array.isArray(selectedType.classProperties[
-            attributeDefinition.propertyName].definition.type) else
-            singleValuedBlock">
-            <ng-container *ngIf="attributeDefinition.visible">
-              <ng-container *ngIf="attributeDefinition.tableDefinition else
-                notTableBlock">
-                <div style="width: 100%; display: flex;"
-                  [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                  labelOrientation === 'Top') ? 'column' : 'row') }">
-                  <ng-container *ngIf="attributeDefinition.customLabel">
-                    <label>
-                      {{getAttributeRepresentation(
-                        attributeDefinition)}}:&nbsp;
-                    </label>
-                  </ng-container>
+    <ng-container *ngFor="let container of formatDefinition.containers">
+      <ng-container *ngIf="(container.kind === FormatContainerKind.
+        REVERSE_REFERENCE_TABLE) else notReverseReferencesTable">
+        <h3>
+          Reverse References For {{getReverseReferenceTableHeaderContent(
+            container)}}
+        </h3>
+        <table_ [rows]="getReverseReferences(container)" [columns]="['name']"
+          [disabled]="true">
+        </table_>
+      </ng-container>
+      <ng-template #notReverseReferencesTable>
+        <div style="display: flex;" [ngStyle]="{ 'flex-direction': ((container.
+          kind === 'list') ? 'column' : 'row') }">
+          <ng-container *ngFor="let attributeDefinition of container.contents">
+            <ng-container *ngIf="Array.isArray(selectedType.classProperties[
+              attributeDefinition.propertyName].definition.type) else
+              singleValuedBlock">
+              <ng-container *ngIf="attributeDefinition.visible">
+                <ng-container *ngIf="attributeDefinition.tableDefinition else
+                  notTableBlock">
+                  <h3>
+                    {{getAttributeRepresentation(attributeDefinition)}}
+                  </h3>
                   <table_ [rows]="getTableElements(attributeDefinition)"
                     [columns]="getTableColumns(attributeDefinition)"
-                    [add]="getTableElementAdditionFunction(
-                    attributeDefinition)"
-                    [move]="getTableElementMovementFunction(
-                    attributeDefinition)"
+                    [add]="getTableElementAdditionFunction(attributeDefinition)"
+                    [move]="getTableElementMovementFunction(attributeDefinition)"
                     [remove]="getTableElementRemovalFunction(
-                    attributeDefinition)" [disabled]="(!attributeDefinition.
-                    editable || isDisabled)"
-                    [hideUserInteractionElements]="isDisabled" style="width:
-                    100%;">
+                    attributeDefinition)" [disabled]="!attributeDefinition.
+                    editable" style="width: 100%;">
                   </table_>
-                </div>
-              </ng-container>
-              <ng-template #notTableBlock>
-                <ng-container *ngIf="isDisabled else
-                  nonTableMultivaluedEnabled">
-                  <div style="width: 100%; display: flex;"
-                    [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                    labelOrientation === 'Top') ? 'column' : 'row') }">
-                    <ng-container *ngIf="attributeDefinition.customLabel">
-                      <label>
-                        {{attributeDefinition.customLabel}}:&nbsp;
-                      </label>
-                    </ng-container>
-                    <div style="width: 100%; display: flex; flex-direction:
-                      column;">
-                      <ng-container *ngFor="let value of object[
-                        attributeDefinition.propertyName]; let j = index">
-                        <div style="width: 100%;">
-                          {{getStringRepresentation(j, attributeDefinition.
-                            propertyName)}}
-                        </div>
-                      </ng-container>
-                    </div>
-                  </div>
                 </ng-container>
-                <ng-template #nonTableMultivaluedEnabled>
+                <ng-template #notTableBlock>
                   <div style="display: flex; flex-direction: column;">
                     <div style="display: flex; flex-direction: row;">
                       <h3>
@@ -101,8 +60,8 @@
                       <button mat-icon-button matTooltip="Add a value to
                         {{attributeDefinition.propertyName}}"
                         class="flex-right-align"
-                        [disabled]="(!attributeDefinition.editable ||
-                        isDisabled)" (click)="addValue(attributeDefinition)">
+                        [disabled]="!attributeDefinition.editable"
+                        (click)="addValue(attributeDefinition)">
                         <mat-icon class="fa fa-plus"></mat-icon>
                       </button>
                     </div>
@@ -113,19 +72,18 @@
                           <button mat-button
                             matTooltip="{{getStringRepresentation(j,
                             attributeDefinition.propertyName)}}"
-                            [disabled]="(!attributeDefinition.editable ||
-                            isDisabled)" (click)="editValue(j,
-                            attributeDefinition)" style="white-space: nowrap;
-                            overflow: hidden; text-overflow: ellipsis; width:
-                            100%; text-align: left;">
+                            [disabled]="!attributeDefinition.editable"
+                            (click)="editValue(j, attributeDefinition)"
+                            style="white-space: nowrap; overflow: hidden;
+                            text-overflow: ellipsis; width: 100%; text-align:
+                            left;">
                             {{getStringRepresentation(j, attributeDefinition.
                               propertyName)}}
                           </button>
                           <button mat-icon-button matTooltip="Remove this
-                            value" [disabled]="(!attributeDefinition.
-                            editable || isDisabled)" (click)="removeValue(j,
-                            attributeDefinition.propertyName)"
-                            style="margin-left: auto;">
+                            value" [disabled]="!attributeDefinition.editable"
+                            (click)="removeValue(j, attributeDefinition.
+                            propertyName)" style="margin-left: auto;">
                             <mat-icon class="fa fa-times"></mat-icon>
                           </button>
                         </div>
@@ -133,34 +91,20 @@
                     </div>
                   </div>
                 </ng-template>
-              </ng-template>
-              <br/>
+                <br/>
+              </ng-container>
             </ng-container>
-          </ng-container>
-          <ng-template #singleValuedBlock>
-            <ng-container *ngIf="attributeDefinition.visible">
-              <ng-container [ngSwitch]="attributeDefinition.kind">
-                <ng-container *ngSwitchCase="'boolean'">
-                  <mat-checkbox [(ngModel)]="object[attributeDefinition.
-                    propertyName]" [disabled]="(!attributeDefinition.
-                    editable || isDisabled)" style="width: 100%;">
-                    {{getAttributeRepresentation(attributeDefinition)}}
-                  </mat-checkbox>
-                </ng-container>
-                <ng-container *ngSwitchCase="'number'">
-                  <ng-container *ngIf="isDisabled else numberEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
-                      {{object[attributeDefinition.propertyName]}}
-                    </div>
+            <ng-template #singleValuedBlock>
+              <ng-container *ngIf="attributeDefinition.visible">
+                <ng-container [ngSwitch]="attributeDefinition.kind">
+                  <ng-container *ngSwitchCase="'boolean'">
+                    <mat-checkbox [(ngModel)]="object[attributeDefinition.
+                      propertyName]" [disabled]="!attributeDefinition.
+                      editable" style="width: 100%;">
+                      {{getAttributeRepresentation(attributeDefinition)}}
+                    </mat-checkbox>
                   </ng-container>
-                  <ng-template #numberEnabled>
+                  <ng-container *ngSwitchCase="'number'">
                     <mat-form-field style="width: 100%;">
                       <input matInput type="number"
                         placeholder="{{getAttributeRepresentation(
@@ -168,28 +112,13 @@
                         attributeDefinition.propertyName]"
                         [disabled]="!attributeDefinition.editable"/>
                     </mat-form-field>
-                  </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchCase="'date'">
-                  <ng-container *ngIf="isDisabled else timestampEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
-                      {{(object[attributeDefinition.propertyName] |
-                        date:'MM/dd/yyyy')}}
-                    </div>
                   </ng-container>
-                  <ng-template #timestampEnabled>
+                  <ng-container *ngSwitchCase="'date'">
                     <mat-form-field style="width: 100%;">
                       <input matInput [matDatepicker]="matDatepicker"
                         placeholder="{{getAttributeRepresentation(
-                        attributeDefinition)}}" [ngModel]="getDateString(
-                        object[attributeDefinition.propertyName])"
+                        attributeDefinition)}}" [ngModel]="getDateString(object[
+                        attributeDefinition.propertyName])"
                         (ngModelChange)="($event ? object[attributeDefinition.
                         propertyName] = $event.getTime() : '')"
                         [disabled]="!attributeDefinition.editable"/>
@@ -197,22 +126,8 @@
                       </mat-datepicker-toggle>
                       <mat-datepicker #matDatepicker></mat-datepicker>
                     </mat-form-field>
-                  </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchCase="'string'">
-                  <ng-container *ngIf="isDisabled else stringEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
-                      {{object[attributeDefinition.propertyName]}}
-                    </div>
                   </ng-container>
-                  <ng-template #stringEnabled>
+                  <ng-container *ngSwitchCase="'string'">
                     <mat-form-field style="width: 100%;">
                       <input matInput type="text"
                         placeholder="{{getAttributeRepresentation(
@@ -220,23 +135,9 @@
                         attributeDefinition.propertyName]"
                         [disabled]="!attributeDefinition.editable"/>
                     </mat-form-field>
-                  </ng-template>
-                </ng-container>
-                <!-- Hopefully the case below can be removed eventually. -->
-                <ng-container *ngSwitchCase="'text'">
-                  <ng-container *ngIf="isDisabled else textEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
-                      {{object[attributeDefinition.propertyName]}}
-                    </div>
                   </ng-container>
-                  <ng-template #textEnabled>
+                  <!-- Hopefully the case below can be removed eventually. -->
+                  <ng-container *ngSwitchCase="'text'">
                     <mat-form-field style="width: 100%;">
                       <input matInput type="text"
                         placeholder="{{getAttributeRepresentation(
@@ -244,22 +145,8 @@
                         attributeDefinition.propertyName]"
                         [disabled]="!attributeDefinition.editable"/>
                     </mat-form-field>
-                  </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchCase="'maskedString'">
-                  <ng-container *ngIf="isDisabled else maskedStringEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
-                      ************
-                    </div>
                   </ng-container>
-                  <ng-template #maskedStringEnabled>
+                  <ng-container *ngSwitchCase="'maskedString'">
                     <mat-form-field style="width: 100%;">
                       <input matInput type="password"
                         placeholder="{{getAttributeRepresentation(
@@ -267,48 +154,28 @@
                         attributeDefinition.propertyName]"
                         [disabled]="!attributeDefinition.editable"/>
                     </mat-form-field>
-                  </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchCase="'markdown'">
-                  <ng-container *ngIf="(!attributeDefinition.editable ||
-                    isDisabled) else markdownEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'markdown'">
+                    <ng-container *ngIf="!attributeDefinition.editable else
+                      editableBlock">
+                      <label style="width: 100%;">
+                        {{getAttributeRepresentation(attributeDefinition)}}:
+                      </label>
                       <markdown [data]="object[attributeDefinition.
                         propertyName]">
                       </markdown>
-                    </div>
+                    </ng-container>
+                    <ng-template #editableBlock>
+                      <markdown-editor [value]="object[attributeDefinition.
+                        propertyName]"
+                        [valueIdentifier]="getAttributeRepresentation(
+                        attributeDefinition)" (valueChanged)="object[
+                        attributeDefinition.propertyName] = $event">
+                      </markdown-editor>
+                      <br/>
+                    </ng-template>
                   </ng-container>
-                  <ng-template #markdownEnabled>
-                    <markdown-editor [value]="object[attributeDefinition.
-                      propertyName]"
-                      [valueIdentifier]="getAttributeRepresentation(
-                      attributeDefinition)" (valueChanged)="object[
-                      attributeDefinition.propertyName] = $event">
-                    </markdown-editor>
-                    <br/>
-                  </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchCase="'state-editor'">
-                  <ng-container *ngIf="isDisabled else stateEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
-                      {{object[attributeDefinition.propertyName]}}
-                    </div>
-                  </ng-container>
-                  <ng-template #stateEnabled>
+                  <ng-container *ngSwitchCase="'state-editor'">
                     <div style="display: flex; flex-direction: row;">
                       <div style="display: flex; flex-direction: column;
                         justify-content: center;">
@@ -332,22 +199,8 @@
                         </button>
                       </ng-container>
                     </div>
-                  </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchCase="'user-selector'">
-                  <ng-container *ngIf="isDisabled else userEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
-                      {{object[attributeDefinition.propertyName]}}
-                    </div>
                   </ng-container>
-                  <ng-template #userEnabled>
+                  <ng-container *ngSwitchCase="'user-selector'">
                     <mat-form-field style="width: 100%;">
                       <mat-select placeholder="{{getAttributeRepresentation(
                         attributeDefinition)}}" [(ngModel)]="object[
@@ -360,23 +213,8 @@
                         </ng-container>
                       </mat-select>
                     </mat-form-field>
-                  </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchDefault>
-                  <ng-container *ngIf="isDisabled else referenceEnabled">
-                    <div style="width: 100%; display: flex;"
-                      [ngStyle]="{ 'flex-direction': ((attributeDefinition.
-                      labelOrientation === 'Top') ? 'column' : 'row') }">
-                      <ng-container *ngIf="attributeDefinition.customLabel">
-                        <label>
-                          {{attributeDefinition.customLabel}}:&nbsp;
-                        </label>
-                      </ng-container>
-                      {{getStringRepresentation(undefined, attributeDefinition.
-                        propertyName)}}
-                    </div>
                   </ng-container>
-                  <ng-template #referenceEnabled>
+                  <ng-container *ngSwitchDefault>
                     <div style="width: 100%; display: flex; flex-direction:
                       row; align-items: center;">
                       <label>
@@ -402,8 +240,8 @@
                           propertyName]">
                           <button mat-icon-button matTooltip="Set a value for
                             {{attributeDefinition.propertyName}}"
-                            [disabled]="(!attributeDefinition.editable ||
-                            isDisabled)" style="margin-left: auto;"
+                            [disabled]="!attributeDefinition.editable"
+                            style="margin-left: auto;"
                             (click)="openObjectEditor(attributeDefinition,
                             false)">
                             <mat-icon class="fa fa-plus"></mat-icon>
@@ -412,10 +250,9 @@
                       </ng-container>
                       <ng-template #globalTypeAttribute>
                         <button mat-icon-button matTooltip="Select an Item"
-                          [disabled]="(!attributeDefinition.editable ||
-                          isDisabled)" (click)="openObjectSelector(
-                          attributeDefinition.propertyName)"
-                          style="margin-left: auto;">
+                          [disabled]="!attributeDefinition.editable"
+                          (click)="openObjectSelector(attributeDefinition.
+                          propertyName)" style="margin-left: auto;">
                           <mat-icon class="fa fa-ellipsis-h"></mat-icon>
                         </button>
                       </ng-template>
@@ -425,7 +262,7 @@
                         <button mat-icon-button
                           matTooltip="Remove the selection for
                           {{attributeDefinition.propertyName}}"
-                          [disabled]="(!attributeDefinition.editable || isDisabled
+                          [disabled]="(!attributeDefinition.editable
                           || (object[attributeDefinition.propertyName] == null))"
                           [ngStyle]="{ 'margin-left': (object[attributeDefinition.
                           propertyName] ? 'auto' : '') }" (click)="object[
@@ -434,15 +271,15 @@
                         </button>
                       </ng-container>
                     </div>
-                  </ng-template>
+                  </ng-container>
                 </ng-container>
               </ng-container>
-            </ng-container>
-          </ng-template>
-        </ng-container>
-      </div>
-    </ng-template>
-  </ng-container>
+            </ng-template>
+          </ng-container>
+        </div>
+      </ng-template>
+    </ng-container>
+  </ng-template>
 </div>
 <ng-container *ngIf="isDialogInstance()">
   <mat-dialog-actions style="height: 40px; width: 100%; display: flex;

@@ -16,6 +16,7 @@ import { FormatContainer,
   FormatContainerKind } from '../../components/type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../components/type-editor/PropertyDefinition.interface';
 import { TableDefinition } from '../../components/type-editor/TableDefinition.interface';
+import { LocationMap } from '../../constants/LocationMap.data';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
@@ -796,8 +797,40 @@ export class ItemRepository {
   }
   
   public getMarkdownRepresentation(koheseObject: any, dataModel: any,
-    viewModel: any, formatDefinition: FormatDefinition): string {
+    viewModel: any, formatDefinitionType: FormatDefinitionType, headingLevel:
+    number, addLinks: boolean): string {
     let representation: string = '';
+    let formatDefinition: FormatDefinition;
+	  let formatDefinitionId: string = viewModel.defaultFormatKey[
+	    formatDefinitionType];
+	  if (formatDefinitionId) {
+	    formatDefinition = viewModel.formatDefinitions[formatDefinitionId];
+	  } else {
+	    let treeConfiguration: TreeConfiguration = this.getTreeConfig().
+	      getValue().config;
+	    let dataModelItemProxy: ItemProxy = treeConfiguration.getProxyFor(
+	      dataModel.id);
+	    while (dataModelItemProxy) {
+	      let ancestorViewModel: any = treeConfiguration.getProxyFor(
+	        'view-' + dataModelItemProxy.item.name.toLowerCase()).item;
+	      formatDefinitionId = ancestorViewModel.defaultFormatKey[
+	        formatDefinitionType];
+	      if (formatDefinitionId) {
+	        formatDefinition = ancestorViewModel.formatDefinitions[
+	          formatDefinitionId];
+	        break;
+	      }
+	      
+	      dataModelItemProxy = treeConfiguration.getProxyFor(
+	        dataModelItemProxy.item.base);
+	    }
+	    
+	    if (!formatDefinition) {
+	      formatDefinition = viewModel.formatDefinitions[viewModel.
+	        defaultFormatKey[FormatDefinitionType.DEFAULT]];
+	    }
+	  }
+    
     let globalTypeNames: Array<string> = [];
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
@@ -805,6 +838,43 @@ export class ItemRepository {
         globalTypeNames.push(itemProxy.item.name);
       }
     }, undefined);
+    
+    for (let j: number = 0; j < headingLevel; j++) {
+	    representation += '#';
+	  }
+	  representation += '# ';
+	  
+	  if (formatDefinition.header.contents.length > 0) {
+  	  if (addLinks) {
+	      representation += ('[' + koheseObject[formatDefinition.header.contents[
+	        0].propertyName] + '](' + window.location.origin + LocationMap[
+	        'Explore'].route + ';id=' + koheseObject.id + ')\n\n');
+  	  } else {
+	      representation += (koheseObject[formatDefinition.header.contents[0].
+	        propertyName] + '\n\n');
+	    }
+	  } else {
+	    if (koheseObject.name) {
+	      return koheseObject.name;
+	    } else if (koheseObject.id) {
+	      return koheseObject.id;
+	    } else {
+	      for (let j: number = 0; j < formatDefinition.containers.length; j++) {
+	        if ((formatDefinition.containers.length > 0) && (formatDefinition.
+	          containers[0].kind !== FormatContainerKind.REVERSE_REFERENCE_TABLE)
+	          && (formatDefinition.containers[0].contents.length > 0)) {
+	          let propertyDefinition: PropertyDefinition = formatDefinition.
+	            containers[0].contents[0];
+	          return propertyDefinition.customLabel + ': ' + String(koheseObject[
+	            propertyDefinition.propertyName]);
+	        }
+	      }
+	      
+	      let firstAttributeName: string = Object.keys(koheseObject)[0];
+	      return firstAttributeName + ': ' + String(koheseObject[
+	        firstAttributeName]);
+	    }
+	  }
     
     for (let j: number = 0; j < formatDefinition.containers.length; j++) {
       let formatContainer: FormatContainer = formatDefinition.containers[j];
@@ -954,25 +1024,16 @@ export class ItemRepository {
                         };
                       }
                       let localTypeViewModel: any = viewModel.localTypes[type];
-                      let formatDefinitionId: string = localTypeViewModel.
-                        defaultFormatKey[FormatDefinitionType.DOCUMENT];
-                      if (!formatDefinitionId) {
-                        formatDefinitionId = localTypeViewModel.
-                          defaultFormatKey[FormatDefinitionType.DEFAULT];
-                      }
-                      
                       if (Array.isArray(value)) {
                         for (let l: number = 0; l < value.length; l++) {
                           body += this.getMarkdownRepresentation(value[l],
                             localTypeDataModelCopy, localTypeViewModel,
-                            localTypeViewModel.formatDefinitions[
-                            formatDefinitionId]);
+                            formatDefinitionType, headingLevel + 1, addLinks);
                         }
                       } else {
                         body += this.getMarkdownRepresentation(value,
                           localTypeDataModelCopy, localTypeViewModel,
-                          localTypeViewModel.formatDefinitions[
-                          formatDefinitionId]);
+                          formatDefinitionType, headingLevel + 1, addLinks);
                       }
                     }
                   } else {

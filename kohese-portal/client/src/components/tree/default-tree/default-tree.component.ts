@@ -25,7 +25,6 @@ import { Image, DisplayableEntity, Action,
   ActionGroup } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
-import { LocationMap } from '../../../constants/LocationMap.data';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 import { ImportComponent } from '../../import/import.component';
 
@@ -145,58 +144,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             ReportSpecifications) => {
             let processItemProxy: (itemProxy: ItemProxy) => void = (itemProxy:
               ItemProxy) => {
-              let viewModel: any = TreeConfiguration.getWorkingTree().
-                getProxyFor('view-' + itemProxy.kind.toLowerCase()).item;
-              let formatDefinition: FormatDefinition;
-              let formatDefinitionId: string = viewModel.defaultFormatKey[
-                FormatDefinitionType.DOCUMENT];
-              if (formatDefinitionId) {
-                formatDefinition = viewModel.formatDefinitions[
-                  formatDefinitionId];
-              } else {
-                let treeConfiguration: TreeConfiguration = this.
-                  _itemRepository.getTreeConfig().getValue().config;
-                let dataModelItemProxy: ItemProxy = itemProxy.model;
-                while (dataModelItemProxy) {
-                  let ancestorViewModel: any = treeConfiguration.getProxyFor(
-                    'view-' + dataModelItemProxy.item.name.toLowerCase()).item;
-                  formatDefinitionId = ancestorViewModel.defaultFormatKey[
-                    FormatDefinitionType.DOCUMENT];
-                  if (formatDefinitionId) {
-                    formatDefinition = ancestorViewModel.formatDefinitions[
-                      formatDefinitionId];
-                    break;
-                  }
-                  
-                  dataModelItemProxy = treeConfiguration.getProxyFor(
-                    dataModelItemProxy.item.base);
-                }
-                
-                if (!formatDefinition) {
-                  formatDefinition = viewModel.formatDefinitions[viewModel.
-                    defaultFormatKey[FormatDefinitionType.DEFAULT]];
-                }
-              }
-              
-              for (let j: number = 0; j < itemProxy.getDepthFromAncestor(
-                object as ItemProxy); j++) {
-                initialContent += '#';
-              }
-              initialContent += '# ';
-              
-              if (reportSpecifications.addLinks) {
-                initialContent += ('[' + itemProxy.item[formatDefinition.
-                  header.contents[0].propertyName] + '](' + window.location.
-                  origin + LocationMap['Explore'].route + ';id=' + itemProxy.
-                  item.id + ')\n\n');
-              } else {
-                initialContent += (itemProxy.item[formatDefinition.header.
-                  contents[0].propertyName] + '\n\n');
-              }
-              
               initialContent += this._itemRepository.getMarkdownRepresentation(
-                itemProxy.item, itemProxy.model.item, viewModel,
-                formatDefinition);
+                itemProxy.item, itemProxy.model.item, this._itemRepository.
+                getTreeConfig().getValue().config.getProxyFor('view-' +
+                itemProxy.kind.toLowerCase()).item, FormatDefinitionType.
+                DOCUMENT, itemProxy.getDepthFromAncestor(object as ItemProxy),
+                reportSpecifications.addLinks);
             };
             
             if (reportSpecifications.includeDescendants) {

@@ -178,6 +178,10 @@ export class FormatObjectEditorComponent implements OnInit {
     return this._usernames;
   }
   
+  get itemRepository() {
+    return this._itemRepository;
+  }
+  
   get Object() {
     return Object;
   }
@@ -658,9 +662,9 @@ export class FormatObjectEditorComponent implements OnInit {
     string {
     // Only customLabel should be used in the first part of the statement below
     return ((attributeDefinition.customLabel ? attributeDefinition.
-      customLabel : attributeDefinition.propertyName) + this._selectedType.
+      customLabel : attributeDefinition.propertyName) + (this._selectedType.
       classProperties[attributeDefinition.propertyName].definition.required ?
-      '*' : '');
+      '*' : ''));
   }
   
   public getDateString(timestamp: number): string {
