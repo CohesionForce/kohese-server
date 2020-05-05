@@ -1110,7 +1110,7 @@ function KIOItemServer(socket){
   });
 
   socket.on('VersionControl/commit', function (request, sendResponse) {
-    var idsArray = Array.from(request.proxyIds);
+    var idsArray : Array<string> = Array.from(request.proxyIds);
 
     KDBRepo.commit(idsArray, request.username, request.email,
       request.message).then(function (commitIdMap) {

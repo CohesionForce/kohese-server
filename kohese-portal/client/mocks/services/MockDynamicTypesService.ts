@@ -1,14 +1,17 @@
 import { ItemProxy } from '../../../common/src/item-proxy';
 import { MockViewData } from '../data/MockViewData';
-import { MockItem } from '../data/MockItem';
-import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
-import { MockDataModel } from '../data/MockDataModel';
 import { MockKoheseType } from '../data/MockKoheseType';
+import { MockItemCache } from './MockItemCache';
+import { ItemCache } from '../../../common/src/item-cache';
+
 
 export class MockDynamicTypesService {
   mockView = new ItemProxy('KoheseView', MockViewData() )
   constructor() {
-
+    if (!ItemCache.getItemCache()){
+      let mockItemCache = new MockItemCache();
+      ItemCache.setItemCache(mockItemCache);  
+    }
   }
   getKoheseTypes () {
     return {

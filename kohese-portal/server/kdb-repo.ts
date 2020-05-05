@@ -188,7 +188,7 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static async commit(repositoryIds, userName, eMail, message) {
+  static async commit(repositoryIds : Array<string>, userName : string, eMail : string, message : string) {
     // TODO Does 'HEAD' need to be a variable?
     var commitIdMap = {};
     var signature = nodegit.Signature.now(userName, eMail);
