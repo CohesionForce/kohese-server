@@ -58,7 +58,6 @@ describe('Component: Editable Cell ', ()=>{
   it('updates when a new action is provided', async(()=>{
     let newProxy = new ItemProxy('Item', MockItem());
     newProxy.item.name = 'New Action';
-    newProxy.item.model = new KoheseModel(MockDataModel());
     editableCellComponent.action = {
       depth : 0,
       proxy : newProxy
@@ -81,5 +80,6 @@ describe('Component: Editable Cell ', ()=>{
 
   afterEach(()=>{
     ItemProxy.getWorkingTree().reset();
+    ItemProxy.getWorkingTree().loadingComplete();
   })
 })
