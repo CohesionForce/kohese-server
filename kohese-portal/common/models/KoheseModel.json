@@ -133,5 +133,82 @@
   "relations": {},
   "acls": [],
   "methods": [],
-  "localTypes": {}
+  "localTypes": {
+    "PropertyType": {
+      "name": "PropertyType",
+      "base": null,
+      "idInjection": true,
+      "properties": {
+        "type": {
+          "name": "type",
+          "type": "string",
+          "required": true
+        },
+        "required": {
+          "name": "required",
+          "type": "boolean"
+        },
+        "id": {
+          "name": "id",
+          "type": "boolean"
+        },
+        "derived": {
+          "name": "derived",
+          "type": "boolean"
+        },
+        "calculated": {
+          "name": "calculated",
+          "type": "string"
+        },
+        "hidden": {
+          "name": "hidden",
+          "type": "boolean"
+        },
+        "relation": {
+          "name": "relation",
+          "type": "RelationType",
+          "relation": {
+            "contained": true,
+            "type": "Item",
+            "foreignKey": "id"
+          }
+        }
+      },
+      "validations": [],
+      "relations": {},
+      "acls": [],
+      "methods": []
+    },
+    "RelationType": {
+      "name": "RelationType",
+      "base": null,
+      "idInjection": true,
+      "properties": {
+        "kind": {
+          "name": "kind",
+          "type": "string",
+          "required": false,
+          "id": false,
+          "default": ""
+        },
+        "foreignKey": {
+          "name": "foreignKey",
+          "type": "string",
+          "required": false,
+          "id": false,
+          "default": ""
+        },
+        "contained": {
+          "name": "contained",
+          "type": "boolean",
+          "required": false,
+          "id": false
+        }
+      },
+      "validations": [],
+      "relations": {},
+      "acls": [],
+      "methods": []
+    }
+  }
 }

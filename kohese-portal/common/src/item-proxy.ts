@@ -259,6 +259,26 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
 //////////////////////////////////////////////////////////////////////////
 // Create ItemProxy from an existing Item
 //////////////////////////////////////////////////////////////////////////
+interface ValidationResultType {
+    valid: boolean,
+    kind: string,
+    itemId: string,
+    missingProperties?: Array<string>,
+    malformedArray?: Array<string>,
+    malformedNumber?: Array<string>,
+    malformedTimestamp?: Array<string>,
+    invalidData?: {}
+}
+
+export interface KoheseModelInterface {
+  // TODO: Need to remove dependance of ItemProxy on model's _item
+  _item? : any;
+
+  item? : any;
+  validateItemContent(itemContent) : ValidationResultType;
+  getPropertyDetails(propertyName: string) : any;
+  isDerivedProperty(propertyName: string) : boolean;
+}
 
 export class ItemProxy {
 
@@ -266,9 +286,9 @@ export class ItemProxy {
   public static theCalcCount = 0;
   // private static shaObj = new jsSHA('SHA-1', 'TEXT');
 
-  public model;
+  public model; // TODO: Should be KoheseModelInterface
   public state;
-  protected _item
+  public _item
   public item;
   public itemChangeHandlers = new WeakMap();
   public dirtyFields;
@@ -755,130 +775,186 @@ export class ItemProxy {
   updateReferences(){
     // console.log('$$$ Updating References for: ' + this._item.id);
     let oldReferences = this.getRelationIdMap().references || {};
-    if (this.model && this.model._item && this.model._item.relationProperties){
-      for(let relationPropertyIdx in this.model._item.relationProperties){
-        let relationProperty = this.model._item.relationProperties[relationPropertyIdx];
-        let relationPropertyDefn = this.model._item.classProperties[relationProperty].definition;
 
+    let thisProxy = this;
+
+    //////////////////////////////////////////////////////////////////////////
+    function updateReferencesForRelations(forObject, withType, withPrefix?){
+
+      let prefix;
+      if (withPrefix){
+        prefix = withPrefix + '.';
+      } else {
+        prefix = '';
+      }
+  
+      for(let relationPropertyIdx in withType.relationProperties){
+        let relationProperty = withType.relationProperties[relationPropertyIdx];
+        let prefixedRelationProperty = prefix + relationProperty;
+        let relationPropertyDefn = withType.classProperties[relationProperty].definition;
+  
         let relationDefn;
         if (typeof relationPropertyDefn.relation === 'object'){
           relationDefn = relationPropertyDefn.relation;
         }
-
+  
         // Ignore relation for children
         if (relationProperty === "children"){
           continue;
         }
+  
+        // Capture state of relations before update
+        let isSingle = true;
+        let oldRelationIds = [];
+        let newRelationIds = [];
+        if (oldReferences &&
+            oldReferences[thisProxy.kind] &&
+            oldReferences[thisProxy.kind][prefixedRelationProperty])
+        {
+          oldRelationIds = oldReferences[thisProxy.kind][prefixedRelationProperty];
+        }
 
-        if (this._item){
-          let relationValue = this._item[relationProperty];
-          let oldRelationIds = [];
-          let newRelationIds = [];
-          if (oldReferences &&
-              oldReferences[this.kind] &&
-              oldReferences[this.kind][relationProperty])
-          {
-            oldRelationIds = oldReferences[this.kind][relationProperty];
-          }
-          if (relationValue){
-            let relationList = [];
-            let isSingle = true;
-            if(Array.isArray(relationValue)){
-              isSingle = false;
+        // Detect relations
+        let relationList = [];
 
-              // Check for reference style
-              let updatedRelationValue = [];
-              let valueUpdated = false;
-              for(let idx in relationValue){
-                let thisRelationValue = relationValue[idx];
-                if (!relationDefn && !thisRelationValue.hasOwnProperty('id')){
-                  valueUpdated = true;
-                  // console.log('%%% Updating reference style for ' + relationProperty + ' from ' + thisRelationValue);
-                  thisRelationValue = {id: thisRelationValue};
-                  // console.log(thisRelationValue);
+        if (forObject){
+          if(relationDefn && relationDefn.contained){
+            let containedTypeDefn = thisProxy.model._item.classLocalTypes[relationPropertyDefn.type];
+            let relationValue = forObject[relationProperty];
+            if (relationValue){
+              updateReferencesForRelations(relationValue, containedTypeDefn, prefixedRelationProperty);
+
+            }
+          } else {
+
+            if (Array.isArray(forObject)){
+              for (let objIdx in forObject) {
+                let relationValue = forObject[objIdx][relationProperty];
+                if (relationValue) {
+                  if(Array.isArray(relationValue)){
+                    isSingle = false;
+        
+                    // Check for reference style
+                    let updatedRelationValue = [];
+                    let valueUpdated = false;
+                    for(let idx in relationValue){
+                      let thisRelationValue = relationValue[idx];
+                      if (!relationDefn && !thisRelationValue.hasOwnProperty('id')){
+                        valueUpdated = true;
+                        thisRelationValue = {id: thisRelationValue};
+                      }
+                      updatedRelationValue.push(thisRelationValue);
+                    }
+        
+                    if(valueUpdated){
+                      forObject[objIdx][relationProperty] = updatedRelationValue;
+                    }
+                    relationList.push(...updatedRelationValue);
+                  } else {
+        
+                    // Check for reference style
+                    if(!relationDefn && !relationValue.hasOwnProperty('id')){
+                      // Update the property to have the correct reference style
+                      relationValue = {id: relationValue};
+                      forObject[objIdx][relationProperty] = relationValue;
+                    }
+        
+                    relationList.push(relationValue);
+                  }
                 }
-                updatedRelationValue.push(thisRelationValue);
               }
-
-              if(valueUpdated){
-                // console.log('==================');
-                // console.log(JSON.stringify(this._item, null, '  '));
-                // console.log('%%% Updating reference style for ' + relationProperty);
-                // console.log(JSON.stringify(relationValue, null, '  '));
-                // console.log(JSON.stringify(updatedRelationValue, null, '  '));
-                this._item[relationProperty] = updatedRelationValue;
-                // console.log('-----------------');
-                // console.log(JSON.stringify(this._item, null, '  '));
-              }
-              relationList = updatedRelationValue;
             } else {
-              isSingle = true;
-
-              // Check for reference style
-              if(!relationDefn && !relationValue.hasOwnProperty('id')){
-                // Update the property to have the correct reference style
-                // console.log('==================');
-                // console.log(JSON.stringify(this._item, null, '  '));
-                // console.log('%%% Updating reference style for ' + relationProperty + ' from ' + relationValue);
-                relationValue = {id: relationValue};
-                this._item[relationProperty] = relationValue;
-                // console.log(relationValue);
-                // console.log('-----------------');
-                // console.log(JSON.stringify(this._item, null, '  '));
-              }
-
-              relationList = [ relationValue ];
-            }
-
-            for(let relIdx in relationList){
-              let refId = relationList[relIdx];
-              if (refId.hasOwnProperty('id')){
-                refId = refId.id;
-              }
-
-              let refProxy;
-              if (relationDefn){
-                refProxy = this.treeConfig.getProxyByProperty(relationDefn.kind, relationDefn.foreignKey, refId);
-                if (!refProxy && !relationDefn.contained){
-                  ItemProxy.createMissingProxy(relationDefn.kind, relationDefn.foreignKey, refId, this.treeConfig);
-                  refProxy = this.treeConfig.getProxyFor(refId);
-                }
-              } else {
-                refProxy = this.treeConfig.getProxyFor(refId);
-                if(!refProxy){
-                  ItemProxy.createMissingProxy('Item', 'id', refId, this.treeConfig);
-                  refProxy = this.treeConfig.getProxyFor(refId);
-                }
-              }
-              if (refProxy){
-                newRelationIds.push(refProxy._item.id);
-                this.addReference(refProxy, relationProperty, isSingle);
-              }
-            }
-
-            if (!Array.isArray(oldRelationIds)){
-              // Convert oldRelationIds to an array
-              if (oldRelationIds){
-                oldRelationIds = [ oldRelationIds ];
-              }
-            }
-            for (let oldRefIdx in oldRelationIds){
-              let oldRefId = oldRelationIds[oldRefIdx];
-              if (!newRelationIds.includes(oldRefId)){
-                // Old Ref is no longer associated
-                // console.log('%%% oldRefId: ' + oldRefId);
-                let oldRefProxy = this.treeConfig.getProxyFor(oldRefId);
-                if (oldRefProxy){
-                  this.removeReference(oldRefProxy, relationProperty, isSingle);
+              let relationValue = forObject[relationProperty];
+              if (relationValue){
+                if(Array.isArray(relationValue)){
+                  isSingle = false;
+      
+                  // Check for reference style
+                  let updatedRelationValue = [];
+                  let valueUpdated = false;
+                  for(let idx in relationValue){
+                    let thisRelationValue = relationValue[idx];
+                    if (!relationDefn && !thisRelationValue.hasOwnProperty('id')){
+                      valueUpdated = true;
+                      thisRelationValue = {id: thisRelationValue};
+                    }
+                    updatedRelationValue.push(thisRelationValue);
+                  }
+      
+                  if(valueUpdated){
+                    forObject[relationProperty] = updatedRelationValue;
+                  }
+                  relationList.push(...updatedRelationValue);
                 } else {
-                  console.log('*** Could not find ref for ' + oldRefId);
-                  console.log(oldRelationIds);
+      
+                  // Check for reference style
+                  if(!relationDefn && !relationValue.hasOwnProperty('id')){
+                    // Update the property to have the correct reference style
+                    relationValue = {id: relationValue};
+                    forObject[relationProperty] = relationValue;
+                  }
+      
+                  relationList.push(relationValue);
                 }
               }
             }
           }
         }
+
+        for(let relIdx in relationList){
+          let refId = relationList[relIdx];
+          if (refId.hasOwnProperty('id')){
+            refId = refId.id;
+          }
+
+          let refProxy;
+          if (relationDefn){
+            refProxy = thisProxy.treeConfig.getProxyByProperty(relationDefn.kind, relationDefn.foreignKey, refId);
+            if (!refProxy && !relationDefn.contained){
+              ItemProxy.createMissingProxy(relationDefn.kind, relationDefn.foreignKey, refId, thisProxy.treeConfig);
+              refProxy = thisProxy.treeConfig.getProxyFor(refId);
+            }
+          } else {
+            refProxy = thisProxy.treeConfig.getProxyFor(refId);
+            if(!refProxy){
+              ItemProxy.createMissingProxy('Item', 'id', refId, thisProxy.treeConfig);
+              refProxy = thisProxy.treeConfig.getProxyFor(refId);
+            }
+          }
+          if (refProxy){
+            newRelationIds.push(refProxy._item.id);
+            thisProxy.addReference(refProxy, prefixedRelationProperty, isSingle);
+          }
+        }
+
+        // Detect old relations that need to be removed
+        if (!Array.isArray(oldRelationIds)){
+          // Convert oldRelationIds to an array
+          if (oldRelationIds){
+            oldRelationIds = [ oldRelationIds ];
+          }
+        }
+        for (let oldRefIdx in oldRelationIds){
+          let oldRefId = oldRelationIds[oldRefIdx];
+          if (!newRelationIds.includes(oldRefId)){
+            // Old Ref is no longer associated
+            // console.log('%%% oldRefId: ' + oldRefId);
+            let oldRefProxy = thisProxy.treeConfig.getProxyFor(oldRefId);
+            if (oldRefProxy){
+              thisProxy.removeReference(oldRefProxy, prefixedRelationProperty, isSingle);
+            } else {
+              console.log('*** Could not find ref for ' + oldRefId);
+              console.log(oldRelationIds);
+            }
+          }
+        }
+
       }
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
+    if (thisProxy.model && thisProxy.model._item && thisProxy.model._item.relationProperties){
+      updateReferencesForRelations(thisProxy._item, thisProxy.model._item);
     }
   }
 
