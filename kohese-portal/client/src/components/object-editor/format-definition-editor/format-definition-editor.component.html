@@ -80,7 +80,8 @@
   </div>
 </ng-container>
 <div>
-  <div style="height: 50px; display: flex; flex-direction: row;">
+  <div style="height: 50px; display: flex; flex-direction: row; align-items:
+    center;">
     <button mat-icon-button matTooltip="Add a vertical format container"
       [disabled]="isDisabled" class="flex-right-align"
       (click)="addFormatContainer(FormatContainerKind.VERTICAL)">
@@ -97,6 +98,13 @@
         FormatContainerKind.REVERSE_REFERENCE_TABLE)">
         <mat-icon class="fa fa-table"></mat-icon>
       </button>
+    </ng-container>
+    <ng-container *ngIf="isDefaultFormatDefinition">
+      <mat-checkbox [disabled]="(isDisabled || !areStateAttributesGroupable())"
+        [ngModel]="areStateAttributesGrouped()"
+        (ngModelChange)="toggleStateAttributeGrouping()">
+        Group State Machines At Bottom
+      </mat-checkbox>
     </ng-container>
   </div>
   <div style="height: calc(100% - 50px);">
@@ -118,7 +126,8 @@
           </mat-panel-title>
           <button mat-icon-button matTooltip="Remove this format container"
             class="flex-right-align" [disabled]="(isDisabled ||
-            (isDefaultFormatDefinition && (formatContainerIndex === 0)))"
+            (isDefaultFormatDefinition && ((formatContainerIndex === 0) ||
+            ((formatContainerIndex === 1) && areStateAttributesGrouped()))))"
             (click)="removeFormatContainer(formatContainer)">
             <mat-icon class="fa fa-times"></mat-icon>
           </button>

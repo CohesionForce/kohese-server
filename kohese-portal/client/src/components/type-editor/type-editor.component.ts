@@ -7,7 +7,8 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { FormatDefinition,
   FormatDefinitionType } from './FormatDefinition.interface';
-import { FormatContainerKind } from './FormatContainer.interface';
+import { FormatContainer,
+  FormatContainerKind } from './FormatContainer.interface';
 import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
@@ -141,6 +142,17 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         attributeEntries.push(JSON.parse(JSON.stringify(
           itemDefaultFormatDefinition.containers[0].contents[j])));
       }
+      if (this.areStateAttributesGrouped(itemDefaultFormatDefinition)) {
+        defaultFormatDefinition.containers.splice(1, 0, {
+          kind: FormatContainerKind.VERTICAL,
+          contents: []
+        });
+        for (let j: number = 0; j < itemDefaultFormatDefinition.containers[1].
+          contents.length; j++) {
+          defaultFormatDefinition.containers[1].contents.push(JSON.parse(JSON.
+            stringify(itemDefaultFormatDefinition.containers[1].contents[j])));
+        }
+      }
       
       viewModel.formatDefinitions[formatDefinitionId] =
         defaultFormatDefinition;
@@ -165,6 +177,32 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       });
     }
+  }
+  
+  private areStateAttributesGrouped(defaultFormatDefinition: FormatDefinition):
+    boolean {
+    let formatContainer: FormatContainer = defaultFormatDefinition.containers[
+      0];
+    for (let j: number = 0; j < formatContainer.contents.length; j++) {
+      if (formatContainer.contents[j].kind === 'state-editor') {
+        return false;
+      }
+    }
+    
+    if (defaultFormatDefinition.containers.length > 1) {
+      formatContainer = defaultFormatDefinition.containers[1];
+      if (formatContainer.contents.length > 0) {
+        if (formatContainer.contents[0].kind === 'state-editor') {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+    
+    return false;
   }
 
   public async delete(): Promise<void> {
