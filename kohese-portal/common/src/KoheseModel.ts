@@ -293,6 +293,7 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
         delete modelMap[key];
       }
     }
+    KoheseModel.modelsDefined = false;
   }
 
   //////////////////////////////////////////////////////////////////////////

@@ -13,8 +13,8 @@ import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 describe('Component: ', ()=>{
   let importComponent: ImportComponent;
   let importFixture : ComponentFixture<ImportComponent>;
-
-  beforeEach(()=>{
+  
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ImportComponent],
       imports: [
@@ -32,6 +32,9 @@ describe('Component: ', ()=>{
 
     importFixture = TestBed.createComponent(ImportComponent);
     importComponent = importFixture.componentInstance;
+
+    // TODO: Need to remove when syncMock is removed
+    MockItemRepository.singleton.syncFull();
 
     importFixture.detectChanges();
     

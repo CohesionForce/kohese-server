@@ -45,12 +45,15 @@ describe('Component: compare-items', () => {
       createComponent(CompareItemsComponent);
     component = compareItemsFixture.componentInstance;
 
+    // TODO: Need to remove when syncMock is removed
+    MockItemRepository.singleton.syncFull();
+
     compareItemsFixture.detectChanges();
   });
   
   it('responds to selecting a base ItemProxy', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      'test-uuid7');
+      'test-uuid6');
     await component.proxySelectionChanged(component.baseProxySubject, proxy);
     expect(component.baseProxySubject.getValue()).toBe(proxy);
     expect(component.selectedBaseVersion).toBeTruthy();
@@ -59,7 +62,7 @@ describe('Component: compare-items', () => {
   
   it('responds to selecting a change ItemProxy', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      'test-uuid7');
+      'test-uuid6');
     await component.proxySelectionChanged(component.changeProxySubject, proxy);
     expect(component.changeProxySubject.getValue()).toBe(proxy);
     expect(component.selectedChangeVersion).toBeTruthy();
@@ -68,7 +71,7 @@ describe('Component: compare-items', () => {
   
   it('compares two objects', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      'test-uuid7');
+      'test-uuid6');
     await component.proxySelectionChanged(component.baseProxySubject, proxy);
     await component.proxySelectionChanged(component.changeProxySubject, proxy);
     await component.compare();

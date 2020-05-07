@@ -1,5 +1,6 @@
 import { ItemProxy } from './item-proxy';
 import { ItemCache } from './item-cache';
+import { KoheseModel } from './KoheseModel';
 import { Subject } from 'rxjs';
 
 import * as  _ from 'underscore';
@@ -315,6 +316,7 @@ export class TreeConfiguration {
       });
       if (KoheseModelDefn){
         KoheseModelDefn.removeLoadedModels();
+        KoheseModelDefn = undefined;
       }
     }
 

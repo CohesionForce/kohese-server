@@ -33,7 +33,7 @@ describe('DocumentTreeComponent', () => {
           provide: ActivatedRoute,
           useValue: {
             params: new BehaviorSubject<any>({
-              id: 'Kurios Iesous'
+              id: 'test-uuid5'
             })
           }
         },
@@ -47,7 +47,7 @@ describe('DocumentTreeComponent', () => {
     fixture = TestBed.createComponent(DocumentTreeComponent);
     component = fixture.componentInstance;
     component.selectedProxyStream = ObservableOf(TreeConfiguration.
-      getWorkingTree().getProxyFor('Kurios Iesous'));
+      getWorkingTree().getProxyFor('test-uuid5'));
     
     fixture.detectChanges();
   });

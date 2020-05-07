@@ -63,7 +63,7 @@ async function initialize (koheseKdbPath, indexAndExit) {
   checkAndCreateDir(kdbDirPath);
 
   // TODO: Need to remove storage of modelDef.json
-  kdbFS.storeJSONDoc(kdbDirPath + '/modelDef.json', kdbModel.modelDef);
+  kdbFS.storeJSONDoc(kdbDirPath + '/modelDef.json', kdbModel.modelDefinitions);
 
   // TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
   checkAndCreateDir(koheseKDBDirPath);

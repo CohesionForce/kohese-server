@@ -59,7 +59,9 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
       }
 
       let propertyDefinition;
-      if (proxy && proxy.model) {
+      if (proxy && proxy.model
+          // && proxy.model._item && proxy.model._item.classProperties  // TODO: Remove after UI tests are triaged
+      ) {
         propertyDefinition = proxy.model._item.classProperties[property];
         if (propertyDefinition && !propertyDefinition.definition) {
           propertyDefinition = undefined;
