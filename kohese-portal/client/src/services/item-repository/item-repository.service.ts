@@ -839,10 +839,12 @@ export class ItemRepository {
       }
     }, undefined);
     
-    for (let j: number = 0; j < headingLevel; j++) {
-	    representation += '#';
+    if (headingLevel > -1) {
+      for (let j: number = 0; j < headingLevel; j++) {
+	      representation += '#';
+	    }
+	    representation += '# ';
 	  }
-	  representation += '# ';
 	  
 	  if (formatDefinition.header.contents.length > 0) {
   	  if (addLinks) {
@@ -852,27 +854,6 @@ export class ItemRepository {
   	  } else {
 	      representation += (koheseObject[formatDefinition.header.contents[0].
 	        propertyName] + '\n\n');
-	    }
-	  } else {
-	    if (koheseObject.name) {
-	      return koheseObject.name;
-	    } else if (koheseObject.id) {
-	      return koheseObject.id;
-	    } else {
-	      for (let j: number = 0; j < formatDefinition.containers.length; j++) {
-	        if ((formatDefinition.containers.length > 0) && (formatDefinition.
-	          containers[0].kind !== FormatContainerKind.REVERSE_REFERENCE_TABLE)
-	          && (formatDefinition.containers[0].contents.length > 0)) {
-	          let propertyDefinition: PropertyDefinition = formatDefinition.
-	            containers[0].contents[0];
-	          return propertyDefinition.customLabel + ': ' + String(koheseObject[
-	            propertyDefinition.propertyName]);
-	        }
-	      }
-	      
-	      let firstAttributeName: string = Object.keys(koheseObject)[0];
-	      return firstAttributeName + ': ' + String(koheseObject[
-	        firstAttributeName]);
 	    }
 	  }
     
@@ -1026,15 +1007,14 @@ export class ItemRepository {
                       let localTypeViewModel: any = viewModel.localTypes[type];
                       if (Array.isArray(value)) {
                         body += value.map((v: any) => {
-                          return '* ' + this.getMarkdownRepresentation(v,
+                          return this.getMarkdownRepresentation(v,
                             localTypeDataModelCopy, localTypeViewModel,
-                            formatDefinitionType, headingLevel + 1,
-                            addLinks);
+                            formatDefinitionType, -1, addLinks);
                         }).join('\n');
                       } else {
                         body += this.getMarkdownRepresentation(value,
                           localTypeDataModelCopy, localTypeViewModel,
-                          formatDefinitionType, headingLevel + 1, addLinks);
+                          formatDefinitionType, -1, addLinks);
                       }
                     }
                   } else {
@@ -1072,6 +1052,10 @@ export class ItemRepository {
                 }
               } else if (propertyDefinition.kind === 'date') {
                 body += new Date(value).toLocaleDateString();
+              } else if (Array.isArray(value)) {
+                body += value.map((v: any) => {
+                  return ('* ' + v);
+                }).join('\n');
               } else {
                 body += value;
               }
