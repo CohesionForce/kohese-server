@@ -308,7 +308,7 @@
               "customLabel": "Actors",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "text",
+              "kind": "",
               "editable": true
             },
             {

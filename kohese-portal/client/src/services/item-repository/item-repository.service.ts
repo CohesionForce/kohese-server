@@ -882,9 +882,9 @@ export class ItemRepository {
         REVERSE_REFERENCE_TABLE) {
         representation += '### Reverse References For ' + formatContainer.
           contents.map((propertyDefinition: PropertyDefinition) => {
-          return propertyDefinition.propertyName.kind + '\'s ' +
+          return '* ' + propertyDefinition.propertyName.kind + '\'s ' +
             propertyDefinition.propertyName.attribute;
-        }).join(', ');
+        }).join('\n');
         
         representation += '\n\n<table><tr><th>Name</th></tr>';
         
@@ -1025,11 +1025,12 @@ export class ItemRepository {
                       }
                       let localTypeViewModel: any = viewModel.localTypes[type];
                       if (Array.isArray(value)) {
-                        for (let l: number = 0; l < value.length; l++) {
-                          body += this.getMarkdownRepresentation(value[l],
+                        body += value.map((v: any) => {
+                          return '* ' + this.getMarkdownRepresentation(v,
                             localTypeDataModelCopy, localTypeViewModel,
-                            formatDefinitionType, headingLevel + 1, addLinks);
-                        }
+                            formatDefinitionType, headingLevel + 1,
+                            addLinks);
+                        }).join('\n');
                       } else {
                         body += this.getMarkdownRepresentation(value,
                           localTypeDataModelCopy, localTypeViewModel,
@@ -1050,11 +1051,11 @@ export class ItemRepository {
                           id = arrayComponent;
                         }
                         
-                        stringComponents.push(TreeConfiguration.
+                        stringComponents.push('* ' + TreeConfiguration.
                           getWorkingTree().getProxyFor(id).item.name);
                       }
                       
-                      body += stringComponents.join(', ');
+                      body += stringComponents.join('\n');
                     } else {
                       let id: string;
                       if (value.id) {
@@ -1069,6 +1070,8 @@ export class ItemRepository {
                     }
                   }
                 }
+              } else if (propertyDefinition.kind === 'date') {
+                body += new Date(value).toLocaleDateString();
               } else {
                 body += value;
               }
