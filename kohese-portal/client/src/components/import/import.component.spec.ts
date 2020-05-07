@@ -14,7 +14,7 @@ describe('Component: ', ()=>{
   let importComponent: ImportComponent;
   let importFixture : ComponentFixture<ImportComponent>;
   
-  beforeEach(async () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ImportComponent],
       imports: [

@@ -29,7 +29,7 @@ describe('Component: Create Wizard', ()=>{
   let createWizardComponent: CreateWizardComponent;
   let createWizardFixture : ComponentFixture<CreateWizardComponent>;
 
-  beforeEach(async ()=>{
+  beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [CreateWizardComponent],
       imports : [CommonModule,

@@ -83,6 +83,5 @@ describe('Component: Editable Cell ', ()=>{
 
   afterEach(()=>{
     ItemProxy.getWorkingTree().reset();
-    ItemProxy.getWorkingTree().loadingComplete();
   })
 })
