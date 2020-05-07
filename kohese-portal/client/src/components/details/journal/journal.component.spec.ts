@@ -22,7 +22,8 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { SessionService } from '../../../services/user/session.service';
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 
-describe('Component: Journal', ()=>{
+// TODO: This needs to be implemented
+xdescribe('Component: Journal', ()=>{
   let journalComponent: JournalComponent;
   let journalFixture : ComponentFixture<JournalComponent>;
 
@@ -48,25 +49,7 @@ describe('Component: Journal', ()=>{
     journalFixture = TestBed.createComponent(JournalComponent);
     journalComponent = journalFixture.componentInstance;
 
-    journalComponent.itemProxy = new ItemProxy('Item', MockItem());
-    
-    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
-      { includeOrigin: true }, (itemProxy: ItemProxy) => {
-      if (!itemProxy.model) {
-        let dataModel: any = MockDataModel();
-        dataModel.classProperties = {};
-        for (let attributeName in dataModel.properties) {
-          dataModel.classProperties[attributeName] = {
-            definedInKind: dataModel.name,
-            definition: dataModel.properties[attributeName]
-          };
-        }
-        
-        itemProxy.model = {
-          item: dataModel
-        };
-      }
-    }, undefined);
+    journalComponent.itemProxy = MockItemRepository.singleton.getProxyFor('test-uuid6');
 
     journalFixture.detectChanges();
 
@@ -76,7 +59,7 @@ describe('Component: Journal', ()=>{
     expect(JournalComponent).toBeTruthy();
   });
 
-  describe('sorting', ()=>{
+  xdescribe('sorting', ()=>{
     it('sorts by eldest first when observed',()=>{
       pending();
     })
@@ -101,9 +84,5 @@ describe('Component: Journal', ()=>{
     it('sorts by issues last', ()=>{
       pending();
     })
-  });
-  
-  afterEach(() => {
-    TreeConfiguration.getWorkingTree().reset();
-  });
+  });  
 })

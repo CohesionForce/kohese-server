@@ -29,7 +29,7 @@ describe('Component: Create Wizard', ()=>{
   let createWizardComponent: CreateWizardComponent;
   let createWizardFixture : ComponentFixture<CreateWizardComponent>;
 
-  beforeEach(()=>{
+  beforeEach(async ()=>{
     TestBed.configureTestingModule({
       declarations: [CreateWizardComponent],
       imports : [CommonModule,
@@ -46,10 +46,13 @@ describe('Component: Create Wizard', ()=>{
         { provide: MatDialogRef, useValue: { close: () => {} } },
         { provide: SessionService, useClass: MockSessionService },
       ]
-    })
+    }).compileComponents();
 
     createWizardFixture = TestBed.createComponent(CreateWizardComponent);
     createWizardComponent = createWizardFixture.componentInstance;
+
+    // TODO: Need to remove when syncMock is removed
+    MockItemRepository.singleton.syncFull();
 
     // Set off the init life cycle
     createWizardFixture.detectChanges();

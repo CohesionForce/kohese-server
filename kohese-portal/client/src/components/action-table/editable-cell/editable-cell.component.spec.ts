@@ -12,15 +12,18 @@ import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('Component: Editable Cell ', ()=>{
   let editableCellComponent: EditableCellComponent;
   let editableCellFixture : ComponentFixture<EditableCellComponent>;
   let editableStream = new BehaviorSubject<boolean>(true);
   let rowActionStream = new Subject<any>();
-  let actionProxy = new ItemProxy('Item', MockItem())
+  
+  // TODO: Need to remove when syncMock is removed
+  MockItemRepository.singleton.syncFull();
 
-  actionProxy.model = new KoheseModel(MockDataModel());
+  let actionProxy = new ItemProxy('Action', MockItem())
 
   beforeEach(async(()=>{
     TestBed.configureTestingModule({
