@@ -264,6 +264,40 @@ export class FormatObjectEditorComponent implements OnInit {
     return references;
   }
   
+  public getTableCellTextRetrievalFunction(attributeName: string): (row: any,
+    columnId: string) => string {
+    return (row: any, columnId: string) => {
+      if (attributeName) {
+	      let type: any = this._selectedType.classProperties[attributeName].
+	        definition.type;
+	      type = (Array.isArray(type) ? type[0] : type);
+	      let treeConfiguration: TreeConfiguration = this._itemRepository.
+	        getTreeConfig().getValue().config;
+	      let dataModel: any = this._selectedType.localTypes[type];
+	      let viewModel: any;
+	      if (dataModel) {
+	        viewModel = this._viewModel.localTypes[type];
+	      } else {
+	        dataModel = treeConfiguration.getProxyFor(type).item;
+	        viewModel = treeConfiguration.getProxyFor('view-' + type.
+	          toLowerCase()).item;
+	      }
+	      if (Array.isArray(dataModel.classProperties[columnId].definition.
+	        type)) {
+	        return row[columnId].map((value: any, index: number) => {
+	          return this.getStringRepresentation(row, columnId, index,
+	            dataModel, viewModel);
+	        }).join(', ');
+	      } else {
+	        return this.getStringRepresentation(row, columnId, undefined,
+	          dataModel, viewModel);
+	      }
+	    }
+	    
+      return String(row[columnId]);
+    };
+  }
+  
   public isLocalTypeAttribute(attributeName: string): boolean {
     let attribute: any = this._selectedType.classProperties[attributeName].
       definition;
@@ -725,33 +759,32 @@ export class FormatObjectEditorComponent implements OnInit {
     return result;
   }
   
-  public getStringRepresentation(index: number, attributeName: string):
-    string {
+  public getStringRepresentation(koheseObject: any, attributeName: string,
+    index: number, dataModel: any, viewModel: any): string {
     let value: any;
     if (index != null) {
-      value = this._object[attributeName][index];
+      value = koheseObject[attributeName][index];
     } else {
-      value = this._object[attributeName];
+      value = koheseObject[attributeName];
     }
     
-    if (!this._enclosingType && (attributeName === 'parentId')) {
+    if ((attributeName === 'parentId') && (dataModel.classProperties[
+      attributeName].definedInKind === 'Item') && ((typeof value) ===
+      'string')) {
       return TreeConfiguration.getWorkingTree().getProxyFor(value).item.name;
     }
     
     let representation: string = String(value);
     if (representation === String({})) {
-      let isLocalTypeAttribute: boolean = (!this._enclosingType && this.
-        isLocalTypeAttribute(attributeName));
-      if (isLocalTypeAttribute) {
+      let type: any = dataModel.classProperties[attributeName].definition.type;
+      type = (Array.isArray(type) ? type[0] : type);
+      if (dataModel.localTypes && dataModel.localTypes[type]) {
         if (value.name) {
           return value.name;
         } else if (value.id) {
           return value.id;
         } else {
-          let type: any = this._selectedType.classProperties[attributeName].
-            definition.type;
-          type = (Array.isArray(type) ? type[0] : type);
-          let viewModel: any = this._viewModel.localTypes[type];
+          viewModel = viewModel.localTypes[type];
           let formatDefinitionId: string = viewModel.defaultFormatKey[this.
             _formatDefinitionType];
           if (!formatDefinitionId) {
