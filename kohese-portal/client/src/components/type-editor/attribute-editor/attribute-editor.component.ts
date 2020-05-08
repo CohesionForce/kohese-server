@@ -180,6 +180,8 @@ export class AttributeEditorComponent implements OnInit, Dialog {
         this._view.inputType.type = 'text';
       } else if (attributeType === 'timestamp') {
         this._view.inputType.type = 'date';
+      } else if (attributeType === 'StateMachine') {
+        this._view.inputType.type = 'state-editor';
       } else {
         this._view.inputType.type = attributeType;
       }
