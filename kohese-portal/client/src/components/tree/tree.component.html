@@ -15,6 +15,8 @@
             [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !==
             -1) }" style="white-space: nowrap; overflow: hidden; text-overflow:
             ellipsis; width: 100%; text-align: left;">
+            <mat-icon class="{{elementMap.get(quickSelectElement)?.icon}}">
+            </mat-icon>
             {{elementMap.get(quickSelectElement)?.text}}
           </button>
           <button mat-icon-button matTooltip="Display this element in the tree"
@@ -121,6 +123,8 @@
             text}}" (click)="scrollElementIntoView(selectionEntry)"
             style="white-space: nowrap; overflow: hidden; text-overflow:
             ellipsis; width: 100%; text-align: left;">
+            <mat-icon class="{{elementMap.get(selectionEntry)?.icon}}">
+            </mat-icon>
             {{elementMap.get(selectionEntry)?.text}}
           </button>
           <button mat-icon-button matTooltip="De-select this element"
