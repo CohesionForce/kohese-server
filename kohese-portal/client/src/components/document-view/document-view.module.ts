@@ -11,6 +11,7 @@ import { DocumentViewComponent } from './document-view.component';
 import { CommonModule } from "@angular/common";
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
@@ -29,6 +30,7 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     MaterialModule,
     FormsModule,
     ReactiveFormsModule,
+    MarkdownModule.forChild(),
     TreeViewModule,
     UserInputModule,
     ObjectEditorModule
