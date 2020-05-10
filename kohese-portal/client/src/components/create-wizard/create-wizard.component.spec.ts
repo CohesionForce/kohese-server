@@ -23,7 +23,9 @@ import { MockItem } from '../../../mocks/data/MockItem';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { SessionService } from '../../services/user/session.service';
-import { ItemProxy } from '../../../../common/src/item-proxy';
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
+import { MarkdownService, MarkedOptions } from 'ngx-markdown';
+
 
 describe('Component: Create Wizard', ()=>{
   let createWizardComponent: CreateWizardComponent;
@@ -37,7 +39,8 @@ describe('Component: Create Wizard', ()=>{
          PipesModule,
          ServicesModule,
          MatDialogModule,
-         BrowserAnimationsModule
+         BrowserAnimationsModule,
+         ObjectEditorModule
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers : [
@@ -45,6 +48,8 @@ describe('Component: Create Wizard', ()=>{
         {provide: NavigationService, useClass: MockNavigationService},
         { provide: MatDialogRef, useValue: { close: () => {} } },
         { provide: SessionService, useClass: MockSessionService },
+        MarkdownService,
+        MarkedOptions
       ]
     }).compileComponents();
 
