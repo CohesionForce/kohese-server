@@ -36,8 +36,8 @@
         <mat-header-cell *matHeaderCellDef>
           {{column}}
         </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          {{getText(element, column)}}
+        <mat-cell *matCellDef="let element" style="white-space: pre-line;"
+          [innerText]="getText(element, column)">
         </mat-cell>
       </ng-container>
     </ng-container>

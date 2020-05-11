@@ -285,9 +285,10 @@ export class FormatObjectEditorComponent implements OnInit {
 	      if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
           let attributeValue = row[columnId] || [];
 	        return attributeValue.map((value: any, index: number) => {
-	          return this.getStringRepresentation(row, columnId, index,
-	            dataModel, viewModel);
-	        }).join(', ');
+	          // Bullet-ize string representations
+	          return '\u2022 ' + this.getStringRepresentation(row, columnId,
+	            index, dataModel, viewModel);
+	        }).join('\n');
 	      } else {
 	        return this.getStringRepresentation(row, columnId, undefined,
 	          dataModel, viewModel);
