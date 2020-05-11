@@ -2,9 +2,9 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
-import { DialogService,
-  DialogComponent } from '../../services/dialog/dialog.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
 
 class ReportPreview {
   private _preview: string = '';
@@ -59,18 +59,16 @@ export class ReportsComponent implements OnInit {
     this.updateReportList();
   }
 
-  public renameReport(targetReportName: string): void {
-    this._dialogService.openInputDialog('Rename ' + targetReportName, '',
-      DialogComponent.INPUT_TYPES.TEXT, 'New Name', targetReportName,
-      (input: any) => {
+  public async renameReport(targetReportName: string): Promise<void> {
+    let newReportName: any = await this._dialogService.openInputDialog(
+      'Rename ' + targetReportName, '', InputDialogKind.STRING, 'New Name',
+      targetReportName, (input: any) => {
       return (input !== targetReportName) && (input.search(/[\/\\]/) === -1);
-    }).afterClosed().subscribe(async (newReportName: string) => {
-      if (newReportName) {
-        await this._itemRepository.renameReport(targetReportName,
-          newReportName);
-        this.updateReportList();
-      }
     });
+    if (newReportName) {
+      await this._itemRepository.renameReport(targetReportName, newReportName);
+      this.updateReportList();
+    }
   }
 
   public async retrieveSavedReportPreview(reportObject: any): Promise<void> {
@@ -90,8 +88,13 @@ export class ReportsComponent implements OnInit {
   }
 
   public getReportInformation(reportObject: any): void {
-    this._dialogService.openInformationDialog('Report Information',
+    if (reportObject.metaContent) {
+      this._dialogService.openInformationDialog('Report Information',
       '\n' + reportObject.metaContent.split('\n\n').join('\n'));
+    } else {
+      this._dialogService.openInformationDialog('Report Information',
+      '\nReport metadata is not available.');
+    }
   }
 
   private updateReportList(): void {

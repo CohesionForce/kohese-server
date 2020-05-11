@@ -32,8 +32,12 @@ class ElementMapValue {
     return this._text;
   }
   
+  get icon() {
+    return this._icon;
+  }
+  
   public constructor(private _parent: any, private _depth: number,
-    private _text: string) {
+    private _text: string, private _icon: string) {
   }
 }
 
@@ -112,9 +116,6 @@ export class TreeComponent implements OnInit, AfterViewInit {
   }
   
   private _getText: (element: any) => string;
-  get getText() {
-    return this._getText;
-  }
   @Input('getText')
   set getText(getText: (element: any) => string) {
     this._getText = getText;
@@ -128,7 +129,27 @@ export class TreeComponent implements OnInit, AfterViewInit {
   }
   @Input('maySelect')
   set maySelect(maySelect: (element: any) => boolean) {
+    if (maySelect == null) {
+      maySelect = (element: any) => {
+        return true;
+      };
+    }
+    
     this._maySelect = maySelect;
+  }
+  
+  private _getIcon: (element: any) => string = (element: any) => {
+    return '';
+  };
+  @Input('getIcon')
+  set getIcon(getIcon: (element: any) => string) {
+    if (getIcon == null) {
+      getIcon = (element: any) => {
+        return '';
+      };
+    }
+    
+    this._getIcon = getIcon;
   }
   
   private _selection: Array<any> = [];
@@ -137,6 +158,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
   }
   @Input('selection')
   set selection(selection: Array<any>) {
+    if (selection == null) {
+      selection = [];
+    }
+    
     this._selection = selection;
     
     for (let j: number = 0; j < this._selection.length; j++) {
@@ -162,6 +187,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
   }
   @Input('allowMultiselect')
   set allowMultiselect(allowMultiselect: boolean) {
+    if (allowMultiselect == null) {
+      allowMultiselect = false;
+    }
+    
     this._allowMultiselect = allowMultiselect;
   }
   
@@ -171,6 +200,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
   }
   @Input('actions')
   set actions(actions: Array<Action>) {
+    if (actions == null) {
+      actions = [];
+    }
+    
     this._actions = actions;
   }
   
@@ -178,6 +211,11 @@ export class TreeComponent implements OnInit, AfterViewInit {
   };
   @Input('elementSelectionHandler')
   set elementSelected(elementSelected: (element: any) => void) {
+    if (elementSelected == null) {
+      elementSelected = (element: any) => {
+      };
+    }
+    
     this._elementSelected = elementSelected;
   }
   
@@ -194,6 +232,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
   }
   @Input('quickSelectElements')
   set quickSelectElements(quickSelectElements: Array<any>) {
+    if (quickSelectElements == null) {
+      quickSelectElements = [];
+    }
+    
     this._quickSelectElements = quickSelectElements;
   }
   
@@ -203,6 +245,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
   }
   @Input('showSelections')
   set showSelections(showSelections: boolean) {
+    if (showSelections == null) {
+      showSelections = false;
+    }
+    
     this._showSelections = showSelections;
   }
   
@@ -226,36 +272,18 @@ export class TreeComponent implements OnInit, AfterViewInit {
   
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
-      this._root = this._data['root'];
-      this._getChildren = this._data['getChildren'];
-      this._hasChildren = this._data['hasChildren'];
-      this._getText = this._data['getText'];
-      
-      if (this._data['maySelect']) {
-        this._maySelect = this._data['maySelect'];
-      }
-      
-      if (this._data['selection']) {
-        this._selection = this._data['selection'];
-      }
-      
-      if (this._data['allowMultiselect']) {
-        this._allowMultiselect = true;
-      }
-      
-      if (this._data['actions']) {
-        this._actions = this._data['actions'];
-      }
-      
-      if (this._data['elementSelectionHandler']) {
-        this._elementSelected = this._data['elementSelectionHandler'];
-      }
-      
-      if (this._data['quickSelectElements']) {
-        this._quickSelectElements = this._data['quickSelectElements'];
-      }
-      
-      this._showSelections = this._data['showSelections'];
+      this.root = this._data['root'];
+      this.getChildren = this._data['getChildren'];
+      this.hasChildren = this._data['hasChildren'];
+      this.getText = this._data['getText'];
+      this.getIcon = this._data['getIcon'];
+      this.maySelect = this._data['maySelect'];
+      this.selection = this._data['selection'];
+      this.allowMultiselect = true;
+      this.actions = this._data['actions'];
+      this.elementSelected = this._data['elementSelectionHandler'];
+      this.quickSelectElements = this._data['quickSelectElements'];
+      this.showSelections = this._data['showSelections'];
     }
     
     this.update(true);
@@ -518,7 +546,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
   
   private processElement(element: any, parent: any, depth: number): void {
     this._elementMap.set(element, new ElementMapValue(parent, depth, this.
-      _getText(element)));
+      _getText(element), this._getIcon(element)));
     
     let children: Array<any> = this._getChildren(element);
     for (let j: number = 0; j < children.length; j++) {

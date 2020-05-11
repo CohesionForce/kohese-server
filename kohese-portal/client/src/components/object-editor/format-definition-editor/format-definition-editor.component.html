@@ -80,7 +80,8 @@
   </div>
 </ng-container>
 <div>
-  <div style="height: 50px; display: flex; flex-direction: row;">
+  <div style="height: 50px; display: flex; flex-direction: row; align-items:
+    center;">
     <button mat-icon-button matTooltip="Add a vertical format container"
       [disabled]="isDisabled" class="flex-right-align"
       (click)="addFormatContainer(FormatContainerKind.VERTICAL)">
@@ -98,10 +99,17 @@
         <mat-icon class="fa fa-table"></mat-icon>
       </button>
     </ng-container>
+    <ng-container *ngIf="isDefaultFormatDefinition">
+      <mat-checkbox [disabled]="(isDisabled || !areStateAttributesGroupable())"
+        [ngModel]="areStateAttributesGrouped()"
+        (ngModelChange)="toggleStateAttributeGrouping()">
+        Group State Machines At Bottom
+      </mat-checkbox>
+    </ng-container>
   </div>
   <div style="height: calc(100% - 50px);">
     <ng-container *ngFor="let formatContainer of formatDefinition.
-      containers">
+      containers; let formatContainerIndex = index">
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title style="width: calc(100% - 70px); align-items:
@@ -117,7 +125,9 @@
             </span>
           </mat-panel-title>
           <button mat-icon-button matTooltip="Remove this format container"
-            class="flex-right-align" [disabled]="isDisabled"
+            class="flex-right-align" [disabled]="(isDisabled ||
+            (isDefaultFormatDefinition && ((formatContainerIndex === 0) ||
+            ((formatContainerIndex === 1) && areStateAttributesGrouped()))))"
             (click)="removeFormatContainer(formatContainer)">
             <mat-icon class="fa fa-times"></mat-icon>
           </button>
@@ -125,7 +135,8 @@
         <ng-template matExpansionPanelContent>
           <div style="height: 50px; display: flex; flex-direction: row;">
             <button mat-icon-button matTooltip="Add an attribute"
-              [disabled]="isDisabled" class="flex-right-align"
+              [disabled]="(isDisabled || (isDefaultFormatDefinition &&
+              (formatContainerIndex === 0)))" class="flex-right-align"
               (click)="addAttribute(formatContainer)">
               <mat-icon class="fa fa-plus"></mat-icon>
             </button>
@@ -204,14 +215,16 @@
                     <mat-icon class="fa fa-eye-slash"></mat-icon>
                   </button>
                   <button mat-icon-button matTooltip="Allow this attribute to
-                    be edited" [disabled]="isDisabled"
-                    [ngClass]="{ 'highlight': propertyDefinition.editable }"
-                    (click)="propertyDefinition.editable = !propertyDefinition.
-                    editable">
+                    be edited" [disabled]="(isDisabled ||
+                    (isDefaultFormatDefinition && (formatContainerIndex ===
+                    0)))" [ngClass]="{ 'highlight': propertyDefinition.
+                    editable }" (click)="propertyDefinition.editable =
+                    !propertyDefinition.editable">
                     <mat-icon class="fa fa-pencil"></mat-icon>
                   </button>
                   <button mat-icon-button matTooltip="Remove this entry"
-                    [disabled]="isDisabled" (click)="removeAttribute(
+                    [disabled]="(isDisabled || (isDefaultFormatDefinition &&
+                    (formatContainerIndex === 0)))" (click)="removeAttribute(
                     formatContainer, propertyDefinition); $event.
                     stopPropagation()">
                     <mat-icon class="fa fa-times"></mat-icon>

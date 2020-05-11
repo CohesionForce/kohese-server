@@ -3,8 +3,8 @@ import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
 import { MAT_DIALOG_DATA, MatTableDataSource,
   MatDialogRef } from '@angular/material';
 
-import { DialogService,
-  DialogComponent } from '../../services/dialog/dialog.service';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
 
 @Component({
   selector: 'state-machine-editor',
@@ -59,63 +59,53 @@ export class StateMachineEditorComponent implements OnInit {
     this._tableDataSource = new MatTableDataSource<string>(this._stateIds);
   }
   
-  public addState(): void {
-    this._dialogService.openInputDialog('Add State', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', '', undefined).afterClosed().subscribe((name:
-      string) => {
-      if (name) {
-        this._stateMachine.state[name] = {
-          name: name,
-          description: ''
-        };
-        this._stateIds.push(name);
-        
-        this._modified = true;
-        this._changeDetectorRef.markForCheck();
-      }
-    });
+  public async addState(): Promise<void> {
+    let name: any = await this._dialogService.openInputDialog('Add State', '',
+      InputDialogKind.STRING, 'Name', '', undefined);
+    if (name) {
+      this._stateMachine.state[name] = {
+        name: name,
+        description: ''
+      };
+      this._stateIds.push(name);
+      
+      this._modified = true;
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
-  public editState(stateId: string, propertyId: string): void {
-    let inputType: string;
-    if ('description' === propertyId) {
-      inputType = DialogComponent.INPUT_TYPES.MULTILINE_TEXT;
-    } else {
-      inputType = DialogComponent.INPUT_TYPES.TEXT;
-    }
-    
+  public async editState(stateId: string, propertyId: string): Promise<void> {
     let propertyName: string = propertyId.charAt(0).toUpperCase() +
       propertyId.slice(1);
     
-    this._dialogService.openInputDialog('Edit ' + propertyName, '', inputType,
-      propertyName, this._stateMachine.state[stateId][propertyId], undefined).
-      afterClosed().subscribe((value: string) => {
-      if (value) {
-        this._stateMachine.state[stateId][propertyId] = value;
-        if ('name' === propertyId) {
-          this._stateMachine.state[value] = this._stateMachine.state[stateId];
-          delete this._stateMachine.state[stateId];
-          this._stateIds.splice(this._stateIds.indexOf(stateId), 1);
-          this._stateIds.push(value);
-          for (let transitionId in this._stateMachine.transition) {
-            let transition: any = this._stateMachine.transition[transitionId];
-            if (stateId === transition.source) {
-              transition.source = value;
-            }
-            
-            if (stateId === transition.target) {
-              transition.target = value;
-            }
+    let value: any = await this._dialogService.openInputDialog('Edit ' +
+      propertyName, '', InputDialogKind.STRING, propertyName, this._stateMachine.
+      state[stateId][propertyId], undefined);
+    if (value) {
+      this._stateMachine.state[stateId][propertyId] = value;
+      if ('name' === propertyId) {
+        this._stateMachine.state[value] = this._stateMachine.state[stateId];
+        delete this._stateMachine.state[stateId];
+        this._stateIds.splice(this._stateIds.indexOf(stateId), 1);
+        this._stateIds.push(value);
+        for (let transitionId in this._stateMachine.transition) {
+          let transition: any = this._stateMachine.transition[transitionId];
+          if (stateId === transition.source) {
+            transition.source = value;
+          }
+          
+          if (stateId === transition.target) {
+            transition.target = value;
           }
         }
-        
-        this._modified = true;
-        this._changeDetectorRef.markForCheck();
       }
-    });
+      
+      this._modified = true;
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
-  public deleteState(stateId: string): void {
+  public async deleteState(stateId: string): Promise<void> {
     let affectedTransitionIds: Array<string> = [];
     let message: string = 'The following transitions are also to be deleted: ';
     for (let transitionId in this._stateMachine.transition) {
@@ -135,80 +125,75 @@ export class StateMachineEditorComponent implements OnInit {
     
     message += ('Are you sure that you want to delete ' + stateId + '?');
     
-    this._dialogService.openYesNoDialog('Delete ' + stateId, message).
-      subscribe((shouldDelete: any) => {
-      if (shouldDelete) {
-        delete this._stateMachine.state[stateId];
-        this._stateIds.splice(this._stateIds.indexOf(stateId), 1);
-        for (let j: number = 0; j < affectedTransitionIds.length; j++) {
-          delete this._stateMachine.transition[affectedTransitionIds[j]];
-        }
-        
-        this._modified = true;
-        this._changeDetectorRef.markForCheck();
+    let shouldDelete: any = await this._dialogService.openYesNoDialog(
+      'Delete ' + stateId, message);
+    if (shouldDelete) {
+      delete this._stateMachine.state[stateId];
+      this._stateIds.splice(this._stateIds.indexOf(stateId), 1);
+      for (let j: number = 0; j < affectedTransitionIds.length; j++) {
+        delete this._stateMachine.transition[affectedTransitionIds[j]];
       }
-    });
+      
+      this._modified = true;
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
-  public addTransition(sourceStateId: string, targetStateId: string): void {
-    this._dialogService.openInputDialog('Add Transition', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', '', undefined).afterClosed().subscribe((name:
-      string) => {
-      if (name) {
-        this._stateMachine.transition[name] = {
-          source: sourceStateId,
-          target: targetStateId,
-          guard: {}
-        };
-        
-        this._modified = true;
-        this._changeDetectorRef.markForCheck();
-      }
-    });
+  public async addTransition(sourceStateId: string, targetStateId: string):
+    Promise<void> {
+    let name: any = await this._dialogService.openInputDialog('Add Transition',
+      '', InputDialogKind.STRING, 'Name', '', undefined);
+    if (name) {
+      this._stateMachine.transition[name] = {
+        source: sourceStateId,
+        target: targetStateId,
+        guard: {}
+      };
+      
+      this._modified = true;
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
-  public editTransition(transitionId: string, propertyId: string): void {
+  public async editTransition(transitionId: string, propertyId: string):
+    Promise<void> {
     if (propertyId) {
       let propertyName: string = propertyId.charAt(0).toUpperCase() +
         propertyId.slice(1);
       
-      this._dialogService.openSelectDialog('Edit ' + propertyName, '',
-        propertyName, this._stateMachine.transition[transitionId][propertyId],
-        this._stateIds).afterClosed().subscribe((value: string) => {
-        if (value) {
-          this._stateMachine.transition[transitionId][propertyId] = value;
-          
-          this._modified = true;
-          this._changeDetectorRef.markForCheck();
-        }
-      });
+      let value: any = await this._dialogService.openDropdownDialog('Edit ' +
+        propertyName, '', propertyName, this._stateMachine.transition[
+        transitionId][propertyId], undefined, this._stateIds);
+      if (value) {
+        this._stateMachine.transition[transitionId][propertyId] = value;
+        
+        this._modified = true;
+        this._changeDetectorRef.markForCheck();
+      }
     } else {
-      this._dialogService.openInputDialog('Edit Name', '', DialogComponent.
-        INPUT_TYPES.TEXT, 'Name', transitionId, undefined).afterClosed().
-        subscribe((value: string) => {
-        if (value) {
-          this._stateMachine.transition[value] = this._stateMachine.transition[
-              transitionId];
-          delete this._stateMachine.transition[transitionId];
-          
-          this._modified = true;
-          this._changeDetectorRef.markForCheck();
-        }
-      });
-    }
-  }
-  
-  public deleteTransition(transitionId: string): void {
-    this._dialogService.openYesNoDialog('Delete ' + transitionId,
-      'Are you sure that you want to delete ' + transitionId + '?').subscribe(
-      (shouldDelete: any) => {
-      if (shouldDelete) {
+      let value: any = await this._dialogService.openInputDialog('Edit Name',
+        '', InputDialogKind.STRING, 'Name', transitionId, undefined);
+      if (value) {
+        this._stateMachine.transition[value] = this._stateMachine.transition[
+            transitionId];
         delete this._stateMachine.transition[transitionId];
         
         this._modified = true;
         this._changeDetectorRef.markForCheck();
       }
-    });
+    }
+  }
+  
+  public async deleteTransition(transitionId: string): Promise<void> {
+    let shouldDelete: any = await this._dialogService.openYesNoDialog(
+      'Delete ' + transitionId, 'Are you sure that you want to delete ' +
+      transitionId + '?');
+    if (shouldDelete) {
+      delete this._stateMachine.transition[transitionId];
+      
+      this._modified = true;
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
   public getTransitionId(fromStateId: string, toStateId: string): string {
@@ -234,7 +219,7 @@ export class StateMachineEditorComponent implements OnInit {
     if (this._modified) {
       let selection: any = await this._dialogService.openYesNoDialog(
         'Unapplied Changes', 'All changes in this dialog will be lost. Do ' +
-        'you want to proceed?').toPromise();
+        'you want to proceed?');
       if (!selection) {
         return Promise.resolve();
       }

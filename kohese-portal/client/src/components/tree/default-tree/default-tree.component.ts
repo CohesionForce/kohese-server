@@ -25,7 +25,6 @@ import { Image, DisplayableEntity, Action,
   ActionGroup } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
-import { LocationMap } from '../../../constants/LocationMap.data';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 import { ImportComponent } from '../../import/import.component';
 
@@ -111,19 +110,20 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     let deleteAction: Action = new Action('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
       return !(object as ItemProxy).internal;
-      }, (object: any) => {
-        this._dialogService.openCustomTextDialog('Confirm Deletion',
-        'Are you sure you want to delete ' + (object as ItemProxy).item.name + '?', [
-        'Cancel', 'Delete', 'Delete Recursively']).subscribe((result: any) => {
-
-        if (result) {
-          if (object === this.rootSubject.getValue()) {
-            this.rootSubject.next(this.getParent(object));
-          }
-          this.rowFocused(undefined);
-          this._itemRepository.deleteItem((object as ItemProxy), (2 === result));
+    }, async (object: any) => {
+      let result: any = await this._dialogService.openDropdownDialog('Remove ' +
+        'Descendants', 'Do you also want to remove all descendants of ' +
+        (object as ItemProxy).item.name + '?', '', 'No', (value: any) => {
+        return true;
+      }, ['Yes', 'No']);
+      if (result) {
+        if (object === this.rootSubject.getValue()) {
+          this.rootSubject.next(this.getParent(object));
         }
-      });
+        this.rowFocused(undefined);
+        this._itemRepository.deleteItem((object as ItemProxy), (result ===
+          'Yes'));
+      }
     });
     this.rootMenuActions.unshift(deleteAction);
     this.menuActions.unshift(deleteAction);
@@ -144,31 +144,12 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             ReportSpecifications) => {
             let processItemProxy: (itemProxy: ItemProxy) => void = (itemProxy:
               ItemProxy) => {
-              let viewModel: any = TreeConfiguration.getWorkingTree().
-                getProxyFor('view-' + itemProxy.kind.toLowerCase()).item;
-              // There should be a default document FormatDefinition.
-              let formatDefinition: FormatDefinition = viewModel.
-                formatDefinitions[viewModel.defaultFormatKey[
-                FormatDefinitionType.DOCUMENT]];
-              for (let j: number = 0; j < itemProxy.getDepthFromAncestor(
-                object as ItemProxy); j++) {
-                initialContent += '#';
-              }
-              initialContent += '# ';
-              
-              if (reportSpecifications.addLinks) {
-                initialContent += ('[' + itemProxy.item[formatDefinition.
-                  header.contents[0].propertyName] + '](' + window.location.
-                  origin + LocationMap['Explore'].route + ';id=' + itemProxy.
-                  item.id + ')\n\n');
-              } else {
-                initialContent += (itemProxy.item[formatDefinition.header.
-                  contents[0].propertyName] + '\n\n');
-              }
-              
               initialContent += this._itemRepository.getMarkdownRepresentation(
-                itemProxy.item, itemProxy.model.item, viewModel,
-                formatDefinition);
+                itemProxy.item, itemProxy.model.item, this._itemRepository.
+                getTreeConfig().getValue().config.getProxyFor('view-' +
+                itemProxy.kind.toLowerCase()).item, FormatDefinitionType.
+                DOCUMENT, itemProxy.getDepthFromAncestor(object as ItemProxy),
+                reportSpecifications.addLinks);
             };
             
             if (reportSpecifications.includeDescendants) {
@@ -298,6 +279,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
                 this.refresh();
               }
               break;
+            case 'update': 
+            case 'dirty': 
+              this.refresh();
+              break;    
             case 'delete': {
                 this.deleteRow(notification.id);
                 this.refresh();
@@ -416,8 +401,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind;  // TODO: Need to remove update of item
-    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
     return super.filter(item);
   }
 

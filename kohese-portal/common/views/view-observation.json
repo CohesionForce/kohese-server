@@ -5,7 +5,6 @@
   "modelName": "Observation",
   "icon": "fa fa-comment",
   "color": "#ffd700",
-  "localTypes": {},
   "viewProperties": {
     "observedBy": {
       "inputType": {
@@ -14,7 +13,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "observedBy"
+      "displayName": "observedBy",
+      "name": "observedBy"
     },
     "observedOn": {
       "inputType": {
@@ -23,7 +23,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "observedOn"
+      "displayName": "observedOn",
+      "name": "observedOn"
     },
     "context": {
       "inputType": {
@@ -36,9 +37,11 @@
       },
       "required": true,
       "default": "ROOT",
-      "displayName": "context"
+      "displayName": "context",
+      "name": "context"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "7c619f60-5d79-11ea-9d2a-81904e0f9ce1": {
       "id": "7c619f60-5d79-11ea-9d2a-81904e0f9ce1",
@@ -60,6 +63,22 @@
         {
           "kind": "list",
           "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
             {
               "propertyName": "id",
               "customLabel": "ID",
@@ -125,6 +144,46 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
@@ -186,6 +245,24 @@
               "kind": "markdown",
               "visible": true,
               "editable": true
+            },
+            {
+              "propertyName": "observedBy",
+              "customLabel": "Observed By",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "observedOn",
+              "customLabel": "Observed On",
+              "labelOrientation": "Left",
+              "kind": "date",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
             }
           ]
         }
@@ -195,8 +272,9 @@
   },
   "defaultFormatKey": {
     "default": "7c619f60-5d79-11ea-9d2a-81904e0f9ce1",
-    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "card": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "board": "89324a90-a7af-11e8-8662-71e48f0160fe"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }

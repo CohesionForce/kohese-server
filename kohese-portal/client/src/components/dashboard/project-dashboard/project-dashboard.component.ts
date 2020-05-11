@@ -107,19 +107,12 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
-
-  openReselectDialog() {
-    this.dialogService.openYesNoDialog('Reselect Project',
-      'A new historical tree has been selected. Would you like to update your selected project?'
-    ).subscribe((result) => {
-      if (result) {
-        this.openProjectSelection();
-      }
-    })
-
+  public async openReselectDialog(): Promise<void> {
+    let result: any = await this.dialogService.openYesNoDialog('Reselect ' +
+      'Project', 'A new historical tree has been selected. Would you like ' +
+      'to update your selected project?');
+    if (result) {
+      this.openProjectSelection();
+    }
   }
-
-
-
-
 }

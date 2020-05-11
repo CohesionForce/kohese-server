@@ -11,6 +11,7 @@ import { UserModule } from '../../services/user/user.module'
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
 import { LensModule } from "../lens/lens.module";
+import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { LensModule } from "../lens/lens.module";
     FormsModule,
     ReactiveFormsModule,
     PipesModule,
-    LensModule
+    LensModule,
+    ObjectEditorModule
   ],
   exports : [
     AdminComponent,

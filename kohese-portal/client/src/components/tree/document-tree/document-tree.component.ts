@@ -104,6 +104,10 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
               this.refresh();
             }
             break;
+          case 'update': 
+          case 'dirty': 
+              this.refresh();
+              break;    
           case 'delete': {
               this.deleteRow(notification.id);
               this.refresh();
@@ -205,8 +209,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind; // TODO: Need to remove update of item
-    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
     return super.filter(item);
   }
 

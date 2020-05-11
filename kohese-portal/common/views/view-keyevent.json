@@ -5,19 +5,11 @@
   "createdBy": "gmckune",
   "createdOn": 1566607211956,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1582935312882,
+  "modifiedOn": 1586900905257,
   "modelName": "KeyEvent",
-  "icon": "fa fa-paper-plane",
+  "icon": "fa fa-key",
   "color": "#000000",
   "viewProperties": {
-    "EventName": {
-      "displayName": "EventName",
-      "inputType": {
-        "type": "text",
-        "options": {}
-      },
-      "name": "EventName"
-    },
     "DetectionMechanism": {
       "displayName": "DetectionMechanism",
       "inputType": {
@@ -73,6 +65,22 @@
         {
           "kind": "list",
           "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
             {
               "propertyName": "id",
               "customLabel": "ID",
@@ -138,20 +146,52 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
-            },
-            {
-              "propertyName": "decisionState",
-              "customLabel": "decisionState",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "state-editor",
-              "editable": true
             },
             {
               "propertyName": "approvedBy",
@@ -210,14 +250,6 @@
               "editable": true
             },
             {
-              "propertyName": "EventName",
-              "customLabel": "EventName",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "text",
-              "editable": true
-            },
-            {
               "propertyName": "DetectionMechanism",
               "customLabel": "DetectionMechanism",
               "labelOrientation": "Top",
@@ -247,6 +279,19 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "text",
+              "editable": true
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "decisionState",
+              "customLabel": "decisionState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
               "editable": true
             }
           ]
@@ -281,10 +326,11 @@
               "editable": true
             },
             {
-              "propertyName": "EventName",
-              "customLabel": "EventName",
+              "propertyName": "name",
+              "customLabel": "name",
               "labelOrientation": "Top",
               "kind": "text",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             },
@@ -335,7 +381,7 @@
       "id": "b1090aa0-fb86-11e9-be56-311e0135452a",
       "name": "KeyEventInfo",
       "columns": [
-        "EventName",
+        "name",
         "DetectionMechanism",
         "EventInputData",
         "Responses",

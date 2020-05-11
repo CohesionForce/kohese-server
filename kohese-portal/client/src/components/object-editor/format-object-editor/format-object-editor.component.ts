@@ -2,14 +2,14 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   Input, Optional, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
-import { DialogService,
-  DialogComponent } from '../../../services/dialog/dialog.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatDefinition,
   FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { FormatContainer,
   FormatContainerKind } from '../../type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
+import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 import { TreeComponent } from '../../tree/tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -27,6 +27,10 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   @Input('object')
   set object(object: any) {
+    if (!object) {
+      object = {};
+    }
+    
     this._object = object;
   }
   
@@ -47,43 +51,6 @@ export class FormatObjectEditorComponent implements OnInit {
   set formatDefinitionType(formatDefinitionType: FormatDefinitionType) {
     this._formatDefinitionType = formatDefinitionType;
     this._changeDetectorRef.markForCheck();
-  }
-  
-  private _type: any;
-  get type() {
-    return this._type;
-  }
-  @Input('type')
-  set type(type: any) {
-    this._type = type;
-    this.selectedType = this._type;
-    
-    this._types.length = 0;
-    if (this._allowKindChange) {
-      TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
-        { includeOrigin: false }, (itemProxy: ItemProxy) => {
-        if (itemProxy.kind === 'KoheseModel') {
-          if (this._allowKindNarrowingOnly) {
-            let modelItemProxy: any = itemProxy;
-            while (modelItemProxy) {
-              if (modelItemProxy.item === this._type) {
-                this._types.push(itemProxy.item);
-                break;
-              }
-              
-              modelItemProxy = this._itemRepository.getTreeConfig().getValue().
-                config.getProxyFor(modelItemProxy.item.base);
-            }
-          } else {
-            this._types.push(itemProxy.item);
-          }
-        }
-      }, undefined);
-    
-      this._types.sort((oneType: any, anotherType: any) => {
-        return oneType.name.localeCompare(anotherType.name);
-      });
-    }
   }
   
   private _types: Array<any> = [];
@@ -127,13 +94,6 @@ export class FormatObjectEditorComponent implements OnInit {
           attributeName].definition.default;
         if (defaultValue != null) {
           this._object[attributeName] = defaultValue;
-        } else {
-          if (Array.isArray(this._selectedType.classProperties[attributeName].
-            definition.type)) {
-            this._object[attributeName] = [];
-          } else {
-            this._object[attributeName] = null;
-          }
         }
       }
     }
@@ -166,6 +126,43 @@ export class FormatObjectEditorComponent implements OnInit {
     this._allowKindNarrowingOnly = allowKindNarrowingOnly;
   }
   
+  private _type: any;
+  get type() {
+    return this._type;
+  }
+  @Input('type')
+  set type(type: any) {
+    this._type = type;
+    this.selectedType = this._type;
+    
+    this._types.length = 0;
+    if (this._allowKindChange) {
+      this._itemRepository.getTreeConfig().getValue().config.getRootProxy().
+        visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
+        if (itemProxy.kind === 'KoheseModel') {
+          if (this._allowKindNarrowingOnly) {
+            let modelItemProxy: any = itemProxy;
+            while (modelItemProxy) {
+              if (modelItemProxy.item === this._type) {
+                this._types.push(itemProxy.item);
+                break;
+              }
+              
+              modelItemProxy = this._itemRepository.getTreeConfig().getValue().
+                config.getProxyFor(modelItemProxy.item.base);
+            }
+          } else {
+            this._types.push(itemProxy.item);
+          }
+        }
+      }, undefined);
+    
+      this._types.sort((oneType: any, anotherType: any) => {
+        return oneType.name.localeCompare(anotherType.name);
+      });
+    }
+  }
+  
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
@@ -179,6 +176,10 @@ export class FormatObjectEditorComponent implements OnInit {
   private _usernames: Array<string> = [];
   get usernames() {
     return this._usernames;
+  }
+  
+  get itemRepository() {
+    return this._itemRepository;
   }
   
   get Object() {
@@ -210,22 +211,16 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
-      this._type = this._data['type'];
-      this._object = this._data['object'];
-      this._enclosingType = this._data['enclosingType'];
-      this._formatDefinitionType = this._data['formatDefinitionType'];
-      this._isDisabled = this._data['disabled'];
-      this._allowKindChange = this._data['allowKindChange'];
+      this.object = this._data['object'];
+      this.enclosingType = this._data['enclosingType'];
+      this.formatDefinitionType = this._data['formatDefinitionType'];
+      this.isDisabled = this._data['disabled'];
+      this.allowKindChange = this._data['allowKindChange'];
       if (this._data['allowKindNarrowingOnly']) {
-        this._allowKindNarrowingOnly = this._data['allowKindNarrowingOnly'];
+        this.allowKindNarrowingOnly = this._data['allowKindNarrowingOnly'];
       }
+      this.type = this._data['type'];
     }
-    
-    if (!this._object) {
-      this._object = {};
-    }
-    
-    this.type = this._type;
     
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree({
       includeOrigin: false
@@ -269,21 +264,18 @@ export class FormatObjectEditorComponent implements OnInit {
     return references;
   }
   
-  public getReverseReferenceName(element: any): string {
-    return element.name;
-  }
-  
   public isLocalTypeAttribute(attributeName: string): boolean {
     let attribute: any = this._selectedType.classProperties[attributeName].
       definition;
     let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
       0] : attribute.type);
-    return this._selectedType.localTypes[typeName];
+    return (this._selectedType.localTypes && this._selectedType.localTypes[
+      typeName]);
   }
   
-  public getLocalType(propertyDefinition: PropertyDefinition): any {
-    let attribute: any = this._selectedType.classProperties[propertyDefinition.
-      propertyName].definition;
+  private getLocalType(attributeName: string): any {
+    let attribute: any = this._selectedType.classProperties[attributeName].
+      definition;
     let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
       0] : attribute.type);
     let localTypeCopy: any = JSON.parse(JSON.stringify(this._selectedType.
@@ -299,42 +291,33 @@ export class FormatObjectEditorComponent implements OnInit {
     return localTypeCopy;
   }
   
-  public getLocalTypeViewModel(propertyDefinition: PropertyDefinition): any {
-    let attribute: any = this._selectedType.classProperties[propertyDefinition.
-      propertyName].definition;
-    let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
-      0] : attribute.type);
-    return this._viewModel.localTypes[typeName];
-  }
-  
-  public getLocalTypeAttributes(propertyDefinition: PropertyDefinition):
-    Array<any> {
-    let attributes: Array<any> = [];
-    let localType: any = this.getLocalType(propertyDefinition);
-    for (let attributeName in localType.properties) {
-      attributes.push(localType.properties[attributeName]);
-    }
-    
-    return attributes;
-  }
-  
-  public getLocalTypeFormatDefinition(propertyDefinition: PropertyDefinition):
-    FormatDefinition {
-    return this.getLocalTypeViewModel(propertyDefinition).formatDefinitions[
-      propertyDefinition.formatDefinition];
-  }
-  
-  public openObjectEditor(attributeName: string): void {
-    let value: any = this._object[attributeName];
+  public openObjectEditor(propertyDefinition: PropertyDefinition,
+    useExistingValue: boolean): void {
+    let value: any = this._object[propertyDefinition.propertyName];
+    let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
+      propertyDefinition.propertyName);
     this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
       data: {
-        object: (value ? TreeConfiguration.getWorkingTree().getProxyFor(value.
-          id).item : value),
-        type: this.getType(attributeName)
+        object: (useExistingValue ? (isLocalTypeAttribute ? value : (value ?
+          this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+          value.id).item : value)) : undefined),
+        enclosingType: (isLocalTypeAttribute ? this._selectedType : undefined),
+        formatDefinitionType: this._formatDefinitionType,
+        disabled: (!propertyDefinition.editable || this._isDisabled ||
+          !isLocalTypeAttribute),
+        type: (isLocalTypeAttribute ? this.getLocalType(propertyDefinition.
+          propertyName) : this._itemRepository.getTreeConfig().getValue().
+          config.getProxyFor(propertyDefinition.propertyName).item)
       }
-    }).updateSize('80%', '80%').afterClosed().subscribe((result: any) => {
-      if (result.object) {
-        this._itemRepository.upsertItem(result.type.name, result.object);
+    }).updateSize('90%', '90%').afterClosed().subscribe((result: any) => {
+      if (result) {
+        if (isLocalTypeAttribute) {
+          this._object[propertyDefinition.propertyName] = result.object;
+        } else {
+          this._itemRepository.upsertItem(result.type.name, result.object);
+        }
+        
+        this._changeDetectorRef.markForCheck();
       }
     });
   }
@@ -387,6 +370,11 @@ export class FormatObjectEditorComponent implements OnInit {
           
           return false;
         },
+        getIcon: (element: any) => {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+            item.icon;
+        },
         selection: (this._object[attributeName] ? [TreeConfiguration.
           getWorkingTree().getProxyFor(this._object[attributeName].id)] : []),
         quickSelectElements: this._itemRepository.getRecentProxies()
@@ -401,117 +389,151 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   public addValue(attributeDefinition: PropertyDefinition): void {
+    if (this._object[attributeDefinition.propertyName] == null) {
+      this._object[attributeDefinition.propertyName] = [];
+    }
+
     this.editValue(this._object[attributeDefinition.propertyName].length,
       attributeDefinition);
   }
   
-  public editValue(index: number, attributeDefinition: PropertyDefinition):
-    void {
+  public async editValue(index: number, attributeDefinition:
+    PropertyDefinition): Promise<void> {
     let attributeName: string = attributeDefinition.propertyName;
     const DIALOG_TITLE: string = 'Specify Value';
     let value: any = this._object[attributeName][index];
-    switch (this.getTypeName(this._selectedType.classProperties[
-      attributeDefinition.propertyName].definition.type)) {
+    let type: any = this._selectedType.classProperties[attributeDefinition.
+      propertyName].definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    switch (type) {
       case 'boolean':
         if (value == null) {
           value = false;
         }
-        this._dialogService.openSelectDialog(DIALOG_TITLE, '',
-          attributeName, value, [true, false]).afterClosed().subscribe(
-          (value: boolean) => {
-          if (value != null) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE, '',
+          attributeName, value, undefined, [true, false]);
+        if (value != null) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'number':
         if (value == null) {
           value = 0;
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.NUMBER, attributeName, value, undefined).afterClosed().
-          subscribe((value: number) => {
-          if (value != null) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.NUMBER, attributeName, value, undefined);
+        if (value != null) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'date':
         if (value == null) {
           value = new Date().getTime();
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.DATE, attributeName, value, undefined).afterClosed().
-          subscribe((value: number) => {
-          if (value != null) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.DATE, attributeName, value, undefined);
+        if (value != null) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'string':
         if (value == null) {
           value = '';
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.TEXT, attributeName, value, undefined).afterClosed().
-          subscribe((value: string) => {
-          if (value) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.STRING, attributeName, value, undefined);
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
+        break;
+      case 'text':
+        if (value == null) {
+          value = '';
+        }
+        
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.STRING, attributeName, value, undefined);
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
+        break;
+      case 'maskedString':
+        if (value == null) {
+          value = '';
+        }
+        
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.MASKED_STRING, attributeName, value, undefined);
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'markdown':
         if (value == null) {
           value = '';
         }
         
-        this._dialogService.openInputDialog(DIALOG_TITLE, '', DialogComponent.
-          INPUT_TYPES.MARKDOWN, attributeName, value, undefined).afterClosed().
-          subscribe((value: string) => {
-          if (value) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
+          InputDialogKind.MARKDOWN, attributeName, value, undefined);
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'state-editor':
-        this._dialogService.openSelectDialog(DIALOG_TITLE, attributeName +
-          ': ' + this._object[attributeName], 'Target', value, this.
-          getStateTransitionCandidates(attributeDefinition).map(
-          (transitionCandidateName: string) => {
+        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE,
+          attributeName + ': ' + this._object[attributeName], 'Target', value,
+          undefined, this.getStateTransitionCandidates(attributeDefinition).
+          map((transitionCandidateName: string) => {
           return this._selectedType.classProperties[attributeName].definition.
             properties.transition[transitionCandidateName].target;
-        })).afterClosed().subscribe((value: string) => {
-          if (value) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        }));
+        if (value) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       case 'user-selector':
         if (value == null) {
           value = 'admin';
         }
         
-        this._dialogService.openSelectDialog(DIALOG_TITLE, '',
-          attributeName, value, this._usernames).afterClosed().subscribe(
-          (value: string) => {
-          if (value != null) {
-            this._object[attributeName].splice(index, 1, value);
-            this._changeDetectorRef.markForCheck();
-          }
-        });
+        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE, '',
+          attributeName, value, undefined, this._usernames);
+        if (value != null) {
+          this._object[attributeName].splice(index, 1, value);
+          this._changeDetectorRef.markForCheck();
+        }
         break;
       default:
-        let type: any = this.getType(attributeName);
-        if (!this._enclosingType) {
+        let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
+          attributeName);
+        if (isLocalTypeAttribute) {
+          this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
+            data: {
+              object: value,
+              enclosingType: this._selectedType,
+              formatDefinitionType: this._formatDefinitionType,
+              disabled: (!attributeDefinition.editable || this._isDisabled),
+              type: this.getLocalType(attributeDefinition.propertyName)
+            }
+          }).updateSize('90%', '90%').afterClosed().subscribe((result:
+            any) => {
+            if (result) {
+              this._object[attributeName].splice(index, 1, result.object);
+              this._changeDetectorRef.markForCheck();
+            }
+          });
+        } else {
           this._dialogService.openComponentDialog(TreeComponent, {
             data: {
               root: TreeConfiguration.getWorkingTree().getRootProxy(),
@@ -545,6 +567,11 @@ export class FormatObjectEditorComponent implements OnInit {
                 
                 return false;
               },*/
+              getIcon: (element: any) => {
+                return this._itemRepository.getTreeConfig().getValue().config.
+                  getProxyFor('view-' + (element as ItemProxy).kind.
+                  toLowerCase()).item.icon;
+              },
               allowMultiselect: true,
               showSelections: true,
               selection: (this._object[attributeName] ? this._object[
@@ -566,32 +593,12 @@ export class FormatObjectEditorComponent implements OnInit {
               this._changeDetectorRef.markForCheck();
             }
           });
-        } else {
-          this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
-            data: {
-              object: ((!value || this._enclosingType) ? value :
-                TreeConfiguration.getWorkingTree().getProxyFor(value.id).item),
-              type: type
-            }
-          }).updateSize('80%', '80%').afterClosed().subscribe((result:
-            any) => {
-            if (result.object) {
-              if (this._enclosingType) {
-                this._object[attributeName].splice(index, 1, result.object);
-                this._changeDetectorRef.markForCheck();
-              } else {
-                this._itemRepository.upsertItem(result.type.name, result.
-                  object);
-              }
-            }
-          });
         }
     }
   }
   
   public removeValue(index: number, attributeName: string): void {
     this._object[attributeName].splice(index, 1);
-    this._changeDetectorRef.markForCheck();
   }
   
   public getTableElements(attributeDefinition: PropertyDefinition):
@@ -605,10 +612,6 @@ export class FormatObjectEditorComponent implements OnInit {
     }
     
     return [];
-  }
-  
-  public getTableElementName(element: any): string {
-    return element.name;
   }
   
   public getTableColumns(attributeDefinition: PropertyDefinition):
@@ -657,6 +660,11 @@ export class FormatObjectEditorComponent implements OnInit {
             }
             
             return false;
+          },
+          getIcon: (element: any) => {
+            return this._itemRepository.getTreeConfig().getValue().config.
+              getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+              item.icon;
           },
           selection: references.map((reference: { id: string }) => {
             return TreeConfiguration.getWorkingTree().getProxyFor(reference.
@@ -738,10 +746,11 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public getAttributeRepresentation(attributeDefinition: PropertyDefinition):
     string {
+    // Only customLabel should be used in the first part of the statement below
     return ((attributeDefinition.customLabel ? attributeDefinition.
-      customLabel : attributeDefinition.propertyName) +
-      (this._selectedType.classProperties[attributeDefinition.propertyName].
-      definition.required ? '*' : ''));
+      customLabel : attributeDefinition.propertyName) + (this._selectedType.
+      classProperties[attributeDefinition.propertyName].definition.required ?
+      '*' : ''));
   }
   
   public getDateString(timestamp: number): string {
@@ -803,47 +812,54 @@ export class FormatObjectEditorComponent implements OnInit {
       value = this._object[attributeName];
     }
     
+    if (!this._enclosingType && (attributeName === 'parentId')) {
+      return TreeConfiguration.getWorkingTree().getProxyFor(value).item.name;
+    }
+    
     let representation: string = String(value);
     if (representation === String({})) {
-      if (value.name) {
-        representation = value.name;
-      } else if (value.id) {
-        let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-          getProxyFor(value.id);
-        if (itemProxy) {
-          // References
-          representation = itemProxy.item.name;
+      let isLocalTypeAttribute: boolean = (!this._enclosingType && this.
+        isLocalTypeAttribute(attributeName));
+      if (isLocalTypeAttribute) {
+        if (value.name) {
+          return value.name;
+        } else if (value.id) {
+          return value.id;
         } else {
-          representation = value.id;
+          let type: any = this._selectedType.classProperties[attributeName].
+            definition.type;
+          type = (Array.isArray(type) ? type[0] : type);
+          let viewModel: any = this._viewModel.localTypes[type];
+          let formatDefinitionId: string = viewModel.defaultFormatKey[this.
+            _formatDefinitionType];
+          if (!formatDefinitionId) {
+            formatDefinitionId = viewModel.defaultFormatKey[
+              FormatDefinitionType.DEFAULT];
+          }
+          let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
+            formatDefinitionId];
+          for (let j: number = 0; j < formatDefinition.containers.length;
+            j++) {
+            if ((formatDefinition.containers.length > 0) && (formatDefinition.
+              containers[0].kind !== FormatContainerKind.
+              REVERSE_REFERENCE_TABLE) && (formatDefinition.containers[0].
+              contents.length > 0)) {
+              let propertyDefinition: PropertyDefinition = formatDefinition.
+                containers[0].contents[0];
+              return propertyDefinition.customLabel + ': ' + String(value[
+                propertyDefinition.propertyName]);
+            }
+          }
+          
+          let firstAttributeName: string = Object.keys(value)[0];
+          return firstAttributeName + ': ' + String(value[firstAttributeName]);
         }
       } else {
-        representation = value[Object.keys(value)[0]];
+        return TreeConfiguration.getWorkingTree().getProxyFor(value.id).item.
+          name;
       }
-    }
-    
-    return representation;
-  }
-  
-  private getTypeName(typeValue: any): string {
-    let type: string;
-    if (Array.isArray(typeValue)) {
-      type = typeValue[0];
     } else {
-      type = typeValue;
+      return representation;
     }
-    
-    return type;
-  }
-  
-  private getType(attributeName: string): any {
-    let typeName: string = this.getTypeName(this._selectedType.classProperties[
-      attributeName].definition.type);
-    for (let localTypeName in this._selectedType.localTypes) {
-      if (localTypeName === typeName) {
-        return this._selectedType.localTypes[localTypeName];
-      }
-    }
-    
-    return TreeConfiguration.getWorkingTree().getProxyFor(typeName).item;
   }
 }

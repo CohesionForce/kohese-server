@@ -6,8 +6,8 @@
     </span>
     <span class="pull-right item-actions">
       <ng-container *ngIf="itemProxy.item.parentId">
-        <i class="fa fa-level-up" (click)="navigate(itemProxy.item.parentId)"
-          title="Go to Parent">
+        <i class="fa fa-level-up" (click)="navigate(itemProxy.item.parentId,
+          false)" title="Go to Parent">
         </i>
       </ng-container>
       <ng-container *ngIf="editableStream.getValue() else notEditable">
@@ -40,7 +40,12 @@
           </document-view>
         </ng-template>
       </mat-tab>
-      <mat-tab label="{{(itemProxy.dirty ? 'Details*' : 'Details')}}">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Details
+          &nbsp;
+          <img *ngIf="itemProxy.dirty"src="assets/icons/versioncontrol/dirty.ico"/>
+        </ng-template>    
         <ng-template matTabContent>
           <format-object-editor [object]="itemProxy.item" [type]="itemProxy.
             model.item" [formatDefinitionType]="FormatDefinitionType.DEFAULT"
@@ -95,6 +100,12 @@
           <h5>
             Descendant Count: {{itemProxy.descendantCount}}
           </h5>
+          <ng-container *ngIf="itemProxy.dirty">
+            <h5>
+              Dirty: {{itemProxy.dirty}}
+            </h5>
+            <pre>{{itemProxy.dirtyFields | json}}</pre>
+          </ng-container>
           <h5>
             Item Data:
           </h5>
@@ -134,7 +145,7 @@
   <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
     row;">
     <button mat-button matTooltip="Navigate to this Item" style="margin-left:
-      auto;" (click)="navigate(itemProxy.item.id)">
+      auto;" (click)="navigate(itemProxy.item.id, true)">
       Explore
     </button>
     <button mat-button matTooltip="Close this dialog box"

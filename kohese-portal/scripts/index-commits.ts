@@ -40,7 +40,8 @@ kdb.initialize(baseRepoPath, indexAndExit).then(async () =>  {
       console.log('::: No missing cache data was detected');
     }
   } catch (err){
-    console.log('*** Error: ' + err);
+    console.log('*** Error: ' + JSON.stringify(err));
+    console.log(err);
     console.log(err.stack);
   }
   console.log('::: Indexing complete');

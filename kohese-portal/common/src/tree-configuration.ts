@@ -1,5 +1,6 @@
 import { ItemProxy } from './item-proxy';
 import { ItemCache } from './item-cache';
+import { KoheseModel } from './KoheseModel';
 import { Subject } from 'rxjs';
 
 import * as  _ from 'underscore';
@@ -60,6 +61,7 @@ export class TreeConfiguration {
       name : 'Root of Knowledge Tree'
     }, this);
     this.repoMap['ROOT'] = this.root;
+    this.addIdMap('Item', 'id', this.root);
 
     this.lostAndFound = new ItemProxy('Internal', {
       id : 'LOST+FOUND',
@@ -67,6 +69,7 @@ export class TreeConfiguration {
       description : 'Collection of node(s) that are no longer connected.'
     }, this);
     this.repoMap['LOST+FOUND'] = this.lostAndFound;
+    this.addIdMap('Item', 'id', this.lostAndFound);
 
     this.rootModelProxy = new ItemProxy('Internal', {
       id: 'Model-Definitions',
@@ -313,6 +316,7 @@ export class TreeConfiguration {
       });
       if (KoheseModelDefn){
         KoheseModelDefn.removeLoadedModels();
+        KoheseModelDefn = undefined;
       }
     }
 

@@ -40,6 +40,10 @@ if (!fs.existsSync(_REPORTS_DIRECTORY_PATH)) {
 //////////////////////////////////////////////////////////////////////////
 ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
   console.log('+++ Received notification of change: ' + change.type);
+  if (change.type === 'dirty') {
+    return;
+  }
+
   if(change.proxy){
     console.log(change.kind);
     console.log(change.proxy.item);
@@ -74,6 +78,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
         break;
       case 'loading':
       case 'loaded':
+      case 'dirty':
       case 'reference-added':
       case 'reference-removed':
       case 'reference-reordered':
@@ -197,34 +202,44 @@ function KIOItemServer(socket){
 
     let itemCache = ItemCache.getItemCache();
     let headCommit = await itemCache.getRef('HEAD');
+    let incrementalDataToLoad;
 
     if (headCommit !== request.headCommit){
-      console.log('### Preparing BulkCacheUpdate Messages: ' + request.headCommit + ' -> ' + headCommit);
-      let objectMap = itemCache.getObjectMap();
-      sendBulkCacheUpdate('metadata', objectMap['metadata']);
-      sendBulkCacheUpdate('refMap', objectMap['refMap']);
-      sendBulkCacheUpdate('tagMap', objectMap['tagMap']);
-      sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
-      for (let key in objectMap.kTreeMapChunks) {
-        sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
+      if (request.incrementalCacheLoad && request.headCommit) {
+        console.log('### Providing incrementalDataToLoad: ' + request.headCommit + ' -> ' + headCommit);
+        incrementalDataToLoad = {
+          HEAD: headCommit
+        }
+      } else {
+        console.log('### Preparing BulkCacheUpdate Messages: ' + request.headCommit + ' -> ' + headCommit);
+        let objectMap = itemCache.getObjectMap();
+        sendBulkCacheUpdate('metadata', objectMap['metadata']);
+        sendBulkCacheUpdate('refMap', objectMap['refMap']);
+        sendBulkCacheUpdate('tagMap', objectMap['tagMap']);
+        sendBulkCacheUpdate('kCommitMap', objectMap['kCommitMap']);
+        for (let key in objectMap.kTreeMapChunks) {
+          sendBulkCacheUpdate('kTreeMap', objectMap['kTreeMapChunks'][key]);
+        }
+        for (let key in objectMap.blobMapChunks) {
+          sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
+        }
+        console.log('### Sent BulkCacheUpdate Messages');
       }
-      for (let key in objectMap.blobMapChunks) {
-        sendBulkCacheUpdate('blobMap', objectMap['blobMapChunks'][key]);
-      }
-      console.log('### Sent BulkCacheUpdate Messages');
     } else {
       console.log('### Item Cache is already in sync');
     }
 
-    let response = {
+    let response : any = {
       timestamp: {
         requestTime: request.timestamp.requestTime,
         requestReceiptTime: requestReceiptTime,
-        responseTransmitTime: null
+        responseTransmitTime: Date.now()
       }
     };
 
-    response.timestamp.responseTransmitTime = Date.now();
+    if (incrementalDataToLoad){
+      response.incrementalDataToLoad = incrementalDataToLoad;
+    }
 
     console.log('::: Sending getItemCache response');
     sendResponse(response);
@@ -808,6 +823,9 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/generateReport', async (request, sendResponse) => {
+    console.log('::: session %s: Received generateReport for %s for user %s at %s',
+        socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
+
     let metaDataString: Array<string> = request.content.split('\n\n', 3);
     fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
       reportName), metaDataString.join('\n\n'), undefined);
@@ -936,17 +954,28 @@ function KIOItemServer(socket){
 
 
   socket.on('getReportMetaData', (request: any, respond: Function) => {
+    console.log('::: session %s: Received getReportMetaData for user %s at %s',
+        socket.id, socket.koheseUser.username, socket.handshake.address);
     respond(fs.readdirSync(_REPORTS_DIRECTORY_PATH).filter((fileName: string) => {
+      // Filter for files that contain report data, by excluding metadata files that start with '.'
       return (!fileName.startsWith('.'));
     }).map((fileName: string) => {
+      let metaContent;
+      let fullFilePath = Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + fileName);
+      if (fs.existsSync(fullFilePath)) {
+        metaContent = fs.readFileSync(fullFilePath, 'utf8');
+      }
       return {
         name: Path.basename(fileName),
-        metaContent: fs.readFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + fileName), 'utf8')
+        metaContent: metaContent
       }
     }));
   });
 
   socket.on('renameReport', (request: any, respond: Function) => {
+    console.log('::: session %s: Received renameReport from %s to %s for user %s at %s',
+        socket.id, request.oldReportName, request.newReportName, socket.koheseUser.username, socket.handshake.address);
+
     fs.renameSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.oldReportName),
       Path.resolve(_REPORTS_DIRECTORY_PATH, request.newReportName));
     fs.renameSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
@@ -956,6 +985,8 @@ function KIOItemServer(socket){
   });
 
   socket.on('getReportPreview', (request: any, respond: Function) => {
+    console.log('::: session %s: Received getReportPreview for %s for user %s at %s',
+        socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
     let reportPreview: string;
     let reportName: string = request.reportName;
     let format: string;
@@ -1036,6 +1067,8 @@ function KIOItemServer(socket){
   });
 
   socket.on('removeReport', (request: any, respond: Function) => {
+    console.log('::: session %s: Received removeReport for %s for user %s at %s',
+        socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
     fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName));
     fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
       reportName));
@@ -1077,7 +1110,7 @@ function KIOItemServer(socket){
   });
 
   socket.on('VersionControl/commit', function (request, sendResponse) {
-    var idsArray = Array.from(request.proxyIds);
+    var idsArray : Array<string> = Array.from(request.proxyIds);
 
     KDBRepo.commit(idsArray, request.username, request.email,
       request.message).then(function (commitIdMap) {

@@ -60,12 +60,13 @@ async function initialize (koheseKdbPath, indexAndExit) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
-  // TODO: Need to remove storage of modelDef.json
-  kdbFS.storeJSONDoc(kdbDirPath + '/modelDef.json', kdbModel.modelDef);
-
   checkAndCreateDir(kdbDirPath);
-  checkAndCreateDir(path.join(kdbDirPath, 'kohese-kdb'));
+
+  // TODO: Need to remove storage of modelDef.json
+  kdbFS.storeJSONDoc(kdbDirPath + '/modelDef.json', kdbModel.modelDefinitions);
+
   // TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
+  checkAndCreateDir(koheseKDBDirPath);
 
   TreeConfiguration.getWorkingTree().getRootProxy().repoPath = path.join(koheseKDBDirPath, 'Root.json');
 
@@ -96,8 +97,11 @@ async function initialize (koheseKdbPath, indexAndExit) {
     var uuid = require('node-uuid');
     var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
     // eslint-disable-next-line no-unused-vars
-    return createRepoStructure(koheseKDBDirPath).then(function(repo) {
+    return createRepoStructure(koheseKDBDirPath).then(async function(repo) {
       kdbFS.storeJSONDoc(path.join(koheseKDBDirPath, 'Root.json'), newRoot);
+      await KDBRepo.add('ROOT','Root.json');
+      await KDBRepo.add('ROOT','.gitignore');
+      await KDBRepo.commit(['ROOT'], 'default-username', 'default-email', 'Creation of new repo');
 
       loadKoheseModelsAndViews();
 
@@ -264,10 +268,12 @@ function storeModelAnalysis(analysisInstance){
   if (proxy) {
     console.log('::: Storing analysis for ' + proxy.item.id + ' - ' + proxy.item.name);
 
-    var repo = proxy.getRepositoryProxy();
-    var analysisPath = determineRepoStoragePath(repo) + '/Analysis/' + modelInstanceId + '.json';
+    let repo = proxy.getRepositoryProxy();
+    let analysisDir = determineRepoStoragePath(repo) + '/Analysis';
+    checkAndCreateDir(analysisDir, true);
 
-    kdbFS.storeJSONDoc(analysisPath, analysisInstance);
+    let analysisFilePath =  analysisDir + '/' + modelInstanceId + '.json';
+    kdbFS.storeJSONDoc(analysisFilePath, analysisInstance);
 
   } else {
     console.log('*** No item found for analysis instance: ' + modelInstanceId);

@@ -5,10 +5,36 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169859,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1572491077359,
+  "modifiedOn": 1588793690702,
   "modelName": "UseCase",
-  "icon": "fa fa-tasks",
+  "icon": "fa fa-lemon-o",
   "color": "#000000",
+  "viewProperties": {
+    "Actors": {
+      "displayName": "Actors",
+      "inputType": {
+        "type": "",
+        "options": {}
+      },
+      "name": "Actors"
+    },
+    "BasicPath": {
+      "displayName": "BasicPath",
+      "inputType": {
+        "type": "",
+        "options": {}
+      },
+      "name": "BasicPath"
+    },
+    "AlternativePaths": {
+      "displayName": "AlternativePaths",
+      "inputType": {
+        "type": "",
+        "options": {}
+      },
+      "name": "AlternativePaths"
+    }
+  },
   "localTypes": {
     "FlowOfEvents": {
       "name": "FlowOfEvents",
@@ -16,6 +42,22 @@
       "icon": "",
       "color": "#000000",
       "viewProperties": {
+        "PathName": {
+          "name": "PathName",
+          "displayName": "PathName",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
+        "PathDescription": {
+          "name": "PathDescription",
+          "displayName": "PathDescription",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
         "Preconditions": {
           "name": "Preconditions",
           "displayName": "Preconditions",
@@ -54,16 +96,24 @@
               "kind": "list",
               "contents": [
                 {
-                  "propertyName": "Preconditions",
-                  "customLabel": "Preconditions",
+                  "propertyName": "PathName",
+                  "customLabel": "PathName",
                   "labelOrientation": "Top",
                   "kind": "text",
                   "visible": true,
                   "editable": true
                 },
                 {
-                  "propertyName": "Postconditions",
-                  "customLabel": "Postconditions",
+                  "propertyName": "PathDescription",
+                  "customLabel": "PathDescription",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "Preconditions",
+                  "customLabel": "Preconditions",
                   "labelOrientation": "Top",
                   "kind": "text",
                   "visible": true,
@@ -75,6 +125,15 @@
                   "labelOrientation": "Top",
                   "kind": "",
                   "visible": true,
+                  "editable": true,
+                  "tableDefinition": "b1090aa0-fb86-11e9-be56-311e0135452a"
+                },
+                {
+                  "propertyName": "Postconditions",
+                  "customLabel": "Postconditions",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
                   "editable": true
                 }
               ]
@@ -83,35 +142,10 @@
         }
       },
       "defaultFormatKey": {
-        "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1"
+        "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+        "document": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1"
       },
       "tableDefinitions": {}
-    }
-  },
-  "viewProperties": {
-    "Actors": {
-      "displayName": "Actors",
-      "inputType": {
-        "type": "text",
-        "options": {}
-      },
-      "name": "Actors"
-    },
-    "BasicPath": {
-      "displayName": "BasicPath",
-      "inputType": {
-        "type": "",
-        "options": {}
-      },
-      "name": "BasicPath"
-    },
-    "AlternativePaths": {
-      "displayName": "AlternativePaths",
-      "inputType": {
-        "type": "",
-        "options": {}
-      },
-      "name": "AlternativePaths"
     }
   },
   "formatDefinitions": {
@@ -135,6 +169,22 @@
         {
           "kind": "list",
           "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
             {
               "propertyName": "id",
               "customLabel": "ID",
@@ -200,20 +250,52 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
-            },
-            {
-              "propertyName": "decisionState",
-              "customLabel": "decisionState",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "state-editor",
-              "editable": true
             },
             {
               "propertyName": "approvedBy",
@@ -276,7 +358,7 @@
               "customLabel": "Actors",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "text",
+              "kind": "",
               "editable": true
             },
             {
@@ -293,6 +375,19 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
+              "editable": true
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "decisionState",
+              "customLabel": "decisionState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
               "editable": true
             }
           ]
@@ -331,6 +426,26 @@
               "customLabel": "Actors",
               "labelOrientation": "Top",
               "kind": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "BasicPath",
+              "customLabel": "BasicPath",
+              "labelOrientation": "Top",
+              "kind": "",
+              "formatDefinition": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "AlternativePaths",
+              "customLabel": "AlternativePaths",
+              "labelOrientation": "Top",
+              "kind": "",
+              "formatDefinition": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             }

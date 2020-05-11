@@ -20,10 +20,8 @@ import { TreeRow } from '../tree-row/tree-row.class';
 import { ActionGroup } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { Filter } from '../../filter/filter.class';
 import { MockItem } from '../../../../mocks/data/MockItem';
-import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 
 describe('Component: default-tree', () => {
   let component: DefaultTreeComponent;
@@ -57,10 +55,8 @@ describe('Component: default-tree', () => {
   });
   
   it('builds a TreeRow for a new Item', fakeAsync(() => {
-    new KoheseModel(MockDataModel());
-    KoheseModel.modelDefinitionLoadingComplete();
     let item: any = MockItem();
-    item.id = 'Kurios Iesous';
+    item.id = 'test-new-row';
     item.parentId = 'test-uuid3';
     for (let j: number = 0; j < component.visibleRows.length; j++) {
       if (item.parentId === (component.visibleRows[j].object as ItemProxy).
@@ -69,12 +65,8 @@ describe('Component: default-tree', () => {
         break;
       }
     }
-    TreeConfiguration.getWorkingTree().getChangeSubject().next({
-      type: 'create',
-      kind: 'Item',
-      id: item.id,
-      proxy: new ItemProxy('Item', item)
-    });
+    let proxy = new ItemProxy('Item', item);
+
     tick();
     let newRowIndex: number;
     for (let j: number = 0; j < component.visibleRows.length; j++) {
@@ -83,6 +75,7 @@ describe('Component: default-tree', () => {
         break;
       }
     }
+
     expect(newRowIndex).toEqual(5);
   }));
   
@@ -91,13 +84,8 @@ describe('Component: default-tree', () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       'test-uuid6');
     proxy.deleteItem(false);
-    TreeConfiguration.getWorkingTree().getChangeSubject().next({
-      type: 'delete',
-      kind: 'Item',
-      id: proxy.item.id,
-      proxy: proxy
-    });
     tick();
+
     expect(component.visibleRows.length).toEqual(numberOfVisibleRows - 1);
   }));
   
@@ -146,6 +134,7 @@ describe('Component: default-tree', () => {
     component.toggleSelectionSynchronization();
     component.toggleSelectionSynchronization();
 
+    // TODO: This test seems to be missing some expect clauses
     expect(true).toEqual(true);
   }));
   
@@ -162,7 +151,7 @@ describe('Component: default-tree', () => {
   
   it('moves an Item before another Item', () => {
     let targetingProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-      getProxyFor('Kurios Iesous');
+      getProxyFor('test-uuid5');
     targetingProxy.parentProxy.makeChildrenManualOrdered();
     let targetProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid1');
@@ -174,7 +163,7 @@ describe('Component: default-tree', () => {
   
   it('moves an Item after another Item', () => {
     let targetProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-      getProxyFor('Kurios Iesous');
+      getProxyFor('test-uuid5');
     targetProxy.parentProxy.makeChildrenManualOrdered();
     let targetingProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid2');
@@ -186,7 +175,7 @@ describe('Component: default-tree', () => {
   
   it('makes an Item a child of another Item', () => {
     let targetProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-      getProxyFor('Kurios Iesous');
+      getProxyFor('test-uuid5');
     let targetingProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid3');
     component.selectedObjectsSubject.next([targetingProxy]);

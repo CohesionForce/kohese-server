@@ -44,6 +44,11 @@ export class TablePreviewDialogComponent implements OnInit {
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
+        getIcon: (element: any) => {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
+            item.icon;
+        },
         selection: [this.previewProxy],
         quickSelectElements: this._itemRepository.getRecentProxies()
       }

@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
   Input, OnInit } from '@angular/core';
 
-import { FormatDefinition } from '../../type-editor/FormatDefinition.interface';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { FormatContainer,
   FormatContainerKind } from '../../type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
@@ -16,15 +17,6 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormatDefinitionEditorComponent implements OnInit {
-  private _formatDefinition: FormatDefinition;
-  get formatDefinition() {
-    return this._formatDefinition;
-  }
-  @Input('formatDefinition')
-  set formatDefinition(formatDefinition: FormatDefinition) {
-    this._formatDefinition = formatDefinition;
-  }
-  
   private _dataModel: any;
   get dataModel() {
     return this._dataModel;
@@ -41,6 +33,18 @@ export class FormatDefinitionEditorComponent implements OnInit {
   @Input('viewModel')
   set viewModel(viewModel: any) {
     this._viewModel = viewModel;
+  }
+  
+  private _formatDefinition: FormatDefinition;
+  get formatDefinition() {
+    return this._formatDefinition;
+  }
+  @Input('formatDefinition')
+  set formatDefinition(formatDefinition: FormatDefinition) {
+    this._formatDefinition = formatDefinition;
+    
+    this._isDefaultFormatDefinition = (this._viewModel.defaultFormatKey[
+      FormatDefinitionType.DEFAULT] === this._formatDefinition.id);
   }
   
   private _attributes: Array<any>;
@@ -66,6 +70,11 @@ export class FormatDefinitionEditorComponent implements OnInit {
     this._isDisabled = isDisabled;
   }
   
+  private _isDefaultFormatDefinition: boolean;
+  get isDefaultFormatDefinition() {
+    return this._isDefaultFormatDefinition;
+  }
+  
   private _userInterfaceTypes: any = {
     'boolean': {
       'Boolean': 'boolean'
@@ -75,7 +84,8 @@ export class FormatDefinitionEditorComponent implements OnInit {
     },
     'string': {
       'Text': 'text',
-      'Markdown': 'markdown'
+      'Markdown': 'markdown',
+      'Masked String': 'maskedString'
     },
     'StateMachine': {
       'State': 'state-editor'
@@ -105,7 +115,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
       item: this._dataModel
     } as ItemProxy);
     do {
-      typeNames.push(dataModelItemProxy.item.base);
+      typeNames.push(dataModelItemProxy.item.name);
       dataModelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
         dataModelItemProxy.item.base);
     } while (dataModelItemProxy);
@@ -136,6 +146,71 @@ export class FormatDefinitionEditorComponent implements OnInit {
         }
       }
     }, undefined);
+  }
+  
+  public areStateAttributesGroupable(): boolean {
+    for (let attributeName in this._dataModel.classProperties) {
+      let type: any = this._dataModel.classProperties[attributeName].
+        definition.type;
+      type = (Array.isArray(type) ? type[0] : type);
+      if (type === 'StateMachine') {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  public areStateAttributesGrouped(): boolean {
+    if (!this.areStateAttributesGroupable()) {
+      return false;
+    }
+    
+    let formatContainer: FormatContainer = this._formatDefinition.containers[
+      0];
+    for (let j: number = 0; j < formatContainer.contents.length; j++) {
+      if (formatContainer.contents[j].kind === 'state-editor') {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
+  public toggleStateAttributeGrouping(): void {
+    if (this.areStateAttributesGrouped()) {
+      let attributeNames: Array<string> = Object.keys(this._dataModel.
+        classProperties);
+      this._formatDefinition.containers[1].contents.reverse();
+      for (let j: number = (this._formatDefinition.containers[1].contents.
+        length - 1); j >= 0; j--) {
+        let propertyDefinition: PropertyDefinition = this._formatDefinition.
+          containers[1].contents.splice(j, 1)[0];
+        /* Adjust insertion index based on 'name' being present in the
+        header */
+        this._formatDefinition.containers[0].contents.splice(attributeNames.
+          indexOf(propertyDefinition.propertyName) - 1, 0, propertyDefinition);
+      }
+      
+      this._formatDefinition.containers.splice(1, 1);
+    } else {
+      let formatContainer: FormatContainer = {
+        kind: FormatContainerKind.VERTICAL,
+        contents: []
+      };
+      
+      for (let j: number = (this._formatDefinition.containers[0].contents.
+        length - 1); j >= 0; j--) {
+        let propertyDefinition: PropertyDefinition = this._formatDefinition.
+          containers[0].contents[j];
+        if (propertyDefinition.kind === 'state-editor') {
+          this._formatDefinition.containers[0].contents.splice(j, 1);
+          formatContainer.contents.unshift(propertyDefinition);
+        }
+      }
+      
+      this._formatDefinition.containers.splice(1, 0, formatContainer);
+    }
   }
   
   public doesPropertyDefinitionMatchSelection(option: any, selection: any):

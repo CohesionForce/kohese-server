@@ -2,25 +2,46 @@
 import {of as observableOf,  BehaviorSubject ,  Observable ,  Subject } from 'rxjs';
 
 
-import { MockItem, MockRoot } from '../data/MockItem';
+import { MockItem } from '../data/MockItem';
 import { MockViewData } from '../data/MockViewData';
-import { MockDataModel } from '../data/MockDataModel';
+import { MockDataModel, ModelDefinitions } from '../data/MockDataModel';
 import { ItemProxy } from '../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../common/src/KoheseModel';
 import { RepoStates,
   TreeConfigType } from '../../src/services/item-repository/item-repository.service';
+import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
 
 export class MockItemRepository {
+  static modelDefinitions = ModelDefinitions();
+  static singleton = new MockItemRepository();
+
   mockRootProxy = ItemProxy.getWorkingTree().getRootProxy();
   state: any;
 
   constructor() {
+    console.log('### MIR Constructor called');
+    if (MockItemRepository.singleton) {
+      this.syncMock();
+      return MockItemRepository.singleton;
+    }
+    console.log('### MIR Creating singleton');
+    MockItemRepository.singleton = this;
+    this.syncMock();
+  }
 
+  syncMock() {
+
+    // TODO: Uncomment the following block to switch to the full data model
+    // this.syncFull();
+    // return;
+
+    TreeConfiguration.getWorkingTree().reset();
     let modelProxy = new KoheseModel(MockDataModel());
+    let viewModelProxy = new ItemProxy('KoheseView', MockViewData());
     KoheseModel.modelDefinitionLoadingComplete();
+    modelProxy.type = new KoheseType(modelProxy, viewModelProxy);
 
-    new ItemProxy('KoheseView', MockViewData());
     let numberOfItemsToAdd: number = 7;
     for (let j: number = 0; j < numberOfItemsToAdd; j++) {
       let item: any = MockItem();
@@ -31,6 +52,47 @@ export class MockItemRepository {
       item.id = item.id + (j + 1);
       new ItemProxy('Item', item);
     }
+    TreeConfiguration.getWorkingTree().loadingComplete();
+  }
+
+  syncFull () {
+    TreeConfiguration.getWorkingTree().reset();
+
+    for(let modelName in MockItemRepository.modelDefinitions.model) {
+      console.log('::: Loading ' + modelName);
+      let modelDefn = MockItemRepository.modelDefinitions.model[modelName];
+      let model = new KoheseModel(modelDefn);
+    }
+
+    for(let viewName in MockItemRepository.modelDefinitions.view) {
+      console.log('::: Loading ' + viewName);
+      let viewDefn = MockItemRepository.modelDefinitions.view[viewName];
+      let view = new ItemProxy('KoheseView',viewDefn)
+    }
+
+    KoheseModel.modelDefinitionLoadingComplete();
+
+    // Mock the effect of KoheseType
+    let working = ItemProxy.getWorkingTree();
+    for(let modelName in MockItemRepository.modelDefinitions.model) {
+      let modelProxy : KoheseModel = (working.getProxyFor(modelName)) as KoheseModel;
+      let viewId = 'view-' + modelName.toLowerCase();
+      let viewProxy = working.getProxyFor(viewId);
+      modelProxy.type = new KoheseType(modelProxy, viewProxy);
+    }
+
+    let numberOfItemsToAdd: number = 7;
+    for (let j: number = 0; j < numberOfItemsToAdd; j++) {
+      let item: any = MockItem();
+      /* Delete the parentId so that this Item will be added as a child of the
+      root proxy */
+      delete item.parentId;
+      // Make the ID of each of these added Items distinct among each other
+      item.id = item.id + (j + 1);
+      new ItemProxy('Action', item);
+    }
+
+    TreeConfiguration.getWorkingTree().loadingComplete();
   }
 
   getRepoStatusSubject() {

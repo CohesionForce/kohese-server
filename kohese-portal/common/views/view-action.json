@@ -5,7 +5,6 @@
   "modelName": "Action",
   "icon": "fa fa-paper-plane",
   "color": "#00008b",
-  "localTypes": {},
   "viewProperties": {
     "actionState": {
       "inputType": {
@@ -26,7 +25,8 @@
       },
       "required": false,
       "default": "Proposed",
-      "displayName": "taskState"
+      "displayName": "actionState",
+      "name": "actionState"
     },
     "assignedTo": {
       "inputType": {
@@ -35,7 +35,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "assignedTo"
+      "displayName": "assignedTo",
+      "name": "assignedTo"
     },
     "estimatedStart": {
       "inputType": {
@@ -44,7 +45,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "estimatedStart"
+      "displayName": "estimatedStart",
+      "name": "estimatedStart"
     },
     "estimatedCompletion": {
       "inputType": {
@@ -53,7 +55,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "estimatedCompletion"
+      "displayName": "estimatedCompletion",
+      "name": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
       "inputType": {
@@ -64,7 +67,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "estimatedHoursEffort"
+      "displayName": "estimatedHoursEffort",
+      "name": "estimatedHoursEffort"
     },
     "actualStart": {
       "inputType": {
@@ -73,7 +77,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "actualStart"
+      "displayName": "actualStart",
+      "name": "actualStart"
     },
     "actualCompletion": {
       "inputType": {
@@ -82,7 +87,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "actualCompletion"
+      "displayName": "actualCompletion",
+      "name": "actualCompletion"
     },
     "remainingHoursEffort": {
       "inputType": {
@@ -93,7 +99,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "remainingHoursEffort"
+      "displayName": "remainingHoursEffort",
+      "name": "remainingHoursEffort"
     },
     "actualHoursEffort": {
       "inputType": {
@@ -104,7 +111,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "actualHoursEffort"
+      "displayName": "actualHoursEffort",
+      "name": "actualHoursEffort"
     },
     "predecessors": {
       "inputType": {
@@ -117,9 +125,11 @@
       },
       "required": false,
       "default": null,
-      "displayName": "predecessors"
+      "displayName": "predecessors",
+      "name": "predecessors"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "f5aec260-5d71-11ea-8553-c51caee8a5fd": {
       "id": "f5aec260-5d71-11ea-8553-c51caee8a5fd",
@@ -141,6 +151,22 @@
         {
           "kind": "list",
           "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
             {
               "propertyName": "id",
               "customLabel": "ID",
@@ -206,20 +232,52 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
-            },
-            {
-              "propertyName": "decisionState",
-              "customLabel": "decisionState",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "state-editor",
-              "editable": true
             },
             {
               "propertyName": "approvedBy",
@@ -275,14 +333,6 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
-              "editable": true
-            },
-            {
-              "propertyName": "actionState",
-              "customLabel": "actionState",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "state-editor",
               "editable": true
             },
             {
@@ -366,6 +416,27 @@
               "editable": true
             }
           ]
+        },
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "decisionState",
+              "customLabel": "decisionState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
+              "editable": true
+            },
+            {
+              "propertyName": "actionState",
+              "customLabel": "actionState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
+              "editable": true
+            }
+          ]
         }
       ]
     },
@@ -393,6 +464,33 @@
               "customLabel": "Description",
               "labelOrientation": "Top",
               "kind": "markdown",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "assignedTo",
+              "customLabel": "Assigned To",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "decisionState",
+              "customLabel": "Decision State",
+              "labelOrientation": "Left",
+              "kind": "state-editor",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "actionState",
+              "customLabel": "Action State",
+              "labelOrientation": "Left",
+              "kind": "state-editor",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             }
@@ -471,6 +569,15 @@
               "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
             },
             {
+              "propertyName": "assignedTo",
+              "customLabel": "Assigned To",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
               "propertyName": "decisionState",
               "customLabel": "Decision State",
               "labelOrientation": "Top",
@@ -494,8 +601,8 @@
   "defaultFormatKey": {
     "default": "f5aec260-5d71-11ea-8553-c51caee8a5fd",
     "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
-    "card": "420b0560-1781-11ea-a38d-57607570dcb1"
+    "card": "420b0560-1781-11ea-a38d-57607570dcb1",
+    "board": "420b0560-1781-11ea-a38d-57607570dcb1"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }

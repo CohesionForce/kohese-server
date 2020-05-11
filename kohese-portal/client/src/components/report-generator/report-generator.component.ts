@@ -105,6 +105,7 @@ export class ReportGeneratorComponent implements OnInit {
     } else {
       typeFormat.active = true;
     }
+    // TODO: Need evaluate setting of dirty
     this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
@@ -121,6 +122,7 @@ export class ReportGeneratorComponent implements OnInit {
       propertyFormat.active = true;
     }
     console.log(this.selectedType);
+    // TODO: Need evaluate setting of dirty
     this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
@@ -131,6 +133,7 @@ export class ReportGeneratorComponent implements OnInit {
         selectedReport.item.typeFormats[type].active = true;
       }
     }
+    // TODO: Need evaluate setting of dirty
     this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
@@ -140,6 +143,7 @@ export class ReportGeneratorComponent implements OnInit {
       selectedReport.item.typeFormats[type].active = false;
 
     }
+    // TODO: Need evaluate setting of dirty
     this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
@@ -151,6 +155,7 @@ export class ReportGeneratorComponent implements OnInit {
       this.selectedTypeFormat.orderedProperties.push(property);
       }
     }
+    // TODO: Need evaluate setting of dirty
     this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
@@ -160,6 +165,7 @@ export class ReportGeneratorComponent implements OnInit {
       this.selectedTypeFormat.properties[property].active = false;
     }
     this.selectedTypeFormat.orderedProperties = [];
+    // TODO: Need evaluate setting of dirty
     this.selectedReport.dirty = true;
     this.changeRef.markForCheck();
   }
@@ -179,24 +185,25 @@ export class ReportGeneratorComponent implements OnInit {
   saveReport() {
     this.itemRepository.upsertItem(this.selectedReport.kind, this.
       selectedReport.item).then((newProxy)=>{
+      // TODO: Need evaluate setting of dirty
       this.selectedReport.dirty = false;
       this.changeRef.markForCheck();
     });
   }
 
-  deleteReport() {
-    this.dialogService.openConfirmDialog('Delete this report', 'Are you sure you wish to delete this report definition?')
-    .subscribe((confirm) => {
-      if (confirm) {
-        this.itemRepository.deleteItem(this.selectedReport, false)
-          .then((results) => {
-            let index = this.reportDefs.indexOf(this.selectedReport);
-            this.reportDefs.splice(index, 1);
-            this.selectedReport = undefined;
-            this.changeRef.markForCheck();
-          })
-      }
-    })
+  public async deleteReport(): Promise<void> {
+    let confirm: any = await this.dialogService.openConfirmDialog('Delete ' +
+      'this report', 'Are you sure you wish to delete this report ' +
+      'definition?');
+    if (confirm) {
+      this.itemRepository.deleteItem(this.selectedReport, false)
+        .then((results) => {
+          let index = this.reportDefs.indexOf(this.selectedReport);
+          this.reportDefs.splice(index, 1);
+          this.selectedReport = undefined;
+          this.changeRef.markForCheck();
+        });
+    }
   }
 }
 

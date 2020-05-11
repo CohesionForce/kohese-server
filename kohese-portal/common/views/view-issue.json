@@ -5,7 +5,6 @@
   "modelName": "Issue",
   "icon": "fa fa-exclamation-circle",
   "color": "#ff0000",
-  "localTypes": {},
   "viewProperties": {
     "issueState": {
       "inputType": {
@@ -20,25 +19,16 @@
       },
       "required": false,
       "default": "Observed",
-      "displayName": "issueState"
+      "displayName": "issueState",
+      "name": "issueState"
     },
-    "observedOn": {
+    "relatedIssues": {
+      "name": "relatedIssues",
+      "displayName": "Related Issues",
       "inputType": {
-        "type": "date",
+        "type": "",
         "options": {}
-      },
-      "required": false,
-      "default": null,
-      "displayName": "observedOn"
-    },
-    "observedBy": {
-      "inputType": {
-        "type": "user-selector",
-        "options": {}
-      },
-      "required": false,
-      "default": null,
-      "displayName": "observedBy"
+      }
     },
     "analysisAction": {
       "inputType": {
@@ -51,20 +41,8 @@
       },
       "required": true,
       "default": null,
-      "displayName": "analysisAction"
-    },
-    "context": {
-      "inputType": {
-        "type": "proxy-selector",
-        "options": {
-          "allowMultiSelect": false,
-          "type": "Item",
-          "useAdvancedSelector": false
-        }
-      },
-      "required": true,
-      "default": null,
-      "displayName": "context"
+      "displayName": "analysisAction",
+      "name": "analysisAction"
     },
     "resolutionActions": {
       "inputType": {
@@ -77,20 +55,23 @@
       },
       "required": true,
       "default": null,
-      "displayName": "resolutionActions"
+      "displayName": "resolutionActions",
+      "name": "resolutionActions"
     },
     "response": {
       "inputType": {
-        "type": "text",
+        "type": "markdown",
         "options": {
           "isMultiLine": true
         }
       },
       "required": false,
       "default": "",
-      "displayName": "response"
+      "displayName": "response",
+      "name": "response"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1": {
       "id": "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1",
@@ -112,6 +93,22 @@
         {
           "kind": "list",
           "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
             {
               "propertyName": "id",
               "customLabel": "ID",
@@ -177,6 +174,46 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
@@ -209,11 +246,11 @@
               "editable": true
             },
             {
-              "propertyName": "issueState",
-              "customLabel": "issueState",
+              "propertyName": "relatedIssues",
+              "customLabel": "relatedIssues",
               "labelOrientation": "Top",
+              "kind": "",
               "visible": true,
-              "kind": "state-editor",
               "editable": true
             },
             {
@@ -237,7 +274,20 @@
               "customLabel": "response",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "text",
+              "kind": "markdown",
+              "editable": true
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "issueState",
+              "customLabel": "issueState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
               "editable": true
             }
           ]
@@ -270,6 +320,33 @@
               "kind": "markdown",
               "visible": true,
               "editable": true
+            },
+            {
+              "propertyName": "observedBy",
+              "customLabel": "Observed By",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "observedOn",
+              "customLabel": "Observed On",
+              "labelOrientation": "Left",
+              "kind": "date",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "issueState",
+              "customLabel": "Issue State",
+              "labelOrientation": "Left",
+              "kind": "state-editor",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
             }
           ]
         }
@@ -279,8 +356,9 @@
   },
   "defaultFormatKey": {
     "default": "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1",
-    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "card": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "board": "89324a90-a7af-11e8-8662-71e48f0160fe"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }

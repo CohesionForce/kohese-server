@@ -8,35 +8,43 @@
   "properties": {
     "modelName": {
       "type": "string",
-      "required": true
+      "required": true,
+      "name": "modelName"
     },
     "icon": {
-      "type": "string"
+      "type": "string",
+      "name": "icon"
     },
     "color": {
       "type": "string",
       "required": true,
-      "default": "#000000"
+      "default": "#000000",
+      "name": "color"
     },
     "viewProperties": {
       "type": "object",
-      "required": true
+      "required": true,
+      "name": "viewProperties"
     },
     "localTypes": {
       "type": "object",
-      "required": true
+      "required": true,
+      "name": "localTypes"
     },
-    "formatDefinitions" : {
+    "formatDefinitions": {
       "type": "object",
-      "required": true
+      "required": true,
+      "name": "formatDefinitions"
     },
-    "defaultFormatKey" : {
+    "defaultFormatKey": {
       "type": "object",
-      "required": true
+      "required": true,
+      "name": "defaultFormatKey"
     },
     "tableDefinitions": {
       "type": "object",
-      "required": true
+      "required": true,
+      "name": "tableDefinitions"
     }
   },
   "validations": [],

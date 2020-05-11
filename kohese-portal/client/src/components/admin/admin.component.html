@@ -1,75 +1,78 @@
-<div class="admin-screen">
+<ng-container *ngIf="sessionMap else initializing">
   <lens></lens>
   <div class="panel-heading">Admin</div>
-  <div class="users-screen">
-    <ng-container *ngIf="sessions">
-      <div class="session-container">
-        <h2>Sessions:</h2>
-        <div *ngFor="let session of (sessions | mapKey)">
-          {{sessions[session].username}} - {{sessions[session].address}}
-          <ng-container *ngIf="sessions[session].numberOfConnections">
-             - {{sessions[session].numberOfConnections}}
-             <ng-container *ngIf="1 === sessions[session].numberOfConnections">
-               Connection
-             </ng-container>
-             <ng-container *ngIf="sessions[session].numberOfConnections > 1">
-               Connections
-             </ng-container>
+  <div [ngStyle]="{ 'height': ((lens === ApplicationLens.DEFAULT) ? '35%' :
+    'calc(35% - 50px)') }">
+    <div style="height: 70px;">
+      <h2>Sessions</h2>
+    </div>
+    <div style="height: calc(100% - 70px); overflow-y: auto;">
+      <ng-container *ngFor="let session of Object.keys(sessionMap)">
+        <div style="width: 100%;">
+          {{sessionMap[session].username}} - {{sessionMap[session].address}}
+          <ng-container *ngIf="sessionMap[session].numberOfConnections">
+            - {{sessionMap[session].numberOfConnections}} Connection{{
+            (sessionMap[session].numberOfConnections > 1) ? 's' : ''}}
           </ng-container>
         </div>
-      </div>
-    </ng-container>
-    <div class="user-container">
-      <div id="admin-user-list">
-        <h2>Users:</h2>
-        <div class="card-container" *ngFor="let userProxy of users">
-          <div class="panel panel-default">
-            <div class="panel-title">
-              {{userProxy.item.name}}
-            </div>
-            <div class="panel-body">
-              {{userProxy.item.description}}
-              Modified on {{userProxy.item.modifiedOn | date }} by {{userProxy.item.modifiedBy}}
-            </div>
-            <div class="panel-footer">
-              <button class="btn btn-primary"
-                (click)="deleteUser(userProxy)">
-                  <i class="fa fa-trash"></i>
-                    Delete
-              </button>
-              <br/>
-              <button class="btn btn-primary"
-                (click)="editUser(userProxy)">
-                  <i class="fa fa-edit"></i>
-                    Edit
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="admin-user-form">
-        <button class="btn btn-default"
-          (click)="addUser()"
-          *ngIf="!addUserForm && !editUserForm">Add User
-        </button>
-
-        <div *ngIf="addUserForm || editUserForm">
-          <h3>{{currentForm}}</h3>
-            <form>
-              <label>Username<input [(ngModel)]="usernameInput" name="usernameInput" type="text"/></label>
-              <br/>
-              <label>Description<input [(ngModel)]="descriptionInput" name="descriptionInput" type="text"/></label>
-              <br/>
-              <label>Email<input [(ngModel)]="emailInput" name="emailInput" type="email"/></label>
-              <label>Password<input [(ngModel)]="passwordInput" name="passwordInput" type="password"/></label>
-              <br/>
-              <label>Confirm Password<input [(ngModel)]="confirmPasswordInput" name="confirmPasswordInput" type="password"/></label>
-              <br/>
-            </form>
-            <button class="btn btn-primary" (click)="updateUser()">Submit</button>
-            <button class="btn btn-danger" (click)="cancelForm()">Cancel</button>
-        </div>
-      </div>
+      </ng-container>
     </div>
   </div>
+  <div style="height: calc(65% - 34px);">
+    <div style="height: 70px; display: flex; flex-direction: row;">
+      <h2>Users</h2>
+      <button mat-icon-button matTooltip="Add a user" style="margin-left:
+        auto;" (click)="add()">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+    </div>
+    <div style="height: calc(100% - 70px); overflow-y: auto;">
+      <ng-container *ngFor="let user of sessionService.users">
+        <mat-card [ngStyle]="{ 'background-color': koheseUserViewModel.
+          color }" style="color: whitesmoke; margin-bottom: 3px;">
+          <mat-card-title style="display: flex; flex-direction: row;">
+            <h3>
+              <mat-icon class="{{koheseUserViewModel.icon}}">
+              </mat-icon>
+              {{user.name}}
+            </h3>
+            <ng-container *ngIf="(editableSet.indexOf(user.id) === -1) else
+              editableBlock">
+              <button mat-icon-button matTooltip="Edit this user"
+                style="margin-left: auto;" (click)="editableSet.push(user.
+                id)">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+            </ng-container>
+            <ng-template #editableBlock>
+              <button mat-icon-button matTooltip="Save this user"
+                style="margin-left: auto;" (click)="save(user)">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Discard unsaved changes to
+                this user" (click)="discardChanges(user)">
+                <mat-icon class="fa fa-times"></mat-icon>
+              </button>
+            </ng-template>
+            <button mat-icon-button matTooltip="Remove this user"
+              (click)="remove(user)">
+              <mat-icon class="fa fa-trash"></mat-icon>
+            </button>
+          </mat-card-title>
+          <mat-card-content style="background-color: white; color: black;">
+            <format-object-editor [type]="koheseUserDataModel"
+              [object]="user" [formatDefinitionType]="FormatDefinitionType.
+              DEFAULT" [disabled]="(editableSet.indexOf(user.id) === -1)">
+            </format-object-editor>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>
+<ng-template #initializing>
+  <div style="height: 100%; width: 100%; display: flex; justify-content:
+    center; align-items: center;">
+    <mat-spinner mode="indeterminate"></mat-spinner>
+  </div>
+</ng-template>

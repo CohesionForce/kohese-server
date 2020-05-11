@@ -3,16 +3,18 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
 import { MatTable } from '@angular/material';
 import * as Uuid from 'uuid/v1';
 
-import { DialogService,
-  DialogComponent } from '../../../services/dialog/dialog.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
 import { FormatDefinition,
   FormatDefinitionType } from '../FormatDefinition.interface';
-import { FormatContainerKind } from '../FormatContainer.interface';
+import { FormatContainer,
+  FormatContainerKind } from '../FormatContainer.interface';
 import { PropertyDefinition } from '../PropertyDefinition.interface';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
+import { InputDialogKind,
+  InputDialogComponent } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
@@ -162,6 +164,10 @@ export class DataModelEditorComponent {
     return this._attributes;
   }
   
+  get Array() {
+    return Array;
+  }
+  
   get Object() {
     return Object;
   }
@@ -203,7 +209,7 @@ export class DataModelEditorComponent {
       let response: any = await this._dialogService.openYesNoDialog(
         'Display Modifications', 'All unsaved modifications to this kind ' +
         'are to be saved if an attribute is added to this kind. Do you want ' +
-        'to proceed?').toPromise();
+        'to proceed?');
       if (!response) {
         return;
       }
@@ -211,7 +217,10 @@ export class DataModelEditorComponent {
     
     let defaultFormatDefinition: FormatDefinition = viewModelProxy.item.
       formatDefinitions[viewModelProxy.item.defaultFormatKey[
-      FormatDefinitionType.DEFAULT]];  
+      FormatDefinitionType.DEFAULT]];
+    if (this.areStateAttributesGrouped(defaultFormatDefinition)) {
+      defaultFormatDefinition.containers[1].contents.length = 0;
+    }
     defaultFormatDefinition.containers[0].contents.length = 0;
     
     let parentTypeViewModel: any = TreeConfiguration.getWorkingTree().
@@ -224,6 +233,18 @@ export class DataModelEditorComponent {
       defaultFormatDefinition.containers[0].contents.push(JSON.parse(JSON.
         stringify(parentTypeDefaultFormatDefinition.containers[0].contents[
         j])));
+    }
+    if (this.areStateAttributesGrouped(parentTypeDefaultFormatDefinition)) {
+      defaultFormatDefinition.containers.splice(1, 0, {
+        kind: FormatContainerKind.VERTICAL,
+        contents: []
+      });
+      for (let j: number = 0; j < parentTypeDefaultFormatDefinition.containers[
+        1].contents.length; j++) {
+        defaultFormatDefinition.containers[1].contents.push(JSON.parse(JSON.
+          stringify(parentTypeDefaultFormatDefinition.containers[1].contents[
+          j])));
+      }
     }
     
     for (let attributeName in this._dataModel.properties) {
@@ -259,7 +280,14 @@ export class DataModelEditorComponent {
           break;
       }
       
-      defaultFormatDefinition.containers[0].contents.push(propertyDefinition);
+      if ((attributeType === 'StateMachine') && this.areStateAttributesGrouped(
+        defaultFormatDefinition)) {
+        defaultFormatDefinition.containers[1].contents.push(
+          propertyDefinition);
+      } else {
+        defaultFormatDefinition.containers[0].contents.push(
+          propertyDefinition);
+      }
     }
     
     this._dataModel.base = parentType.name;
@@ -286,52 +314,58 @@ export class DataModelEditorComponent {
       let response: any = await this._dialogService.openYesNoDialog(
         'Display Modifications', 'All unsaved modifications to this kind ' +
         'are to be saved if a local type is added to this kind. Do you want ' +
-        'to proceed?').toPromise();
+        'to proceed?');
       if (!response) {
         return;
       }
     }
     
-    this._dialogService.openInputDialog('Add Local Type', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', 'Local Type', (input: any) => {
-      return !!input;
-    }).afterClosed().subscribe((name: string) => {
-      if (name) {
+    this._dialogService.openComponentsDialog([{
+      component: InputDialogComponent,
+      matDialogData: {
+        inputDialogConfiguration: {
+          title: 'Local Type',
+          text: '',
+          fieldName: 'Name',
+          value: 'Local Type',
+          validate: (input: any) => {
+            return !!input;
+          },
+          inputDialogKind: InputDialogKind.STRING
+        }
+      },
+      label: 'Name'
+    }, {
+      component: AttributeEditorComponent,
+      matDialogData: {},
+      label: 'Attribute'
+    }], { data: {} }).updateSize('90%', '90%').afterClosed().subscribe(
+      (results: Array<any>) => {
+      if (results) {
         let dataModel: any = {
-          name: name,
+          name: results[0],
           base: null,
           idInjection: true,
-          properties: {
-            name: {
-              name: 'name',
-              type: 'string'
-            }
-          },
+          properties: {},
           validations: [],
           relations: {},
           acls: [],
           methods: []
         };
+        dataModel.properties[results[1].attribute.name] = results[1].attribute;
         
         let viewModel: any = {
-          name: name,
-          modelName: name,
+          name: results[0],
+          modelName: results[0],
           icon: '',
           color: '#000000',
-          viewProperties: {
-            name: {
-              name: 'name',
-              displayName: 'Name',
-              inputType: {
-                type: 'text',
-                options: {}
-              }
-            }
-          },
+          viewProperties: {},
           formatDefinitions: {},
           defaultFormatKey: {},
           tableDefinitions: {}
         };
+        viewModel.viewProperties[results[1].attribute.name] = results[1].view;
+        
         let formatDefinitionId: string = (<any> Uuid).default();
         let defaultFormatDefinition: FormatDefinition = {
           id: formatDefinitionId,
@@ -342,17 +376,58 @@ export class DataModelEditorComponent {
           },
           containers: [{
             kind: FormatContainerKind.VERTICAL,
-            contents: [
-            ]
+            contents: []
           }]
         };
+        
+        let propertyDefinition: PropertyDefinition = {
+          propertyName: results[1].attribute.name,
+          customLabel: results[1].view.displayName,
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        let type: any = results[1].attribute.type;
+        type = (Array.isArray(type) ? type[0] : type);
+        switch (type) {
+          case 'boolean':
+            propertyDefinition.kind = 'boolean';
+            break;
+          case 'number':
+            propertyDefinition.kind = 'number';
+            break;
+          case 'string':
+            propertyDefinition.kind = 'text';
+            break;
+          case 'StateMachine':
+            propertyDefinition.kind = 'state-editor';
+            break;
+          case 'timestamp':
+            propertyDefinition.kind = 'date';
+            break;
+          case 'user-selector':
+            propertyDefinition.kind = 'user-selector';
+            break;
+        }
+        
+        if (type === 'StateMachine') {
+          defaultFormatDefinition.containers.push({
+            kind: FormatContainerKind.VERTICAL,
+            contents: [propertyDefinition]
+          });
+        } else {
+          defaultFormatDefinition.containers[0].contents.push(
+            propertyDefinition);
+        }
+        
         viewModel.formatDefinitions[formatDefinitionId] =
           defaultFormatDefinition;
         viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
           formatDefinitionId;
 
-        this._dataModel.localTypes[name] = dataModel;
-        viewModelProxy.item.localTypes[name] = viewModel;
+        this._dataModel.localTypes[results[0]] = dataModel;
+        viewModelProxy.item.localTypes[results[0]] = viewModel;
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
@@ -365,73 +440,170 @@ export class DataModelEditorComponent {
     });
   }
   
-  public removeLocalType(name: string): void {
-    this._dialogService.openYesNoDialog('Remove ' + name, 'All ' +
-      'unsaved modifications to this kind are to be saved if this local ' +
-      'type is removed. Do you want to proceed?').subscribe((choiceValue:
-      any) => {
-      if (choiceValue) {
-        let viewModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
-          'view-' + this._dataModel.name.toLowerCase()).item;
-        delete this._dataModel.localTypes[name];
-        delete viewModel.localTypes[name];
-        
-        this.save();
-        this._itemRepository.upsertItem('KoheseView', viewModel);
-        
-        // Re-enter edit mode
-        this._editable = true;
-        
-        this._changeDetectorRef.markForCheck();
-      }
-    });
+  public async removeLocalType(name: string): Promise<void> {
+    let choiceValue: any = await this._dialogService.openYesNoDialog(
+      'Remove ' + name, 'All unsaved modifications to this kind are to be ' +
+      'saved if this local type is removed. Do you want to proceed?');
+    if (choiceValue) {
+      let viewModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
+        'view-' + this._dataModel.name.toLowerCase()).item;
+      delete this._dataModel.localTypes[name];
+      delete viewModel.localTypes[name];
+      
+      this.save();
+      this._itemRepository.upsertItem('KoheseView', viewModel);
+      
+      // Re-enter edit mode
+      this._editable = true;
+      
+      this._changeDetectorRef.markForCheck();
+    }
   }
   
   public async addAttribute(): Promise<void> {
     let viewModelProxy: ItemProxy;
+    let treeConfiguration: TreeConfiguration = this._itemRepository.
+      getTreeConfig().getValue().config;
     if (this._enclosingType) {
-      viewModelProxy = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        this._enclosingType.name.toLowerCase());
+      viewModelProxy = treeConfiguration.getProxyFor('view-' + this.
+        _enclosingType.name.toLowerCase());
     } else {
-      viewModelProxy = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        this._dataModel.name.toLowerCase());
+      viewModelProxy = treeConfiguration.getProxyFor('view-' + this._dataModel.
+        name.toLowerCase());
     }
     
-    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
-      let response: any = await this._dialogService.openYesNoDialog(
-        'Display Modifications', 'All unsaved modifications to this kind ' +
-        'are to be saved if an attribute is added to this kind. Do you want ' +
-        'to proceed?').toPromise();
+    let subtypeViewModels: Array<any> = [];
+    if (!this._enclosingType) {
+      treeConfiguration.getRootProxy().visitTree({ includeOrigin: false },
+        (itemProxy: ItemProxy) => {
+        if ((itemProxy.kind === 'KoheseView') && (itemProxy !==
+          viewModelProxy)) {
+          let dataModelItemProxy: ItemProxy = treeConfiguration.
+            getProxyFor(itemProxy.item.modelName);
+          while (dataModelItemProxy) {
+            if (dataModelItemProxy.item === this._dataModel) {
+              subtypeViewModels.push(itemProxy.item);
+              break;
+            }
+            
+            dataModelItemProxy = treeConfiguration.getProxyFor(
+              dataModelItemProxy.item.base);
+          }
+        }
+      }, undefined);
+      
+      subtypeViewModels.sort((oneViewModel: any, anotherViewModel: any) => {
+        return oneViewModel.modelName.localeCompare(anotherViewModel.
+          modelName);
+      });
+    }
+    
+    let title: string = '';
+    let text: string = '';
+    if (this._hasUnsavedChanges || viewModelProxy.dirty || (subtypeViewModels.
+      length > 0)) {
+      if (this._hasUnsavedChanges || viewModelProxy.dirty) {
+        title += 'Display Modifications';
+        text += 'All unsaved modifications to this kind are to be saved if ' +
+          'an attribute is added to this kind.';
+        if (subtypeViewModels.length > 0) {
+          title += ' And Additional Type Modification';
+          text += ' The following additional types are expected to have an ' +
+            'entry added to their default Format Definition upon a new ' +
+            'attribute being added to the selected type, as well: ' +
+            subtypeViewModels.map((viewModel: any) => {
+            return viewModel.modelName;
+          }).join(', ') + '.';
+        }
+      } else {
+        title += 'Additional Type Modification';
+        text += 'The following additional types are expected to have an ' +
+          'entry added to their default Format Definition upon a new ' +
+          'attribute being added to the selected type: ' + subtypeViewModels.
+          map((viewModel: any) => {
+          return viewModel.modelName;
+        }).join(', ') + '.';
+      }
+      
+      text += ' Do you want to proceed?';
+      let response: any = await this._dialogService.openYesNoDialog(title,
+        text);
       if (!response) {
         return;
       }
     }
     
-    this._dialogService.openComponentDialog(AttributeEditorComponent, {
-      data: {
+    this._dialogService.openComponentsDialog([{
+      component: AttributeEditorComponent,
+      matDialogData: {
         type: this._dataModel
       }
-    }).afterClosed().subscribe((attributeObject: any) => {
-      if (attributeObject) {
-        this._dataModel.properties[attributeObject.attributeName] =
-          attributeObject.attribute;
+    }], { data: {} }).afterClosed().subscribe((results: Array<any>) => {
+      if (results) {
+        /* Get attribute names before adding the new attribute so that
+        insertionIndex below is calculated correctly */
+        let attributeNames: Array<string> = Object.keys(this._dataModel.
+          properties);
+        
+        this._dataModel.properties[results[0].attribute.name] =
+          results[0].attribute;
         let viewModel: any = (this._enclosingType ? viewModelProxy.item.
           localTypes[this._dataModel.name] : viewModelProxy.item);
-        viewModel.viewProperties[attributeObject.attributeName] =
-          attributeObject.view;
-        viewModel.formatDefinitions[viewModel.defaultFormatKey[
-          FormatDefinitionType.DEFAULT]].containers[0].contents.push({
-          propertyName: attributeObject.attributeName,
-          customLabel: attributeObject.attributeName,
+        viewModel.viewProperties[results[0].attribute.name] =
+          results[0].view;
+        let propertyDefinition: PropertyDefinition = {
+          propertyName: results[0].attribute.name,
+          customLabel: results[0].view.displayName,
           labelOrientation: 'Top',
-          kind: attributeObject.view.inputType.type,
+          kind: results[0].view.inputType.type,
           visible: true,
           editable: true
-        });
+        };
+        let defaultFormatDefinition: FormatDefinition = viewModel.
+          formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
+          DEFAULT]];
+        if ((propertyDefinition.kind === 'state-editor') && this.
+          areStateAttributesGrouped(defaultFormatDefinition)) {
+          defaultFormatDefinition.containers[1].contents.push(
+            propertyDefinition);
+        } else {
+          defaultFormatDefinition.containers[0].contents.push(
+            propertyDefinition);
+        }
+        
+        for (let j: number = 0; j < subtypeViewModels.length; j++) {
+          defaultFormatDefinition = subtypeViewModels[j].formatDefinitions[
+            subtypeViewModels[j].defaultFormatKey[FormatDefinitionType.
+            DEFAULT]];
+          if ((propertyDefinition.kind === 'state-editor') && this.
+            areStateAttributesGrouped(defaultFormatDefinition)) {
+            let propertyDefinitionNames: Array<string> =
+              defaultFormatDefinition.containers[1].contents.map((definition:
+              PropertyDefinition) => {
+              return definition.propertyName;
+            });
+            let insertionIndex: number = Math.max(...attributeNames.map(
+              (attributeName: string) => {
+              return propertyDefinitionNames.indexOf(attributeName);
+            }));
+            defaultFormatDefinition.containers[1].contents.splice(
+              insertionIndex + 1, 0, propertyDefinition);
+          } else {
+            let insertionIndex: number = defaultFormatDefinition.
+              containers[0].contents.map((definition:
+              PropertyDefinition) => {
+              return definition.propertyName;
+            }).indexOf(attributeNames[attributeNames.length - 1]);
+            defaultFormatDefinition.containers[0].contents.splice(
+              insertionIndex + 1, 0, propertyDefinition);
+          }
+          
+          this._itemRepository.upsertItem('KoheseView', subtypeViewModels[j]);
+        }
         
         this.save();
         this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
-        this._attributes.push(attributeObject.attribute);
+        this._attributes.push(results[0].attribute);
         this._attributeTable.renderRows();
         
         // Re-enter edit mode
@@ -440,6 +612,32 @@ export class DataModelEditorComponent {
         this._changeDetectorRef.markForCheck();
       }
     });
+  }
+  
+  private areStateAttributesGrouped(defaultFormatDefinition: FormatDefinition):
+    boolean {
+    let formatContainer: FormatContainer = defaultFormatDefinition.containers[
+      0];
+    for (let j: number = 0; j < formatContainer.contents.length; j++) {
+      if (formatContainer.contents[j].kind === 'state-editor') {
+        return false;
+      }
+    }
+    
+    if (defaultFormatDefinition.containers.length > 1) {
+      formatContainer = defaultFormatDefinition.containers[1];
+      if (formatContainer.contents.length > 0) {
+        if (formatContainer.contents[0].kind === 'state-editor') {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+    
+    return false;
   }
   
   public sortAttributes(columnId: string, sortDirection: string): void {
@@ -563,24 +761,96 @@ export class DataModelEditorComponent {
   
   public async typeSelected(attribute: any, attributeType: string):
     Promise<void> {
-    let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-      getProxyFor('view-' + this._dataModel.name.toLowerCase());
-    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
-      let response: any = await this._dialogService.openYesNoDialog(
-        'Display Modifications', 'All unsaved modifications to this kind ' +
-        'are to be saved if an attribute is added to this kind. Do you want ' +
-        'to proceed?').toPromise();
+    let viewModelProxy: ItemProxy;
+    let treeConfiguration: TreeConfiguration = this._itemRepository.
+      getTreeConfig().getValue().config;
+    if (this._enclosingType) {
+      viewModelProxy = treeConfiguration.getProxyFor('view-' + this.
+        _enclosingType.name.toLowerCase());
+    } else {
+      viewModelProxy = treeConfiguration.getProxyFor('view-' + this._dataModel.
+        name.toLowerCase());
+    }
+    
+    let subtypeViewModels: Array<any> = [];
+    if (!this._enclosingType) {
+      treeConfiguration.getRootProxy().visitTree({ includeOrigin: false },
+        (itemProxy: ItemProxy) => {
+        if ((itemProxy.kind === 'KoheseView') && (itemProxy !==
+          viewModelProxy)) {
+          let dataModelItemProxy: ItemProxy = treeConfiguration.
+            getProxyFor(itemProxy.item.modelName);
+          while (dataModelItemProxy) {
+            if (dataModelItemProxy.item === this._dataModel) {
+              subtypeViewModels.push(itemProxy.item);
+              break;
+            }
+            
+            dataModelItemProxy = treeConfiguration.getProxyFor(
+              dataModelItemProxy.item.base);
+          }
+        }
+      }, undefined);
+      
+      subtypeViewModels.sort((oneViewModel: any, anotherViewModel: any) => {
+        return oneViewModel.modelName.localeCompare(anotherViewModel.
+          modelName);
+      });
+    }
+    
+    // Test "No" selection below (update UI)
+    let title: string = '';
+    let text: string = '';
+    if (this._hasUnsavedChanges || viewModelProxy.dirty || (subtypeViewModels.
+      length > 0)) {
+      if (this._hasUnsavedChanges || viewModelProxy.dirty) {
+        title += 'Display Modifications';
+        text += 'All unsaved modifications to this kind are to be saved if ' +
+          'an attribute is added to this kind.';
+        if (subtypeViewModels.length > 0) {
+          title += ' And Additional Type Modification';
+          text += ' The following additional types are expected to have one ' +
+            'or more Format Definitions modified upon the type of this ' +
+            'attribute being modified, as well: ' +
+            subtypeViewModels.map((viewModel: any) => {
+            return viewModel.modelName;
+          }).join(', ') + '.';
+        }
+      } else {
+        title += 'Additional Type Modification';
+        text += 'The following additional types are expected to have one ' +
+            'or more Format Definitions modified upon the type of this ' +
+            'attribute being modified: ' + subtypeViewModels.
+          map((viewModel: any) => {
+          return viewModel.modelName;
+        }).join(', ') + '.';
+      }
+      
+      text += ' Do you want to proceed?';
+      let response: any = await this._dialogService.openYesNoDialog(title,
+        text);
       if (!response) {
         return;
       }
     }
     
+    let previousAttributeTypeName: string;
     if (Array.isArray(attribute.type)) {
+      previousAttributeTypeName = attribute.type[0];
       attribute.type = [attributeType];
     } else {
+      previousAttributeTypeName = attribute.type;
       attribute.type = attributeType;
     }
     
+    if (attribute.type === 'string') {
+      attribute.default = '';
+    } else {
+      delete attribute.default;
+    }
+    
+    let viewModel: any = (this._enclosingType ? viewModelProxy.item.
+      localTypes[this._dataModel.name] : viewModelProxy.item);
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
       if (!attribute.relation) {
         attribute.relation = {
@@ -589,24 +859,296 @@ export class DataModelEditorComponent {
         };
       }
       
-      viewModelProxy.item.viewProperties[attribute.name].inputType.type = '';
+      viewModel.viewProperties[attribute.name].inputType.type = '';
     } else {
       delete attribute.relation;
       
       if (attributeType === 'string') {
-        viewModelProxy.item.viewProperties[attribute.name].inputType.type =
+        viewModel.viewProperties[attribute.name].inputType.type =
           'text';
       } else if (attributeType === 'timestamp') {
-        viewModelProxy.item.viewProperties[attribute.name].inputType.type =
+        viewModel.viewProperties[attribute.name].inputType.type =
           'date';
+      } else if (attributeType === 'StateMachine') {
+        viewModel.viewProperties[attribute.name].inputType.type =
+          'state-editor';
       } else {
-        viewModelProxy.item.viewProperties[attribute.name].inputType.type =
+        viewModel.viewProperties[attribute.name].inputType.type =
           attributeType;
       }
     }
     
+    let subtypeViewModelsToUpdate: Array<any> = [];
+    let attributeNames: Array<string> = Object.keys(this._dataModel.
+      classProperties);
+    if ((previousAttributeTypeName === 'StateMachine') || (attributeType ===
+      'StateMachine')) {
+      let attributeNames: Array<string> = Object.keys(this._dataModel.
+        properties);
+      let changeContainer: (formatDefinition: FormatDefinition) => void;
+      if (previousAttributeTypeName === 'StateMachine') {
+        changeContainer = (formatDefinition: FormatDefinition) => {
+          let attributeIndex: number = formatDefinition.containers[1].contents.
+            map((propertyDefinition: PropertyDefinition) => {
+            return propertyDefinition.propertyName;
+          }).indexOf(attribute.name);
+          let propertyDefinition: PropertyDefinition = formatDefinition.
+            containers[1].contents.splice(attributeIndex, 1)[0];
+          if (formatDefinition.containers[1].contents.length === 0) {
+            formatDefinition.containers.splice(1, 1);
+          }
+          
+          formatDefinition.containers[0].contents.splice(Object.keys(this.
+            _dataModel.classProperties).indexOf(attribute.name) - 1, 0,
+            propertyDefinition);
+        };
+      } else {
+        changeContainer = (formatDefinition: FormatDefinition) => {
+          let attributeIndex: number = formatDefinition.containers[0].contents.
+            map((propertyDefinition: PropertyDefinition) => {
+            return propertyDefinition.propertyName;
+          }).indexOf(attribute.name);
+          let propertyDefinition: PropertyDefinition = formatDefinition.
+            containers[0].contents.splice(attributeIndex, 1)[0];
+          let propertyDefinitionNames: Array<string> = formatDefinition.
+            containers[1].contents.map((definition: PropertyDefinition) => {
+            return definition.propertyName;
+          });
+          let insertionIndex: number = Math.max(...attributeNames.map(
+            (attributeName: string) => {
+            return propertyDefinitionNames.indexOf(attributeName);
+          }));
+          formatDefinition.containers[1].contents.splice(insertionIndex + 1, 0,
+            propertyDefinition);
+        };
+      }
+      
+      let defaultFormatDefinition: FormatDefinition = viewModel.
+        formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
+        DEFAULT]];
+      
+      if (this.areStateAttributesGrouped(defaultFormatDefinition)) {
+        changeContainer(defaultFormatDefinition);
+      } else {
+        if (attributeType === 'StateMachine') {
+          defaultFormatDefinition.containers.splice(1, 0, {
+            kind: FormatContainerKind.VERTICAL,
+            contents: []
+          });
+          changeContainer(defaultFormatDefinition);
+        }
+      }
+      
+      for (let j: number = 0; j < subtypeViewModels.length; j++) {
+        defaultFormatDefinition = subtypeViewModels[j].formatDefinitions[
+          subtypeViewModels[j].defaultFormatKey[FormatDefinitionType.
+          DEFAULT]];
+        
+        if (this.areStateAttributesGrouped(defaultFormatDefinition)) {
+          changeContainer(defaultFormatDefinition);
+        } else {
+          if (attributeType === 'StateMachine') {
+            defaultFormatDefinition.containers.splice(1, 0, {
+              kind: FormatContainerKind.VERTICAL,
+              contents: []
+            });
+            changeContainer(defaultFormatDefinition);
+          }
+        }
+        
+        for (let formatDefinitionId in subtypeViewModels[j].
+          formatDefinitions) {
+          let formatDefinition: FormatDefinition = subtypeViewModels[j].
+            formatDefinitions[formatDefinitionId];
+          for (let k: number = 0; k < formatDefinition.containers.length;
+            k++) {
+            let formatContainer: FormatContainer = formatDefinition.containers[
+              k];
+            if (formatContainer.kind === FormatContainerKind.
+              REVERSE_REFERENCE_TABLE) {
+              if ((Object.values(this._fundamentalTypes).indexOf(
+                previousAttributeTypeName) === -1) && (Object.values(this.
+                _fundamentalTypes).indexOf(attributeType) !== -1)) {
+                for (let l: number = (formatContainer.contents.length - 1); l
+                  >= 0; l--) {
+                  let propertyDefinition: PropertyDefinition = formatContainer.
+                    contents[l];
+                  if ((propertyDefinition.propertyName.kind === this.
+                    _dataModel.name) && (propertyDefinition.propertyName.
+                    attribute === attribute.name)) {
+                    formatContainer.contents.splice(l, 1);
+                  }
+                }
+              }
+            } else {
+              for (let l: number = 0; l < formatContainer.contents.length;
+                l++) {
+                let propertyDefinition: PropertyDefinition = formatContainer.
+                  contents[l];
+                if (propertyDefinition.propertyName === attribute.name) {
+                  let typeName: string = (Array.isArray(attribute.type) ?
+                    attribute.type[0] : attribute.type);
+                  switch (typeName) {
+					          case 'boolean':
+					            propertyDefinition.kind = 'boolean';
+					            break;
+					          case 'number':
+					            propertyDefinition.kind = 'number';
+					            break;
+					          case 'string':
+					            propertyDefinition.kind = 'text';
+					            break;
+					          case 'StateMachine':
+					            propertyDefinition.kind = 'state-editor';
+					            break;
+					          case 'timestamp':
+					            propertyDefinition.kind = 'date';
+					            break;
+					          case 'user-selector':
+					            propertyDefinition.kind = 'user-selector';
+					            break;
+					          default:
+					            propertyDefinition.kind = '';
+					        }
+                }
+              }
+            }
+          }
+        }
+        
+        subtypeViewModelsToUpdate.push(subtypeViewModels[j]);
+      }
+    }
+    
+    for (let formatDefinitionId in viewModel.formatDefinitions) {
+	    let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
+	      formatDefinitionId];
+	    for (let k: number = 0; k < formatDefinition.containers.length;
+	      k++) {
+	      let formatContainer: FormatContainer = formatDefinition.containers[
+	        k];
+	      if (formatContainer.kind === FormatContainerKind.
+	        REVERSE_REFERENCE_TABLE) {
+	        if ((Object.values(this._fundamentalTypes).indexOf(
+	          previousAttributeTypeName) === -1) && (Object.values(this.
+	          _fundamentalTypes).indexOf(attributeType) !== -1)) {
+	          for (let l: number = (formatContainer.contents.length - 1); l >=
+	            0; l--) {
+	            let propertyDefinition: PropertyDefinition = formatContainer.
+	              contents[l];
+	            if ((propertyDefinition.propertyName.kind === this.
+	              _dataModel.name) && (propertyDefinition.propertyName.
+	              attribute === attribute.name)) {
+	              formatContainer.contents.splice(l, 1);
+	            }
+	          }
+	        }
+	      } else {
+	        for (let l: number = 0; l < formatContainer.contents.length;
+	          l++) {
+	          let propertyDefinition: PropertyDefinition = formatContainer.
+	            contents[l];
+	          if (propertyDefinition.propertyName === attribute.name) {
+	            let typeName: string = (Array.isArray(attribute.type) ?
+	              attribute.type[0] : attribute.type);
+	            switch (typeName) {
+			          case 'boolean':
+			            propertyDefinition.kind = 'boolean';
+			            break;
+			          case 'number':
+			            propertyDefinition.kind = 'number';
+			            break;
+			          case 'string':
+			            propertyDefinition.kind = 'text';
+			            break;
+			          case 'StateMachine':
+			            propertyDefinition.kind = 'state-editor';
+			            break;
+			          case 'timestamp':
+			            propertyDefinition.kind = 'date';
+			            break;
+			          case 'user-selector':
+			            propertyDefinition.kind = 'user-selector';
+			            break;
+			          default:
+			            propertyDefinition.kind = '';
+			        }
+	          }
+	        }
+	      }
+	    }
+	  }
+	  
+	  for (let j: number = 0; j < subtypeViewModels.length; j++) {
+      for (let formatDefinitionId in subtypeViewModels[j].formatDefinitions) {
+        let formatDefinition: FormatDefinition = subtypeViewModels[j].
+          formatDefinitions[formatDefinitionId];
+        for (let k: number = 0; k < formatDefinition.containers.length; k++) {
+          let formatContainer: FormatContainer = formatDefinition.containers[
+            k];
+          if (formatContainer.kind === FormatContainerKind.
+            REVERSE_REFERENCE_TABLE) {
+            if ((Object.values(this._fundamentalTypes).indexOf(
+              previousAttributeTypeName) === -1) && (Object.values(this.
+              _fundamentalTypes).indexOf(attributeType) !== -1)) {
+              for (let l: number = (formatContainer.contents.length - 1); l >=
+                0; l--) {
+                let propertyDefinition: PropertyDefinition = formatContainer.
+                  contents[l];
+                if ((propertyDefinition.propertyName.kind === this._dataModel.
+                  name) && (propertyDefinition.propertyName.attribute ===
+                  attribute.name)) {
+                  formatContainer.contents.splice(l, 1);
+                }
+              }
+            }
+          } else {
+            for (let l: number = 0; l < formatContainer.contents.length; l++) {
+              let propertyDefinition: PropertyDefinition = formatContainer.
+                contents[l];
+              if (propertyDefinition.propertyName === attribute.name) {
+                let typeName: string = (Array.isArray(attribute.type) ?
+                  attribute.type[0] : attribute.type);
+                switch (typeName) {
+				          case 'boolean':
+				            propertyDefinition.kind = 'boolean';
+				            break;
+				          case 'number':
+				            propertyDefinition.kind = 'number';
+				            break;
+				          case 'string':
+				            propertyDefinition.kind = 'text';
+				            break;
+				          case 'StateMachine':
+				            propertyDefinition.kind = 'state-editor';
+				            break;
+				          case 'timestamp':
+				            propertyDefinition.kind = 'date';
+				            break;
+				          case 'user-selector':
+				            propertyDefinition.kind = 'user-selector';
+				            break;
+				          default:
+				            propertyDefinition.kind = '';
+				        }
+              }
+            }
+          }
+        }
+      }
+      
+      if (subtypeViewModelsToUpdate.indexOf(subtypeViewModels[j]) === -1) {
+        subtypeViewModelsToUpdate.push(subtypeViewModels[j]);
+      }
+    }
+    
+    for (let j: number = 0; j < subtypeViewModelsToUpdate.length; j++) {
+      this._itemRepository.upsertItem('KoheseView', subtypeViewModelsToUpdate[
+        j]);
+    }
+    
     this.save();
-    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+    this._itemRepository.upsertItem('KoheseView', viewModel);
     
     // Re-enter edit mode
     this._editable = true;
@@ -645,16 +1187,16 @@ export class DataModelEditorComponent {
       selection.foreignKey));
   }
   
-  public isMultivalued(attribute: any): boolean {
-    return Array.isArray(attribute.type);
-  }
-  
   public toggleMultivaluedness(attribute: any): void {
     let type: any = attribute.type;
-    if (this.isMultivalued(attribute)) {
-      type = [type];
-    } else {
+    if (Array.isArray(type)) {
       type = type[0];
+      if (type === 'string') {
+        attribute.default = '';
+      }
+    } else {
+      type = [type];
+      delete attribute.default;
     }
 
     attribute.type = type;
@@ -663,57 +1205,191 @@ export class DataModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
   
-  public getAttributeUsages(attributeName: string): Array<any> {
-    let attributeUsages: Array<any> = [];
-    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
-      (itemProxy: ItemProxy) => {
-      if (itemProxy.kind === this._dataModel.name) {
-        if (Array.isArray(this._dataModel.properties[attributeName].type)) {
-          // The first check below should not be necessary.
-          if (itemProxy.item[attributeName] && itemProxy.item[attributeName].
-            length > 0) {
-            attributeUsages.push(itemProxy.item);
-          }
-        } else {
-          if (itemProxy.item[attributeName] != null) {
-            attributeUsages.push(itemProxy.item);
+  public async removeAttribute(propertyId: string): Promise<void> {
+    let viewModel: any;
+    if (this._enclosingType) {
+      viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._enclosingType.name.toLowerCase()).item.localTypes[this.
+        _dataModel.name];
+    } else {
+      viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
+        this._dataModel.name.toLowerCase()).item;
+    }
+    
+    /* paths Element format: [<View Model>, <FormatDefinition ID>,
+    <FormatContainer index>, <PropertyDefinition index>] */
+    let paths: Array<Array<any>> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getRootProxy().
+      visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseView') && (itemProxy.item !==
+        viewModel)) {
+        let formatDefinitions: Array<FormatDefinition> = Object.values(
+          itemProxy.item.formatDefinitions);
+        for (let j: number = 0; j < formatDefinitions.length; j++) {
+          for (let k: number = 0; k < formatDefinitions[j].containers.
+            length; k++) {
+            let formatContainer: FormatContainer = formatDefinitions[j].
+              containers[k];
+            if (formatContainer.kind === FormatContainerKind.
+              REVERSE_REFERENCE_TABLE) {
+              let propertyDefinitions: Array<PropertyDefinition> =
+                formatContainer.contents.filter((propertyDefinition:
+                PropertyDefinition) => {
+                return ((propertyDefinition.propertyName.kind === this.
+                  _dataModel.name) && (propertyDefinition.propertyName.
+                  attribute === propertyId));
+              });
+              if (propertyDefinitions.length > 0) {
+                for (let l: number = 0; l < propertyDefinitions.length;
+                  l++) {
+                  paths.push([itemProxy.item, formatDefinitions[j].id, k,
+                    formatContainer.contents.indexOf(propertyDefinitions[l])]);
+                }
+              }
+            } else {
+              let isSubtype: boolean = false;
+              let dataModelItemProxy: ItemProxy = this._itemRepository.
+                getTreeConfig().getValue().config.getProxyFor(itemProxy.item.
+                modelName);
+              while (dataModelItemProxy) {
+                if (dataModelItemProxy.item === this._dataModel) {
+                  isSubtype = true;
+                  break;
+                }
+                
+                dataModelItemProxy = this._itemRepository.getTreeConfig().
+                  getValue().config.getProxyFor(dataModelItemProxy.item.base);
+              }
+              
+              if (isSubtype) {
+                let entryIndex: number = formatContainer.contents.map(
+                  (propertyDefinition: PropertyDefinition) => {
+                  return propertyDefinition.propertyName;
+                }).indexOf(propertyId);
+                if (entryIndex !== -1) {
+                  paths.push([itemProxy.item, formatDefinitions[j].id, k,
+                    entryIndex]);
+                }
+              }
+            }
           }
         }
       }
-    });
+    }, undefined);
     
-    return attributeUsages;
-  }
-  
-  public removeAttribute(propertyId: string): void {
-    this._dialogService.openYesNoDialog('Remove ' + propertyId, 'All ' +
-      'unsaved modifications to this kind are to be saved if this attribute ' +
-      'is removed. Do you want to proceed?').subscribe((choiceValue: any) => {
-      if (choiceValue) {
-        let viewModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
-          'view-' + this._dataModel.name.toLowerCase()).item;
-        delete this._dataModel.properties[propertyId];
-        delete viewModel.viewProperties[propertyId];
-        let defaultFormatDefinition: FormatDefinition = viewModel.
-          formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
-          DEFAULT]];
-        defaultFormatDefinition.containers[0].contents.splice(
-          defaultFormatDefinition.containers[0].contents.map(
-          (propertyDefinition: PropertyDefinition) => {
-          return propertyDefinition.propertyName;
-        }).indexOf(propertyId), 1);
-        
-        this.save();
+    let attribute: any = this._dataModel.properties[propertyId];
+    let type: any = attribute.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    let removeFromModels: () => void = () => {
+      delete this._dataModel.properties[propertyId];
+      delete viewModel.viewProperties[propertyId];
+      let formatDefinitions: Array<FormatDefinition> = Object.values(viewModel.
+        formatDefinitions);
+      let defaultFormatDefinitionId: string = viewModel.defaultFormatKey[
+        FormatDefinitionType.DEFAULT];
+      for (let j: number = 0; j < formatDefinitions.length; j++) {
+        for (let k: number = (formatDefinitions[j].containers.length - 1); k >=
+          0; k--) {
+          let formatContainer: FormatContainer = formatDefinitions[j].
+            containers[k];
+          let isDefaultFormatDefinitionStateAttributeFormatContainer: boolean =
+            ((formatDefinitions[j].id === defaultFormatDefinitionId) && this.
+            areStateAttributesGrouped(formatDefinitions[j]));
+          if (formatContainer.kind === FormatContainerKind.
+            REVERSE_REFERENCE_TABLE) {
+            let propertyDefinitions: Array<PropertyDefinition> =
+              formatContainer.contents.filter((propertyDefinition:
+              PropertyDefinition) => {
+              return ((propertyDefinition.propertyName.kind === this.
+                _dataModel.name) && (propertyDefinition.propertyName.attribute
+                === propertyId));
+            });
+            if (propertyDefinitions.length > 0) {
+              for (let l: number = 0; l < propertyDefinitions.length; l++) {
+                formatContainer.contents.splice(formatContainer.contents.
+                  indexOf(propertyDefinitions[l]), 1);
+              }
+            }
+          } else {
+            let entryIndex: number = formatContainer.contents.map(
+              (propertyDefinition: PropertyDefinition) => {
+              return propertyDefinition.propertyName;
+            }).indexOf(propertyId);
+            if (entryIndex !== -1) {
+              formatContainer.contents.splice(entryIndex, 1);
+            }
+          }
+          
+          if ((type === 'StateMachine') &&
+            isDefaultFormatDefinitionStateAttributeFormatContainer &&
+            (formatContainer.contents.length === 0)) {
+            formatDefinitions[j].containers.splice(k, 1);
+          }
+        }
+      }
+      
+      this.save();
+      
+      if (this._enclosingType) {
+        this._itemRepository.upsertItem('KoheseView', TreeConfiguration.
+          getWorkingTree().getProxyFor('view-' + this._enclosingType.name.
+          toLowerCase()).item);
+      } else {
         this._itemRepository.upsertItem('KoheseView', viewModel);
-        this._attributes.splice(Object.keys(this._dataModel.properties).
-          indexOf(propertyId), 1);
-        this._attributeTable.renderRows();
-        
-        // Re-enter edit mode
-        this._editable = true;
-        
+      }
+      
+      this._attributes.splice(Object.keys(this._dataModel.properties).indexOf(
+        propertyId), 1);
+      this._attributeTable.renderRows();
+      
+      // Re-enter edit mode
+      this._editable = true;
+    };
+    
+    if (paths.length === 0) {
+      let choiceValue: any = await this._dialogService.openYesNoDialog(
+        'Remove ' + propertyId, 'All unsaved modifications to this type are ' +
+        'to be saved if this attribute is removed. Do you want to proceed?');
+      if (choiceValue) {
+        removeFromModels();
         this._changeDetectorRef.markForCheck();
       }
-    });
+    } else {
+      let choiceValue: any = await this._dialogService.openYesNoDialog(
+        'Remove ' + propertyId, 'All unsaved modifications to this type are ' +
+        'to be saved if this attribute is removed. Additionally, the ' +
+        'following types are expected to have one or more Format Definition ' +
+        'entries removed: ' + paths.map((path: Array<any>) => {
+          return path[0].name;
+      }).filter((viewModelName: string, index: number, source:
+        Array<string>) => {
+        return (source.indexOf(viewModelName) === index);
+      }).join(', ') + '. Do you want to proceed?');
+      if (choiceValue) {
+        for (let j: number = 0; j < paths.length; j++) {
+          let formatDefinitionId: string = String(paths[j][1]);
+          let formatDefinition: FormatDefinition = (paths[j][0][
+            'formatDefinitions'][formatDefinitionId] as FormatDefinition);
+          let formatContainer: FormatContainer = formatDefinition.containers[
+            paths[j][2] as number];
+          let isDefaultFormatDefinitionStateAttributeFormatContainer: boolean =
+            ((paths[j][0]['defaultFormatKey'][FormatDefinitionType.DEFAULT] ===
+            formatDefinitionId) && this.areStateAttributesGrouped(
+            formatDefinition));
+          formatContainer.contents.splice((paths[j][3] as number), 1);
+          if ((type === 'StateMachine') &&
+            isDefaultFormatDefinitionStateAttributeFormatContainer &&
+            (formatContainer.contents.length === 0)) {
+            formatDefinition.containers.splice(formatDefinition.containers.
+              indexOf(formatContainer), 1);
+          }
+          
+          this._itemRepository.upsertItem('KoheseView', paths[j][0]);
+        }
+        
+        removeFromModels();
+        this._changeDetectorRef.markForCheck();
+      }
+    }
   }
 }

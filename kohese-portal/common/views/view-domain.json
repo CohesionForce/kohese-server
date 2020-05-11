@@ -1,0 +1,241 @@
+{
+  "id": "view-domain",
+  "name": "Domain",
+  "parentId": "view-item",
+  "createdBy": "gmckune",
+  "createdOn": 1586302904733,
+  "modifiedBy": "gmckune",
+  "modifiedOn": 1586375436725,
+  "modelName": "Domain",
+  "icon": "fa fa-book",
+  "color": "#000000",
+  "viewProperties": {},
+  "localTypes": {},
+  "formatDefinitions": {
+    "56ecc900-7929-11ea-9d30-c7b5e0ffd284": {
+      "id": "56ecc900-7929-11ea-9d30-c7b5e0ffd284",
+      "name": "Default Format Definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": "name",
+            "customLabel": "Name",
+            "labelOrientation": "Top",
+            "kind": "text",
+            "visible": true,
+            "editable": true
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "id",
+              "customLabel": "ID",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "description",
+              "customLabel": "Description",
+              "labelOrientation": "Top",
+              "kind": "markdown",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "tags",
+              "customLabel": "Tags",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "parentId",
+              "customLabel": "Parent",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "createdBy",
+              "customLabel": "Created By",
+              "labelOrientation": "Top",
+              "kind": "user-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "createdOn",
+              "customLabel": "Created On",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "modifiedBy",
+              "customLabel": "Modified By",
+              "labelOrientation": "Top",
+              "kind": "user-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "modifiedOn",
+              "customLabel": "Modified On",
+              "labelOrientation": "Top",
+              "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "children",
+              "customLabel": "Children",
+              "labelOrientation": "Top",
+              "kind": "proxy-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "approvedBy",
+              "customLabel": "approvedBy",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "text",
+              "editable": true
+            },
+            {
+              "propertyName": "approvedOn",
+              "customLabel": "approvedOn",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "date",
+              "editable": true
+            },
+            {
+              "propertyName": "rationale",
+              "customLabel": "rationale",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "text",
+              "editable": true
+            },
+            {
+              "propertyName": "alternatives",
+              "customLabel": "alternatives",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "costImpact",
+              "customLabel": "costImpact",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "scheduleImpact",
+              "customLabel": "scheduleImpact",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "otherImpacts",
+              "customLabel": "otherImpacts",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "",
+              "editable": true
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "decisionState",
+              "customLabel": "decisionState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
+              "editable": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "defaultFormatKey": {
+    "default": "56ecc900-7929-11ea-9d30-c7b5e0ffd284"
+  },
+  "tableDefinitions": {}
+}

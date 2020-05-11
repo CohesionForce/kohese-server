@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  Optional, Inject, Input } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  Input } from '@angular/core';
 
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { Dialog } from '../../dialog/Dialog.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
@@ -15,23 +15,11 @@ import { StateMachineEditorComponent } from '../../state-machine-editor/state-ma
   styleUrls: ['./attribute-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AttributeEditorComponent implements OnInit {
-  private _attributeName: string = '';
-  get attributeName() {
-    return this._attributeName;
-  }
-  @Input('attributeName')
-  set attributeName(attributeName: string) {
-    this._attributeName = attributeName;
-    this._attribute.name = this._attributeName;
-    this._view.name = this._attributeName;
-  }
-  
+export class AttributeEditorComponent implements OnInit, Dialog {
   private _attribute: any = {
-    name: this._attributeName,
+    name: '',
     type: 'boolean',
     required: false,
-    default: '',
     id: false
   };
   get attribute() {
@@ -51,9 +39,9 @@ export class AttributeEditorComponent implements OnInit {
     this._type = type;
   }
   
-  private _view: any  = {
-    name: this._attributeName,
-    displayName: this._attributeName,
+  private _view: any = {
+    name: '',
+    displayName: '',
     inputType: {
       type: 'boolean',
       options: {}
@@ -80,28 +68,9 @@ export class AttributeEditorComponent implements OnInit {
     return this._dynamicTypesService;
   }
   
-  get multivalued() {
-    return Array.isArray(this._attribute.type);
-  }
-  set multivalued(multivalued: boolean) {
-    let type: any = this._attribute.type;
-    if (multivalued) {
-      type = [type];
-    } else {
-      type = type[0];
-    }
-
-    this._attribute.type = type;
-    this._changeDetectorRef.markForCheck();
-  }
-  
   private _idAttributes: any = {};
   get idAttributes() {
     return this._idAttributes;
-  }
-  
-  get data() {
-    return this._data;
   }
   
   private _fundamentalTypes: any = {
@@ -144,31 +113,20 @@ export class AttributeEditorComponent implements OnInit {
     return this._attributeTypes;
   }
   
+  get Array() {
+    return Array;
+  }
+  
   get Object() {
     return Object;
   }
   
-  public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<AttributeEditorComponent>,
-    private _changeDetectorRef: ChangeDetectorRef,
+  public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dynamicTypesService: DynamicTypesService, private _dialogService:
     DialogService) {
   }
   
   public ngOnInit(): void {
-    if (this._data) {
-      this._type = this._data['type'];
-      if (this._data['attribute']) {
-        this._attributeName = this._data['attributeName'];
-        this._attribute = this._data['attribute'];
-        this._view = this._data['view'];
-      }
-      
-      if (this._data['editable'] === false) {
-        this._editable = false;
-      }
-    }
-    
     let koheseTypes: any = this._dynamicTypesService.getKoheseTypes();
     for (let typeName in koheseTypes) {
       this._attributeTypes[typeName] = typeName;
@@ -200,6 +158,12 @@ export class AttributeEditorComponent implements OnInit {
       this._attribute.type = attributeType;
     }
     
+    if (this._attribute.type === 'string') {
+      this._attribute.default = '';
+    } else {
+      delete this._attribute.default;
+    }
+    
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
       if (!this._attribute.relation) {
         this._attribute.relation = {
@@ -216,6 +180,8 @@ export class AttributeEditorComponent implements OnInit {
         this._view.inputType.type = 'text';
       } else if (attributeType === 'timestamp') {
         this._view.inputType.type = 'date';
+      } else if (attributeType === 'StateMachine') {
+        this._view.inputType.type = 'state-editor';
       } else {
         this._view.inputType.type = attributeType;
       }
@@ -309,11 +275,34 @@ export class AttributeEditorComponent implements OnInit {
     }
   }
   
-  public close(accept: boolean): void {
-    this._matDialogRef.close(accept ? {
-        attributeName: this._attributeName,
+  public toggleMultivaluedness(): void {
+    let type: any = this._attribute.type;
+    if (Array.isArray(type)) {
+      type = type[0];
+      if (type === 'string') {
+        this._attribute.default = '';
+      }
+    } else {
+      type = [type];
+      delete this._attribute.default;
+    }
+
+    this._attribute.type = type;
+  }
+  
+  public isValid(): boolean {
+    return !!this._attribute.name;
+  }
+  
+  public close(value: any): any {
+    let result: any;
+    if (value) {
+      result = {
         attribute: this._attribute,
         view: this._view
-      } : undefined);
+      };
+    }
+    
+    return result;
   }
 }

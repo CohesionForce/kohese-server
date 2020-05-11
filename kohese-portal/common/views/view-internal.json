@@ -3,9 +3,8 @@
   "name": "Internal View Model",
   "parentId": "view-item",
   "modelName": "Internal",
-  "icon": "fa fa-wrench",
+  "icon": "fa fa-gears",
   "color": "#000000",
-  "localTypes": {},
   "viewProperties": {
     "name": {
       "inputType": {
@@ -16,7 +15,8 @@
       },
       "required": true,
       "default": "",
-      "displayName": "Name"
+      "displayName": "Name",
+      "name": "name"
     },
     "description": {
       "inputType": {
@@ -25,7 +25,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "Description"
+      "displayName": "Description",
+      "name": "description"
     },
     "tags": {
       "inputType": {
@@ -36,7 +37,8 @@
       },
       "required": false,
       "default": "",
-      "displayName": "Tags"
+      "displayName": "Tags",
+      "name": "tags"
     },
     "parentId": {
       "inputType": {
@@ -49,9 +51,11 @@
       },
       "required": true,
       "default": "ROOT",
-      "displayName": "Parent"
+      "displayName": "Parent",
+      "name": "parentId"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "862f8640-5d80-11ea-a066-2f1589f675a2": {
       "id": "862f8640-5d80-11ea-a066-2f1589f675a2",
@@ -73,6 +77,22 @@
         {
           "kind": "list",
           "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
             {
               "propertyName": "id",
               "customLabel": "ID",
@@ -138,6 +158,46 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
@@ -186,6 +246,5 @@
     "default": "862f8640-5d80-11ea-a066-2f1589f675a2",
     "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }

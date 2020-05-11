@@ -10,10 +10,13 @@ import { ToastrService } from 'ngx-toastr';
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
-import { FormatDefinition } from '../../components/type-editor/FormatDefinition.interface';
-import { FormatContainer } from '../../components/type-editor/FormatContainer.interface';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../components/type-editor/FormatDefinition.interface';
+import { FormatContainer,
+  FormatContainerKind } from '../../components/type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../components/type-editor/PropertyDefinition.interface';
 import { TableDefinition } from '../../components/type-editor/TableDefinition.interface';
+import { LocationMap } from '../../constants/LocationMap.data';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
@@ -794,204 +797,75 @@ export class ItemRepository {
   }
   
   public getMarkdownRepresentation(koheseObject: any, dataModel: any,
-    viewModel: any, formatDefinition: FormatDefinition): string {
+    viewModel: any, formatDefinitionType: FormatDefinitionType, headingLevel:
+    number, addLinks: boolean): string {
     let representation: string = '';
+    let formatDefinition: FormatDefinition;
+	  let formatDefinitionId: string = viewModel.defaultFormatKey[
+	    formatDefinitionType];
+	  if (formatDefinitionId) {
+	    formatDefinition = viewModel.formatDefinitions[formatDefinitionId];
+	  } else {
+	    let treeConfiguration: TreeConfiguration = this.getTreeConfig().
+	      getValue().config;
+	    let dataModelItemProxy: ItemProxy = treeConfiguration.getProxyFor(
+	      dataModel.id);
+	    while (dataModelItemProxy) {
+	      let ancestorViewModel: any = treeConfiguration.getProxyFor(
+	        'view-' + dataModelItemProxy.item.name.toLowerCase()).item;
+	      formatDefinitionId = ancestorViewModel.defaultFormatKey[
+	        formatDefinitionType];
+	      if (formatDefinitionId) {
+	        formatDefinition = ancestorViewModel.formatDefinitions[
+	          formatDefinitionId];
+	        break;
+	      }
+	      
+	      dataModelItemProxy = treeConfiguration.getProxyFor(
+	        dataModelItemProxy.item.base);
+	    }
+	    
+	    if (!formatDefinition) {
+	      formatDefinition = viewModel.formatDefinitions[viewModel.
+	        defaultFormatKey[FormatDefinitionType.DEFAULT]];
+	    }
+	  }
+    
+    let globalTypeNames: Array<string> = [];
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if (itemProxy.kind === 'KoheseModel') {
+        globalTypeNames.push(itemProxy.item.name);
+      }
+    }, undefined);
+    
+    if (headingLevel > -1) {
+      for (let j: number = 0; j < headingLevel; j++) {
+	      representation += '#';
+	    }
+	    representation += '# ';
+	  }
+	  
+	  if (formatDefinition.header.contents.length > 0) {
+  	  if (addLinks) {
+	      representation += ('[' + koheseObject[formatDefinition.header.contents[
+	        0].propertyName] + '](' + window.location.origin + LocationMap[
+	        'Explore'].route + ';id=' + koheseObject.id + ')\n\n');
+  	  } else {
+	      representation += (koheseObject[formatDefinition.header.contents[0].
+	        propertyName] + '\n\n');
+	    }
+	  }
+    
     for (let j: number = 0; j < formatDefinition.containers.length; j++) {
       let formatContainer: FormatContainer = formatDefinition.containers[j];
-      if (formatContainer.kind === 'column') {
-        representation += '\n\n<table>';
-        let headerRow: string = '<tr>';
-        let bodyRow: string = '<tr>';
-        for (let k: number = 0; k < formatContainer.contents.length; k++) {
-          let propertyDefinition: PropertyDefinition = formatContainer.
-            contents[k];
-          if (propertyDefinition.labelOrientation === 'Top') {
-            headerRow += ('<th>' + propertyDefinition.customLabel +
-              '</th>');
-          }
-          
-          if (propertyDefinition.visible) {
-            bodyRow += '<td>';
-            if (propertyDefinition.labelOrientation === 'Left') {
-              bodyRow += ('**' + propertyDefinition.customLabel + ':** ');
-            }
-            
-            let value: any = koheseObject[propertyDefinition.propertyName];
-            if ((propertyDefinition.kind === '') || (propertyDefinition.kind
-              === 'proxy-selector')) {
-              if (propertyDefinition.tableDefinition) {
-                bodyRow += '<table><tr>';
-                let tableDefinition: TableDefinition = TreeConfiguration.
-                  getWorkingTree().getProxyFor('view-' + dataModel.
-                  classProperties[propertyDefinition.propertyName].definition.
-                  type[0].toLowerCase()).item.tableDefinitions[
-                  propertyDefinition.tableDefinition];
-                for (let l: number = 0; l < tableDefinition.columns.length;
-                  l++) {
-                  bodyRow += ('<th>' + tableDefinition.columns[l] + '</th>');
-                }
-                
-                bodyRow += '</tr>';
-                
-                for (let l: number = 0; l < value.length; l++) {
-                  let reference: any = TreeConfiguration.getWorkingTree().
-                    getProxyFor(value[l].id).item;
-                  bodyRow += '<tr>';
-                  
-                  for (let m: number = 0; m < tableDefinition.columns.length;
-                    m++) {
-                    bodyRow += '<td>' + String(reference[tableDefinition.
-                      columns[m]]) + '</td>';
-                  }
-                  
-                  bodyRow += '</tr>';
-                }
-                
-                bodyRow += '</table>';
-              } else {
-                if (propertyDefinition.formatDefinition) {
-                  // Local type attribute
-                  let dataModelType: any = dataModel.properties[
-                    propertyDefinition.propertyName].type;
-                  let typeName: string = (Array.isArray(dataModelType) ?
-                    dataModelType[0] : dataModelType);
-                  bodyRow += this.getMarkdownRepresentation(value, dataModel.
-                    localTypes[typeName], viewModel.localTypes[typeName],
-                    viewModel.localTypes[typeName].formatDefinitions[
-                    propertyDefinition.formatDefinition]);
-                } else {
-                  // Global type attribute
-                  if (value) {
-                    let id: string;
-                    if (value.id) {
-                      id = value.id;
-                    } else {
-                      // Accommodation code
-                      id = value;
-                    }
-                    
-                    bodyRow += TreeConfiguration.getWorkingTree().getProxyFor(
-                      id).item.name;
-                  }
-                }
-              }
-            } else {
-              bodyRow += value;
-            }
-            
-            bodyRow += '\n\n</td>';
-          }
-        }
-          
-        representation += (headerRow + '</tr>' + bodyRow + '</tr>');
-        
-        representation += '\n</table>\n\n';
-      } else if (formatContainer.kind === 'list') {
-        for (let k: number = 0; k < formatContainer.contents.length; k++) {
-          let propertyDefinition: PropertyDefinition = formatContainer.
-            contents[k];
-          let value: any = koheseObject[propertyDefinition.propertyName];
-          if (propertyDefinition.visible) {
-            if (propertyDefinition.labelOrientation === 'Top') {
-              representation += ('**' + propertyDefinition.customLabel +
-                '**\n\n');
-            } else {
-              representation += ('**' + propertyDefinition.customLabel +
-                ':** ');
-            }
-            
-            if ((propertyDefinition.kind === '') || (propertyDefinition.kind
-              === 'proxy-selector')) {
-              if (propertyDefinition.tableDefinition) {
-                representation += '\n\n<table><tr>';
-                let tableDefinition: TableDefinition = TreeConfiguration.
-                  getWorkingTree().getProxyFor('view-' + dataModel.
-                  classProperties[propertyDefinition.propertyName].definition.
-                  type[0].toLowerCase()).item.tableDefinitions[
-                  propertyDefinition.tableDefinition];
-                for (let l: number = 0; l < tableDefinition.columns.length;
-                  l++) {
-                  representation += ('<th>' + tableDefinition.columns[l] +
-                    '</th>');
-                }
-                
-                representation += '</tr>';
-                
-                for (let l: number = 0; l < value.length; l++) {
-                  let reference: any = TreeConfiguration.getWorkingTree().
-                    getProxyFor(value[l].id).item;
-                  representation += '<tr>';
-                  
-                  for (let m: number = 0; m < tableDefinition.columns.length;
-                    m++) {
-                    representation += '<td>' + String(reference[
-                      tableDefinition.columns[m]]) + '</td>';
-                  }
-                  
-                  representation += '</tr>';
-                }
-                
-                representation += '</table>\n\n';
-              } else {
-                if (propertyDefinition.formatDefinition) {
-                  // Local type attribute
-                  let dataModelType: any = dataModel.properties[
-                    propertyDefinition.propertyName].type;
-                  let typeName: string = (Array.isArray(dataModelType) ?
-                    dataModelType[0] : dataModelType);
-                  representation += this.getMarkdownRepresentation(value,
-                    dataModel.localTypes[typeName], viewModel.localTypes[
-                    typeName], viewModel.localTypes[typeName].
-                    formatDefinitions[propertyDefinition.formatDefinition]);
-                } else {
-                  // Global type attribute
-                  if (value) {
-                    if (Array.isArray(value)) {
-                      let stringComponents: Array<string> = [];
-                      for (let l: number = 0; l < value.length; l++) {
-                        let arrayComponent: any = value[l];
-                        let id: string;
-                        if (arrayComponent.id) {
-                          id = arrayComponent.id;
-                        } else {
-                          // Accommodation code
-                          id = arrayComponent;
-                        }
-                        
-                        stringComponents.push(TreeConfiguration.
-                          getWorkingTree().getProxyFor(id).item.name);
-                      }
-                      
-                      representation += stringComponents.join(', ');
-                    } else {
-                      let id: string;
-                      if (value.id) {
-                        id = value.id;
-                      } else {
-                        // Accommodation code
-                        id = value;
-                      }
-                      
-                      representation += TreeConfiguration.getWorkingTree().
-                        getProxyFor(id).item.name;
-                    }
-                  }
-                }
-              }
-            } else {
-              representation += value;
-            }
-            
-            representation += '\n\n';
-          }
-        }
-      } else {
-        // Reverse reference table
+      if (formatContainer.kind === FormatContainerKind.
+        REVERSE_REFERENCE_TABLE) {
         representation += '### Reverse References For ' + formatContainer.
           contents.map((propertyDefinition: PropertyDefinition) => {
-          return propertyDefinition.propertyName.kind + '\'s ' +
+          return '* ' + propertyDefinition.propertyName.kind + '\'s ' +
             propertyDefinition.propertyName.attribute;
-        }).join(', ');
+        }).join('\n');
         
         representation += '\n\n<table><tr><th>Name</th></tr>';
         
@@ -1014,6 +888,192 @@ export class ItemRepository {
         }
         
         representation += '</table>\n\n';
+      } else {
+        let header: string;
+        let body: string;
+        let isVerticalFormatContainer: boolean = (formatContainer.kind ===
+          FormatContainerKind.VERTICAL);
+        if (!isVerticalFormatContainer) {
+          representation += '\n\n<table>';
+          header = '<tr>';
+          body = '<tr>';
+        }
+        
+        for (let k: number = 0; k < formatContainer.contents.length; k++) {
+          if (isVerticalFormatContainer) {
+            header = '';
+            body = '';
+          }
+          
+          let propertyDefinition: PropertyDefinition = formatContainer.
+            contents[k];
+          if (propertyDefinition.visible) {
+            if (propertyDefinition.labelOrientation === 'Top') {
+              if (isVerticalFormatContainer) {
+                header += ('**' + propertyDefinition.customLabel +
+                  ':**\n\n');
+              } else {
+                header += ('<th>' + propertyDefinition.customLabel +
+                  '</th>');
+              }
+            }
+            
+            if (!isVerticalFormatContainer) {
+              body += '<td>';
+            }
+            
+            if (propertyDefinition.labelOrientation === 'Left') {
+              body += ('**' + propertyDefinition.customLabel + ':** ');
+            }
+            
+            let value: any = koheseObject[propertyDefinition.propertyName];
+            if (value != null) {
+              if ((propertyDefinition.kind === '') || (propertyDefinition.kind
+                === 'proxy-selector')) {
+                if (propertyDefinition.tableDefinition) {
+                  if (isVerticalFormatContainer) {
+                    body += '\n\n<table><tr>';
+                  } else {
+                    body += '<table><tr>';
+                  }
+                  
+                  let tableDefinition: TableDefinition;
+                  let typeName: string = dataModel.classProperties[
+                    propertyDefinition.propertyName].definition.type[0];
+                  let isLocalTypeAttribute: boolean = (globalTypeNames.indexOf(
+                    typeName) === -1);
+                  if (isLocalTypeAttribute) {
+                    tableDefinition = viewModel.localTypes[typeName].
+                      tableDefinitions[propertyDefinition.tableDefinition];
+                  } else {
+                    tableDefinition = TreeConfiguration.getWorkingTree().
+                      getProxyFor('view-' + typeName.toLowerCase()).item.
+                      tableDefinitions[propertyDefinition.tableDefinition];
+                  }
+                  
+                  for (let l: number = 0; l < tableDefinition.columns.length;
+                    l++) {
+                    body += ('<th>' + tableDefinition.columns[l] + '</th>');
+                  }
+                  
+                  body += '</tr>';
+                  
+                  for (let l: number = 0; l < value.length; l++) {
+                    let reference: any;
+                    if (isLocalTypeAttribute) {
+                      reference = value[l];
+                    } else {
+                      reference = TreeConfiguration.getWorkingTree().
+                        getProxyFor(value[l].id).item;
+                    }
+                    
+                    body += '<tr>';
+                    
+                    for (let m: number = 0; m < tableDefinition.columns.length;
+                      m++) {
+                      body += ('<td>' + String(reference[tableDefinition.
+                        columns[m]]) + '</td>');
+                    }
+                    
+                    body += '</tr>';
+                  }
+                  
+                  body += '</table>';
+                  if (isVerticalFormatContainer) {
+                    body += '\n\n';
+                  }
+                } else {
+                  let type: any = dataModel.classProperties[propertyDefinition.
+                    propertyName].definition.type;
+                  type = (Array.isArray(type) ? type[0] : type);
+                  if ((propertyDefinition.propertyName !== 'parentId') &&
+                    (globalTypeNames.indexOf(type) === -1)) {
+                    /* The below condition is present to avoid errors caused by
+                    attributes typed "object". */
+                    if (dataModel.localTypes[type]) {
+                      // Local type attribute
+                      let localTypeDataModelCopy: any = JSON.parse(JSON.
+                        stringify(dataModel.localTypes[type]));
+                      localTypeDataModelCopy.classProperties = {};
+                      for (let attributeName in localTypeDataModelCopy.
+                        properties) {
+                        localTypeDataModelCopy.classProperties[attributeName] =
+                          {
+                          definedInKind: type,
+                          definition: localTypeDataModelCopy.properties[
+                            attributeName]
+                        };
+                      }
+                      let localTypeViewModel: any = viewModel.localTypes[type];
+                      if (Array.isArray(value)) {
+                        body += value.map((v: any) => {
+                          return this.getMarkdownRepresentation(v,
+                            localTypeDataModelCopy, localTypeViewModel,
+                            formatDefinitionType, -1, addLinks);
+                        }).join('\n');
+                      } else {
+                        body += this.getMarkdownRepresentation(value,
+                          localTypeDataModelCopy, localTypeViewModel,
+                          formatDefinitionType, -1, addLinks);
+                      }
+                    }
+                  } else {
+                    // Global type attribute
+                    if (Array.isArray(value)) {
+                      let stringComponents: Array<string> = [];
+                      for (let l: number = 0; l < value.length; l++) {
+                        let arrayComponent: any = value[l];
+                        let id: string;
+                        if (arrayComponent.id) {
+                          id = arrayComponent.id;
+                        } else {
+                          // Accommodation code
+                          id = arrayComponent;
+                        }
+                        
+                        stringComponents.push('* ' + TreeConfiguration.
+                          getWorkingTree().getProxyFor(id).item.name);
+                      }
+                      
+                      body += stringComponents.join('\n');
+                    } else {
+                      let id: string;
+                      if (value.id) {
+                        id = value.id;
+                      } else {
+                        // Accommodation code
+                        id = value;
+                      }
+                      
+                      body += TreeConfiguration.getWorkingTree().
+                        getProxyFor(id).item.name;
+                    }
+                  }
+                }
+              } else if (propertyDefinition.kind === 'date') {
+                body += new Date(value).toLocaleDateString();
+              } else if (Array.isArray(value)) {
+                body += value.map((v: any) => {
+                  return ('* ' + v);
+                }).join('\n');
+              } else {
+                body += value;
+              }
+            }
+            
+            body += '\n\n'
+            if (isVerticalFormatContainer) {
+              representation += (header + body);
+            } else {
+              body += '</td>';
+            }
+          }
+        }
+        
+        if (!isVerticalFormatContainer) {
+          representation += (header + '</tr>' + body + '</tr>' +
+            '\n</table>\n\n');
+        }
       }
     }
     

@@ -146,6 +146,22 @@
           "kind": "list",
           "contents": [
             {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "id",
               "customLabel": "ID",
               "labelOrientation": "Top",
@@ -210,20 +226,52 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
-            },
-            {
-              "propertyName": "taskState",
-              "customLabel": "taskState",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "state-editor",
-              "editable": true
             },
             {
               "propertyName": "predecessors",
@@ -298,6 +346,19 @@
               "editable": true
             }
           ]
+        },
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "taskState",
+              "customLabel": "taskState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
+              "editable": true
+            }
+          ]
         }
       ]
     },
@@ -325,6 +386,24 @@
               "customLabel": "Description",
               "labelOrientation": "Top",
               "kind": "markdown",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "assignedTo",
+              "customLabel": "Assigned To",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "taskState",
+              "customLabel": "Task State",
+              "labelOrientation": "Left",
+              "kind": "state-editor",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             }
@@ -403,6 +482,15 @@
               "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
             },
             {
+              "propertyName": "assignedTo",
+              "customLabel": "Assigned To",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
               "propertyName": "taskState",
               "customLabel": "Task State",
               "labelOrientation": "Top",
@@ -421,6 +509,5 @@
     "card": "1b91cfb0-1798-11ea-a725-0b882dea506f",
     "board": "1b91cfb0-1798-11ea-a725-0b882dea506f"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }

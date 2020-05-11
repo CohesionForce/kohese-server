@@ -42,7 +42,6 @@ describe('Component: attribute-editor', ()=>{
 
     fixture = TestBed.createComponent(AttributeEditorComponent);
     component = fixture.componentInstance;
-    component.attributeName = 'name';
     fixture.detectChanges();
   });
   
@@ -60,11 +59,11 @@ describe('Component: attribute-editor', ()=>{
   });
   
   it('determines and changes multivalued-ness of properties', () => {
-    component.multivalued = true;
-    expect(component.multivalued).toEqual(true);
+    component.toggleMultivaluedness();
+    expect(Array.isArray(component.attribute.type)).toEqual(true);
     
-    component.multivalued = false;
-    expect(component.multivalued).toEqual(false);
+    component.toggleMultivaluedness();
+    expect(Array.isArray(component.attribute.type)).toEqual(false);
   });
   
   it('determines if two relations are equal', () => {

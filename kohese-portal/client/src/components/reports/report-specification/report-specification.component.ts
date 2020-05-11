@@ -197,15 +197,13 @@ export class ReportSpecificationComponent {
     if (reportObjects.map((reportObject: any) => {
       return reportObject.name;
     }).indexOf(this._reportSpecifications.name) !== -1) {
-      this._dialogService.openYesNoDialog('Overwrite ' + this.
-        _reportSpecifications.name, 'A report named ' + this.
-        _reportSpecifications.name + ' already exists. Proceeding should ' +
-        'overwrite that report. Do you want to proceed?').subscribe(
-        async (result: any) => {
-        if (result) {
-          await this._produceReport();
-        }
-      });
+      let result: any = await this._dialogService.openYesNoDialog(
+        'Overwrite ' + this._reportSpecifications.name, 'A report named ' +
+        this._reportSpecifications.name + ' already exists. Proceeding ' +
+        'should overwrite that report. Do you want to proceed?');
+      if (result) {
+        await this._produceReport();
+      }
     } else {
       await this._produceReport();
     }

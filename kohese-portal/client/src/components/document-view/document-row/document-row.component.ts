@@ -47,12 +47,16 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
   docWriter: HtmlRenderer;
   upsertComplete : Subject<any> = new Subject();
   
+  get itemRepository() {
+    return this._itemRepository;
+  }
+  
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
 
   constructor(private changeRef: ChangeDetectorRef,
-              private itemRepository: ItemRepository,
+              private _itemRepository: ItemRepository,
               private dialogService: DialogService,
               private element: ElementRef) {
     this.docReader = new commonmark.Parser();
@@ -68,12 +72,20 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
   }
 
   upsertItem(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
-    this.itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
+    this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
       row.editable = false;
       docInfo.proxy = newProxy;
       this.upsertComplete.next();
       this.changeRef.markForCheck();
     })
+  }
+  
+  public async discardChanges(): Promise<void> {
+    await this._itemRepository.fetchItem(this.docInfo.proxy);
+    this.row.editable = false;
+    /* Not needed, but added with hope that this component will be made to use
+    ChangeDetectionStrategy.OnPush */
+    this.changeRef.markForCheck();
   }
 
   showProxyDetails(proxy: ItemProxy) {

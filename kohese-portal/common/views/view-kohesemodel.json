@@ -3,10 +3,213 @@
   "name": "KoheseModel View Model",
   "parentId": "view-item",
   "modelName": "KoheseModel",
-  "icon": "",
+  "icon": "fa fa-sitemap",
   "color": "#000000",
-  "localTypes": {},
   "viewProperties": {},
+  "localTypes": {
+    "PropertyType": {
+      "name": "PropertyType",
+      "modelName": "PropertyType",
+      "icon": "",
+      "color": "#000000",
+      "viewProperties": {
+        "type": {
+          "name": "type",
+          "displayName": "Type",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
+        "required": {
+          "name": "required",
+          "displayName": "Required",
+          "inputType": {
+            "type": "boolean",
+            "options": {}
+          }
+        },
+        "id": {
+          "name": "id",
+          "displayName": "Id",
+          "inputType": {
+            "type": "boolean",
+            "options": {}
+          }
+        },
+        "derived": {
+          "name": "derived",
+          "displayName": "Derived",
+          "inputType": {
+            "type": "boolean",
+            "options": {}
+          }
+        },
+        "calculated": {
+          "name": "calculated",
+          "displayName": "Calculated",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
+        "hidden": {
+          "name": "hidden",
+          "displayName": "Hidden",
+          "inputType": {
+            "type": "boolean",
+            "options": {}
+          }
+        }
+      },
+      "formatDefinitions": {
+        "d8664dc0-89c4-11ea-95d5-01975b059115": {
+          "id": "d8664dc0-89c4-11ea-95d5-01975b059115",
+          "name": "Default Format Definition",
+          "header": {
+            "kind": "header",
+            "contents": []
+          },
+          "containers": [
+            {
+              "kind": "list",
+              "contents": [
+                {
+                  "propertyName": "type",
+                  "customLabel": "Type",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "required",
+                  "customLabel": "Required",
+                  "labelOrientation": "Top",
+                  "kind": "boolean",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "id",
+                  "customLabel": "Id",
+                  "labelOrientation": "Top",
+                  "kind": "boolean",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "derived",
+                  "customLabel": "Derived",
+                  "labelOrientation": "Top",
+                  "kind": "boolean",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "calculated",
+                  "customLabel": "Calculated",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "hidden",
+                  "customLabel": "Hidden",
+                  "labelOrientation": "Top",
+                  "kind": "boolean",
+                  "visible": true,
+                  "editable": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "defaultFormatKey": {
+        "default": "d8664dc0-89c4-11ea-95d5-01975b059115"
+      },
+      "tableDefinitions": {}
+    },
+    "RelationType": {
+      "name": "RelationType",
+      "modelName": "RelationType",
+      "icon": "",
+      "color": "#000000",
+      "viewProperties": {
+        "kind": {
+          "name": "kind",
+          "displayName": "Kind",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
+        "foreignKey": {
+          "name": "foreignKey",
+          "displayName": "Foreign Key",
+          "inputType": {
+            "type": "text",
+            "options": {}
+          }
+        },
+        "contained": {
+          "name": "contained",
+          "displayName": "Contained",
+          "inputType": {
+            "type": "boolean",
+            "options": {}
+          }
+        }
+      },
+      "formatDefinitions": {
+        "be2028d0-89c6-11ea-95d5-01975b059115": {
+          "id": "be2028d0-89c6-11ea-95d5-01975b059115",
+          "name": "Default Format Definition",
+          "header": {
+            "kind": "header",
+            "contents": []
+          },
+          "containers": [
+            {
+              "kind": "list",
+              "contents": [
+                {
+                  "propertyName": "kind",
+                  "customLabel": "Kind",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "foreignKey",
+                  "customLabel": "Foreign Key",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "contained",
+                  "customLabel": "Contained",
+                  "labelOrientation": "Top",
+                  "kind": "boolean",
+                  "visible": true,
+                  "editable": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "defaultFormatKey": {
+        "default": "be2028d0-89c6-11ea-95d5-01975b059115"
+      },
+      "tableDefinitions": {}
+    }
+  },
   "formatDefinitions": {
     "ce7b13c0-6964-11ea-80c5-0b0cc7c6ec96": {
       "name": "Default Format Definition",
@@ -27,6 +230,22 @@
         {
           "kind": "list",
           "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
             {
               "propertyName": "id",
               "customLabel": "ID",
@@ -92,6 +311,46 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
@@ -108,6 +367,5 @@
   "defaultFormatKey": {
     "default": "ce7b13c0-6964-11ea-80c5-0b0cc7c6ec96"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }

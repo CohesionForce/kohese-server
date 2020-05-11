@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { AnalysisService } from '../../services/analysis/analysis.service';
-import { DialogService,
-  DialogComponent } from '../../services/dialog/dialog.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
 
 export enum DataFormat {
   HTML = 'HTML', CSV = 'CSV', TXT = 'TXT'
@@ -163,22 +163,21 @@ export class AnalysisViewComponent extends NavigatableComponent {
     return content;
   }
   
-  public export(elements: Array<any>, includePartsOfSpeech: boolean,
-    baseItemName: string, dataFormat: DataFormat): void {
-    this.dialogService.openInputDialog('Export', '', DialogComponent.
-      INPUT_TYPES.TEXT, 'Name', baseItemName + '_' + new Date().
+  public async export(elements: Array<any>, includePartsOfSpeech: boolean,
+    baseItemName: string, dataFormat: DataFormat): Promise<void> {
+    let name: any = await this.dialogService.openInputDialog('Export', '',
+      InputDialogKind.STRING, 'Name', baseItemName + '_' + new Date().
       toISOString() + '.' + dataFormat.toLowerCase(), (input: any) => {
       return (input && (input.search(/[\/\\]/) === -1));
-    }).afterClosed().subscribe(async (name: any) => {
-      if (name) {
-        await this.itemRepository.produceReport(this.getTableContent(elements,
-          includePartsOfSpeech, dataFormat), name, 'text/markdown');
-        let downloadAnchor: any = document.createElement('a');
-        downloadAnchor.download = name;
-        downloadAnchor.href = '/producedReports/' + name;
-        downloadAnchor.click();
-      }
     });
+    if (name) {
+      await this.itemRepository.produceReport(this.getTableContent(elements,
+        includePartsOfSpeech, dataFormat), name, 'text/markdown');
+      let downloadAnchor: any = document.createElement('a');
+      downloadAnchor.download = name;
+      downloadAnchor.href = '/producedReports/' + name;
+      downloadAnchor.click();
+    }
   }
 }
 

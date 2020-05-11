@@ -6,22 +6,27 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169840,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1572491077313,
+  "modifiedOn": 1587074473129,
   "base": "Decision",
   "idInjection": true,
   "properties": {
     "Actors": {
       "name": "Actors",
       "type": [
-        "string"
+        "Actor"
       ],
-      "required": false
+      "required": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     },
     "BasicPath": {
       "name": "BasicPath",
       "type": "FlowOfEvents",
       "required": false,
       "relation": {
+        "contained": true,
         "kind": "Item",
         "foreignKey": "id"
       }
@@ -33,6 +38,7 @@
       ],
       "required": false,
       "relation": {
+        "contained": true,
         "kind": "Item",
         "foreignKey": "id"
       }
@@ -48,13 +54,24 @@
       "base": "Item",
       "idInjection": true,
       "properties": {
+        "PathName": {
+          "name": "PathName",
+          "type": "string",
+          "required": false,
+          "id": false
+        },
+        "PathDescription": {
+          "name": "PathDescription",
+          "type": "string",
+          "required": false,
+          "id": false
+        },
         "Preconditions": {
           "name": "Preconditions",
           "type": [
             "string"
           ],
           "required": false,
-          "default": "",
           "id": false
         },
         "Postconditions": {
@@ -63,7 +80,6 @@
             "string"
           ],
           "required": false,
-          "default": "",
           "id": false
         },
         "Flow": {
@@ -72,7 +88,6 @@
             "KeyEvent"
           ],
           "required": false,
-          "default": "",
           "id": false,
           "relation": {
             "kind": "Item",

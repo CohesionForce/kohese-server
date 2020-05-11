@@ -44,6 +44,11 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   private _filterDelayIdentifier: any;
 
   private _images: Array<Image> = [
+    new Image('assets/icons/versioncontrol/dirty.ico', (object: any) => {
+      return 'Unsaved Changes';
+    }, false, (object: any) => {
+      return (object as ItemProxy).dirty;
+    }),
     new Image('assets/icons/versioncontrol/unstaged.ico', (object: any) => {
       return 'Unstaged' + ((object as ItemProxy).vcStatus.isNew() ? ' - New' :
         '');
@@ -81,25 +86,24 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       new Action('Revert', 'Undoes all uncommitted changes to this Item',
         'fa fa-undo', (object: any) => {
         return ((object as ItemProxy).vcStatus.hasChanges());
-        }, (object: any) => {
-        this._dialogService.openYesNoDialog('Undo Changes', 'Are you sure ' +
-          'that you want to undo all changes to this Item since the last ' +
-          'commit?').subscribe((result: any) => {
-          if (result) {
-            this._versionControlService.revertItems([(object as ItemProxy)]).
-              subscribe((statusMap: any) => {
-              if (statusMap.error) {
-                this._toastrService.error('Revert Failed', 'Version Control',
-                  {positionClass: 'toast-bottom-right'});
-                this._notificationService.addNotifications('ERROR: Version Control - Revert Failed');
-              } else {
-                this._toastrService.success('Revert Succeeded',
-                  'Version Control', {positionClass: 'toast-bottom-right'});
-                this._notificationService.addNotifications('COMPLETED: Version Control - Revert Succeeded');
-              }
-            });
-          }
-        });
+        }, async (object: any) => {
+        let result: any = await this._dialogService.openYesNoDialog('Undo ' +
+          'Changes', 'Are you sure that you want to undo all changes to ' +
+          'this Item since the last commit?');
+        if (result) {
+          this._versionControlService.revertItems([(object as ItemProxy)]).
+            subscribe((statusMap: any) => {
+            if (statusMap.error) {
+              this._toastrService.error('Revert Failed', 'Version Control',
+                {positionClass: 'toast-bottom-right'});
+              this._notificationService.addNotifications('ERROR: Version Control - Revert Failed');
+            } else {
+              this._toastrService.success('Revert Succeeded',
+                'Version Control', {positionClass: 'toast-bottom-right'});
+              this._notificationService.addNotifications('COMPLETED: Version Control - Revert Succeeded');
+            }
+          });
+        }
       }),
       new Action('Stage', 'Stages changes to this Item', 'fa fa-plus',
         (object: any) => {
@@ -320,8 +324,6 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   protected filter(object: any): boolean {
     let proxy: ItemProxy = (object as ItemProxy);
     let item: any = proxy.item;
-    item['kind'] = proxy.kind; // TODO: Need to remove update of item
-    item['status'] = proxy.vcStatus.statusArray; // TODO: Need to remove update of item
     return super.filter(item);
   }
 

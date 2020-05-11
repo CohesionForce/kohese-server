@@ -5,11 +5,10 @@
   "createdBy": "gmckune",
   "createdOn": 1572491164827,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1572826394102,
+  "modifiedOn": 1586376069127,
   "modelName": "KeyEventDictionary",
-  "icon": "fa fa-tasks",
+  "icon": "fa fa-th-list",
   "color": "#000000",
-  "localTypes": {},
   "viewProperties": {
     "KeyEvents": {
       "displayName": "KeyEvents",
@@ -20,6 +19,7 @@
       "name": "KeyEvents"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "815abbc0-5d77-11ea-9d2a-81904e0f9ce1": {
       "id": "815abbc0-5d77-11ea-9d2a-81904e0f9ce1",
@@ -41,6 +41,22 @@
         {
           "kind": "list",
           "contents": [
+            {
+              "propertyName": "kind",
+              "customLabel": "Kind",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "status",
+              "customLabel": "Status",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": false,
+              "editable": false
+            },
             {
               "propertyName": "id",
               "customLabel": "ID",
@@ -106,20 +122,52 @@
               "editable": false
             },
             {
+              "propertyName": "loadPending",
+              "customLabel": "loadPending",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "hasValidationError",
+              "customLabel": "hasValidationError",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "$dirtyFields",
+              "customLabel": "$dirtyFields",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "__deletedProperty",
+              "customLabel": "__deletedProperty",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": false,
+              "editable": false
+            },
+            {
+              "propertyName": "itemIds",
+              "customLabel": "itemIds",
+              "labelOrientation": "Top",
+              "kind": "string",
+              "visible": false,
+              "editable": false
+            },
+            {
               "propertyName": "children",
               "customLabel": "Children",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
-            },
-            {
-              "propertyName": "decisionState",
-              "customLabel": "decisionState",
-              "labelOrientation": "Top",
-              "visible": true,
-              "kind": "state-editor",
-              "editable": true
             },
             {
               "propertyName": "approvedBy",
@@ -183,6 +231,19 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
+              "editable": true
+            }
+          ]
+        },
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "decisionState",
+              "customLabel": "decisionState",
+              "labelOrientation": "Top",
+              "visible": true,
+              "kind": "state-editor",
               "editable": true
             }
           ]
