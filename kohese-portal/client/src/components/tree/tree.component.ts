@@ -279,7 +279,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
       this.getIcon = this._data['getIcon'];
       this.maySelect = this._data['maySelect'];
       this.selection = this._data['selection'];
-      this.allowMultiselect = true;
+      this.allowMultiselect = this._data['allowMultiselect'];
       this.actions = this._data['actions'];
       this.elementSelected = this._data['elementSelectionHandler'];
       this.quickSelectElements = this._data['quickSelectElements'];

@@ -96,28 +96,21 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this) && this._data);
   }
   
-  public upsertItem(): void {
+  public async upsertItem(): Promise<void> {
+    let kind: string;
+    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this.
+      _formatObjectEditorQueryList.toArray();
+    if (formatObjectEditorArray.length > 0) {
+      kind = formatObjectEditorArray[0].selectedType.name;
+    } else {
+      kind = this._itemProxy.kind;
+    }
+    
     try {
-      let kind: string;
-      let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this.
-        _formatObjectEditorQueryList.toArray();
-      if (formatObjectEditorArray.length > 0) {
-        kind = formatObjectEditorArray[0].selectedType.name;
-      } else {
-        kind = this._itemProxy.kind;
-      }
-      
-      ItemProxy.validateItemContent(kind, this._itemProxy.item,
-        TreeConfiguration.getWorkingTree());
-      this._itemRepository.upsertItem(kind, this._itemProxy.item).then(
-        (updatedItemProxy: ItemProxy) => {
-        this.editableStream.next(false);
-        this._changeDetectorRef.markForCheck();
-      });
+      await this._itemRepository.upsertItem(kind, this._itemProxy.item);
+      this.editableStream.next(false);
+      this._changeDetectorRef.markForCheck();
     } catch (error) {
-      this._dialogService.openInformationDialog('Invalid Item', 'The ' +
-        'following attributes are insufficiently populated: ' + error.
-        validation.missingProperties.join(', ') + '.');
     }
   }
 
