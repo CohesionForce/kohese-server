@@ -35,6 +35,18 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
     itemModel = new KoheseModel(itemDefinition);
 
     let koheseModelDefinition = kdbFS.loadJSONDoc('./common/models/KoheseModel.json');
+
+    koheseModelDefinition.properties.aProperty = {
+      "name": "BasicPath",
+      "type": "PropertyType",
+      "required": false,
+      "relation": {
+        "contained": true,
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    };
+
     koheseModelModel = new KoheseModel(koheseModelDefinition);
 
     let koheseUserDefinition = kdbFS.loadJSONDoc('./common/models/KoheseUser.json');
@@ -227,4 +239,17 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
     proxy.deleteItem();
   });
 
+  it('should associate typeProperties with a LDT', () => {
+    // Define the item
+    let proxy = koheseModelModel;
+
+    proxy.item.aProperty = {
+      name: 'TestProperty',
+      id: 'test-property'
+    };
+
+    // TODO: Need to add expect statements
+    proxy.item.aProperty.id = 'change-id';
+
+  });
 });

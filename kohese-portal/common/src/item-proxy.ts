@@ -122,6 +122,10 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
           // if (Array.isArray(returnValue)){
           //   console.log('$$$ Returning an array: ' + path);
           // }
+          if (propertyDefinition.definition.relation && propertyDefinition.definition.relation.contained) {
+            let localTypeName = propertyDefinition.definition.type;
+            attributeTypeProperties = proxy.model.item.classLocalTypes[localTypeName].classProperties;
+          }
           changeHandler = ItemChangeHandler(returnValue, proxy, path, attributeTypeProperties);
           proxy.itemChangeHandlers.set(returnValue, changeHandler);
         }
@@ -178,7 +182,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
       // Detect unexpected properties
       if (!propertyDefinition && proxy && proxy.model) {
         let trace = new Error().stack;
-        console.log('!!! Warning: Trying to set unexpected property: ' + propertyPath + '/' + property.toString() + ' - to: ' + value);
+        console.log('!!! Warning: Trying to set unexpected property: ' + propertyPath + '/' + property.toString() + ' - to: ' + JSON.stringify(value));
         if (displayICHUnexpectedSetDetails) {
           console.log(trace);
         }
@@ -235,7 +239,8 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
 
       // TODO: Need to chain nested objects
       
-      console.log('>>> Setting property: ' + property.toString() + ' - ' + JSON.stringify(value));
+      // TODO: Need to remove next line
+      // console.log('>>> Setting property: ' + property.toString() + ' - ' + JSON.stringify(value));
       target[property] = value;
 
       if (proxy && provideNotification) {
