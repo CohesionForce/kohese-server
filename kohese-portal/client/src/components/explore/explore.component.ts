@@ -33,8 +33,10 @@ export class ExploreComponent extends NavigatableComponent
      (treeConfigurationObject: any)=>{
      if (treeConfigurationObject) {
        this.router.params.subscribe((params: Params) => {
-         this._itemProxy = treeConfigurationObject.config.getProxyFor(params[
-           'id']);
+         if (params['id']) {
+           this._itemProxy = treeConfigurationObject.config.getProxyFor(params[
+             'id']);
+         }
        });
      }
    });
