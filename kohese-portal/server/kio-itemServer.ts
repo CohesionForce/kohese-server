@@ -834,8 +834,14 @@ function KIOItemServer(socket){
         reportName), request.content, undefined);
       sendResponse();
     } else {
+      let title: string = request.reportName;
+      let extensionBeginningIndex: number = title.lastIndexOf('.');
+      if (extensionBeginningIndex !== -1) {
+        title = title.substring(0, extensionBeginningIndex);
+      }
+      
       let pandocProcess: any = child.spawn('pandoc', ['-f', 'commonmark',
-        '-t', 'html', '-s'], undefined);
+        '-t', 'html', '-s', '-M', 'title=' + title], undefined);
       pandocProcess.stdin.write(request.content);
       pandocProcess.stdin.end();
       let reportContent: string = await new Promise<string>((resolve: (output:
