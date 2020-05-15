@@ -42,7 +42,7 @@ let displayICHUnexpectedSetDetails = false;
 // ItemChangeHandler tracks changes to the item content and provides update
 // of dirty status.
 //////////////////////////////////////////////////////////////////////////
-const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperties?) => {
+const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, typeProperties?) => {
   return new Proxy(target, {
 
     //////////////////////////////////////////////////////////////////////////
@@ -53,6 +53,8 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
         path = propertyPath + '.';
       }
       path += property.toString();
+
+      // console.log('%%% Get: ' + JSON.stringify(typeDecl) + ' - ' + proxy._item.name + ' - ' + path)
 
       // Retrieve the existing value of the target property
       let returnValue = target[property];
@@ -65,12 +67,15 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
 
       // Determine if there is a property definition
       let propertyDefinition;
-      if (typeProperties) {
-        propertyDefinition = typeProperties[property];
-      } else if (!propertyPath && proxy && proxy.model) {
-        propertyDefinition = proxy.model._item.classProperties[property];
+
+      if (!typeProperties && !propertyPath && proxy && proxy.model) {
+        // At the ItemProxy level, so retrieve from model.item.classProperties
+        typeProperties = proxy.model._item.classProperties;
       }
 
+      if (typeProperties) {
+        propertyDefinition = typeProperties[property];
+      }
       if (propertyDefinition && !propertyDefinition.definition) {
         propertyDefinition = undefined;
       } 
@@ -83,6 +88,13 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
           return true;
         }
   
+        if (property === '$typeDecl') {
+          return typeDecl;
+        }
+
+        if (property === '$typeProperties') {
+          return typeProperties;
+        }
         if (propertyDefinition){
           // Provide automatic return of fields required by current UI filter implementation
           // TODO: Remove this logic when the UI filter is updated to remove this approach
@@ -102,31 +114,22 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
               }
               break;
           }
-
-          // Provide an empty array since it is defined
-          if (Array.isArray(propertyDefinition.definition.type)){
-            returnValue = target[property] = [];
-          }
-          // TODO: Handle LDT
-          // TODO: Handle any object
- 
         }
       }
 
       // Wrap any nested Objects (or Arrays)
       if (returnValue !== null && typeof returnValue === 'object' && propertyDefinition && !propertyDefinition.definition.derived) {
+        // TODO: Determine if itemChangeHandlers can be replaced with $isItemChangeHandler based logic
+        // TODO: Determine if there is a risk of two portions of the same item containing the same returnValue due to assignment issue
         let changeHandler = proxy.itemChangeHandlers.get(returnValue);
         if (!changeHandler) {
-          // TODO: Need to provide typeProperties for nested ICH
           let attributeTypeProperties;
-          // if (Array.isArray(returnValue)){
-          //   console.log('$$$ Returning an array: ' + path);
-          // }
+          let nestedTypeDecl = propertyDefinition.definition.type;
+
           if (propertyDefinition.definition.relation && propertyDefinition.definition.relation.contained) {
-            let localTypeName = propertyDefinition.definition.type;
-            attributeTypeProperties = proxy.model.item.classLocalTypes[localTypeName].classProperties;
+            attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
           }
-          changeHandler = ItemChangeHandler(returnValue, proxy, path, attributeTypeProperties);
+          changeHandler = ItemChangeHandler(nestedTypeDecl, returnValue, proxy, path, attributeTypeProperties);
           proxy.itemChangeHandlers.set(returnValue, changeHandler);
         }
         returnValue = changeHandler;
@@ -145,6 +148,8 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
         path = propertyPath + '.';
       }
       path += property.toString();
+
+      // console.log('%%% Set: ' + JSON.stringify(typeDecl) + ' - ' + proxy._item.name + ' - ' + path)
 
       if (target[property] === value) {
         // console.log('$$$ Trying to set property to same value: ' + property.toString() + ' - ' + value);
@@ -205,6 +210,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
           clonedValue = JSON.parse(JSON.stringify(value))
         }
 
+        // TODO: Handle array splitting
         if (!proxy.dirtyFields.hasOwnProperty(path)) {
           // Copy the original value for comparison
           let clonedOriginalValue;
@@ -237,8 +243,6 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
         provideNotification = true;
       }
 
-      // TODO: Need to chain nested objects
-      
       // TODO: Need to remove next line
       // console.log('>>> Setting property: ' + property.toString() + ' - ' + JSON.stringify(value));
       target[property] = value;
@@ -269,6 +273,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?, typeProperti
         }
 
         if (!proxy.dirtyFields[path]) {
+          // TODO: Handle array splitting
           proxy.dirtyFields[path] = {
             from: target[property]
           }
@@ -465,7 +470,7 @@ export class ItemProxy {
 
 
     proxy._item = {};
-    proxy.item = ItemChangeHandler(proxy._item, proxy); // TODO: typeProperties
+    proxy.item = ItemChangeHandler(kind, proxy._item, proxy);
 
     proxy.copyAttributes(forItem);
     proxy.clearDirtyFlags();
@@ -1159,7 +1164,7 @@ export class ItemProxy {
       var newKeys = Object.keys(newItem);
       if (!_.isEqual(oldKeys, newKeys)){
         this._item = newItem;
-        this.item = ItemChangeHandler(this._item, this); // TODO: typeProperties
+        this.item = ItemChangeHandler(this.kind, this._item, this);
       }
     }
   }

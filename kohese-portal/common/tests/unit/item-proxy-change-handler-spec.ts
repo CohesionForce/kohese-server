@@ -7,6 +7,7 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
   let itemModel : KoheseModel;
   let koheseModelModel : KoheseModel;
   let koheseUserModel : KoheseModel;
+  let internalModel : KoheseModel;
   loadMetamodels();
 
   function loadMetamodels() {
@@ -51,6 +52,9 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
 
     let koheseUserDefinition = kdbFS.loadJSONDoc('./common/models/KoheseUser.json');
     koheseUserModel = new KoheseModel(koheseUserDefinition);
+
+    let internalDefinition = kdbFS.loadJSONDoc('./common/models/Internal.json');
+    internalModel = new KoheseModel(internalDefinition);
 
     KoheseModel.modelDefinitionLoadingComplete();
     ItemProxy.getWorkingTree().loadingComplete();
@@ -220,22 +224,6 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
 
     testField(proxy, 'aStringArrayField', [ 'test' ], [ 'test-changed' ], [ 'test-changed-again' ], undefined);
 
-    console.log('::: Pushing to an empty array');
-    let initialValue = [ 'hello' ]
-    proxy.item.aStringArrayField.push(initialValue[0]);
-    // proxy.item.aStringArrayField = [];
-    // proxy.item.aStringArrayField.push(initialValue[0]);
-    let field = 'aStringArrayField';
-    expect(_.clone(proxy.item[field])).toEqual(initialValue);
-    expect(proxy._item[field]).toEqual(initialValue);
-    expect(proxy.dirty).toBeTruthy();
-    // TODO: Need to adjust expect to match array behavior
-    // expect(proxy.dirtyFields[field].from).toBeUndefined();
-    // expect(proxy.dirtyFields[field].to).toEqual([]);
-    expect(proxy.dirtyFields[field + '.0'].from).toBeUndefined();
-    expect(proxy.dirtyFields[field + '.0'].to).toEqual(initialValue[0]);
-    console.log(JSON.stringify(proxy.dirtyFields, null, '  '));
-
     proxy.deleteItem();
   });
 
@@ -248,8 +236,14 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
       id: 'test-property'
     };
 
-    // TODO: Need to add expect statements
     proxy.item.aProperty.id = 'change-id';
-
+    expect(proxy.item.aProperty.id).toBe('change-id');
+    expect(proxy.item.aProperty.name).toBe('TestProperty');
+    expect(proxy.dirtyFields['aProperty.id'].from).toBe('test-property');
+    expect(proxy.dirtyFields['aProperty.id'].to).toBe('change-id');
+    console.log('%%% Item TypeProperties: ' + proxy.item.$typeDecl);
+    console.log(JSON.stringify(proxy.item.$typeProperties, null, '  '));
+    console.log('%%% aProperty TypeProperties: ' + proxy.item.aProperty.$typeDecl);
+    console.log(JSON.stringify(proxy.item.aProperty.$typeProperties, null, '  '));
   });
 });
