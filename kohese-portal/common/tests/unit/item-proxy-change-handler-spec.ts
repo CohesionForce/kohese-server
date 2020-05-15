@@ -37,9 +37,20 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
 
     let koheseModelDefinition = kdbFS.loadJSONDoc('./common/models/KoheseModel.json');
 
-    koheseModelDefinition.properties.aProperty = {
+    koheseModelDefinition.properties.aLDTField = {
       "name": "BasicPath",
       "type": "PropertyType",
+      "required": false,
+      "relation": {
+        "contained": true,
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    };
+
+    koheseModelDefinition.properties.aLDTArrayField = {
+      "name": "BasicPath",
+      "type": [ "PropertyType" ],
       "required": false,
       "relation": {
         "contained": true,
@@ -224,6 +235,12 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
 
     testField(proxy, 'aStringArrayField', [ 'test' ], [ 'test-changed' ], [ 'test-changed-again' ], undefined);
 
+    proxy.item.aStringArrayField = [];
+    proxy.item.aStringArrayField.push('first');
+    proxy.item.aStringArrayField.push('second');
+    expect(proxy.dirtyFields['aStringArrayField.0'].to).toEqual('first');
+    expect(proxy.dirtyFields['aStringArrayField.1'].to).toEqual('second');
+
     proxy.deleteItem();
   });
 
@@ -231,19 +248,42 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
     // Define the item
     let proxy = koheseModelModel;
 
-    proxy.item.aProperty = {
+    proxy.item.aLDTField = {
       name: 'TestProperty',
       id: 'test-property'
     };
 
-    proxy.item.aProperty.id = 'change-id';
-    expect(proxy.item.aProperty.id).toBe('change-id');
-    expect(proxy.item.aProperty.name).toBe('TestProperty');
-    expect(proxy.dirtyFields['aProperty.id'].from).toBe('test-property');
-    expect(proxy.dirtyFields['aProperty.id'].to).toBe('change-id');
-    console.log('%%% Item TypeProperties: ' + proxy.item.$typeDecl);
-    console.log(JSON.stringify(proxy.item.$typeProperties, null, '  '));
-    console.log('%%% aProperty TypeProperties: ' + proxy.item.aProperty.$typeDecl);
-    console.log(JSON.stringify(proxy.item.aProperty.$typeProperties, null, '  '));
+    proxy.item.aLDTField.id = 'change-id';
+    expect(proxy.item.aLDTField.id).toBe('change-id');
+    expect(proxy.item.aLDTField.name).toBe('TestProperty');
+    expect(proxy.dirtyFields['aLDTField.id'].from).toBe('test-property');
+    expect(proxy.dirtyFields['aLDTField.id'].to).toBe('change-id');
+    // console.log('%%% Item TypeProperties: ' + proxy.item.$typeDecl);
+    // console.log(JSON.stringify(proxy.item.$typeProperties, null, '  '));
+    // console.log('%%% aLDTField TypeProperties: ' + proxy.item.aLDTField.$typeDecl);
+    // console.log(JSON.stringify(proxy.item.aLDTField.$typeProperties, null, '  '));
   });
+
+  it('should associate typeProperties with an LDT Array', () => {
+    // Define the item
+    let proxy = koheseModelModel;
+
+    proxy.item.aLDTArrayField = [];
+    
+    proxy.item.aLDTArrayField.push({
+      name: 'TestProperty',
+      id: 'test-property'
+    });
+
+    proxy.item.aLDTArrayField[0].id = 'change-id';
+    expect(proxy.item.aLDTArrayField.$typeDecl).toEqual([ 'PropertyType' ]);
+    expect(proxy.item.aLDTArrayField[0].id).toBe('change-id');
+    expect(proxy.item.aLDTArrayField[0].name).toBe('TestProperty');
+    // expect(proxy.dirtyFields['aLDTArrayField.0.id'].from).toBe('test-property');
+    // expect(proxy.dirtyFields['aLDTArrayField.0'].to.id).toBe('change-id');
+    expect(proxy.item.aLDTArrayField[0].$typeDecl).toEqual('PropertyType');
+    // console.log('%%% aLDTArrayField TypeProperties: ' + proxy.item.aLDTArrayField[0].$typeDecl);
+    // console.log(JSON.stringify(proxy.item.aLDTArrayField[0].$typeProperties, null, '  '));
+  });
+
 });

@@ -565,6 +565,9 @@ export class FormatObjectEditorComponent implements OnInit {
     return async () => {
       let references: Array<{ id: string }> = this._object[attributeDefinition.
         propertyName];
+      if (!references) {
+        references = this._object[attributeDefinition.propertyName] = [];
+      }
       let selection: any = await this._dialogService.openComponentDialog(
         TreeComponent, {
         data: {
@@ -597,11 +600,16 @@ export class FormatObjectEditorComponent implements OnInit {
           return { id: itemProxy.item.id };
         }));
       }
-      
+
       rows.push(...references.map((reference: { id: string }) => {
         return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
           item;
       }));
+      
+      // Delete the array if it becomes empty
+      if (references.length === 0) {
+        delete this._object[attributeDefinition.propertyName];
+      }
       
       this._changeDetectorRef.markForCheck();
       return rows;

@@ -118,16 +118,25 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
       }
 
       // Wrap any nested Objects (or Arrays)
-      if (returnValue !== null && typeof returnValue === 'object' && propertyDefinition && !propertyDefinition.definition.derived) {
+      if (returnValue !== null && typeof returnValue === 'object') {
         // TODO: Determine if itemChangeHandlers can be replaced with $isItemChangeHandler based logic
         // TODO: Determine if there is a risk of two portions of the same item containing the same returnValue due to assignment issue
         let changeHandler = proxy.itemChangeHandlers.get(returnValue);
         if (!changeHandler) {
           let attributeTypeProperties;
-          let nestedTypeDecl = propertyDefinition.definition.type;
+          let nestedTypeDecl = propertyDefinition ? propertyDefinition.definition.type : undefined;
 
-          if (propertyDefinition.definition.relation && propertyDefinition.definition.relation.contained) {
-            attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+          if (propertyDefinition && propertyDefinition.definition.relation && propertyDefinition.definition.relation.contained) {
+            if (!Array.isArray(nestedTypeDecl)) {
+              attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+            }
+          }
+          
+          if (Array.isArray(typeDecl)){
+            nestedTypeDecl = typeDecl[0];
+            if (proxy.model.item.classLocalTypes[nestedTypeDecl]){
+              attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+            }
           }
           changeHandler = ItemChangeHandler(nestedTypeDecl, returnValue, proxy, path, attributeTypeProperties);
           proxy.itemChangeHandlers.set(returnValue, changeHandler);
@@ -185,7 +194,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
       } 
 
       // Detect unexpected properties
-      if (!propertyDefinition && proxy && proxy.model) {
+      if (!propertyDefinition && proxy && proxy.model && !Array.isArray(typeDecl)) {
         let trace = new Error().stack;
         console.log('!!! Warning: Trying to set unexpected property: ' + propertyPath + '/' + property.toString() + ' - to: ' + JSON.stringify(value));
         if (displayICHUnexpectedSetDetails) {
