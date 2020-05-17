@@ -36,11 +36,13 @@ class RelationIdMap {
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const DATE_REGEX = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/i;
 
+let displayICHUnexpectedSetDetails = false;
+
 //////////////////////////////////////////////////////////////////////////
 // ItemChangeHandler tracks changes to the item content and provides update
 // of dirty status.
 //////////////////////////////////////////////////////////////////////////
-const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
+const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, typeProperties?) => {
   return new Proxy(target, {
 
     //////////////////////////////////////////////////////////////////////////
@@ -52,57 +54,91 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
       }
       path += property.toString();
 
+      // console.log('%%% Get: ' + JSON.stringify(typeDecl) + ' - ' + proxy._item.name + ' - ' + path)
+
+      // Retrieve the existing value of the target property
       let returnValue = target[property];
 
+      // Do not wrap the classProperties
+      // TODO: Remove this when classProperities is completely defined by LDT
       if (property === 'classProperties') {
         return returnValue;
       }
 
+      // Determine if there is a property definition
       let propertyDefinition;
-      if (proxy && proxy.model
-          // && proxy.model._item && proxy.model._item.classProperties  // TODO: Remove after UI tests are triaged
-      ) {
-        propertyDefinition = proxy.model._item.classProperties[property];
-        if (propertyDefinition && !propertyDefinition.definition) {
-          propertyDefinition = undefined;
-        } 
+
+      if (!typeProperties && !propertyPath && proxy && proxy.model) {
+        // At the ItemProxy level, so retrieve from model.item.classProperties
+        typeProperties = proxy.model._item.classProperties;
       }
 
+      if (typeProperties) {
+        propertyDefinition = typeProperties[property];
+      }
+      if (propertyDefinition && !propertyDefinition.definition) {
+        propertyDefinition = undefined;
+      } 
+
+      // Set returnValue for automatic properties
       if (!target.hasOwnProperty(property)) {
 
-        // Detect if this is proxy Item data
-        if (property === '$isProxy') {
+        // Detect if this is an ItemChangeHandler
+        if (property === '$isItemChangeHandler') {
           return true;
         }
   
+        if (property === '$typeDecl') {
+          return typeDecl;
+        }
+
+        if (property === '$typeProperties') {
+          return typeProperties;
+        }
         if (propertyDefinition){
           // Provide automatic return of fields required by current UI filter implementation
           // TODO: Remove this logic when the UI filter is updated to remove this approach
           switch (property) {
             case 'kind':
-              if (proxy) {
+              if (!propertyPath && proxy) {
                 return proxy.kind;
               } else {
                 return undefined;
               }
               break;
             case 'status':
-              if (proxy && proxy.vcStatus) {
+              if (!propertyPath && proxy && proxy.vcStatus) {
                 return proxy.vcStatus.statusArray;
               } else {
                 return undefined;
               }
               break;
           }
- 
         }
       }
 
       // Wrap any nested Objects (or Arrays)
-      if (returnValue !== null && typeof returnValue === 'object' && propertyDefinition && !propertyDefinition.definition.derived) {
+      if (returnValue !== null && typeof returnValue === 'object') {
+        // TODO: Determine if itemChangeHandlers can be replaced with $isItemChangeHandler based logic
+        // TODO: Determine if there is a risk of two portions of the same item containing the same returnValue due to assignment issue
         let changeHandler = proxy.itemChangeHandlers.get(returnValue);
         if (!changeHandler) {
-          changeHandler = ItemChangeHandler(returnValue, proxy, path);
+          let attributeTypeProperties;
+          let nestedTypeDecl = propertyDefinition ? propertyDefinition.definition.type : undefined;
+
+          if (propertyDefinition && propertyDefinition.definition.relation && propertyDefinition.definition.relation.contained) {
+            if (!Array.isArray(nestedTypeDecl)) {
+              attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+            }
+          }
+          
+          if (Array.isArray(typeDecl)){
+            nestedTypeDecl = typeDecl[0];
+            if (proxy.model.item.classLocalTypes[nestedTypeDecl]){
+              attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+            }
+          }
+          changeHandler = ItemChangeHandler(nestedTypeDecl, returnValue, proxy, path, attributeTypeProperties);
           proxy.itemChangeHandlers.set(returnValue, changeHandler);
         }
         returnValue = changeHandler;
@@ -122,6 +158,8 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
       }
       path += property.toString();
 
+      // console.log('%%% Set: ' + JSON.stringify(typeDecl) + ' - ' + proxy._item.name + ' - ' + path)
+
       if (target[property] === value) {
         // console.log('$$$ Trying to set property to same value: ' + property.toString() + ' - ' + value);
         return true;
@@ -131,8 +169,10 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
       switch (property) {
         case 'children':
         case '__deletedProperty':
-          target[property] = value;
-          return true;
+          if (!propertyPath){
+            target[property] = value;
+            return true;  
+          }
       }
 
       // Store Lost-Proxy fields
@@ -141,17 +181,27 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
         return true;
       }
 
+      // Determine if there is a property definition
+      let propertyDefinition;
+      if (typeProperties) {
+        propertyDefinition = typeProperties[property];
+      } else if (!propertyPath && proxy && proxy.model) {
+        propertyDefinition = proxy.model._item.classProperties[property];
+      }
+
+      if (propertyDefinition && !propertyDefinition.definition) {
+        propertyDefinition = undefined;
+      } 
 
       // Detect unexpected properties
-      let propertyDefinition;
-      if (proxy && proxy.model) {
-        propertyDefinition = proxy.model._item.classProperties[property];
-        if (!propertyDefinition) {
-          let trace = new Error().stack;
-          console.log('*** Trying to set invalid property: ' + property.toString());
+      if (!propertyDefinition && proxy && proxy.model && !Array.isArray(typeDecl)) {
+        let trace = new Error().stack;
+        console.log('!!! Warning: Trying to set unexpected property: ' + propertyPath + '/' + property.toString() + ' - to: ' + JSON.stringify(value));
+        if (displayICHUnexpectedSetDetails) {
           console.log(trace);
         }
-        
+        console.log('!!! Warning: Attempting to set unexpected property will become an error');
+
         // TODO: Need to throw an exception if this is attempted (for now let it happen)
       }
 
@@ -169,11 +219,12 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
           clonedValue = JSON.parse(JSON.stringify(value))
         }
 
-        if (!proxy.dirtyFields[path]) {
+        // TODO: Handle array splitting
+        if (!proxy.dirtyFields.hasOwnProperty(path)) {
           // Copy the original value for comparison
           let clonedOriginalValue;
 
-          if (target[property]) {
+          if (target.hasOwnProperty(property)) {
             clonedOriginalValue = JSON.parse(JSON.stringify(target[property]));
           }
 
@@ -189,6 +240,9 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
 
         // Detect if the value has been reset to its original value
         if (_.isEqual(proxy.dirtyFields[path].to, proxy.dirtyFields[path].from)) {
+          // TODO: remove next console lines
+          // console.log('--> Removing dirty for: ' + path);
+          // console.log(JSON.stringify(proxy.dirtyFields[path], null, '  '));
           delete proxy.dirtyFields[path];
           if (Object.keys(proxy.dirtyFields).length === 0) {
             delete proxy.dirtyFields;
@@ -198,9 +252,8 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
         provideNotification = true;
       }
 
-
-      // TODO: Need to chain nested objects
-      
+      // TODO: Need to remove next line
+      // console.log('>>> Setting property: ' + property.toString() + ' - ' + JSON.stringify(value));
       target[property] = value;
 
       if (proxy && provideNotification) {
@@ -229,6 +282,7 @@ const ItemChangeHandler = (target, proxy: ItemProxy, propertyPath?) => {
         }
 
         if (!proxy.dirtyFields[path]) {
+          // TODO: Handle array splitting
           proxy.dirtyFields[path] = {
             from: target[property]
           }
@@ -425,7 +479,7 @@ export class ItemProxy {
 
 
     proxy._item = {};
-    proxy.item = ItemChangeHandler(proxy._item, proxy);
+    proxy.item = ItemChangeHandler(kind, proxy._item, proxy);
 
     proxy.copyAttributes(forItem);
     proxy.clearDirtyFlags();
@@ -1119,7 +1173,7 @@ export class ItemProxy {
       var newKeys = Object.keys(newItem);
       if (!_.isEqual(oldKeys, newKeys)){
         this._item = newItem;
-        this.item = ItemChangeHandler(this._item, this);
+        this.item = ItemChangeHandler(this.kind, this._item, this);
       }
     }
   }
