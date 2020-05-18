@@ -86,9 +86,9 @@ export class MockItemRepository {
 
   public getHistoryFor(proxy: ItemProxy): Promise<any> {
     let historyObject: any = {
-      author: 'Kurios Iesous',
-      commit: 'Kurios Iesous',
-      message: 'Kurios Iesous.',
+      author: 'Mock commit author',
+      commit: 'mock-commit-id',
+      message: 'Mock commit message.',
       date: 0
     };
     proxy.history = [historyObject];

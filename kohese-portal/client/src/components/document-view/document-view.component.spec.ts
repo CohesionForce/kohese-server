@@ -50,7 +50,7 @@ describe('Component: Document View', ()=>{
     documentViewFixture = TestBed.createComponent(DocumentViewComponent);
     documentViewComponent = documentViewFixture.componentInstance;
     documentViewComponent.proxyStream = ObservableOf(TreeConfiguration.
-      getWorkingTree().getProxyFor('Kurios Iesous'));
+      getWorkingTree().getProxyFor('test-uuid1'));
     documentViewComponent.filterSubject = new BehaviorSubject({
       source : AnalysisViews.TERM_VIEW,
       filter : '',
@@ -63,7 +63,7 @@ describe('Component: Document View', ()=>{
 
   it('instantiates the Document View component', ()=>{
     documentViewComponent.proxyStream = new BehaviorSubject(TreeConfiguration.
-      getWorkingTree().getProxyFor('Kurios Iesous'));
+      getWorkingTree().getProxyFor('test-uuid1'));
     expect(documentViewComponent).toBeTruthy();
   })
 

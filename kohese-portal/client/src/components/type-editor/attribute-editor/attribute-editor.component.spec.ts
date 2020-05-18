@@ -70,16 +70,21 @@ describe('Component: attribute-editor', ()=>{
   
   it('determines if two relations are equal', () => {
     let firstRelation: any = {
-      kind: 'Kurios Iesous',
-      foreignKey: 'Kurios Iesous'
+      kind: 'FirstTestKind',
+      foreignKey: 'FirstTestKey'
     };
     
     let secondRelation: any = {
-      kind: 'Anything else',
-      foreignKey: 'Any other thing'
+      kind: 'SecondTestKind',
+      foreignKey: 'SecondTestKey'
     };
     
-    expect(component.areRelationsEqual(secondRelation, firstRelation)).toEqual(
-      false);
+    let thirdRelation : any = {
+      kind: 'FirstTestKind',
+      foreignKey: 'FirstTestKey'
+    };
+
+    expect(component.areRelationsEqual(secondRelation, firstRelation)).toEqual(false);
+    expect(component.areRelationsEqual(thirdRelation, firstRelation)).toEqual(true);
   });
 });
