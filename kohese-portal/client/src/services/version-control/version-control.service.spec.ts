@@ -3,14 +3,16 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { MockDataModel } from '../../../mocks/data/MockDataModel';
 import { MockItem } from '../../../mocks/data/MockItem';
+import { ItemRepository } from '../item-repository/item-repository.service';
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 
 describe('Service: version-control', () => {
   let proxy: ItemProxy;
   let versionControlService: VersionControlService;
 
   beforeAll(() => {
-    new KoheseModel(MockDataModel());
-    KoheseModel.modelDefinitionLoadingComplete();
+    let mockItemRepository = new MockItemRepository() as unknown as ItemRepository;
+
     let item: any = MockItem();
     item.id = 'test-uuid';
     proxy = new ItemProxy('Item', item);
@@ -49,11 +51,12 @@ describe('Service: version-control', () => {
   });
 
   it('commits changes', (done: Function) => {
-    versionControlService.commitItems([proxy],
-      new ItemProxy('KoheseUser', {
-        name: 'Test User',
-        email: 'TestUser@test.kohese.com'
-      }),
+    let test_user =  new ItemProxy('KoheseUser', {
+      name: 'Test User',
+      email: 'TestUser@test.kohese.com',
+      password: '$invalid-password'
+    });
+    versionControlService.commitItems([proxy], test_user,
       'Test Commit Message.').subscribe((statusMap: any) => {
       expect(true).toEqual(true);
       done();

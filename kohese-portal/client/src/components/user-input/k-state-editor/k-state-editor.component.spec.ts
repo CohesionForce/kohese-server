@@ -6,7 +6,6 @@ import { PipesModule } from '../../../pipes/pipes.module';
 import { StateService } from '../../../services/state/state.service';
 import { MockStateService } from '../../../../mocks/services/MockStateService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
@@ -25,16 +24,12 @@ describe('k-state-editor', () => {
         PipesModule
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [{
-          provide: StateService,
-          useClass: MockStateService
-        }, {
-          provide: DynamicTypesService,
-          useClass: MockDynamicTypesService
-        }, {
-          provide: ItemRepository,
-          useClass: MockItemRepository
-        }]
+      providers: [
+        { provide: StateService, useClass: MockStateService },
+        DynamicTypesService,
+        { provide: ItemRepository,
+          useClass: MockItemRepository }
+      ]
     }).compileComponents();
 
     stateEditor = TestBed.createComponent(KStateEditorComponent);
