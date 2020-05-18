@@ -282,9 +282,9 @@ export class FormatObjectEditorComponent implements OnInit {
 	        viewModel = treeConfiguration.getProxyFor('view-' + type.
 	          toLowerCase()).item;
 	      }
-	      if (Array.isArray(dataModel.classProperties[columnId].definition.
-	        type)) {
-	        return row[columnId].map((value: any, index: number) => {
+	      if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
+          let attributeValue = row[columnId] || [];
+	        return attributeValue.map((value: any, index: number) => {
 	          return this.getStringRepresentation(row, columnId, index,
 	            dataModel, viewModel);
 	        }).join(', ');
