@@ -9,7 +9,6 @@ import { TypeEditorComponent } from './type-editor.component';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { MockDynamicTypesService } from '../../../mocks/services/MockDynamicTypesService';
 import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { PipesModule } from '../../pipes/pipes.module';
@@ -28,7 +27,7 @@ describe('Component: Type Editor', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide: DynamicTypesService, useClass: MockDynamicTypesService},
+        DynamicTypesService,
         {provide: DialogService, useClass: MockDialogService},
         {provide: ItemRepository, useClass: MockItemRepository}
       ]

@@ -11,6 +11,8 @@ import { KoheseModel } from '../../../common/src/KoheseModel';
 import { RepoStates,
   TreeConfigType } from '../../src/services/item-repository/item-repository.service';
 import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
+import { MockItemCache } from './MockItemCache';
+import { ItemCache } from '../../../common/src/item-cache';
 
 export class MockItemRepository {
   static modelDefinitions = ModelDefinitions();
@@ -22,40 +24,19 @@ export class MockItemRepository {
   constructor() {
     console.log('### MIR Constructor called');
     if (MockItemRepository.singleton) {
-      this.syncMock();
+      this.mockFullSync();
       return MockItemRepository.singleton;
     }
     console.log('### MIR Creating singleton');
     MockItemRepository.singleton = this;
-    this.syncMock();
-  }
-
-  syncMock() {
-
-    // TODO: Uncomment the following block to switch to the full data model
-    // this.syncFull();
-    // return;
-
-    TreeConfiguration.getWorkingTree().reset();
-    let modelProxy = new KoheseModel(MockDataModel());
-    let viewModelProxy = new ItemProxy('KoheseView', MockViewData());
-    KoheseModel.modelDefinitionLoadingComplete();
-    modelProxy.type = new KoheseType(modelProxy, viewModelProxy);
-
-    let numberOfItemsToAdd: number = 7;
-    for (let j: number = 0; j < numberOfItemsToAdd; j++) {
-      let item: any = MockItem();
-      /* Delete the parentId so that this Item will be added as a child of the
-      root proxy */
-      delete item.parentId;
-      // Make the ID of each of these added Items distinct among each other
-      item.id = item.id + (j + 1);
-      new ItemProxy('Item', item);
+    if (!ItemCache.getItemCache()){
+      let mockItemCache = new MockItemCache();
+      ItemCache.setItemCache(mockItemCache);  
     }
-    TreeConfiguration.getWorkingTree().loadingComplete();
+    this.mockFullSync();
   }
 
-  syncFull () {
+  mockFullSync () {
     TreeConfiguration.getWorkingTree().reset();
 
     for(let modelName in MockItemRepository.modelDefinitions.model) {

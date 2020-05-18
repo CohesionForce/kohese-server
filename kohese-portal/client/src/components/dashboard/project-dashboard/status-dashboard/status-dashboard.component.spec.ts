@@ -5,8 +5,9 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { MaterialModule } from '../../../../material.module';
 import { PipesModule } from '../../../../pipes/pipes.module';
+import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../../../mocks/services/MockDynamicTypesService';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 import { StateFilterService } from '../../state-filter.service';
@@ -27,10 +28,11 @@ describe('Component: StatusDashboardComponent', () => {
         PipesModule
         ],
       providers: [
-        { provide: DynamicTypesService, useClass: MockDynamicTypesService },
+        { provide: ItemRepository, useClass: MockItemRepository },
+        DynamicTypesService,
         { provide: DialogService, useClass: MockDialogService },
         { provide: StateFilterService, useClass: MockStateFilterService }
-        ],
+      ],
       schemas: [ NO_ERRORS_SCHEMA ]
     }).compileComponents();
     

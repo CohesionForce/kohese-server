@@ -7,7 +7,6 @@ import { MaterialModule } from '../../../material.module';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -34,7 +33,7 @@ describe('Component: compare-items', () => {
           changeProxy: proxy
         } },
         { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: DynamicTypesService, useClass: MockDynamicTypesService },
+        DynamicTypesService,
         { provide: DialogService, useClass: MockDialogService },
         { provide: NavigationService, useClass: MockNavigationService },
         { provide: MatDialogRef, useValue: { close: () => {} } }
@@ -44,9 +43,6 @@ describe('Component: compare-items', () => {
     let compareItemsFixture: ComponentFixture<CompareItemsComponent> = TestBed.
       createComponent(CompareItemsComponent);
     component = compareItemsFixture.componentInstance;
-
-    // TODO: Need to remove when syncMock is removed
-    MockItemRepository.singleton.syncFull();
 
     compareItemsFixture.detectChanges();
   });
