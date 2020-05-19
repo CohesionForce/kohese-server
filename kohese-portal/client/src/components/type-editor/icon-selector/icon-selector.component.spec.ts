@@ -7,7 +7,8 @@ import { MaterialModule } from '../../../material.module'
 
 import { IconSelectorComponent } from './icon-selector.component';
 
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 
 describe('Component: Icon Selector', ()=>{
@@ -23,7 +24,8 @@ describe('Component: Icon Selector', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide: DynamicTypesService, useClass: MockDynamicTypesService}
+        {provide: ItemRepository, useClass: MockItemRepository},
+        DynamicTypesService
       ]
     }).compileComponents();
 

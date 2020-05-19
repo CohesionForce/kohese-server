@@ -9,7 +9,6 @@ import { MaterialModule } from '../../../material.module';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -38,7 +37,7 @@ describe('DocumentTreeComponent', () => {
           }
         },
         { provide: DialogService, useClass: MockDialogService },
-        { provide: DynamicTypesService, useClass: MockDynamicTypesService },
+        DynamicTypesService,
         { provide: ItemRepository, useClass: MockItemRepository }
       ],
       schemas: [ NO_ERRORS_SCHEMA ]

@@ -6,9 +6,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../../material.module';
 import { PipesModule } from '../../../pipes/pipes.module';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { Comparison, ChangeType } from '../comparison.class';
 import { CommitComparisonComponent } from './commit-comparison.component';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('Component: commit-comparison', () => {
   let component: CommitComparisonComponent;
@@ -16,13 +17,16 @@ describe('Component: commit-comparison', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [CommitComparisonComponent],
-      providers: [ {
+      providers: [ 
+        {
           provide: MAT_DIALOG_DATA,
           useValue: {
             baseCommitId: '7ef7525795a5c370b0abfa501ab87324f5ce5908',
             changeCommitId: '42a8e801f9efef73db114730d5819997e38916d7'
           }
-        }, { provide: DynamicTypesService, useClass: MockDynamicTypesService }
+        }, 
+        { provide: ItemRepository, useClass: MockItemRepository },
+        DynamicTypesService
       ],
       imports: [
         BrowserAnimationsModule,

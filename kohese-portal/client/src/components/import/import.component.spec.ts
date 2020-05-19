@@ -33,9 +33,6 @@ describe('Component: ', ()=>{
     importFixture = TestBed.createComponent(ImportComponent);
     importComponent = importFixture.componentInstance;
 
-    // TODO: Need to remove when syncMock is removed
-    MockItemRepository.singleton.syncFull();
-
     importFixture.detectChanges();
     
   })

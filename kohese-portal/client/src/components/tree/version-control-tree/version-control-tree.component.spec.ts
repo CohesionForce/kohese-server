@@ -16,7 +16,6 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { NotificationService } from '../../../services/notifications/notification.service';
 import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
 import { VersionControlTreeComponent } from './version-control-tree.component';
@@ -49,7 +48,7 @@ describe('Component: version-control-tree', () => {
           provide: VersionControlService,
           useClass: MockVersionControlService
         },
-        { provide: DynamicTypesService, useClass: MockDynamicTypesService },
+        DynamicTypesService,
         { provide: NotificationService, useClass: MockNotificationService }
       ]
     }).compileComponents();

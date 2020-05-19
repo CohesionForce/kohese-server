@@ -15,7 +15,6 @@ import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../mocks/services/MockDynamicTypesService';
 import { BehaviorSubject } from 'rxjs';
 import { MockItem, MockDocument } from '../../../mocks/data/MockItem';
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -44,14 +43,14 @@ describe('Component: Document View', ()=>{
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: DialogService, useClass: MockDialogService},
-        {provide: DynamicTypesService, useClass: MockDynamicTypesService}
+        DynamicTypesService
       ]
     }).compileComponents();
 
     documentViewFixture = TestBed.createComponent(DocumentViewComponent);
     documentViewComponent = documentViewFixture.componentInstance;
     documentViewComponent.proxyStream = ObservableOf(TreeConfiguration.
-      getWorkingTree().getProxyFor('Kurios Iesous'));
+      getWorkingTree().getProxyFor('test-uuid1'));
     documentViewComponent.filterSubject = new BehaviorSubject({
       source : AnalysisViews.TERM_VIEW,
       filter : '',
@@ -64,16 +63,16 @@ describe('Component: Document View', ()=>{
 
   it('instantiates the Document View component', ()=>{
     documentViewComponent.proxyStream = new BehaviorSubject(TreeConfiguration.
-      getWorkingTree().getProxyFor('Kurios Iesous'));
+      getWorkingTree().getProxyFor('test-uuid1'));
     expect(documentViewComponent).toBeTruthy();
   })
 
   it('loads the whole document when incremental load is off', ()=>{
-    documentViewComponent.proxyStream = new BehaviorSubject(TreeConfiguration.
-      getWorkingTree().getRootProxy());
+    let rootProxy = TreeConfiguration.getWorkingTree().getRootProxy();
+    documentViewComponent.proxyStream = new BehaviorSubject(rootProxy);
     documentViewComponent.incrementalLoad = false;
     documentViewFixture.detectChanges();
-    expect(documentViewComponent.itemsLoaded).toBe(12)
+    expect(documentViewComponent.itemsLoaded).toBe(rootProxy.descendantCount + 1);
   })
 
   it('loads only a subset of the document when incremental load is on', ()=>{
@@ -92,13 +91,14 @@ describe('Component: Document View', ()=>{
 
   it('stops loading at the character limit', ()=>{
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getRootProxy();
+    // TODO: Need to determine why we are adding the word Description 8000 times to the second child item of the Root
     for (let j: number = 0; j < 8000; j++) {
       proxy.children[2].item.description += "Description";
     }
     documentViewComponent.proxyStream = new BehaviorSubject(proxy);
     documentViewComponent.incrementalLoad = true;
     documentViewFixture.detectChanges();
-    expect(documentViewComponent.itemsLoaded).toBe(5);
+    expect(documentViewComponent.itemsLoaded).toBe(26);
   })
 
   afterEach(()=>{
