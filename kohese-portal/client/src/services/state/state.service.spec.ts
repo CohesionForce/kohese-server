@@ -13,7 +13,7 @@ describe('StateService', () => {
   let proxy: ItemProxy;
 
   beforeAll(() => {
-    let mockItemRepository = new MockItemRepository() as unknown as ItemRepository;
+    let mockItemRepository = new MockItemRepository() as any as ItemRepository;
     let dynamicTypesServicePlaceholder = new DynamicTypesService(mockItemRepository);
     stateService = new StateService(dynamicTypesServicePlaceholder);
 

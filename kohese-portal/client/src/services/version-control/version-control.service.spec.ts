@@ -11,7 +11,7 @@ describe('Service: version-control', () => {
   let versionControlService: VersionControlService;
 
   beforeAll(() => {
-    let mockItemRepository = new MockItemRepository() as unknown as ItemRepository;
+    let mockItemRepository = new MockItemRepository() as any as ItemRepository;
 
     let item: any = MockItem();
     item.id = 'test-uuid';

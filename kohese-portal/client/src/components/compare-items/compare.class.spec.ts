@@ -7,7 +7,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 describe('Class: Compare', () => {
-  let mockItemRepository = new MockItemRepository() as unknown as ItemRepository;
+  let mockItemRepository = new MockItemRepository() as any as ItemRepository;
   let dynamicTypesServicePlaceholder = new DynamicTypesService(mockItemRepository);
 
   it('compares two commits', async () => {

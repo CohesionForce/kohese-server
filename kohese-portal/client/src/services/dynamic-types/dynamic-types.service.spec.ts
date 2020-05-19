@@ -7,7 +7,7 @@ describe('DynamicTypesService', () => {
   let typeService: DynamicTypesService;
 
   beforeAll(() => {
-    let itemRepositoryPlaceholder = new MockItemRepository as unknown as ItemRepository;
+    let itemRepositoryPlaceholder = new MockItemRepository as any as ItemRepository;
     typeService = new DynamicTypesService(itemRepositoryPlaceholder);
   });
 
