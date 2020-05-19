@@ -145,43 +145,36 @@ implements OnInit, OnDestroy {
       });
     }
 
-    this.repoStatusSubscription = this.itemRepository.getRepoStatusSubject()
-    .subscribe((update: any) => {
-      switch (update.state) {
-        case RepoStates.KOHESEMODELS_SYNCHRONIZED:
-        case RepoStates.SYNCHRONIZATION_SUCCEEDED:
-          this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
-            if (newConfig) {
-              const types = this.typeService.getKoheseTypes();
+    this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
+      if (newConfig) {
+        const types = this.typeService.getKoheseTypes();
 
-              for (const type in types) {
-                if (type) {
-                  const vm = types[type].viewModelProxy;
-                  if (vm && vm.item.formatDefinitions && vm.item.defaultFormatKey) {
-                    this.formatDefs[type] = vm.item.formatDefinitions[vm.item.
-                      defaultFormatKey[FormatDefinitionType.DOCUMENT]];
-                  } else {
-                    console.log('Format not defined for ' + type);
-                  }
-                }
-              }
-              this.treeConfig = newConfig.config;
-              this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
-                if (newProxy) {
-                  this.itemProxy = newProxy;
-                  this.itemRepository.registerRecentProxy(newProxy);
-                  this.itemsLoaded = 0;
-                  // TODO - Determine if there is a way to cache and diff the new doc before
-                  // regenerating
-                  this.generateDoc();
-                  this.changeRef.markForCheck();
-                } else {
-                  this.itemProxy = undefined;
-                }
-              });
-              this.initialized = true;
+        for (const type in types) {
+          if (type) {
+            const vm = types[type].viewModelProxy;
+            if (vm && vm.item.formatDefinitions && vm.item.defaultFormatKey) {
+              this.formatDefs[type] = vm.item.formatDefinitions[vm.item.
+                defaultFormatKey[FormatDefinitionType.DOCUMENT]];
+            } else {
+              console.log('Format not defined for ' + type);
             }
-          });
+          }
+        }
+        this.treeConfig = newConfig.config;
+        this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
+          if (newProxy) {
+            this.itemProxy = newProxy;
+            this.itemRepository.registerRecentProxy(newProxy);
+            this.itemsLoaded = 0;
+            // TODO - Determine if there is a way to cache and diff the new doc before
+            // regenerating
+            this.generateDoc();
+            this.changeRef.markForCheck();
+          } else {
+            this.itemProxy = undefined;
+          }
+        });
+        this.initialized = true;
       }
     });
   }
