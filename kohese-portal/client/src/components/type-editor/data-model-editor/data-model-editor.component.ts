@@ -260,12 +260,7 @@ export class DataModelEditorComponent {
         let type: any = attributeEntry.definition.type;
         type = (Array.isArray(type) ? type[0] : type);
         return (type === 'StateMachine');
-      }).length === 0) {
-        defaultFormatDefinition.containers.splice(1, 0, {
-          kind: FormatContainerKind.VERTICAL,
-          contents: []
-        });
-      } else {
+      }).length > 0) {
         defaultFormatDefinition.containers[1].contents.length = 0;
       }
     }
@@ -283,14 +278,37 @@ export class DataModelEditorComponent {
         j])));
     }
     if (!parentTypeViewModel.ungroupDefaultFormatDefinitionStateAttributes) {
-      for (let j: number = 0; j < parentTypeDefaultFormatDefinition.containers[
-        1].contents.length; j++) {
-        defaultFormatDefinition.containers[1].contents.push(JSON.parse(JSON.
-          stringify(parentTypeDefaultFormatDefinition.containers[1].contents[
-          j])));
+      let parentTypeDataModel: any = treeConfiguration.getProxyFor(
+        parentTypeViewModel.modelName).item;
+      if (Object.values(parentTypeDataModel.classProperties).filter(
+        (attributeEntry: any) => {
+        let type: any = attributeEntry.definition.type;
+        type = (Array.isArray(type) ? type[0] : type);
+        return (type === 'StateMachine');
+      }).length > 0) {
+        if (Object.values(parentTypeDataModel.classProperties).filter(
+          (attributeEntry: any) => {
+          let type: any = attributeEntry.definition.type;
+          type = (Array.isArray(type) ? type[0] : type);
+          return (type === 'StateMachine');
+        }).length === 0) {
+          // No state attribute container should already be present
+          defaultFormatDefinition.containers.splice(1, 0, {
+            kind: FormatContainerKind.VERTICAL,
+            contents: []
+          });
+        }
+        
+        for (let j: number = 0; j < parentTypeDefaultFormatDefinition.containers[
+          1].contents.length; j++) {
+          defaultFormatDefinition.containers[1].contents.push(JSON.parse(JSON.
+            stringify(parentTypeDefaultFormatDefinition.containers[1].contents[
+            j])));
+        }
       }
     }
     
+    let stateFormatContainerAdded: boolean = false;
     for (let attributeName in this._dataModel.properties) {
       let propertyDefinition: PropertyDefinition = {
         propertyName: attributeName,
@@ -324,15 +342,31 @@ export class DataModelEditorComponent {
           break;
       }
       
-      if ((attributeType === 'StateMachine') && !parentTypeViewModel.
+      if ((attributeType === 'StateMachine') && !viewModelProxy.item.
         ungroupDefaultFormatDefinitionStateAttributes) {
-        defaultFormatDefinition.containers[1].contents.push(
-          propertyDefinition);
+        if ((Object.values(this._dataModel.classProperties).filter(
+          (attributeEntry: any) => {
+          let type: any = attributeEntry.definition.type;
+          type = (Array.isArray(type) ? type[0] : type);
+          return (type === 'StateMachine');
+        }).length === 0) && !stateFormatContainerAdded) {
+          defaultFormatDefinition.containers.splice(1, 0, {
+            kind: FormatContainerKind.VERTICAL,
+            contents: [propertyDefinition]
+          });
+          stateFormatContainerAdded = true;
+        } else {
+          defaultFormatDefinition.containers[1].contents.push(
+            propertyDefinition);
+        }
       } else {
         defaultFormatDefinition.containers[0].contents.push(
           propertyDefinition);
       }
     }
+    
+    this._dataModel.base = parentType.name;
+    this._dataModel.parentId = parentType.name;
     
     for (let j: number = 0; j < subtypeViewModels.length; j++) {
       let subtypeDefaultFormatDefinition: FormatDefinition = subtypeViewModels[
@@ -347,12 +381,7 @@ export class DataModelEditorComponent {
           let type: any = attributeEntry.definition.type;
           type = (Array.isArray(type) ? type[0] : type);
           return (type === 'StateMachine');
-        }).length === 0) {
-          subtypeDefaultFormatDefinition.containers.splice(1, 0, {
-            kind: FormatContainerKind.VERTICAL,
-            contents: []
-          });
-        } else {
+        }).length > 0) {
           subtypeDefaultFormatDefinition.containers[1].contents.length = 0;
         }
       }
@@ -364,14 +393,37 @@ export class DataModelEditorComponent {
           JSON.stringify(defaultFormatDefinition.containers[0].contents[j])));
       }
       if (!viewModelProxy.item.ungroupDefaultFormatDefinitionStateAttributes) {
-        for (let j: number = 0; j < defaultFormatDefinition.containers[1].
-          contents.length; j++) {
-          subtypeDefaultFormatDefinition.containers[1].contents.push(JSON.
-            parse(JSON.stringify(defaultFormatDefinition.containers[1].
-            contents[j])));
+        /* Due to classProperties not being updated within a session, the
+        conditional below might evaluate incorrectly. */
+        if (Object.values(this._dataModel.classProperties).filter(
+          (attributeEntry: any) => {
+          let type: any = attributeEntry.definition.type;
+          type = (Array.isArray(type) ? type[0] : type);
+          return (type === 'StateMachine');
+        }).length > 0) {
+          if (Object.values(subtypeDataModel.classProperties).filter(
+            (attributeEntry: any) => {
+            let type: any = attributeEntry.definition.type;
+            type = (Array.isArray(type) ? type[0] : type);
+            return (type === 'StateMachine');
+          }).length === 0) {
+            // No state attribute container should already be present
+            subtypeDefaultFormatDefinition.containers.splice(1, 0, {
+              kind: FormatContainerKind.VERTICAL,
+              contents: []
+            });
+          }
+          
+          for (let j: number = 0; j < defaultFormatDefinition.containers[1].
+            contents.length; j++) {
+            subtypeDefaultFormatDefinition.containers[1].contents.push(JSON.
+              parse(JSON.stringify(defaultFormatDefinition.containers[1].
+              contents[j])));
+          }
         }
       }
       
+      stateFormatContainerAdded = false;
       for (let attributeName in subtypeDataModel.properties) {
         let propertyDefinition: PropertyDefinition = {
           propertyName: attributeName,
@@ -408,8 +460,23 @@ export class DataModelEditorComponent {
         
         if ((attributeType === 'StateMachine') && !viewModelProxy.item.
           ungroupDefaultFormatDefinitionStateAttributes) {
-          subtypeDefaultFormatDefinition.containers[1].contents.push(
-            propertyDefinition);
+          /* Due to classProperties not being updated within a session, the
+          conditional below might evaluate incorrectly. */
+          if ((Object.values(this._dataModel.classProperties).filter(
+            (attributeEntry: any) => {
+            let type: any = attributeEntry.definition.type;
+            type = (Array.isArray(type) ? type[0] : type);
+            return (type === 'StateMachine');
+          }).length === 0) && !stateFormatContainerAdded) {
+            subtypeDefaultFormatDefinition.containers.splice(1, 0, {
+              kind: FormatContainerKind.VERTICAL,
+              contents: [propertyDefinition]
+            });
+            stateFormatContainerAdded = true;
+          } else {
+            subtypeDefaultFormatDefinition.containers[1].contents.push(
+              propertyDefinition);
+          }
         } else {
           subtypeDefaultFormatDefinition.containers[0].contents.push(
             propertyDefinition);
@@ -419,8 +486,6 @@ export class DataModelEditorComponent {
       this._itemRepository.upsertItem('KoheseView', subtypeViewModels[j]);
     }
     
-    this._dataModel.base = parentType.name;
-    this._dataModel.parentId = parentType.name;
     this._modifiedEventEmitter.emit();
     
     this.save();
@@ -712,7 +777,9 @@ export class DataModelEditorComponent {
           if ((propertyDefinition.kind === 'state-editor') &&
             !subtypeViewModels[j].
             ungroupDefaultFormatDefinitionStateAttributes) {
-            if (Object.values(this._dataModel.classProperties).filter(
+            let subtypeDataModel: any = treeConfiguration.getProxyFor(
+              subtypeViewModels[j].modelName).item;
+            if (Object.values(subtypeDataModel.classProperties).filter(
               (attributeEntry: any) => {
               let type: any = attributeEntry.definition.type;
               type = (Array.isArray(type) ? type[0] : type);
@@ -1024,36 +1091,13 @@ export class DataModelEditorComponent {
       let defaultFormatDefinition: FormatDefinition = viewModel.
         formatDefinitions[viewModel.defaultFormatKey[FormatDefinitionType.
         DEFAULT]];
-      
-      if (viewModel.ungroupDefaultFormatDefinitionStateAttributes) {
-        if (attributeType === 'StateMachine') {
-          defaultFormatDefinition.containers.splice(1, 0, {
-            kind: FormatContainerKind.VERTICAL,
-            contents: []
-          });
-          changeContainer(defaultFormatDefinition);
-        }
-      } else {
-        changeContainer(defaultFormatDefinition);
-      }
+      changeContainer(defaultFormatDefinition);
       
       for (let j: number = 0; j < subtypeViewModels.length; j++) {
         defaultFormatDefinition = subtypeViewModels[j].formatDefinitions[
           subtypeViewModels[j].defaultFormatKey[FormatDefinitionType.
           DEFAULT]];
-        
-        if (subtypeViewModels[j].
-          ungroupDefaultFormatDefinitionStateAttributes) {
-          if (attributeType === 'StateMachine') {
-            defaultFormatDefinition.containers.splice(1, 0, {
-              kind: FormatContainerKind.VERTICAL,
-              contents: []
-            });
-            changeContainer(defaultFormatDefinition);
-          }
-        } else {
-          changeContainer(defaultFormatDefinition);
-        }
+        changeContainer(defaultFormatDefinition);
         
         for (let formatDefinitionId in subtypeViewModels[j].
           formatDefinitions) {
