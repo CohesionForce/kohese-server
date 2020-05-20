@@ -161,24 +161,8 @@ export class FormatDefinitionEditorComponent implements OnInit {
     return false;
   }
   
-  public areStateAttributesGrouped(): boolean {
-    if (!this.areStateAttributesGroupable()) {
-      return false;
-    }
-    
-    let formatContainer: FormatContainer = this._formatDefinition.containers[
-      0];
-    for (let j: number = 0; j < formatContainer.contents.length; j++) {
-      if (formatContainer.contents[j].kind === 'state-editor') {
-        return false;
-      }
-    }
-    
-    return true;
-  }
-  
   public toggleStateAttributeGrouping(): void {
-    if (this.areStateAttributesGrouped()) {
+    if (!this._viewModel.ungroupDefaultFormatDefinitionStateAttributes) {
       let attributeNames: Array<string> = Object.keys(this._dataModel.
         classProperties);
       this._formatDefinition.containers[1].contents.reverse();
@@ -211,6 +195,9 @@ export class FormatDefinitionEditorComponent implements OnInit {
       
       this._formatDefinition.containers.splice(1, 0, formatContainer);
     }
+    
+    this._viewModel.ungroupDefaultFormatDefinitionStateAttributes = !this.
+      _viewModel.ungroupDefaultFormatDefinitionStateAttributes;
   }
   
   public doesPropertyDefinitionMatchSelection(option: any, selection: any):

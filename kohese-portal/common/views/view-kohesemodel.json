@@ -123,6 +123,10 @@
                   "editable": true
                 }
               ]
+            },
+            {
+              "kind": "list",
+              "contents": []
             }
           ]
         }
@@ -200,6 +204,10 @@
                   "editable": true
                 }
               ]
+            },
+            {
+              "kind": "list",
+              "contents": []
             }
           ]
         }
@@ -359,6 +367,10 @@
               "editable": false
             }
           ]
+        },
+        {
+          "kind": "list",
+          "contents": []
         }
       ],
       "id": "ce7b13c0-6964-11ea-80c5-0b0cc7c6ec96"

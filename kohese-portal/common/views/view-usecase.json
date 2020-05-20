@@ -136,6 +136,10 @@
                   "editable": true
                 }
               ]
+            },
+            {
+              "kind": "list",
+              "contents": []
             }
           ]
         }

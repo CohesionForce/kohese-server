@@ -213,6 +213,10 @@
               "editable": false
             }
           ]
+        },
+        {
+          "kind": "list",
+          "contents": []
         }
       ],
       "id": "cf123860-5a76-11ea-8c15-5359dfa592ed"
