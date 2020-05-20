@@ -178,6 +178,10 @@ export class FormatObjectEditorComponent implements OnInit {
     return this._usernames;
   }
   
+  get itemRepository() {
+    return this._itemRepository;
+  }
+  
   get Object() {
     return Object;
   }
@@ -561,6 +565,9 @@ export class FormatObjectEditorComponent implements OnInit {
     return async () => {
       let references: Array<{ id: string }> = this._object[attributeDefinition.
         propertyName];
+      if (!references) {
+        references = this._object[attributeDefinition.propertyName] = [];
+      }
       let selection: any = await this._dialogService.openComponentDialog(
         TreeComponent, {
         data: {
@@ -593,11 +600,16 @@ export class FormatObjectEditorComponent implements OnInit {
           return { id: itemProxy.item.id };
         }));
       }
-      
+
       rows.push(...references.map((reference: { id: string }) => {
         return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
           item;
       }));
+      
+      // Delete the array if it becomes empty
+      if (references.length === 0) {
+        delete this._object[attributeDefinition.propertyName];
+      }
       
       this._changeDetectorRef.markForCheck();
       return rows;
@@ -656,10 +668,11 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public getAttributeRepresentation(attributeDefinition: PropertyDefinition):
     string {
+    // Only customLabel should be used in the first part of the statement below
     return ((attributeDefinition.customLabel ? attributeDefinition.
-      customLabel : attributeDefinition.propertyName) +
-      (this._selectedType.classProperties[attributeDefinition.propertyName].
-      definition.required ? '*' : ''));
+      customLabel : attributeDefinition.propertyName) + (this._selectedType.
+      classProperties[attributeDefinition.propertyName].definition.required ?
+      '*' : ''));
   }
   
   public getDateString(timestamp: number): string {

@@ -40,16 +40,13 @@ describe('Component: Action Table', ()=>{
 
     actionTableFixture = TestBed.createComponent(ActionTableComponent);
     actionTableComponent = actionTableFixture.componentInstance;
+
     let itemRepository: any = TestBed.get(ItemRepository);
     let proxy: ItemProxy = itemRepository.getRootProxy();
-    let koheseType: any = MockKoheseType();
-    KoheseModel.modelDefinitionLoadingComplete();
-    let list: Array<any> = proxy.getSubtreeAsList();
-    for (let j: number = 0; j < list.length; j++) {
-      if (!list[j].proxy.model) {
-        list[j].proxy.model = koheseType.dataModelProxy;
-      }
-    }
+
+    // TODO: Need to remove when syncMock is removed
+    MockItemRepository.singleton.syncFull();
+
     actionTableComponent.proxyStream = new BehaviorSubject<any>(proxy);
     actionTableComponent.editableStream = new BehaviorSubject<boolean>(true);
 

@@ -70,12 +70,13 @@
       true">
     </mat-header-row>
     <mat-row *matRowDef="let row; columns: getDisplayColumnIdentifiers()"
-      draggable="{{!!move}}" (dragstart)="$event.dataTransfer.setData('rows',
-      getMoveDataTransferValue(row)); $event.dataTransfer.dropEffect = 'move';
-      changeDetectorRef.detach()" (dragend)="changeDetectorRef.reattach();
-      changeDetectorRef.markForCheck()" (dragover)="$event.preventDefault();
-      $event.currentTarget.style['border-top'] = ''; $event.currentTarget.
-      style['border-bottom'] = ''; ((($event.offsetY / $event.currentTarget.
+      [draggable]="(!isDisabled && move)" (dragstart)="$event.dataTransfer.
+      setData('rows', getMoveDataTransferValue(row)); $event.dataTransfer.
+      dropEffect = 'move'; changeDetectorRef.detach()"
+      (dragend)="changeDetectorRef.reattach(); changeDetectorRef.
+      markForCheck()" (dragover)="$event.preventDefault(); $event.
+      currentTarget.style['border-top'] = ''; $event.currentTarget.style[
+      'border-bottom'] = ''; ((($event.offsetY / $event.currentTarget.
       offsetHeight) < 0.5) ? $event.currentTarget.style['border-top'] =
       'dashed' : $event.currentTarget.style['border-bottom'] = 'dashed')"
       (dragleave)="$event.currentTarget.style['border-top'] = ''; $event.

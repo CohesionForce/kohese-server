@@ -5,7 +5,7 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169859,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1587074533594,
+  "modifiedOn": 1588793690702,
   "modelName": "UseCase",
   "icon": "fa fa-lemon-o",
   "color": "#000000",
@@ -125,7 +125,8 @@
                   "labelOrientation": "Top",
                   "kind": "",
                   "visible": true,
-                  "editable": true
+                  "editable": true,
+                  "tableDefinition": "b1090aa0-fb86-11e9-be56-311e0135452a"
                 },
                 {
                   "propertyName": "Postconditions",
@@ -145,7 +146,8 @@
         }
       },
       "defaultFormatKey": {
-        "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1"
+        "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+        "document": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1"
       },
       "tableDefinitions": {}
     }
@@ -360,7 +362,7 @@
               "customLabel": "Actors",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "text",
+              "kind": "",
               "editable": true
             },
             {

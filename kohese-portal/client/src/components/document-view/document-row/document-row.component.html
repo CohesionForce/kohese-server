@@ -25,27 +25,19 @@
     </div>
     <div class="document-row">
       <ng-container *ngIf="row.editable else notEditable">
-        <div>
-          <mat-form-field style="width: 100%;">
-            <input matInput type="text" placeholder="{{docInfo.format.header.
-              contents[0].customLabel}}" [(ngModel)]="docInfo.proxy.item.
-              name"/>
-          </mat-form-field>
-        </div>
+        <format-object-editor [type]="docInfo.proxy.model.item"
+          [object]="docInfo.proxy.item"
+          [formatDefinitionType]="FormatDefinitionType.DOCUMENT">
+        </format-object-editor>
       </ng-container>
       <ng-template #notEditable>
-        <label>
-          <span>{{docInfo.format.header.contents[0].customLabel}}</span>
-        </label>
-        <div [innerHTML]="'<h' + (docInfo.depth + 1) + '>' + docInfo.proxy.item.
-          name + '</h' + (docInfo.depth + 1) + '>'">
-        </div>
+        <markdown [data]="itemRepository.getMarkdownRepresentation(docInfo.
+          proxy.item, docInfo.proxy.model.item, itemRepository.getTreeConfig().
+          getValue().config.getProxyFor('view-' + docInfo.proxy.model.item.
+          name.toLowerCase()).item, FormatDefinitionType.DOCUMENT, docInfo.
+          depth, false)">
+        </markdown>
       </ng-template>
-      <format-object-editor [type]="docInfo.proxy.model.item"
-        [object]="docInfo.proxy.item"
-        [formatDefinitionType]="FormatDefinitionType.DOCUMENT"
-        [disabled]="!row.editable">
-      </format-object-editor>
     </div>
     <!-- <div class="document-row" *ngIf="row.editable" [ngClass]="{'hovered-body': row.rowState === 'show'}">
       <textarea matInput [(ngModel)]="docInfo.proxy.item.name"></textarea>

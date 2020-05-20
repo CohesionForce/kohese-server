@@ -16,6 +16,7 @@ import { FormatContainer,
   FormatContainerKind } from '../../components/type-editor/FormatContainer.interface';
 import { PropertyDefinition } from '../../components/type-editor/PropertyDefinition.interface';
 import { TableDefinition } from '../../components/type-editor/TableDefinition.interface';
+import { LocationMap } from '../../constants/LocationMap.data';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
@@ -796,8 +797,40 @@ export class ItemRepository {
   }
   
   public getMarkdownRepresentation(koheseObject: any, dataModel: any,
-    viewModel: any, formatDefinition: FormatDefinition): string {
+    viewModel: any, formatDefinitionType: FormatDefinitionType, headingLevel:
+    number, addLinks: boolean): string {
     let representation: string = '';
+    let formatDefinition: FormatDefinition;
+	  let formatDefinitionId: string = viewModel.defaultFormatKey[
+	    formatDefinitionType];
+	  if (formatDefinitionId) {
+	    formatDefinition = viewModel.formatDefinitions[formatDefinitionId];
+	  } else {
+	    let treeConfiguration: TreeConfiguration = this.getTreeConfig().
+	      getValue().config;
+	    let dataModelItemProxy: ItemProxy = treeConfiguration.getProxyFor(
+	      dataModel.id);
+	    while (dataModelItemProxy) {
+	      let ancestorViewModel: any = treeConfiguration.getProxyFor(
+	        'view-' + dataModelItemProxy.item.name.toLowerCase()).item;
+	      formatDefinitionId = ancestorViewModel.defaultFormatKey[
+	        formatDefinitionType];
+	      if (formatDefinitionId) {
+	        formatDefinition = ancestorViewModel.formatDefinitions[
+	          formatDefinitionId];
+	        break;
+	      }
+	      
+	      dataModelItemProxy = treeConfiguration.getProxyFor(
+	        dataModelItemProxy.item.base);
+	    }
+	    
+	    if (!formatDefinition) {
+	      formatDefinition = viewModel.formatDefinitions[viewModel.
+	        defaultFormatKey[FormatDefinitionType.DEFAULT]];
+	    }
+	  }
+    
     let globalTypeNames: Array<string> = [];
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
@@ -806,15 +839,42 @@ export class ItemRepository {
       }
     }, undefined);
     
+    if (headingLevel > -1) {
+      if (headingLevel === 0) {
+        representation += '<div style="font-size: xxx-large;">';
+      } else {
+        for (let j: number = 0; j < headingLevel; j++) {
+	        representation += '#';
+	      }
+	      
+	      representation += ' ';
+	    }
+	  }
+	  
+	  if (formatDefinition.header.contents.length > 0) {
+  	  if (addLinks) {
+	      representation += ('[' + koheseObject[formatDefinition.header.contents[
+	        0].propertyName] + '](' + window.location.origin + LocationMap[
+	        'Explore'].route + ';id=' + koheseObject.id + ')\n\n');
+  	  } else {
+	      representation += (koheseObject[formatDefinition.header.contents[0].
+	        propertyName] + '\n\n');
+	    }
+	  }
+	  
+	  if (headingLevel === 0) {
+	    representation += '</div>\n\n';
+	  }
+    
     for (let j: number = 0; j < formatDefinition.containers.length; j++) {
       let formatContainer: FormatContainer = formatDefinition.containers[j];
       if (formatContainer.kind === FormatContainerKind.
         REVERSE_REFERENCE_TABLE) {
         representation += '### Reverse References For ' + formatContainer.
           contents.map((propertyDefinition: PropertyDefinition) => {
-          return propertyDefinition.propertyName.kind + '\'s ' +
+          return '* ' + propertyDefinition.propertyName.kind + '\'s ' +
             propertyDefinition.propertyName.attribute;
-        }).join(', ');
+        }).join('\n');
         
         representation += '\n\n<table><tr><th>Name</th></tr>';
         
@@ -954,25 +1014,16 @@ export class ItemRepository {
                         };
                       }
                       let localTypeViewModel: any = viewModel.localTypes[type];
-                      let formatDefinitionId: string = localTypeViewModel.
-                        defaultFormatKey[FormatDefinitionType.DOCUMENT];
-                      if (!formatDefinitionId) {
-                        formatDefinitionId = localTypeViewModel.
-                          defaultFormatKey[FormatDefinitionType.DEFAULT];
-                      }
-                      
                       if (Array.isArray(value)) {
-                        for (let l: number = 0; l < value.length; l++) {
-                          body += this.getMarkdownRepresentation(value[l],
+                        body += value.map((v: any) => {
+                          return this.getMarkdownRepresentation(v,
                             localTypeDataModelCopy, localTypeViewModel,
-                            localTypeViewModel.formatDefinitions[
-                            formatDefinitionId]);
-                        }
+                            formatDefinitionType, -1, addLinks);
+                        }).join('\n');
                       } else {
                         body += this.getMarkdownRepresentation(value,
                           localTypeDataModelCopy, localTypeViewModel,
-                          localTypeViewModel.formatDefinitions[
-                          formatDefinitionId]);
+                          formatDefinitionType, -1, addLinks);
                       }
                     }
                   } else {
@@ -989,11 +1040,11 @@ export class ItemRepository {
                           id = arrayComponent;
                         }
                         
-                        stringComponents.push(TreeConfiguration.
+                        stringComponents.push('* ' + TreeConfiguration.
                           getWorkingTree().getProxyFor(id).item.name);
                       }
                       
-                      body += stringComponents.join(', ');
+                      body += stringComponents.join('\n');
                     } else {
                       let id: string;
                       if (value.id) {
@@ -1008,6 +1059,12 @@ export class ItemRepository {
                     }
                   }
                 }
+              } else if (propertyDefinition.kind === 'date') {
+                body += new Date(value).toLocaleDateString();
+              } else if (Array.isArray(value)) {
+                body += value.map((v: any) => {
+                  return ('* ' + v);
+                }).join('\n');
               } else {
                 body += value;
               }
