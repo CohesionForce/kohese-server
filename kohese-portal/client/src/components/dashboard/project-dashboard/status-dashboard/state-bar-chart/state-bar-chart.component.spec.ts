@@ -33,7 +33,7 @@ describe('StateBarChartComponent', () => {
     fixture = TestBed.createComponent(StateBarChartComponent);
     component = fixture.componentInstance;
     component.projectStream = new BehaviorSubject<ProjectInfo>({
-      proxy: TreeConfiguration.getWorkingTree().getProxyFor('Kurios Iesous'),
+      proxy: TreeConfiguration.getWorkingTree().getProxyFor('test-uuid1'),
       users: [],
       projectItems: []
     });

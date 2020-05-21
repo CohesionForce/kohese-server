@@ -28,7 +28,7 @@ describe('UserStatisticsComponent', () => {
     fixture = TestBed.createComponent(UserStatisticsComponent);
     component = fixture.componentInstance;
     component.projectStream = ObservableOf({
-      proxy: TreeConfiguration.getWorkingTree().getProxyFor('Kurios Iesous'),
+      proxy: TreeConfiguration.getWorkingTree().getProxyFor('test-uuid1'),
       users: [],
       projectItems: []
     });

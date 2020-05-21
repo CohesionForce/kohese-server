@@ -56,9 +56,6 @@ describe('Component: Create Wizard', ()=>{
     createWizardFixture = TestBed.createComponent(CreateWizardComponent);
     createWizardComponent = createWizardFixture.componentInstance;
 
-    // TODO: Need to remove when syncMock is removed
-    MockItemRepository.singleton.syncFull();
-
     // Set off the init life cycle
     createWizardFixture.detectChanges();
   })
