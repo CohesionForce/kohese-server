@@ -735,7 +735,11 @@ export class FormatObjectEditorComponent implements OnInit {
     }
     
     if (!this._enclosingType && (attributeName === 'parentId')) {
-      return TreeConfiguration.getWorkingTree().getProxyFor(value).item.name;
+      let parentId = value;
+      if (parentId.hasOwnProperty('id')){
+        parentId = value.id;
+      }
+      return TreeConfiguration.getWorkingTree().getProxyFor(parentId).item.name;
     }
     
     let representation: string = String(value);
