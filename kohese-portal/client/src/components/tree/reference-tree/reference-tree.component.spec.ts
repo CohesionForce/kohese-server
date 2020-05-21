@@ -12,7 +12,6 @@ import { MockDialogService } from '../../../../mocks/services/MockDialogService'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { ReferenceTreeComponent } from './reference-tree.component';
 
 describe('Component: reference-tree', () => {
@@ -33,7 +32,7 @@ describe('Component: reference-tree', () => {
         }) } },
         { provide: DialogService, useClass: MockDialogService },
         { provide: NavigationService, useClass: MockNavigationService },
-        { provide: DynamicTypesService, useClass: MockDynamicTypesService }
+        DynamicTypesService
       ]
     }).compileComponents();
     

@@ -842,10 +842,15 @@ export class ItemRepository {
     }, undefined);
     
     if (headingLevel > -1) {
-      for (let j: number = 0; j < headingLevel; j++) {
-	      representation += '#';
+      if (headingLevel === 0) {
+        representation += '<div style="font-size: xxx-large;">';
+      } else {
+        for (let j: number = 0; j < headingLevel; j++) {
+	        representation += '#';
+	      }
+	      
+	      representation += ' ';
 	    }
-	    representation += '# ';
 	  }
 	  
 	  if (formatDefinition.header.contents.length > 0) {
@@ -857,6 +862,10 @@ export class ItemRepository {
 	      representation += (koheseObject[formatDefinition.header.contents[0].
 	        propertyName] + '\n\n');
 	    }
+	  }
+	  
+	  if (headingLevel === 0) {
+	    representation += '</div>\n\n';
 	  }
     
     for (let j: number = 0; j < formatDefinition.containers.length; j++) {

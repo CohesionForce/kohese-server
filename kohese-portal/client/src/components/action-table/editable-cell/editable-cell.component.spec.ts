@@ -20,9 +20,6 @@ describe('Component: Editable Cell ', ()=>{
   let editableStream = new BehaviorSubject<boolean>(true);
   let rowActionStream = new Subject<any>();
   
-  // TODO: Need to remove when syncMock is removed
-  MockItemRepository.singleton.syncFull();
-
   let actionProxy = new ItemProxy('Action', MockItem())
 
   beforeEach(async(()=>{
