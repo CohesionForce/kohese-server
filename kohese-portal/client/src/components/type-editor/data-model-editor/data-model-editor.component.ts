@@ -286,7 +286,12 @@ export class DataModelEditorComponent {
         type = (Array.isArray(type) ? type[0] : type);
         return (type === 'StateMachine');
       }).length > 0) {
-        if (Object.values(parentTypeDataModel.classProperties).filter(
+        /* At this point, _dataModel has not yet had its parentType changed.
+        Should there be no state attributes in the previous hierarchy for this
+        type, add an empty FormatContainer to the default FormatDefinition
+        (since it should not have had an automatically-added state
+        FormatContainer). */
+        if (Object.values(this._dataModel.classProperties).filter(
           (attributeEntry: any) => {
           let type: any = attributeEntry.definition.type;
           type = (Array.isArray(type) ? type[0] : type);

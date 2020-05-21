@@ -100,8 +100,8 @@
       </button>
     </ng-container>
     <ng-container *ngIf="isDefaultFormatDefinition">
-      <mat-checkbox [disabled]="(isDisabled || !areStateAttributesGroupable())"
-        [ngModel]="!viewModel.ungroupDefaultFormatDefinitionStateAttributes"
+      <mat-checkbox [disabled]="isDisabled" [ngModel]="!viewModel.
+        ungroupDefaultFormatDefinitionStateAttributes"
         (ngModelChange)="toggleStateAttributeGrouping()">
         Group State Machines At Bottom
       </mat-checkbox>
