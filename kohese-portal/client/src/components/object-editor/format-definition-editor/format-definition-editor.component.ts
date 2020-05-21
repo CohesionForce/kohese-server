@@ -148,35 +148,29 @@ export class FormatDefinitionEditorComponent implements OnInit {
     }, undefined);
   }
   
-  public areStateAttributesGroupable(): boolean {
-    for (let attributeName in this._dataModel.classProperties) {
-      let type: any = this._dataModel.classProperties[attributeName].
-        definition.type;
-      type = (Array.isArray(type) ? type[0] : type);
-      if (type === 'StateMachine') {
-        return true;
-      }
-    }
-    
-    return false;
-  }
-  
   public toggleStateAttributeGrouping(): void {
     if (!this._viewModel.ungroupDefaultFormatDefinitionStateAttributes) {
-      let attributeNames: Array<string> = Object.keys(this._dataModel.
-        classProperties);
-      this._formatDefinition.containers[1].contents.reverse();
-      for (let j: number = (this._formatDefinition.containers[1].contents.
-        length - 1); j >= 0; j--) {
-        let propertyDefinition: PropertyDefinition = this._formatDefinition.
-          containers[1].contents.splice(j, 1)[0];
-        /* Adjust insertion index based on 'name' being present in the
-        header */
-        this._formatDefinition.containers[0].contents.splice(attributeNames.
-          indexOf(propertyDefinition.propertyName) - 1, 0, propertyDefinition);
+      if (Object.values(this._dataModel.classProperties).filter(
+        (attributeEntry: any) => {
+        let type: any = attributeEntry.definition.type;
+        type = (Array.isArray(type) ? type[0] : type);
+        return (type === 'StateMachine');
+      }).length > 0) {
+        let attributeNames: Array<string> = Object.keys(this._dataModel.
+          classProperties);
+        this._formatDefinition.containers[1].contents.reverse();
+        for (let j: number = (this._formatDefinition.containers[1].contents.
+          length - 1); j >= 0; j--) {
+          let propertyDefinition: PropertyDefinition = this._formatDefinition.
+            containers[1].contents.splice(j, 1)[0];
+          /* Adjust insertion index based on 'name' being present in the
+          header */
+          this._formatDefinition.containers[0].contents.splice(attributeNames.
+            indexOf(propertyDefinition.propertyName) - 1, 0, propertyDefinition);
+        }
+        
+        this._formatDefinition.containers.splice(1, 1);
       }
-      
-      this._formatDefinition.containers.splice(1, 1);
     } else {
       let formatContainer: FormatContainer = {
         kind: FormatContainerKind.VERTICAL,
@@ -198,6 +192,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
     
     this._viewModel.ungroupDefaultFormatDefinitionStateAttributes = !this.
       _viewModel.ungroupDefaultFormatDefinitionStateAttributes;
+    console.log(this._viewModel.ungroupDefaultFormatDefinitionStateAttributes);
   }
   
   public doesPropertyDefinitionMatchSelection(option: any, selection: any):
