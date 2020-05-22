@@ -835,11 +835,17 @@ export class DataModelEditorComponent {
     let viewModel: any = (this._enclosingType ? viewModelProxy.item.
       localTypes[this._dataModel.name] : viewModelProxy.item);
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
-      if (!attribute.relation) {
+      if (this._dataModel.classLocalTypes[attributeType]) {
         attribute.relation = {
-          kind: 'Item',
-          foreignKey: 'id'
+          contained: true
         };
+      } else {
+        if (!attribute.relation) {
+          attribute.relation = {
+            kind: 'Item',
+            foreignKey: 'id'
+          };
+        }
       }
       
       viewModel.viewProperties[attribute.name].inputType.type = '';

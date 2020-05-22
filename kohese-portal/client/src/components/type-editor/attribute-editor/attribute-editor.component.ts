@@ -165,11 +165,17 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     }
     
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
-      if (!this._attribute.relation) {
+      if (this._type && this._type.classLocalTypes[attributeType]) {
         this._attribute.relation = {
-          kind: 'Item',
-          foreignKey: 'id'
+          containment: true
         };
+      } else {
+        if (!this._attribute.relation) {
+          this._attribute.relation = {
+            kind: 'Item',
+            foreignKey: 'id'
+          };
+        }
       }
       
       this._view.inputType.type = '';

@@ -28,9 +28,10 @@
         <br/>
         <br/>
       </ng-container>
-      <ng-container *ngIf="(Object.values(fundamentalTypes).indexOf(
+      <ng-container *ngIf="((Object.values(fundamentalTypes).indexOf(
         Array.isArray(attribute.type) ? attribute.type[0] : attribute.type) ===
-        -1)">
+        -1) && !type.classLocalTypes[(Array.isArray(attribute.type) ?
+        attribute.type[0] : attribute.type)])">
         <mat-form-field style="width: 100%;">
           <mat-select placeholder="Reference Attribute"
             [ngModel]="attribute.relation" (ngModelChange)="attribute.
