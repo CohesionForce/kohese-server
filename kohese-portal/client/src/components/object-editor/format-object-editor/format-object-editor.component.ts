@@ -268,6 +268,10 @@ export class FormatObjectEditorComponent implements OnInit {
     columnId: string) => string {
     return (row: any, columnId: string) => {
       if (attributeName) {
+        if (row[columnId] == null) {
+          return '';
+        }
+        
 	      let type: any = this._selectedType.classProperties[attributeName].
 	        definition.type;
 	      type = (Array.isArray(type) ? type[0] : type);
@@ -283,15 +287,15 @@ export class FormatObjectEditorComponent implements OnInit {
 	          toLowerCase()).item;
 	      }
 	      if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
-          let attributeValue = row[columnId] || [];
-	        return attributeValue.map((value: any, index: number) => {
+	        return row[columnId].map((value: any, index: number) => {
 	          // Bullet-ize string representations
-	          return '\u2022 ' + this.getStringRepresentation(row, columnId,
-	            index, dataModel, viewModel);
+	          return '\u2022 ' + this._itemRepository.getStringRepresentation(
+	            row, columnId, index, dataModel, viewModel, this.
+	            _formatDefinitionType);
 	        }).join('\n');
 	      } else {
-	        return this.getStringRepresentation(row, columnId, undefined,
-	          dataModel, viewModel);
+	        return this._itemRepository.getStringRepresentation(row, columnId,
+	          undefined, dataModel, viewModel, this._formatDefinitionType);
 	      }
 	    }
 	    
@@ -758,64 +762,5 @@ export class FormatObjectEditorComponent implements OnInit {
     }
     
     return result;
-  }
-  
-  public getStringRepresentation(koheseObject: any, attributeName: string,
-    index: number, dataModel: any, viewModel: any): string {
-    let value: any;
-    if (index != null) {
-      value = koheseObject[attributeName][index];
-    } else {
-      value = koheseObject[attributeName];
-    }
-    
-    if ((attributeName === 'parentId') && (dataModel.classProperties[
-      attributeName].definedInKind === 'Item') && ((typeof value) ===
-      'string')) {
-      return TreeConfiguration.getWorkingTree().getProxyFor(value).item.name;
-    }
-    
-    let representation: string = String(value);
-    if (representation === String({})) {
-      let type: any = dataModel.classProperties[attributeName].definition.type;
-      type = (Array.isArray(type) ? type[0] : type);
-      if (dataModel.localTypes && dataModel.localTypes[type]) {
-        if (value.name) {
-          return value.name;
-        } else if (value.id) {
-          return value.id;
-        } else {
-          viewModel = viewModel.localTypes[type];
-          let formatDefinitionId: string = viewModel.defaultFormatKey[this.
-            _formatDefinitionType];
-          if (!formatDefinitionId) {
-            formatDefinitionId = viewModel.defaultFormatKey[
-              FormatDefinitionType.DEFAULT];
-          }
-          let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
-            formatDefinitionId];
-          for (let j: number = 0; j < formatDefinition.containers.length;
-            j++) {
-            if ((formatDefinition.containers.length > 0) && (formatDefinition.
-              containers[0].kind !== FormatContainerKind.
-              REVERSE_REFERENCE_TABLE) && (formatDefinition.containers[0].
-              contents.length > 0)) {
-              let propertyDefinition: PropertyDefinition = formatDefinition.
-                containers[0].contents[0];
-              return propertyDefinition.customLabel + ': ' + String(value[
-                propertyDefinition.propertyName]);
-            }
-          }
-          
-          let firstAttributeName: string = Object.keys(value)[0];
-          return firstAttributeName + ': ' + String(value[firstAttributeName]);
-        }
-      } else {
-        return TreeConfiguration.getWorkingTree().getProxyFor(value.id).item.
-          name;
-      }
-    } else {
-      return representation;
-    }
   }
 }
