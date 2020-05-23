@@ -323,6 +323,18 @@ export class FormatObjectEditorComponent implements OnInit {
   }
   
   public openObjectSelector(attributeName: string): void {
+    let itemId = undefined;
+    switch (typeof(this._object[attributeName])) {
+      case 'object':
+        itemId = this._object[attributeName].item.id;
+        break;
+      case 'string':
+        itemId = this._object[attributeName];
+    }
+
+    let currentSelectedProxy = TreeConfiguration.getWorkingTree().getProxyFor(itemId);
+    let currentSelectedProxyArray = itemId ? [ currentSelectedProxy ] : [];
+
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
@@ -337,14 +349,18 @@ export class FormatObjectEditorComponent implements OnInit {
             getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
             item.icon;
         },
-        selection: (this._object[attributeName] ? [TreeConfiguration.
-          getWorkingTree().getProxyFor(this._object[attributeName].id)] : []),
+        selection: currentSelectedProxyArray,
         quickSelectElements: this._itemRepository.getRecentProxies()
       }
     }).updateSize('90%', '90%').afterClosed().subscribe((selection:
       Array<any>) => {
       if (selection) {
-        this._object[attributeName] = { id: selection[0].item.id };
+        let itemId = selection[0].item.id;
+        if (attributeName === 'parentId') {
+          this._object[attributeName] = itemId;
+        } else {
+          this._object[attributeName] = { id: itemId };
+        }
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -735,7 +751,11 @@ export class FormatObjectEditorComponent implements OnInit {
     }
     
     if (!this._enclosingType && (attributeName === 'parentId')) {
-      return TreeConfiguration.getWorkingTree().getProxyFor(value).item.name;
+      let parentId = value;
+      if (parentId.hasOwnProperty('id')){
+        parentId = value.id;
+      }
+      return TreeConfiguration.getWorkingTree().getProxyFor(parentId).item.name;
     }
     
     let representation: string = String(value);

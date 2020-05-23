@@ -164,7 +164,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  private _allowMultiselect: boolean = false;
+  private _allowMultiselect: boolean = this._data['allowMultiselect'];
   get allowMultiselect() {
     return this._allowMultiselect;
   }
@@ -261,7 +261,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
       this.getText = this._data['getText'];
       this.getIcon = this._data['getIcon'];
       this.selection = this._data['selection'];
-      this.allowMultiselect = true;
+      this.allowMultiselect = this._data['allowMultiselect'];
       this.actions = this._data['actions'];
       this.elementSelected = this._data['elementSelectionHandler'];
       this.quickSelectElements = this._data['quickSelectElements'];
