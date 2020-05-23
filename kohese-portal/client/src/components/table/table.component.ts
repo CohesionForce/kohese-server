@@ -1,6 +1,8 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, OnInit, Input, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef, Sort } from '@angular/material';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
+  ViewChild } from '@angular/core';
+import { Sort } from '@angular/material';
+
+import { Dialog } from '../dialog/Dialog.interface';
 
 @Component({
   selector: 'table_',
@@ -8,7 +10,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, Sort } from '@angular/material';
   styleUrls: ['./table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TableComponent implements OnInit {
+export class TableComponent implements Dialog {
   private _rows: Array<any>;
   get rows() {
     return this._rows;
@@ -35,6 +37,15 @@ export class TableComponent implements OnInit {
     }
     
     this._columns = columns;
+  }
+  
+  private _getText: (row: any, columnId: string) => string;
+  get getText() {
+    return this._getText;
+  }
+  @Input('getText')
+  set getText(getText: (row: any, columnId: string) => string) {
+    this._getText = getText;
   }
   
   private _selection: Array<any> = [];
@@ -125,29 +136,7 @@ export class TableComponent implements OnInit {
     return this._changeDetectorRef;
   }
   
-  get matDialogRef() {
-    return this._matDialogRef;
-  }
-  
-  public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<TableComponent>) {
-  }
-  
-  public ngOnInit(): void {
-    if (this.isDialogInstance()) {
-      this.rows = this._data['rows'];
-      this.columns = this._data['columns'];
-      this.add = this._data['add'];
-      this.edit = this._data['edit'];
-      this.move = this._data['move'];
-      this.remove = this._data['remove'];
-    }
-  }
-  
-  public isDialogInstance(): boolean {
-    return this._matDialogRef && (this._matDialogRef.componentInstance ===
-      this) && this._data;
+  public constructor(private _changeDetectorRef: ChangeDetectorRef) {
   }
   
   public sort(sortInformation: Sort): void {
@@ -203,5 +192,9 @@ export class TableComponent implements OnInit {
     return indices.map((index: number) => {
       return this._rows[index];
     });
+  }
+  
+  public close(accept: boolean): any {
+    return (accept ? this._selection : undefined);
   }
 }

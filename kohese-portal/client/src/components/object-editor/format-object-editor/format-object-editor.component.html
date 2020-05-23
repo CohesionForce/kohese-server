@@ -26,6 +26,7 @@
             container)}}
         </h3>
         <table_ [rows]="getReverseReferences(container)" [columns]="['name']"
+          [getText]="getTableCellTextRetrievalFunction(undefined)"
           [disabled]="true">
         </table_>
       </ng-container>
@@ -33,10 +34,10 @@
         <div style="display: flex;" [ngStyle]="{ 'flex-direction': ((container.
           kind === 'list') ? 'column' : 'row') }">
           <ng-container *ngFor="let attributeDefinition of container.contents">
-            <ng-container *ngIf="Array.isArray(selectedType.classProperties[
-              attributeDefinition.propertyName].definition.type) else
-              singleValuedBlock">
-              <ng-container *ngIf="attributeDefinition.visible">
+            <ng-container *ngIf="attributeDefinition.visible">
+              <ng-container *ngIf="Array.isArray(selectedType.classProperties[
+                attributeDefinition.propertyName].definition.type) else
+                singleValuedBlock">
                 <ng-container *ngIf="attributeDefinition.tableDefinition else
                   notTableBlock">
                   <h3>
@@ -44,6 +45,8 @@
                   </h3>
                   <table_ [rows]="getTableElements(attributeDefinition)"
                     [columns]="getTableColumns(attributeDefinition)"
+                    [getText]="getTableCellTextRetrievalFunction(
+                    attributeDefinition.propertyName)"
                     [add]="getTableElementAdditionFunction(attributeDefinition)"
                     [move]="getTableElementMovementFunction(attributeDefinition)"
                     [remove]="getTableElementRemovalFunction(
@@ -70,15 +73,18 @@
                         attributeDefinition.propertyName]; let j = index">
                         <div style="display: flex; flex-direction: row;">
                           <button mat-button
-                            matTooltip="{{getStringRepresentation(j,
-                            attributeDefinition.propertyName)}}"
-                            [disabled]="!attributeDefinition.editable"
-                            (click)="editValue(j, attributeDefinition)"
-                            style="white-space: nowrap; overflow: hidden;
-                            text-overflow: ellipsis; width: 100%; text-align:
-                            left;">
-                            {{getStringRepresentation(j, attributeDefinition.
-                              propertyName)}}
+                            matTooltip="{{itemRepository.
+                            getStringRepresentation(object,
+                            attributeDefinition.propertyName, j, selectedType,
+                            viewModel, formatDefinitionType)}}"
+                            [disabled]="(!attributeDefinition.editable ||
+                            isDisabled)" (click)="editValue(j,
+                            attributeDefinition)" style="white-space: nowrap;
+                            overflow: hidden; text-overflow: ellipsis; width:
+                            100%; text-align: left;">
+                            {{itemRepository.getStringRepresentation(object,
+                              attributeDefinition.propertyName, j, selectedType,
+                              viewModel, formatDefinitionType)}}
                           </button>
                           <button mat-icon-button matTooltip="Remove this
                             value" [disabled]="!attributeDefinition.editable"
@@ -93,9 +99,7 @@
                 </ng-template>
                 <br/>
               </ng-container>
-            </ng-container>
-            <ng-template #singleValuedBlock>
-              <ng-container *ngIf="attributeDefinition.visible">
+              <ng-template #singleValuedBlock>
                 <ng-container [ngSwitch]="attributeDefinition.kind">
                   <ng-container *ngSwitchCase="'boolean'">
                     <mat-checkbox [(ngModel)]="object[attributeDefinition.
@@ -229,8 +233,9 @@
                           3px; white-space: nowrap; overflow: hidden;
                           text-overflow: ellipsis;" (click)="openObjectEditor(
                           attributeDefinition, true)">
-                          {{getStringRepresentation(undefined,
-                            attributeDefinition.propertyName)}}
+                          {{itemRepository.getStringRepresentation(object,
+                            attributeDefinition.propertyName, undefined,
+                            selectedType, viewModel, formatDefinitionType)}}
                         </button>
                       </ng-container>
                       <ng-container *ngIf="isLocalTypeAttribute(
@@ -273,8 +278,8 @@
                     </div>
                   </ng-container>
                 </ng-container>
-              </ng-container>
-            </ng-template>
+              </ng-template>
+            </ng-container>
           </ng-container>
         </div>
       </ng-template>

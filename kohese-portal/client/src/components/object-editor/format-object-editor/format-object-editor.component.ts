@@ -264,6 +264,45 @@ export class FormatObjectEditorComponent implements OnInit {
     return references;
   }
   
+  public getTableCellTextRetrievalFunction(attributeName: string): (row: any,
+    columnId: string) => string {
+    return (row: any, columnId: string) => {
+      if (attributeName) {
+        if (row[columnId] == null) {
+          return '';
+        }
+        
+	      let type: any = this._selectedType.classProperties[attributeName].
+	        definition.type;
+	      type = (Array.isArray(type) ? type[0] : type);
+	      let treeConfiguration: TreeConfiguration = this._itemRepository.
+	        getTreeConfig().getValue().config;
+	      let dataModel: any = this._selectedType.localTypes[type];
+	      let viewModel: any;
+	      if (dataModel) {
+	        viewModel = this._viewModel.localTypes[type];
+	      } else {
+	        dataModel = treeConfiguration.getProxyFor(type).item;
+	        viewModel = treeConfiguration.getProxyFor('view-' + type.
+	          toLowerCase()).item;
+	      }
+	      if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
+	        return row[columnId].map((value: any, index: number) => {
+	          // Bullet-ize string representations
+	          return '\u2022 ' + this._itemRepository.getStringRepresentation(
+	            row, columnId, index, dataModel, viewModel, this.
+	            _formatDefinitionType);
+	        }).join('\n');
+	      } else {
+	        return this._itemRepository.getStringRepresentation(row, columnId,
+	          undefined, dataModel, viewModel, this._formatDefinitionType);
+	      }
+	    }
+	    
+      return String(row[columnId]);
+    };
+  }
+  
   public isLocalTypeAttribute(attributeName: string): boolean {
     let attribute: any = this._selectedType.classProperties[attributeName].
       definition;
@@ -739,69 +778,5 @@ export class FormatObjectEditorComponent implements OnInit {
     }
     
     return result;
-  }
-  
-  public getStringRepresentation(index: number, attributeName: string):
-    string {
-    let value: any;
-    if (index != null) {
-      value = this._object[attributeName][index];
-    } else {
-      value = this._object[attributeName];
-    }
-    
-    if (!this._enclosingType && (attributeName === 'parentId')) {
-      let parentId = value;
-      if (parentId.hasOwnProperty('id')){
-        parentId = value.id;
-      }
-      return TreeConfiguration.getWorkingTree().getProxyFor(parentId).item.name;
-    }
-    
-    let representation: string = String(value);
-    if (representation === String({})) {
-      let isLocalTypeAttribute: boolean = (!this._enclosingType && this.
-        isLocalTypeAttribute(attributeName));
-      if (isLocalTypeAttribute) {
-        if (value.name) {
-          return value.name;
-        } else if (value.id) {
-          return value.id;
-        } else {
-          let type: any = this._selectedType.classProperties[attributeName].
-            definition.type;
-          type = (Array.isArray(type) ? type[0] : type);
-          let viewModel: any = this._viewModel.localTypes[type];
-          let formatDefinitionId: string = viewModel.defaultFormatKey[this.
-            _formatDefinitionType];
-          if (!formatDefinitionId) {
-            formatDefinitionId = viewModel.defaultFormatKey[
-              FormatDefinitionType.DEFAULT];
-          }
-          let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
-            formatDefinitionId];
-          for (let j: number = 0; j < formatDefinition.containers.length;
-            j++) {
-            if ((formatDefinition.containers.length > 0) && (formatDefinition.
-              containers[0].kind !== FormatContainerKind.
-              REVERSE_REFERENCE_TABLE) && (formatDefinition.containers[0].
-              contents.length > 0)) {
-              let propertyDefinition: PropertyDefinition = formatDefinition.
-                containers[0].contents[0];
-              return propertyDefinition.customLabel + ': ' + String(value[
-                propertyDefinition.propertyName]);
-            }
-          }
-          
-          let firstAttributeName: string = Object.keys(value)[0];
-          return firstAttributeName + ': ' + String(value[firstAttributeName]);
-        }
-      } else {
-        return TreeConfiguration.getWorkingTree().getProxyFor(value.id).item.
-          name;
-      }
-    } else {
-      return representation;
-    }
   }
 }
