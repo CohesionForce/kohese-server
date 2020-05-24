@@ -344,6 +344,44 @@ export class FormatObjectEditorComponent implements OnInit {
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
+        maySelect: (element: any) => {
+          let typeName: string = this._selectedType.classProperties[
+            attributeName].definition.type;
+          let elementTypeName: string = (element as ItemProxy).kind;
+          if ((elementTypeName === 'Item') || ((attributeName === 'parentId')
+            && !this._enclosingType)) {
+            if ((attributeName === 'parentId') && !this._enclosingType) {
+              let objectItemProxy: ItemProxy = TreeConfiguration.
+                getWorkingTree().getProxyFor(this._object.id);
+              let itemProxy: ItemProxy = (element as ItemProxy);
+              while (itemProxy) {
+                if (itemProxy === objectItemProxy) {
+                  return false;
+                }
+                
+                itemProxy = itemProxy.parentProxy;
+              }
+            }
+            
+            return true;
+          /*} else {
+            while (true) {
+              if (elementTypeName === typeName) {
+                return true;
+              }
+              
+              let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
+                getProxyFor(elementTypeName);
+              if (itemProxy) {
+                elementTypeName = itemProxy.item.base;
+              } else {
+                break;
+              }
+            }*/
+          }
+          
+          return false;
+        },
         getIcon: (element: any) => {
           return this._itemRepository.getTreeConfig().getValue().config.
             getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
@@ -521,6 +559,30 @@ export class FormatObjectEditorComponent implements OnInit {
               getText: (element: any) => {
                 return (element as ItemProxy).item.name;
               },
+              /*maySelect: (element: any) => {
+                let typeName: string = this._selectedType.classProperties[
+                  attributeName].definition.type[0];
+                let elementTypeName: string = (element as ItemProxy).kind;
+                if (elementTypeName === 'Item') {
+                  return true;
+                } else {
+                  while (true) {
+                    if (elementTypeName === typeName) {
+                      return true;
+                    }
+                    
+                    let itemProxy: ItemProxy = TreeConfiguration.
+                      getWorkingTree().getProxyFor(elementTypeName);
+                    if (itemProxy) {
+                      elementTypeName = itemProxy.item.base;
+                    } else {
+                      break;
+                    }
+                  }
+                }
+                
+                return false;
+              },*/
               getIcon: (element: any) => {
                 return this._itemRepository.getTreeConfig().getValue().config.
                   getProxyFor('view-' + (element as ItemProxy).kind.
@@ -593,6 +655,30 @@ export class FormatObjectEditorComponent implements OnInit {
           },
           getText: (element: any) => {
             return (element as ItemProxy).item.name;
+          },
+          maySelect: (element: any) => {
+            let typeName: string = this._selectedType.classProperties[
+              attributeDefinition.propertyName].definition.type[0];
+            let elementTypeName: string = (element as ItemProxy).kind;
+            if (elementTypeName === 'Item') {
+              return true;
+            } else {
+              while (true) {
+                if (elementTypeName === typeName) {
+                  return true;
+                }
+                
+                let itemProxy: ItemProxy = TreeConfiguration.
+                  getWorkingTree().getProxyFor(elementTypeName);
+                if (itemProxy) {
+                  elementTypeName = itemProxy.item.base;
+                } else {
+                  break;
+                }
+              }
+            }
+            
+            return false;
           },
           getIcon: (element: any) => {
             return this._itemRepository.getTreeConfig().getValue().config.

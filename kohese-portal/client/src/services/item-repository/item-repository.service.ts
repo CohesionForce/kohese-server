@@ -696,6 +696,8 @@ export class ItemRepository {
         item: item
       }, (response: any) => {
         if (response.error) {
+          this.dialogService.openInformationDialog('Error', 'An error ' +
+            'occurred while saving ' + item.name + '.');
           reject(response.error);
         } else {
           let proxy: ItemProxy;
