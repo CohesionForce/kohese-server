@@ -128,14 +128,16 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
 
           if (propertyDefinition && propertyDefinition.definition.relation && propertyDefinition.definition.relation.contained) {
             if (!Array.isArray(nestedTypeDecl)) {
-              attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+              attributeTypeProperties = proxy.model.item.classLocalTypes[
+                nestedTypeDecl].definition.classProperties;
             }
           }
           
           if (Array.isArray(typeDecl)){
             nestedTypeDecl = typeDecl[0];
             if (proxy.model.item.classLocalTypes[nestedTypeDecl]){
-              attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+              attributeTypeProperties = proxy.model.item.classLocalTypes[
+                nestedTypeDecl].definition.classProperties;
             }
           }
           changeHandler = ItemChangeHandler(nestedTypeDecl, returnValue, proxy, path, attributeTypeProperties);

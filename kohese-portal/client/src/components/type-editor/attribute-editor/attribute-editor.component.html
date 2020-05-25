@@ -28,29 +28,25 @@
         <br/>
         <br/>
       </ng-container>
-      <ng-container *ngIf="((Object.values(fundamentalTypes).indexOf(
-        Array.isArray(attribute.type) ? attribute.type[0] : attribute.type) ===
-        -1) && !type.classLocalTypes[(Array.isArray(attribute.type) ?
-        attribute.type[0] : attribute.type)])">
-        <mat-form-field style="width: 100%;">
-          <mat-select placeholder="Reference Attribute"
-            [ngModel]="attribute.relation" (ngModelChange)="attribute.
-            relation = $event" [compareWith]="areRelationsEqual"
-            [disabled]="!attribute.relation">
-            <ng-container *ngIf="attribute.relation">
-              <mat-optgroup *ngFor="let typeName of (idAttributes | mapKey)"
-                [label]="typeName">
-                <mat-option *ngFor="let attributeName of idAttributes[
-                  typeName]" [value]="{ kind: typeName,
-                  foreignKey: attributeName }">
-                  {{attributeName}}
-                </mat-option>
-              </mat-optgroup>
-            </ng-container>
-          </mat-select>
-        </mat-form-field>
-        <br/>
-      </ng-container>
+      <mat-form-field style="width: 100%;">
+        <mat-select placeholder="Reference Attribute" [ngModel]="attribute.
+          relation" (ngModelChange)="attribute.relation = $event"
+          [compareWith]="areRelationsEqual" [disabled]="!((Object.values(
+          fundamentalTypes).indexOf(Array.isArray(attribute.type) ? attribute.
+          type[0] : attribute.type) === -1) && (!contextualGlobalType.
+          classLocalTypes[Array.isArray(attribute.type) ? attribute.type[0] :
+          attribute.type]))">
+          <mat-optgroup *ngFor="let typeName of (idAttributes | mapKey)"
+            [label]="typeName">
+            <mat-option *ngFor="let attributeName of idAttributes[
+              typeName]" [value]="{ kind: typeName,
+              foreignKey: attributeName }">
+              {{attributeName}}
+            </mat-option>
+          </mat-optgroup>
+        </mat-select>
+      </mat-form-field>
+      <br/>
       <mat-form-field style="width: 100%;">
         <mat-select placeholder="Display Type" [ngModel]="view.inputType.type"
           (ngModelChange)="view.inputType.type = $event"

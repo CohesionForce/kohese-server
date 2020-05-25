@@ -320,7 +320,9 @@ export class DataModelEditorComponent {
       label: 'Name'
     }, {
       component: AttributeEditorComponent,
-      matDialogData: {},
+      matDialogData: {
+        contextualGlobalType: this._dataModel
+      },
       label: 'Attribute'
     }], { data: {} }).updateSize('90%', '90%').afterClosed().subscribe(
       (results: Array<any>) => {
@@ -519,7 +521,8 @@ export class DataModelEditorComponent {
     this._dialogService.openComponentsDialog([{
       component: AttributeEditorComponent,
       matDialogData: {
-        type: this._dataModel
+        contextualGlobalType: (this._enclosingType ? this._enclosingType :
+          this._dataModel)
       }
     }], { data: {} }).afterClosed().subscribe((results: Array<any>) => {
       if (results) {
@@ -835,12 +838,13 @@ export class DataModelEditorComponent {
     let viewModel: any = (this._enclosingType ? viewModelProxy.item.
       localTypes[this._dataModel.name] : viewModelProxy.item);
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
-      if (this._dataModel.classLocalTypes[attributeType]) {
+      if (this._enclosingType ? this._enclosingType.classLocalTypes[
+        attributeType] : this._dataModel.classLocalTypes[attributeType]) {
         attribute.relation = {
           contained: true
         };
       } else {
-        if (!attribute.relation) {
+        if (!attribute.relation || attribute.relation.contained) {
           attribute.relation = {
             kind: 'Item',
             foreignKey: 'id'
@@ -1137,7 +1141,7 @@ export class DataModelEditorComponent {
     }
     
     this.save();
-    this._itemRepository.upsertItem('KoheseView', viewModel);
+    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
     
     // Re-enter edit mode
     this._editable = true;
@@ -1172,8 +1176,8 @@ export class DataModelEditorComponent {
   }
   
   public areRelationsEqual(option: any, selection: any): boolean {
-    return ((option.kind === selection.kind) && (option.foreignKey ===
-      selection.foreignKey));
+    return (selection && (option.kind === selection.kind) && (option.foreignKey
+      === selection.foreignKey));
   }
   
   public toggleMultivaluedness(attribute: any): void {
