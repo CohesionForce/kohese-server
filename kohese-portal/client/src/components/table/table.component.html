@@ -1,5 +1,4 @@
-<div style="width: 100%;" [ngStyle]="{ 'height': isDialogInstance() ? '90%' :
-  '100%' }">
+<div style="height: 100%; width: 100%;">
   <div style="height: 50px; display: flex; flex-direction: row;">
     <ng-container *ngIf="add">
       <button mat-icon-button matTooltip="Add elements" [disabled]="isDisabled"
@@ -37,8 +36,8 @@
         <mat-header-cell *matHeaderCellDef>
           {{column}}
         </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          {{element[column]}}
+        <mat-cell *matCellDef="let element" style="white-space: pre-line;"
+          [innerText]="getText(element, column)">
         </mat-cell>
       </ng-container>
     </ng-container>
@@ -84,22 +83,8 @@
       preventDefault(); $event.currentTarget.style['border-top'] = ''; $event.
       currentTarget.style['border-bottom'] = ''; move(getRowsFromDataTransfer(
       $event.dataTransfer.getData('rows')), row, ((($event.offsetY / $event.
-      currentTarget.offsetHeight) < 0.5) ? true : false))">
+      currentTarget.offsetHeight) < 0.5) ? true : false))" style="align-items:
+      start;">
     </mat-row>
   </mat-table>
 </div>
-<ng-container *ngIf="isDialogInstance()">
-  <mat-dialog-actions style="height: 10%; width: 100%; display: flex;
-    flex-direction: column;">
-    <span class="flex-right-align">
-      <button mat-button matTooltip="Select these elements"
-        (click)="matDialogRef.close(selection)">
-        Select
-      </button>
-      <button mat-button matTooltip="Cancel the selection process"
-        (click)="matDialogRef.close(undefined)">
-        Cancel
-      </button>
-    </span>
-  </mat-dialog-actions>
-</ng-container>
