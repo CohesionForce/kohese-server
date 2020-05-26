@@ -9,9 +9,10 @@ import { MaterialModule } from '../../../material.module';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { AttributeEditorComponent } from './attribute-editor.component';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class'
 import { MockDataModel } from '../../../../mocks/data/MockDataModel';
 import { MockViewData } from '../../../../mocks/data/MockViewData';
@@ -35,7 +36,8 @@ describe('Component: attribute-editor', ()=>{
          ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
-        {provide: DynamicTypesService, useClass: MockDynamicTypesService},
+        {provide: ItemRepository, useClass: MockItemRepository},
+        DynamicTypesService,
         {provide: DialogService, useClass: MockDialogService}
       ]
     }).compileComponents();
@@ -68,16 +70,21 @@ describe('Component: attribute-editor', ()=>{
   
   it('determines if two relations are equal', () => {
     let firstRelation: any = {
-      kind: 'Kurios Iesous',
-      foreignKey: 'Kurios Iesous'
+      kind: 'FirstTestKind',
+      foreignKey: 'FirstTestKey'
     };
     
     let secondRelation: any = {
-      kind: 'Anything else',
-      foreignKey: 'Any other thing'
+      kind: 'SecondTestKind',
+      foreignKey: 'SecondTestKey'
     };
     
-    expect(component.areRelationsEqual(secondRelation, firstRelation)).toEqual(
-      false);
+    let thirdRelation : any = {
+      kind: 'FirstTestKind',
+      foreignKey: 'FirstTestKey'
+    };
+
+    expect(component.areRelationsEqual(secondRelation, firstRelation)).toEqual(false);
+    expect(component.areRelationsEqual(thirdRelation, firstRelation)).toEqual(true);
   });
 });

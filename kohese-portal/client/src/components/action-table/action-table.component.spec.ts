@@ -44,9 +44,6 @@ describe('Component: Action Table', ()=>{
     let itemRepository: any = TestBed.get(ItemRepository);
     let proxy: ItemProxy = itemRepository.getRootProxy();
 
-    // TODO: Need to remove when syncMock is removed
-    MockItemRepository.singleton.syncFull();
-
     actionTableComponent.proxyStream = new BehaviorSubject<any>(proxy);
     actionTableComponent.editableStream = new BehaviorSubject<boolean>(true);
 

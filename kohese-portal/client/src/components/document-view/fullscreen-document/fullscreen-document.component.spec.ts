@@ -16,7 +16,7 @@ describe('FullscreenDocumentComponent', () => {
       declarations: [ FullscreenDocumentComponent ],
       providers: [ {
         provide: ActivatedRoute,
-        useValue: { params: new BehaviorSubject<any>({ id: 'Kurios Iesous' }) }
+        useValue: { params: new BehaviorSubject<any>({ id: 'test-uuid2' }) }
         }, { provide: ItemRepository, useClass: MockItemRepository } ],
       schemas: [ NO_ERRORS_SCHEMA ]
     })

@@ -696,6 +696,8 @@ export class ItemRepository {
         item: item
       }, (response: any) => {
         if (response.error) {
+          this.dialogService.openInformationDialog('Error', 'An error ' +
+            'occurred while saving ' + item.name + '.');
           reject(response.error);
         } else {
           let proxy: ItemProxy;
@@ -876,7 +878,8 @@ export class ItemRepository {
             propertyDefinition.propertyName.attribute;
         }).join('\n');
         
-        representation += '\n\n<table><tr><th>Name</th></tr>';
+        representation += '\n\n<table><tr><th>' +
+          'Name</th></tr>';
         
         let reverseReferencesObject: any = TreeConfiguration.getWorkingTree().
           getProxyFor(koheseObject.id).relations.referencedBy;
@@ -890,8 +893,8 @@ export class ItemRepository {
               return itemProxy.item;
             });
             for (let k: number = 0; k < reverseReferences.length; k++) {
-              representation += ('<tr><td>' + reverseReferences[k].name +
-                '</td></tr>');
+              representation += ('<tr style="vertical-align: top;"><td>' +
+                reverseReferences[k].name + '</td></tr>');
             }
           }
         }
@@ -905,7 +908,7 @@ export class ItemRepository {
         if (!isVerticalFormatContainer) {
           representation += '\n\n<table>';
           header = '<tr>';
-          body = '<tr>';
+          body = '<tr style="vertical-align: top;">';
         }
         
         for (let k: number = 0; k < formatContainer.contents.length; k++) {
@@ -946,18 +949,26 @@ export class ItemRepository {
                     body += '<table><tr>';
                   }
                   
+                  let attributeTypeDataModel: any;
+                  let attributeTypeViewModel: any;
                   let tableDefinition: TableDefinition;
                   let typeName: string = dataModel.classProperties[
                     propertyDefinition.propertyName].definition.type[0];
                   let isLocalTypeAttribute: boolean = (globalTypeNames.indexOf(
                     typeName) === -1);
                   if (isLocalTypeAttribute) {
-                    tableDefinition = viewModel.localTypes[typeName].
-                      tableDefinitions[propertyDefinition.tableDefinition];
+                    attributeTypeDataModel = dataModel.localTypes[typeName];
+                    attributeTypeViewModel = viewModel.localTypes[typeName];
+                    tableDefinition = attributeTypeViewModel.tableDefinitions[
+                      propertyDefinition.tableDefinition];
                   } else {
-                    tableDefinition = TreeConfiguration.getWorkingTree().
-                      getProxyFor('view-' + typeName.toLowerCase()).item.
-                      tableDefinitions[propertyDefinition.tableDefinition];
+                    attributeTypeDataModel = this.currentTreeConfigSubject.
+                      getValue().config.getProxyFor(typeName).item;
+                    attributeTypeViewModel = this.currentTreeConfigSubject.
+                      getValue().config.getProxyFor('view-' + typeName.
+                      toLowerCase()).item;
+                    tableDefinition = attributeTypeViewModel.tableDefinitions[
+                      propertyDefinition.tableDefinition];
                   }
                   
                   for (let l: number = 0; l < tableDefinition.columns.length;
@@ -976,12 +987,32 @@ export class ItemRepository {
                         getProxyFor(value[l].id).item;
                     }
                     
-                    body += '<tr>';
+                    body += '<tr style="vertical-align: top;">';
                     
                     for (let m: number = 0; m < tableDefinition.columns.length;
                       m++) {
-                      body += ('<td>' + String(reference[tableDefinition.
-                        columns[m]]) + '</td>');
+                      body += '<td>';
+                      if (reference[tableDefinition.columns[m]]) {
+                        if (Array.isArray(attributeTypeDataModel.classProperties[
+                          tableDefinition.columns[m]].definition.type)) {
+                          body += '<ul>';
+                          for (let n: number = 0; n < reference[
+                            tableDefinition.columns[m]].length; n++) {
+                            body += ('<li>' + this.getStringRepresentation(
+                              reference, tableDefinition.columns[m], n,
+                              attributeTypeDataModel, attributeTypeViewModel,
+                              formatDefinitionType) + '</li>');
+                          }
+                          body += '</ul>';
+                        } else {
+                          body += this.getStringRepresentation(reference,
+                            tableDefinition.columns[m], undefined,
+                            attributeTypeDataModel, attributeTypeViewModel,
+                            formatDefinitionType);
+                        }
+                      }
+                      
+                      body += '</td>';
                     }
                     
                     body += '</tr>';
@@ -1087,6 +1118,67 @@ export class ItemRepository {
     }
     
     return representation;
+  }
+  
+  public getStringRepresentation(koheseObject: any, attributeName: string,
+    index: number, dataModel: any, viewModel: any, formatDefinitionType:
+    FormatDefinitionType): string {
+    let value: any;
+    if (index != null) {
+      value = koheseObject[attributeName][index];
+    } else {
+      value = koheseObject[attributeName];
+    }
+    
+    if ((attributeName === 'parentId') && (dataModel.classProperties[
+      attributeName].definedInKind === 'Item') && ((typeof value) ===
+      'string')) {
+      return this.currentTreeConfigSubject.getValue().config.getProxyFor(
+        value).item.name;
+    }
+    
+    let representation: string = String(value);
+    if (representation === String({})) {
+      let type: any = dataModel.classProperties[attributeName].definition.type;
+      type = (Array.isArray(type) ? type[0] : type);
+      if (dataModel.localTypes && dataModel.localTypes[type]) {
+        if (value.name) {
+          return value.name;
+        } else if (value.id) {
+          return value.id;
+        } else {
+          viewModel = viewModel.localTypes[type];
+          let formatDefinitionId: string = viewModel.defaultFormatKey[
+            formatDefinitionType];
+          if (!formatDefinitionId) {
+            formatDefinitionId = viewModel.defaultFormatKey[
+              FormatDefinitionType.DEFAULT];
+          }
+          let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
+            formatDefinitionId];
+          for (let j: number = 0; j < formatDefinition.containers.length;
+            j++) {
+            if ((formatDefinition.containers.length > 0) && (formatDefinition.
+              containers[0].kind !== FormatContainerKind.
+              REVERSE_REFERENCE_TABLE) && (formatDefinition.containers[0].
+              contents.length > 0)) {
+              let propertyDefinition: PropertyDefinition = formatDefinition.
+                containers[0].contents[0];
+              return propertyDefinition.customLabel + ': ' + String(value[
+                propertyDefinition.propertyName]);
+            }
+          }
+          
+          let firstAttributeName: string = Object.keys(value)[0];
+          return firstAttributeName + ': ' + String(value[firstAttributeName]);
+        }
+      } else {
+        return this.currentTreeConfigSubject.getValue().config.getProxyFor(
+          value.id).item.name;
+      }
+    } else {
+      return representation;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////

@@ -11,7 +11,8 @@
       <ng-container *ngFor="let quickSelectElement of quickSelectElements">
         <div style="display: flex; flex-direction: row;">
           <button mat-button matTooltip="{{elementMap.get(quickSelectElement)?.
-            text}}" (click)="changeElementSelection(quickSelectElement)"
+            text}}" [disabled]="!maySelect(quickSelectElement)"
+            (click)="changeElementSelection(quickSelectElement)"
             [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !==
             -1) }" style="white-space: nowrap; overflow: hidden; text-overflow:
             ellipsis; width: 100%; text-align: left;">
@@ -84,7 +85,8 @@
             </ng-container>
             <span style="width: 93%; display: flex; flex-direction: row;">
               <button mat-button matTooltip="{{elementMap.get(element).
-                text}}" (click)="changeElementSelection(element)"
+                text}}" [disabled]="!maySelect(element)"
+                (click)="changeElementSelection(element)"
                 [ngClass]="{ 'highlight': (selection.indexOf(element) !==
                 -1) }" style="white-space: nowrap; overflow: hidden;
                 text-overflow: ellipsis; width: 100%; text-align: left;">

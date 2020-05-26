@@ -20,7 +20,7 @@ describe('ProjectOverviewComponent', () => {
     fixture = TestBed.createComponent(ProjectOverviewComponent);
     component = fixture.componentInstance;
     component.projectStream = ObservableOf({
-      proxy: TreeConfiguration.getWorkingTree().getProxyFor('Kurios Iesous'),
+      proxy: TreeConfiguration.getWorkingTree().getProxyFor('test-uuid1'),
       users: [],
       projectItems: []
     });

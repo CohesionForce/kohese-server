@@ -45,6 +45,11 @@
       "type": "object",
       "required": true,
       "name": "tableDefinitions"
+    },
+    "ungroupDefaultFormatDefinitionStateAttributes": {
+      "name": "ungroupDefaultFormatDefinitionStateAttributes",
+      "type": "boolean",
+      "defaultValue": false
     }
   },
   "validations": [],

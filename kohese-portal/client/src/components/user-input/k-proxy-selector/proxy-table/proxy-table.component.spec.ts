@@ -28,7 +28,7 @@ describe('Component: proxy-table', () => {
       createComponent(ProxyTableComponent);
     component = fixture.componentInstance;
     component.columns = ['name'];
-    component.dataStream = ObservableOf([{ id: 'Kurios Iesous' },
+    component.dataStream = ObservableOf([{ id: 'test-uuid2' },
       { id: 'test-uuid3' }, { id: 'test-uuid1' }]);
     fixture.detectChanges();
   });

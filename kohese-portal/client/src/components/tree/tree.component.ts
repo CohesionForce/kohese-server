@@ -121,6 +121,23 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._getText = getText;
   }
   
+  private _maySelect: (element: any) => boolean = (element: any) => {
+    return true;
+  };
+  get maySelect() {
+    return this._maySelect;
+  }
+  @Input('maySelect')
+  set maySelect(maySelect: (element: any) => boolean) {
+    if (maySelect == null) {
+      maySelect = (element: any) => {
+        return true;
+      };
+    }
+    
+    this._maySelect = maySelect;
+  }
+  
   private _getIcon: (element: any) => string = (element: any) => {
     return '';
   };
@@ -164,7 +181,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  private _allowMultiselect: boolean = false;
+  private _allowMultiselect: boolean = this._data['allowMultiselect'];
   get allowMultiselect() {
     return this._allowMultiselect;
   }
@@ -260,8 +277,9 @@ export class TreeComponent implements OnInit, AfterViewInit {
       this.hasChildren = this._data['hasChildren'];
       this.getText = this._data['getText'];
       this.getIcon = this._data['getIcon'];
+      this.maySelect = this._data['maySelect'];
       this.selection = this._data['selection'];
-      this.allowMultiselect = true;
+      this.allowMultiselect = this._data['allowMultiselect'];
       this.actions = this._data['actions'];
       this.elementSelected = this._data['elementSelectionHandler'];
       this.quickSelectElements = this._data['quickSelectElements'];

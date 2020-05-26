@@ -11,8 +11,9 @@ import { MockItem } from '../../../../mocks/data/MockItem';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { MockDynamicTypesService } from '../../../../mocks/services/MockDynamicTypesService';
 import { BehaviorSubject } from 'rxjs';
 
 describe('Component: History Tab', ()=>{
@@ -29,7 +30,8 @@ describe('Component: History Tab', ()=>{
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},
-        { provide: DynamicTypesService, useClass: MockDynamicTypesService }
+        { provide: ItemRepository, useClass: MockItemRepository },
+        DynamicTypesService
       ]
     }).compileComponents();
 

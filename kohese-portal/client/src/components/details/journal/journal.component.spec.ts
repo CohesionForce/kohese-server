@@ -23,7 +23,7 @@ import { SessionService } from '../../../services/user/session.service';
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 
 // TODO: This needs to be implemented
-xdescribe('Component: Journal', ()=>{
+describe('Component: Journal', ()=>{
   let journalComponent: JournalComponent;
   let journalFixture : ComponentFixture<JournalComponent>;
 
@@ -59,7 +59,7 @@ xdescribe('Component: Journal', ()=>{
     expect(JournalComponent).toBeTruthy();
   });
 
-  xdescribe('sorting', ()=>{
+  describe('sorting', ()=>{
     it('sorts by eldest first when observed',()=>{
       pending();
     })

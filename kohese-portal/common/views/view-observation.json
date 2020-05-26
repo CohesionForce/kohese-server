@@ -4,7 +4,7 @@
   "parentId": "view-item",
   "modelName": "Observation",
   "icon": "fa fa-comment",
-  "color": "#ffd700",
+  "color": "#bcc00a",
   "viewProperties": {
     "observedBy": {
       "inputType": {

@@ -36,7 +36,7 @@ describe('Component: filter', () => {
     let filter: Filter = component.filterSubject.getValue();
     filter.rootElement.criteria.push(new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.BEGINS_WITH,
-      'Kurios Iesous'));
+      'test-uuid2'));
     expect(component.isCriterionDefined()).toEqual(true);
   });
 });

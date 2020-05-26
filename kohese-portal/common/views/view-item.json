@@ -4,7 +4,7 @@
   "parentId": "View-Model-Definitions",
   "modelName": "Item",
   "icon": "fa fa-sticky-note",
-  "color": "#000000",
+  "color": "#565656",
   "localTypes": {},
   "viewProperties": {
     "name": {
@@ -293,7 +293,10 @@
   },
   "defaultFormatKey": {
     "default": "cf123860-5a76-11ea-8c15-5359dfa592ed",
-    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "card": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "board": "89324a90-a7af-11e8-8662-71e48f0160fe"
+
   },
   "tableDefinitions": {
     "3b4d68d0-e603-11e9-bf30-55b2f7a3af55": {
@@ -310,6 +313,5 @@
         "column4": []
       }
     }
-  },
-  "itemIds": []
+  }
 }
