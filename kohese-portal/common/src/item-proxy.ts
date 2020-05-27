@@ -1172,6 +1172,17 @@ export class ItemProxy {
       
       var newKeys = Object.keys(newItem);
       if (!_.isEqual(oldKeys, newKeys)){
+        let deletedKeys = _.difference(oldKeys, newKeys);
+        if (deletedKeys.length > 0) {
+          console.log('*** Error: Found unexpected properties: ' + deletedKeys + ' in ' + this.kind + ' - ' + this._item.name + ' - ' + this._item.id);
+          deletedKeys.forEach(key => {
+            console.log('>>> ' + key + ' = ' + JSON.stringify(this._item[key]));
+          });
+        // } else {
+        //   console.log('!!! Warning: Properties are in a different order: ');
+        //   console.log('>>> Old Keys: ' + oldKeys);  
+        //   console.log('>>> New Keys: ' + newKeys);
+        }
         this._item = newItem;
         this.item = ItemChangeHandler(this.kind, this._item, this);
       }
@@ -2225,7 +2236,9 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  private static createMissingProxy(forKind, forKey, forId, treeConfig) {
+  public static createMissingProxy(forKind, forKey, forId, treeConfig) {
+    // TODO: This function should be reverted to private after solving delete detection
+    // TODO: Clients should not be directly creating missing proxies for deleted items.
     var lostProxy = new ItemProxy('Internal-Lost', {
       id : forId,
       name : 'Lost Item: ' + forKind + ' with ' + forKey + ' of ' + forId,

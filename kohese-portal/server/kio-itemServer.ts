@@ -438,6 +438,7 @@ function KIOItemServer(socket){
 
     var repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
     console.log('::: Getting status for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId);
+    let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
 
     KDBRepo.getStatus(request.repoId, function(status){
       if (status) {
@@ -450,6 +451,13 @@ function KIOItemServer(socket){
               id: statusRecord.itemId,
               status: statusRecord.status
             });
+
+            // Create lost item to represent the item if it does not exist
+            let proxy = workingTree.getProxyFor(statusRecord.itemId);
+            if (!proxy) {
+              // TODO: Need to evaluate and remove the creation of missing proxies from this location
+              proxy = ItemProxy.createMissingProxy('Item','id', statusRecord.itemId, workingTree);
+            }
           }
         }
 

@@ -451,8 +451,15 @@ export class ItemRepository {
 
     let workingTree = ItemProxy.getWorkingTree();
     let proxy: ItemProxy = workingTree.getProxyFor(itemId);
+    
+    if (itemStatus) {
+      if (!proxy) {
+        console.log('+++ Creating lost-item for missing proxy to update status: ' + itemId + ' - ' + itemStatus);
+        // TODO: Need to evaluate and remove the creation of missing proxies from this location
+        proxy = ItemProxy.createMissingProxy('Item','id', itemId, workingTree);
+  
+      }
 
-    if (proxy && itemStatus) {
       console.log('^^^ Updating status for: ' + itemId + ' - ' + itemStatus);
       proxy.updateVCStatus(itemStatus);
 
@@ -462,9 +469,7 @@ export class ItemRepository {
         type: 'update',
         proxy: proxy
       });
-    } else {
-      console.log('*** Could not find proxy to update status: ' + itemId + ' - ' + itemStatus);
-    }
+    } 
 
   }
 
