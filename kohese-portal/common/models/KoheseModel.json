@@ -16,6 +16,10 @@
       "type": "boolean",
       "name": "isMetaModel"
     },
+    "isInternal": {
+      "type": "boolean",
+      "default": false
+    },
     "idInjection": {
       "type": "boolean",
       "required": true,
