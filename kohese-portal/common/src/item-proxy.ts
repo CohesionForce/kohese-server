@@ -1223,7 +1223,7 @@ export class ItemProxy {
     
     if (this.kind === 'KoheseModel') {
       for (let localTypeName in this._item.localTypes) {
-        let localType: any = this._item.localTypes[localTypeName];
+        let localType: any = clone.localTypes[localTypeName];
         let koheseModelType: any = this.model._item;
         for (let j: number = 0; j < koheseModelType.derivedProperties.length;
           j++) {
