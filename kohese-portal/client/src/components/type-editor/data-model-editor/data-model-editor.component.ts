@@ -36,8 +36,12 @@ export class DataModelEditorComponent {
     this._attributeTypes = JSON.parse(JSON.stringify(this._fundamentalTypes));
     this._idAttributes = {};
     
-    if (!this._enclosingType) {
-      for (let localTypeName in this._dataModel.localTypes) {
+    if (this._enclosingType) {
+      for (let localTypeName in this._enclosingType.classLocalTypes) {
+        this._attributeTypes[localTypeName] = localTypeName;
+      }
+    } else {
+      for (let localTypeName in this._dataModel.classLocalTypes) {
         this._attributeTypes[localTypeName] = localTypeName;
       }
     }
@@ -1054,8 +1058,16 @@ export class DataModelEditorComponent {
     let previousAttributeTypeName: string = (Array.isArray(attribute.type) ?
       attribute.type[0] : attribute.type);
     
-    let viewModel: any = (this._enclosingType ? viewModelProxy.item.
-      localTypes[this._dataModel.name] : viewModelProxy.item);
+    let viewModel: any;
+    if (this._enclosingType) {
+      viewModel = this._itemRepository.getTreeConfig().getValue().config.
+        getProxyFor('view-' + this._enclosingType.classLocalTypes[this.
+        _dataModel.name].definedInKind.toLowerCase()).item.localTypes[this.
+        _dataModel.name];
+    } else {
+      viewModel = viewModelProxy.item;
+    }
+    
     let subtypeViewModelsToUpdate: Array<any> = [];
     let attributeNames: Array<string> = Object.keys(this._dataModel.
       classProperties);
@@ -1323,7 +1335,8 @@ export class DataModelEditorComponent {
     
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
       if (this._enclosingType ? this._enclosingType.classLocalTypes[
-        attributeType] : this._dataModel.classLocalTypes[attributeType]) {
+        attributeType].definition : this._dataModel.classLocalTypes[
+        attributeType].definition) {
         attribute.relation = {
           contained: true
         };
@@ -1416,8 +1429,9 @@ export class DataModelEditorComponent {
   public async removeAttribute(propertyId: string): Promise<void> {
     let viewModel: any;
     if (this._enclosingType) {
-      viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        this._enclosingType.name.toLowerCase()).item.localTypes[this.
+      viewModel = this._itemRepository.getTreeConfig().getValue().config.
+        getProxyFor('view-' + this._enclosingType.classLocalTypes[this.
+        _dataModel.name].definedInKind.toLowerCase()).item.localTypes[this.
         _dataModel.name];
     } else {
       viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +

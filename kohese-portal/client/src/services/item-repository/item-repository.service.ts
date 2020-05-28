@@ -798,9 +798,9 @@ export class ItemRepository {
       { reportName: reportName }, true);
   }
   
-  public getMarkdownRepresentation(koheseObject: any, dataModel: any,
-    viewModel: any, formatDefinitionType: FormatDefinitionType, headingLevel:
-    number, addLinks: boolean): string {
+  public getMarkdownRepresentation(koheseObject: any, enclosingType: any,
+    dataModel: any, viewModel: any, formatDefinitionType: FormatDefinitionType,
+    headingLevel: number, addLinks: boolean): string {
     let representation: string = '';
     let formatDefinition: FormatDefinition;
 	  let formatDefinitionId: string = viewModel.defaultFormatKey[
@@ -1000,6 +1000,7 @@ export class ItemRepository {
                             tableDefinition.columns[m]].length; n++) {
                             body += ('<li>' + this.getStringRepresentation(
                               reference, tableDefinition.columns[m], n,
+                              (enclosingType ? enclosingType : dataModel),
                               attributeTypeDataModel, attributeTypeViewModel,
                               formatDefinitionType) + '</li>');
                           }
@@ -1007,6 +1008,7 @@ export class ItemRepository {
                         } else {
                           body += this.getStringRepresentation(reference,
                             tableDefinition.columns[m], undefined,
+                            (enclosingType ? enclosingType : dataModel),
                             attributeTypeDataModel, attributeTypeViewModel,
                             formatDefinitionType);
                         }
@@ -1048,11 +1050,13 @@ export class ItemRepository {
                       if (Array.isArray(value)) {
                         body += value.map((v: any) => {
                           return this.getMarkdownRepresentation(v,
+                            (enclosingType ? enclosingType : dataModel),
                             localTypeDataModelCopy, localTypeViewModel,
                             formatDefinitionType, -1, addLinks);
                         }).join('\n');
                       } else {
                         body += this.getMarkdownRepresentation(value,
+                          (enclosingType ? enclosingType : dataModel),
                           localTypeDataModelCopy, localTypeViewModel,
                           formatDefinitionType, -1, addLinks);
                       }
@@ -1121,8 +1125,8 @@ export class ItemRepository {
   }
   
   public getStringRepresentation(koheseObject: any, attributeName: string,
-    index: number, dataModel: any, viewModel: any, formatDefinitionType:
-    FormatDefinitionType): string {
+    index: number, enclosingType: any, dataModel: any, viewModel: any,
+    formatDefinitionType: FormatDefinitionType): string {
     let value: any;
     if (index != null) {
       value = koheseObject[attributeName][index];
@@ -1141,13 +1145,16 @@ export class ItemRepository {
     if (representation === String({})) {
       let type: any = dataModel.classProperties[attributeName].definition.type;
       type = (Array.isArray(type) ? type[0] : type);
-      if (dataModel.localTypes && dataModel.localTypes[type]) {
+      if (enclosingType.classLocalTypes && enclosingType.classLocalTypes[
+        type]) {
         if (value.name) {
           return value.name;
         } else if (value.id) {
           return value.id;
         } else {
-          viewModel = viewModel.localTypes[type];
+          viewModel = this.currentTreeConfigSubject.getValue().config.
+            getProxyFor('view-' + enclosingType.classLocalTypes[type].
+            definedInKind.toLowerCase()).item.localTypes[type];
           let formatDefinitionId: string = viewModel.defaultFormatKey[
             formatDefinitionType];
           if (!formatDefinitionId) {
