@@ -957,8 +957,12 @@ export class ItemRepository {
                   let isLocalTypeAttribute: boolean = (globalTypeNames.indexOf(
                     typeName) === -1);
                   if (isLocalTypeAttribute) {
-                    attributeTypeDataModel = dataModel.localTypes[typeName];
-                    attributeTypeViewModel = viewModel.localTypes[typeName];
+                    attributeTypeDataModel = (enclosingType ? enclosingType :
+                      dataModel).classLocalTypes[typeName].definition;
+                    attributeTypeViewModel = this.currentTreeConfigSubject.
+                      getValue().config.getProxyFor('view-' + (enclosingType ?
+                      enclosingType : dataModel).classLocalTypes[typeName].
+                      definedInKind.toLowerCase()).item.localTypes[typeName];
                     tableDefinition = attributeTypeViewModel.tableDefinitions[
                       propertyDefinition.tableDefinition];
                   } else {
@@ -1032,10 +1036,12 @@ export class ItemRepository {
                     (globalTypeNames.indexOf(type) === -1)) {
                     /* The below condition is present to avoid errors caused by
                     attributes typed "object". */
-                    if (dataModel.localTypes[type]) {
+                    if ((enclosingType ? enclosingType : dataModel).
+                      classLocalTypes[type]) {
                       // Local type attribute
                       let localTypeDataModelCopy: any = JSON.parse(JSON.
-                        stringify(dataModel.localTypes[type]));
+                        stringify((enclosingType ? enclosingType : dataModel).
+                        classLocalTypes[type].definition));
                       localTypeDataModelCopy.classProperties = {};
                       for (let attributeName in localTypeDataModelCopy.
                         properties) {
@@ -1046,7 +1052,11 @@ export class ItemRepository {
                             attributeName]
                         };
                       }
-                      let localTypeViewModel: any = viewModel.localTypes[type];
+                      let localTypeViewModel: any = this.
+                        currentTreeConfigSubject.getValue().config.getProxyFor(
+                        'view-' + (enclosingType ? enclosingType : dataModel).
+                        classLocalTypes[type].definedInKind.toLowerCase()).
+                        item.localTypes[type];
                       if (Array.isArray(value)) {
                         body += value.map((v: any) => {
                           return this.getMarkdownRepresentation(v,
