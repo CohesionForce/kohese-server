@@ -371,23 +371,6 @@ export class ViewModelEditorComponent {
     }
   }
   
-  public getDataModel(dataModel: any): any {
-    if (dataModel.localTypes) {
-      return dataModel;
-    } else {
-      let localTypeCopy: any = JSON.parse(JSON.stringify(dataModel));
-      localTypeCopy.classProperties = {};
-      for (let attributeName in localTypeCopy.properties) {
-        localTypeCopy.classProperties[attributeName] = {
-          definedInKind: dataModel.name,
-          definition: localTypeCopy.properties[attributeName]
-        };
-      }
-      
-      return localTypeCopy;
-    }
-  }
-  
   public async renameFormatDefinition(formatDefinitionId: string):
     Promise<void> {
     let formatDefinition: FormatDefinition = this._viewModel.formatDefinitions[

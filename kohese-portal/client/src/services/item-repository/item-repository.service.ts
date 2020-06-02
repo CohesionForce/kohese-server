@@ -1036,38 +1036,27 @@ export class ItemRepository {
                     (globalTypeNames.indexOf(type) === -1)) {
                     /* The below condition is present to avoid errors caused by
                     attributes typed "object". */
-                    if ((enclosingType ? enclosingType : dataModel).
-                      classLocalTypes[type]) {
+                    let classLocalTypesEntry: any = (enclosingType ?
+                      enclosingType : dataModel).classLocalTypes[type];
+                    if (classLocalTypesEntry) {
                       // Local type attribute
-                      let localTypeDataModelCopy: any = JSON.parse(JSON.
-                        stringify((enclosingType ? enclosingType : dataModel).
-                        classLocalTypes[type].definition));
-                      localTypeDataModelCopy.classProperties = {};
-                      for (let attributeName in localTypeDataModelCopy.
-                        properties) {
-                        localTypeDataModelCopy.classProperties[attributeName] =
-                          {
-                          definedInKind: type,
-                          definition: localTypeDataModelCopy.properties[
-                            attributeName]
-                        };
-                      }
+                      let localTypeDataModel: any = classLocalTypesEntry.
+                        definition;
                       let localTypeViewModel: any = this.
                         currentTreeConfigSubject.getValue().config.getProxyFor(
-                        'view-' + (enclosingType ? enclosingType : dataModel).
-                        classLocalTypes[type].definedInKind.toLowerCase()).
-                        item.localTypes[type];
+                        'view-' + classLocalTypesEntry.definedInKind.
+                        toLowerCase()).item.localTypes[type];
                       if (Array.isArray(value)) {
                         body += value.map((v: any) => {
                           return this.getMarkdownRepresentation(v,
                             (enclosingType ? enclosingType : dataModel),
-                            localTypeDataModelCopy, localTypeViewModel,
+                            localTypeDataModel, localTypeViewModel,
                             formatDefinitionType, -1, addLinks);
                         }).join('\n');
                       } else {
                         body += this.getMarkdownRepresentation(value,
                           (enclosingType ? enclosingType : dataModel),
-                          localTypeDataModelCopy, localTypeViewModel,
+                          localTypeDataModel, localTypeViewModel,
                           formatDefinitionType, -1, addLinks);
                       }
                     }
@@ -1155,16 +1144,17 @@ export class ItemRepository {
     if (representation === String({})) {
       let type: any = dataModel.classProperties[attributeName].definition.type;
       type = (Array.isArray(type) ? type[0] : type);
-      if (enclosingType.classLocalTypes && enclosingType.classLocalTypes[
-        type]) {
+      let classLocalTypes: any = (enclosingType ? enclosingType : dataModel).
+        classLocalTypes;
+      if (classLocalTypes && classLocalTypes[type]) {
         if (value.name) {
           return value.name;
         } else if (value.id) {
           return value.id;
         } else {
           viewModel = this.currentTreeConfigSubject.getValue().config.
-            getProxyFor('view-' + enclosingType.classLocalTypes[type].
-            definedInKind.toLowerCase()).item.localTypes[type];
+            getProxyFor('view-' + classLocalTypes[type].definedInKind.
+            toLowerCase()).item.localTypes[type];
           let formatDefinitionId: string = viewModel.defaultFormatKey[
             formatDefinitionType];
           if (!formatDefinitionId) {

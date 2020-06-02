@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
   Input, OnInit } from '@angular/core';
 
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatDefinition,
   FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
 import { FormatContainer,
@@ -17,6 +18,12 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormatDefinitionEditorComponent implements OnInit {
+  private _enclosingType: any;
+  @Input('enclosingType')
+  set enclosingType(enclosingType: any) {
+    this._enclosingType = enclosingType;
+  }
+  
   private _dataModel: any;
   get dataModel() {
     return this._dataModel;
@@ -106,7 +113,8 @@ export class FormatDefinitionEditorComponent implements OnInit {
     return Object;
   }
   
-  public constructor(private _changeDetectorRef: ChangeDetectorRef) {
+  public constructor(private _changeDetectorRef: ChangeDetectorRef,
+    private _itemRepository: ItemRepository) {
   }
   
   public ngOnInit(): void {
@@ -202,12 +210,17 @@ export class FormatDefinitionEditorComponent implements OnInit {
   }
   
   public getSelectableAttributes(): Array<any> {
-    if (this._dataModel.localTypes) {
+    if ((this._enclosingType ? this._enclosingType : this._dataModel).
+      localTypes) {
       return this._attributes.filter((attribute: any) => {
         let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
           0] : attribute.type);
-        return (!this._dataModel.localTypes[typeName] || (Object.values(this.
-          _viewModel.localTypes[typeName].formatDefinitions).length > 0));
+        let classLocalTypesEntry: any = (this._enclosingType ? this.
+          _enclosingType : this._dataModel).classLocalTypes[typeName];
+        return (!classLocalTypesEntry || (Object.values(this._itemRepository.
+          getTreeConfig().getValue().config.getProxyFor('view-' +
+          classLocalTypesEntry.definedInKind.toLowerCase()).item.localTypes[
+          typeName].formatDefinitions).length > 0));
       });
     } else {
       return this._attributes;
@@ -249,14 +262,19 @@ export class FormatDefinitionEditorComponent implements OnInit {
     }
     propertyDefinition.kind = userInterfaceType;
     
-    if (this._dataModel.localTypes) {
+    if ((this._enclosingType ? this._enclosingType : this._dataModel).
+      localTypes) {
       let dataModelType: any = this._dataModel.classProperties[attributeName].
         definition.type;
       let typeName: string = (Array.isArray(dataModelType) ? dataModelType[0] :
         dataModelType);
-      if (this._viewModel.localTypes[typeName]) {
-        propertyDefinition.formatDefinition = Object.values(this._viewModel.
-          localTypes[typeName].formatDefinitions)[0]['id'];
+      let localTypeViewModelEntry: any = this._itemRepository.getTreeConfig().
+        getValue().config.getProxyFor('view-' + (this._enclosingType ? this.
+        _enclosingType : this._dataModel).classLocalTypes[typeName].
+        definedInKind.toLowerCase()).item.localTypes[typeName];
+      if (localTypeViewModelEntry) {
+        propertyDefinition.formatDefinition = Object.values(
+          localTypeViewModelEntry.formatDefinitions)[0]['id'];
       } else {
         delete propertyDefinition.formatDefinition;
       }
@@ -339,10 +357,15 @@ export class FormatDefinitionEditorComponent implements OnInit {
       }
       
       let formatDefinitionId: string;
-      if (this._dataModel.localTypes) {
-        if (this._dataModel.localTypes[attributeType]) {
-          let formatDefinitions: Array<FormatDefinition> = Object.values(
-            this._viewModel.localTypes[attributeType].formatDefinitions);
+      if ((this._enclosingType ? this._enclosingType : this._dataModel).
+        localTypes) {
+        let classLocalTypesEntry: any = (this._enclosingType ? this.
+          _enclosingType : this._dataModel).classLocalTypes[attributeType];
+        if (classLocalTypesEntry) {
+          let formatDefinitions: Array<FormatDefinition> = Object.values(this.
+            _itemRepository.getTreeConfig().getValue().config.getProxyFor(
+            'view-' + classLocalTypesEntry.definedInKind.toLowerCase()).item.
+            localTypes[attributeType].formatDefinitions);
           if (formatDefinitions.length > 0) {
             formatDefinitionId = formatDefinitions[0].id;
           }
@@ -413,8 +436,10 @@ export class FormatDefinitionEditorComponent implements OnInit {
       propertyDefinition.propertyName].definition.type;
     let typeName: string = (Array.isArray(dataModelType) ? dataModelType[0] :
       dataModelType);
-    return Object.values(this._viewModel.localTypes[typeName].
-      formatDefinitions);
+    return Object.values(this._itemRepository.getTreeConfig().getValue().
+      config.getProxyFor('view-' + (this._enclosingType ? this._enclosingType :
+      this._dataModel).classLocalTypes[typeName].definedInKind.toLowerCase()).
+      item.localTypes[typeName].formatDefinitions);
   }
   
   public isMultivaluedReferenceAttribute(propertyDefinition:
@@ -437,9 +462,12 @@ export class FormatDefinitionEditorComponent implements OnInit {
       return (attribute.name === propertyDefinition.propertyName);
     })[0].type[0];
     
-    if (this._viewModel.localTypes && this._viewModel.localTypes[
-      attributeTypeName]) {
-      return Object.values(this._viewModel.localTypes[attributeTypeName].
+    let classLocalTypes: any = (this._enclosingType ? this._enclosingType :
+      this._dataModel).classLocalTypes;
+    if (classLocalTypes && classLocalTypes[attributeTypeName]) {
+      return Object.values(this._itemRepository.getTreeConfig().getValue().
+        config.getProxyFor('view-' + classLocalTypes[attributeTypeName].
+        definedInKind.toLowerCase()).item.localTypes[attributeTypeName].
         tableDefinitions);
     } else {
       return Object.values(TreeConfiguration.getWorkingTree().getProxyFor(
