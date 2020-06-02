@@ -70,6 +70,16 @@
                 </mat-icon>
                 {{item.name}}
               </h3>
+              <ng-container *ngIf="itemRepository.getTreeConfig().getValue().
+                config.getProxyFor(item.id).dirty">
+                <!--
+                  Wrap the img below with a button to size and vertically align
+                  the image well.
+                -->
+                <button mat-icon-button [disabled]="true">
+                  <img src="assets/icons/versioncontrol/dirty.ico"/>
+                </button>
+              </ng-container>
               <button mat-icon-button matTooltip="Display Item information"
                 style="margin-left: auto;" (click)="displayInformation(
                 item)">

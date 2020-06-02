@@ -2062,6 +2062,14 @@ export class ItemProxy {
     // Copy the withItem into the current proxy
     let modifications = this.copyAttributes(withItem);
     this.clearDirtyFlags();
+    this.treeConfig.changeSubject.next({
+      type: 'dirty',
+      kind: this.kind,
+      id: this._item.id,
+      dirty: false,
+      dirtyFields: {},
+      proxy: this
+    });
 
     // console.log('%%% Modifications');
     // console.log(modifications);
