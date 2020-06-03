@@ -2,6 +2,7 @@ const Fetch = require('node-fetch');
 const StringReplaceAsync = require('string-replace-async');
 
 import { ItemProxy } from '../common/src/item-proxy';
+import { KoheseModel } from '../common/src/KoheseModel';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
 import { ItemCache } from '../common/src/item-cache';
@@ -523,7 +524,11 @@ function KIOItemServer(socket){
 
         proxy.updateItem(kind, item);
       } else {
-        proxy = new ItemProxy(kind, item);
+        if (kind === 'KoheseModel') {
+          proxy = new KoheseModel(item);
+        } else {
+          proxy = new ItemProxy(kind, item);
+        }
       }
 
       sendResponse({

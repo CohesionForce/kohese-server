@@ -324,7 +324,8 @@ export class TreeConfiguration {
     rootProxy.addChild(this.rootModelProxy);
     rootProxy.addChild(this.rootViewModelProxy);
 
-    this.dumpAllProxies();
+    this.treehashCalculated = false;
+    // this.dumpAllProxies();
   }
 
   //////////////////////////////////////////////////////////////////////////

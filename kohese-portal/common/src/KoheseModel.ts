@@ -45,6 +45,18 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
     if (!modelMap[itemId]) {
       modelMap[itemId] = this;
     }
+
+    if (KoheseModel.modelsDefined){
+      this.updateDerivedModelProperties();
+
+    // Update derived properties in descendants
+    var models = this.getDescendants();
+
+      for(var index in models){
+        let modelProxy = models[index];
+        modelProxy.updateDerivedModelProperties();
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -52,8 +64,21 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
   //////////////////////////////////////////////////////////////////////////
   updateItem(kind, forItem) {
     console.log('::: Updating KoheseModel: ' + forItem.id);
+
+    // TODO: need to skip update if there are no changes
     super.updateItem(kind, forItem);
-    // TODO: Need to update derived properties in descendants if there is a changed
+
+    if (KoheseModel.modelsDefined){
+      this.updateDerivedModelProperties();
+
+    // Update derived properties in descendants
+    var models = this.getDescendants();
+
+      for(var index in models){
+        let modelProxy = models[index];
+        modelProxy.updateDerivedModelProperties();
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -184,104 +209,111 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
 
     for(var index in models){
       let modelProxy = models[index];
-      let kind = modelProxy._item.name;
-      console.log('::: Processing Model Properties ' + kind);
-
-      let propertyOrder = _.clone(modelProxy.parentProxy._item.propertyOrder) || [];
-      modelProxy._item.propertyOrder = propertyOrder.concat(Object.keys(modelProxy._item.properties));
-
-      let propertyStorageOrder = _.clone(modelProxy.parentProxy._item.propertyStorageOrder) || [];
-
-      if (modelProxy._item.invertItemOrder){
-        modelProxy._item.propertyStorageOrder = Object.keys(modelProxy._item.properties).concat(propertyStorageOrder);
-      } else {
-        modelProxy._item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy._item.properties));
-      }
-
-      modelProxy._item.classLocalTypes = _.clone(modelProxy.parentProxy._item.classLocalTypes) || {};
-      modelProxy._item.classProperties = _.clone(modelProxy.parentProxy._item.classProperties) || {};
-      modelProxy._item.requiredProperties = _.clone(modelProxy.parentProxy._item.requiredProperties) || [];
-      modelProxy._item.derivedProperties = _.clone(modelProxy.parentProxy._item.derivedProperties) || [];
-      modelProxy._item.calculatedProperties = _.clone(modelProxy.parentProxy._item.calculatedProperties) || [];
-      modelProxy._item.stateProperties = _.clone(modelProxy.parentProxy._item.stateProperties) || [];
-      modelProxy._item.relationProperties = _.clone(modelProxy.parentProxy._item.relationProperties) || [];
-      modelProxy._item.idProperties = _.clone(modelProxy.parentProxy._item.idProperties) || [];
-
-      for (let dataType in modelProxy._item.localTypes){
-        let localTypeSettings = modelProxy._item.localTypes[dataType];
-        modelProxy._item.classLocalTypes[dataType] = {
-          definedInKind: kind,
-          definition: localTypeSettings
-        };
-
-        let classLocalType = modelProxy._item.classLocalTypes[dataType].
-          definition;
-        let classLocalParentType : any = {};  // TODO: Consider if LDT inheritance should be supported
-
-        classLocalType.classProperties = _.clone(classLocalParentType.classProperties) || {};
-        classLocalType.requiredProperties = _.clone(classLocalParentType.requiredProperties) || [];
-        classLocalType.derivedProperties = _.clone(classLocalParentType.derivedProperties) || [];
-        classLocalType.calculatedProperties = _.clone(classLocalParentType.calculatedProperties) || [];
-        classLocalType.stateProperties = _.clone(classLocalParentType.stateProperties) || [];
-        classLocalType.relationProperties = _.clone(classLocalParentType.relationProperties) || [];
-        classLocalType.idProperties = _.clone(classLocalParentType.idProperties) || [];
-        
-        for (var property in localTypeSettings.properties){
-          var propertySettings = localTypeSettings.properties[property];
-
-          classLocalType.classProperties[property] = {
-            definedInKind: kind,
-            definition: propertySettings
-          };
-  
-          if (propertySettings.derived){
-            classLocalType.derivedProperties.push(property);
-            if(propertySettings.calculated){
-              classLocalType.calculatedProperties.push(property);
-            }
-          }
-          // TODO: Can a LDT have StateMachine
-          if (propertySettings.type && (propertySettings.type ==='StateMachine')){
-            classLocalType.stateProperties.push(property);
-          }
-          if (propertySettings.relation){
-            classLocalType.relationProperties.push(property);
-          }
-          if (propertySettings.id){
-            classLocalType.idProperties.push(property);
-          }
-        }
-      }
-
-      for (var property in modelProxy._item.properties){
-        var propertySettings = modelProxy._item.properties[property];
-        modelProxy._item.classProperties[property] = {
-          definedInKind: kind,
-          definition: propertySettings
-        };
-        if (propertySettings.required){
-          modelProxy._item.requiredProperties.push(property);
-        }
-        if (propertySettings.derived){
-          modelProxy._item.derivedProperties.push(property);
-          if(propertySettings.calculated){
-            modelProxy._item.calculatedProperties.push(property);
-          }
-        }
-        if (propertySettings.type && (propertySettings.type ==='StateMachine')){
-          modelProxy._item.stateProperties.push(property);
-        }
-        if (propertySettings.relation){
-          modelProxy._item.relationProperties.push(property);
-        }
-        if (propertySettings.id){
-          modelProxy._item.idProperties.push(property);
-        }
-      }
+      modelProxy.updateDerivedModelProperties();
     }
 
     TreeConfiguration.registerKoheseModelClass(KoheseModel);
     KoheseModel.modelsDefined = true;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  updateDerivedModelProperties () {
+    let modelProxy = this;
+    let kind = modelProxy._item.name;
+    console.log('::: Processing Model Properties ' + kind);
+
+    let propertyOrder = _.clone(modelProxy.parentProxy._item.propertyOrder) || [];
+    modelProxy._item.propertyOrder = propertyOrder.concat(Object.keys(modelProxy._item.properties));
+
+    let propertyStorageOrder = _.clone(modelProxy.parentProxy._item.propertyStorageOrder) || [];
+
+    if (modelProxy._item.invertItemOrder){
+      modelProxy._item.propertyStorageOrder = Object.keys(modelProxy._item.properties).concat(propertyStorageOrder);
+    } else {
+      modelProxy._item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy._item.properties));
+    }
+
+    modelProxy._item.classLocalTypes = _.clone(modelProxy.parentProxy._item.classLocalTypes) || {};
+    modelProxy._item.classProperties = _.clone(modelProxy.parentProxy._item.classProperties) || {};
+    modelProxy._item.requiredProperties = _.clone(modelProxy.parentProxy._item.requiredProperties) || [];
+    modelProxy._item.derivedProperties = _.clone(modelProxy.parentProxy._item.derivedProperties) || [];
+    modelProxy._item.calculatedProperties = _.clone(modelProxy.parentProxy._item.calculatedProperties) || [];
+    modelProxy._item.stateProperties = _.clone(modelProxy.parentProxy._item.stateProperties) || [];
+    modelProxy._item.relationProperties = _.clone(modelProxy.parentProxy._item.relationProperties) || [];
+    modelProxy._item.idProperties = _.clone(modelProxy.parentProxy._item.idProperties) || [];
+
+    for (let dataType in modelProxy._item.localTypes){
+      let localTypeSettings = modelProxy._item.localTypes[dataType];
+      modelProxy._item.classLocalTypes[dataType] = {
+        definedInKind: kind,
+        definition: localTypeSettings
+      };
+
+      let classLocalType = modelProxy._item.classLocalTypes[dataType].definition;
+      let classLocalParentType : any = {};  // TODO: Consider if LDT inheritance should be supported
+
+      classLocalType.classProperties = _.clone(classLocalParentType.classProperties) || {};
+      classLocalType.requiredProperties = _.clone(classLocalParentType.requiredProperties) || [];
+      classLocalType.derivedProperties = _.clone(classLocalParentType.derivedProperties) || [];
+      classLocalType.calculatedProperties = _.clone(classLocalParentType.calculatedProperties) || [];
+      classLocalType.stateProperties = _.clone(classLocalParentType.stateProperties) || [];
+      classLocalType.relationProperties = _.clone(classLocalParentType.relationProperties) || [];
+      classLocalType.idProperties = _.clone(classLocalParentType.idProperties) || [];
+      
+      for (var property in localTypeSettings.properties){
+        var propertySettings = localTypeSettings.properties[property];
+
+        classLocalType.classProperties[property] = {
+          definedInKind: kind,
+          definition: propertySettings
+        };
+
+        if (propertySettings.derived){
+          classLocalType.derivedProperties.push(property);
+          if(propertySettings.calculated){
+            classLocalType.calculatedProperties.push(property);
+          }
+        }
+        // TODO: Can a LDT have StateMachine
+        if (propertySettings.type && (propertySettings.type ==='StateMachine')){
+          classLocalType.stateProperties.push(property);
+        }
+        if (propertySettings.relation){
+          classLocalType.relationProperties.push(property);
+        }
+        if (propertySettings.id){
+          classLocalType.idProperties.push(property);
+        }
+      }
+    }
+
+    for (var property in modelProxy._item.properties){
+      var propertySettings = modelProxy._item.properties[property];
+      modelProxy._item.classProperties[property] = {
+        definedInKind: kind,
+        definition: propertySettings
+      };
+      if (propertySettings.required){
+        modelProxy._item.requiredProperties.push(property);
+      }
+      if (propertySettings.derived){
+        modelProxy._item.derivedProperties.push(property);
+        if(propertySettings.calculated){
+          modelProxy._item.calculatedProperties.push(property);
+        }
+      }
+      if (propertySettings.type && (propertySettings.type ==='StateMachine')){
+        modelProxy._item.stateProperties.push(property);
+      }
+      if (propertySettings.relation){
+        modelProxy._item.relationProperties.push(property);
+      }
+      if (propertySettings.id){
+        modelProxy._item.idProperties.push(property);
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
