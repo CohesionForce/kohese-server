@@ -87,7 +87,7 @@
       }
     },
     "analysisAction": {
-      "type": "string",
+      "type": "Item",
       "relation": {
         "kind": "Item",
         "foreignKey": "id"
