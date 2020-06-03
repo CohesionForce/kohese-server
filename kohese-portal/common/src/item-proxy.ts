@@ -128,14 +128,16 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
 
           if (propertyDefinition && propertyDefinition.definition.relation && propertyDefinition.definition.relation.contained) {
             if (!Array.isArray(nestedTypeDecl)) {
-              attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+              attributeTypeProperties = proxy.model.item.classLocalTypes[
+                nestedTypeDecl].definition.classProperties;
             }
           }
           
           if (Array.isArray(typeDecl)){
             nestedTypeDecl = typeDecl[0];
             if (proxy.model.item.classLocalTypes[nestedTypeDecl]){
-              attributeTypeProperties = proxy.model.item.classLocalTypes[nestedTypeDecl].classProperties;
+              attributeTypeProperties = proxy.model.item.classLocalTypes[
+                nestedTypeDecl].definition.classProperties;
             }
           }
           changeHandler = ItemChangeHandler(nestedTypeDecl, returnValue, proxy, path, attributeTypeProperties);
@@ -1229,6 +1231,18 @@ export class ItemProxy {
         delete clone[key];
       }
     }
+    
+    if (this.kind === 'KoheseModel') {
+      for (let localTypeName in this._item.localTypes) {
+        let localType: any = clone.localTypes[localTypeName];
+        let koheseModelType: any = this.model._item;
+        for (let j: number = 0; j < koheseModelType.derivedProperties.length;
+          j++) {
+          delete localType[koheseModelType.derivedProperties[j]];
+        }
+      }
+    }
+    
     return clone;
   }
 

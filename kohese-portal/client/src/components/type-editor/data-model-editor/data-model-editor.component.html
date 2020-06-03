@@ -92,8 +92,11 @@
           <mat-icon class="fa fa-edit"></mat-icon>
         </button>
       </ng-container>
-      <ng-container *ngIf="(Object.values(fundamentalTypes).indexOf(
-        Array.isArray(element.type) ? element.type[0] : element.type) === -1)">
+      <ng-container *ngIf="((Object.values(fundamentalTypes).indexOf(Array.
+        isArray(element.type) ? element.type[0] : element.type) === -1) &&
+        (enclosingType ? !enclosingType.classLocalTypes[Array.isArray(element.
+        type) ? element.type[0] : element.type] : !dataModel.classLocalTypes[
+        Array.isArray(element.type) ? element.type[0] : element.type]))">
         <mat-form-field style="width: 180px; padding: 0px 5px 0px 5px;">
           <mat-select placeholder="Reference Attribute"
             [ngModel]="element.relation" (ngModelChange)="element.

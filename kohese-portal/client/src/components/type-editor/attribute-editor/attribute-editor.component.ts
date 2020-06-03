@@ -30,13 +30,13 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     this._attribute = attribute;
   }
   
-  private _type: any;
-  get type() {
-    return this._type;
+  private _contextualGlobalType: any;
+  get contextualGlobalType() {
+    return this._contextualGlobalType;
   }
-  @Input('type')
-  set type(type: any) {
-    this._type = type;
+  @Input('contextualGlobalType')
+  set contextualGlobalType(contextualGlobalType: any) {
+    this._contextualGlobalType = contextualGlobalType;
   }
   
   private _view: any = {
@@ -143,8 +143,8 @@ export class AttributeEditorComponent implements OnInit, Dialog {
         }
       }
       
-      if (koheseType.dataModelProxy.item === this._type) {
-        for (let localTypeName in this._type.localTypes) {
+      if (koheseType.dataModelProxy.item === this._contextualGlobalType) {
+        for (let localTypeName in this._contextualGlobalType.localTypes) {
           this._attributeTypes[localTypeName] = localTypeName;
         }
       }
@@ -165,11 +165,17 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     }
     
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
-      if (!this._attribute.relation) {
+      if (this._contextualGlobalType.classLocalTypes[attributeType]) {
         this._attribute.relation = {
-          kind: 'Item',
-          foreignKey: 'id'
+          contained: true
         };
+      } else {
+        if (!this._attribute.relation || this._attribute.relation.contained) {
+          this._attribute.relation = {
+            kind: 'Item',
+            foreignKey: 'id'
+          };
+        }
       }
       
       this._view.inputType.type = '';
@@ -235,8 +241,8 @@ export class AttributeEditorComponent implements OnInit, Dialog {
   }
   
   public areRelationsEqual(option: any, selection: any): boolean {
-    return ((option.kind === selection.kind) && (option.foreignKey ===
-      selection.foreignKey));
+    return (selection && (option.kind === selection.kind) && (option.foreignKey
+      === selection.foreignKey));
   }
   
   public getTypes(): Array<string> {

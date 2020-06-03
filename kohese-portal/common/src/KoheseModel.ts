@@ -214,7 +214,8 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
           definition: localTypeSettings
         };
 
-        let classLocalType = modelProxy._item.classLocalTypes[dataType]
+        let classLocalType = modelProxy._item.classLocalTypes[dataType].
+          definition;
         let classLocalParentType : any = {};  // TODO: Consider if LDT inheritance should be supported
 
         classLocalType.classProperties = _.clone(classLocalParentType.classProperties) || {};
