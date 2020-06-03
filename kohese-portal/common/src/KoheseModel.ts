@@ -45,6 +45,18 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
     if (!modelMap[itemId]) {
       modelMap[itemId] = this;
     }
+
+    if (KoheseModel.modelsDefined){
+      this.updateDerivedModelProperties();
+
+    // Update derived properties in descendants
+    var models = this.getDescendants();
+
+      for(var index in models){
+        let modelProxy = models[index];
+        modelProxy.updateDerivedModelProperties();
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
