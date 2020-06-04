@@ -9,8 +9,7 @@ https://libgit2.github.com/docs/guides/101-samples/
 # history of diffs and follow file renames
 #  - to find rename search for similarity index
 ```
-git log --follow -p --word-diff Action/e8d583d0-6780-11e5-9d66-3bceb4f8ff0c.json
-
+git log --follow -p --word-diff [some.file]
 git log --name-status -M
 ```
 

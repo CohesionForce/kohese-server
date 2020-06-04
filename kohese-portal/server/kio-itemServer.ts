@@ -2,6 +2,7 @@ const Fetch = require('node-fetch');
 const StringReplaceAsync = require('string-replace-async');
 
 import { ItemProxy } from '../common/src/item-proxy';
+import { KoheseModel } from '../common/src/KoheseModel';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
 import { ItemCache } from '../common/src/item-cache';
@@ -438,6 +439,7 @@ function KIOItemServer(socket){
 
     var repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
     console.log('::: Getting status for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId);
+    let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
 
     KDBRepo.getStatus(request.repoId, function(status){
       if (status) {
@@ -450,6 +452,13 @@ function KIOItemServer(socket){
               id: statusRecord.itemId,
               status: statusRecord.status
             });
+
+            // Create lost item to represent the item if it does not exist
+            let proxy = workingTree.getProxyFor(statusRecord.itemId);
+            if (!proxy) {
+              // TODO: Need to evaluate and remove the creation of missing proxies from this location
+              proxy = ItemProxy.createMissingProxy('Item','id', statusRecord.itemId, workingTree);
+            }
           }
         }
 
@@ -515,7 +524,11 @@ function KIOItemServer(socket){
 
         proxy.updateItem(kind, item);
       } else {
-        proxy = new ItemProxy(kind, item);
+        if (kind === 'KoheseModel') {
+          proxy = new KoheseModel(item);
+        } else {
+          proxy = new ItemProxy(kind, item);
+        }
       }
 
       sendResponse({
