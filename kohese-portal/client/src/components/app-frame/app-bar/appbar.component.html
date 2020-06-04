@@ -23,10 +23,11 @@
       </span>
     </div>
     <div class="nav navbar-top-links navbar-right">
-      <button mat-icon-button [matMenuTriggerFor]="modifiedItemsMenu"
-        [disabled]="(modifiedItems.length === 0)">
-        <img src="assets/icons/versioncontrol/dirty.ico"/>
-      </button>
+      <ng-container *ngIf="(modifiedItems.length > 0)">
+        <button mat-icon-button [matMenuTriggerFor]="modifiedItemsMenu">
+          <img src="assets/icons/versioncontrol/dirty.ico"/>
+        </button>
+      </ng-container>
       <mat-menu #modifiedItemsMenu="matMenu" [overlapTrigger]="false">
         <ng-container *ngFor="let modifiedItem of modifiedItems">
           <button mat-menu-item (click)="navigate('Explore',
