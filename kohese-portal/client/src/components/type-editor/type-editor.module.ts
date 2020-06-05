@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TypeEditorComponent } from './type-editor.component';
-import { IconSelectorComponent } from './icon-selector/icon-selector.component';
 import { AttributeEditorComponent } from './attribute-editor/attribute-editor.component';
 import { DataModelEditorComponent } from './data-model-editor/data-model-editor.component';
 import { ViewModelEditorComponent } from './view-model-editor/view-model-editor.component';
@@ -18,13 +17,11 @@ import { AngularSplitModule } from 'angular-split';
 @NgModule({
   declarations: [
     TypeEditorComponent,
-    IconSelectorComponent,
     AttributeEditorComponent,
     DataModelEditorComponent,
     ViewModelEditorComponent
   ],
   entryComponents: [
-    IconSelectorComponent,
     AttributeEditorComponent
   ],
   imports: [

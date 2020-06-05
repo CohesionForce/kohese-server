@@ -5,7 +5,6 @@ import { MatTable } from '@angular/material';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { IconSelectorComponent } from '../icon-selector/icon-selector.component';
 import { FormatPreviewComponent } from '../format-editor/format-preview/format-preview.component';
 import { TableDefinition } from '../TableDefinition.interface';
 import { FormatDefinition,
