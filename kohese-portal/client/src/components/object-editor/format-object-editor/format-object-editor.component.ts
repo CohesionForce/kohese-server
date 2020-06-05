@@ -272,38 +272,40 @@ export class FormatObjectEditorComponent implements OnInit {
           return '';
         }
         
-	      let type: any = (this._enclosingType ? this._enclosingType : this.
-	        _selectedType).classProperties[attributeName].definition.type;
-	      type = (Array.isArray(type) ? type[0] : type);
-	      let treeConfiguration: TreeConfiguration = this._itemRepository.
-	        getTreeConfig().getValue().config;
-	      let dataModel: any = (this._enclosingType ? this._enclosingType : this.
-          _selectedType).classLocalTypes[type].definition;
-	      let viewModel: any;
-	      if (dataModel) {
-	        viewModel = this._itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + this._enclosingType.classLocalTypes[type].
-            definedInKind.toLowerCase()).item.localTypes[type];
-	      } else {
-	        dataModel = treeConfiguration.getProxyFor(type).item;
-	        viewModel = treeConfiguration.getProxyFor('view-' + type.
-	          toLowerCase()).item;
-	      }
-	      if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
-	        return row[columnId].map((value: any, index: number) => {
-	          // Bullet-ize string representations
-	          return '\u2022 ' + this._itemRepository.getStringRepresentation(
-	            row, columnId, index, (this._enclosingType ? this.
-	            _enclosingType : this._selectedType), dataModel, viewModel, this.
-	            _formatDefinitionType);
-	        }).join('\n');
-	      } else {
-	        return this._itemRepository.getStringRepresentation(row, columnId,
-	          undefined, (this._enclosingType ? this._enclosingType : this.
+        let type: any = this._selectedType.classProperties[attributeName].
+          definition.type;
+        type = (Array.isArray(type) ? type[0] : type);
+        let treeConfiguration: TreeConfiguration = this._itemRepository.
+          getTreeConfig().getValue().config;
+        let dataModel: any;
+        let viewModel: any;
+        let classLocalTypesEntry: any = (this._enclosingType ? this.
+          _enclosingType : this._selectedType).classLocalTypes[type];
+        if (classLocalTypesEntry) {
+          dataModel = classLocalTypesEntry.definition;
+          viewModel = this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + classLocalTypesEntry.definedInKind.
+            toLowerCase()).item.localTypes[type];
+        } else {
+          dataModel = treeConfiguration.getProxyFor(type).item;
+          viewModel = treeConfiguration.getProxyFor('view-' + type.
+            toLowerCase()).item;
+        }
+        if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
+          return row[columnId].map((value: any, index: number) => {
+            // Bullet-ize string representations
+            return '\u2022 ' + this._itemRepository.getStringRepresentation(
+              row, columnId, index, (this._enclosingType ? this.
+              _enclosingType : this._selectedType), dataModel, viewModel, this.
+              _formatDefinitionType);
+          }).join('\n');
+        } else {
+          return this._itemRepository.getStringRepresentation(row, columnId,
+            undefined, (this._enclosingType ? this._enclosingType : this.
             _selectedType), dataModel, viewModel, this._formatDefinitionType);
-	      }
-	    }
-	    
+        }
+      }
+      
       return String(row[columnId]);
     };
   }
@@ -326,38 +328,6 @@ export class FormatObjectEditorComponent implements OnInit {
     let type: any = (this._enclosingType ? this._enclosingType : this.
       _selectedType);
     return type.classLocalTypes[typeName].definition;
-  }
-  
-  public openObjectEditor(propertyDefinition: PropertyDefinition,
-    useExistingValue: boolean): void {
-    let value: any = this._object[propertyDefinition.propertyName];
-    let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
-      propertyDefinition.propertyName);
-    this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
-      data: {
-        object: (useExistingValue ? (isLocalTypeAttribute ? value : (value ?
-          this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
-          value.id).item : value)) : undefined),
-        enclosingType: (this._enclosingType ? this._enclosingType : this.
-          _selectedType),
-        formatDefinitionType: this._formatDefinitionType,
-        disabled: (!propertyDefinition.editable || this._isDisabled ||
-          !isLocalTypeAttribute),
-        type: (isLocalTypeAttribute ? this.getLocalType(propertyDefinition.
-          propertyName) : this._itemRepository.getTreeConfig().getValue().
-          config.getProxyFor(propertyDefinition.propertyName).item)
-      }
-    }).updateSize('90%', '90%').afterClosed().subscribe((result: any) => {
-      if (result) {
-        if (isLocalTypeAttribute) {
-          this._object[propertyDefinition.propertyName] = result.object;
-        } else {
-          this._itemRepository.upsertItem(result.type.name, result.object);
-        }
-        
-        this._changeDetectorRef.markForCheck();
-      }
-    });
   }
   
   public openObjectSelector(attributeName: string): void {
@@ -442,218 +412,96 @@ export class FormatObjectEditorComponent implements OnInit {
     });
   }
   
-  public addValue(attributeDefinition: PropertyDefinition): void {
-    if (this._object[attributeDefinition.propertyName] == null) {
-      this._object[attributeDefinition.propertyName] = [];
+  public addValue(attribute: any): any {
+    if (Array.isArray(attribute.type) && this._object[attribute.name] ==
+      null) {
+      this._object[attribute.name] = [];
     }
-
-    this.editValue(this._object[attributeDefinition.propertyName].length,
-      attributeDefinition);
-  }
-  
-  public async editValue(index: number, attributeDefinition:
-    PropertyDefinition): Promise<void> {
-    let attributeName: string = attributeDefinition.propertyName;
-    const DIALOG_TITLE: string = 'Specify Value';
-    let value: any = this._object[attributeName][index];
-    let type: any = this._selectedType.classProperties[attributeDefinition.
-      propertyName].definition.type;
-    type = (Array.isArray(type) ? type[0] : type);
+    
+    let defaultValue: any = attribute.default;
+    if (defaultValue != null) {
+      return defaultValue;
+    }
+    
+    let type: any = (Array.isArray(attribute.type) ? attribute.type[0] :
+      attribute.type);
+    // 'state-editor' case should be handled by the 'if' above
     switch (type) {
       case 'boolean':
-        if (value == null) {
-          value = false;
-        }
-        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE, '',
-          attributeName, value, undefined, [true, false]);
-        if (value != null) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
+        return false;
       case 'number':
-        if (value == null) {
-          value = 0;
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.NUMBER, attributeName, value, undefined);
-        if (value != null) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'date':
-        if (value == null) {
-          value = new Date().getTime();
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.DATE, attributeName, value, undefined);
-        if (value != null) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
+        return 0;
+      case 'timestamp':
+        return new Date().getTime();
       case 'string':
-        if (value == null) {
-          value = '';
+        if (attribute.relation) {
+          // 'username' attribute reference
+          return 'admin';
+        } else {
+          return '';
         }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.STRING, attributeName, value, undefined);
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'text':
-        if (value == null) {
-          value = '';
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.STRING, attributeName, value, undefined);
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'maskedString':
-        if (value == null) {
-          value = '';
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.MASKED_STRING, attributeName, value, undefined);
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'markdown':
-        if (value == null) {
-          value = '';
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.MARKDOWN, attributeName, value, undefined);
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'state-editor':
-        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE,
-          attributeName + ': ' + this._object[attributeName], 'Target', value,
-          undefined, this.getStateTransitionCandidates(attributeDefinition).
-          map((transitionCandidateName: string) => {
-          return this._selectedType.classProperties[attributeName].definition.
-            properties.transition[transitionCandidateName].target;
-        }));
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'user-selector':
-        if (value == null) {
-          value = 'admin';
-        }
-        
-        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE, '',
-          attributeName, value, undefined, this._usernames);
-        if (value != null) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
       default:
         let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
-          attributeName);
+          attribute.name);
         if (isLocalTypeAttribute) {
-          this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
-            data: {
-              object: value,
-              enclosingType: (this._enclosingType ? this._enclosingType: this.
-                _selectedType),
-              formatDefinitionType: this._formatDefinitionType,
-              disabled: (!attributeDefinition.editable || this._isDisabled),
-              type: this.getLocalType(attributeDefinition.propertyName)
-            }
-          }).updateSize('90%', '90%').afterClosed().subscribe((result:
-            any) => {
-            if (result) {
-              this._object[attributeName].splice(index, 1, result.object);
-              this._changeDetectorRef.markForCheck();
-            }
-          });
-        } else {
-          this._dialogService.openComponentDialog(TreeComponent, {
-            data: {
-              root: TreeConfiguration.getWorkingTree().getRootProxy(),
-              getChildren: (element: any) => {
-                return (element as ItemProxy).children;
-              },
-              getText: (element: any) => {
-                return (element as ItemProxy).item.name;
-              },
-              /*maySelect: (element: any) => {
-                let typeName: string = this._selectedType.classProperties[
-                  attributeName].definition.type[0];
-                let elementTypeName: string = (element as ItemProxy).kind;
-                if (elementTypeName === 'Item') {
-                  return true;
+          let classLocalTypesEntry: any = (this._enclosingType ? this.
+            _enclosingType : this._selectedType).classLocalTypes[type];
+          let localTypeDataModel: any = classLocalTypesEntry.definition;
+          let localTypeViewModel: any = this._itemRepository.getTreeConfig().
+            getValue().config.getProxyFor('view-' + classLocalTypesEntry.
+            definedInKind.toLowerCase()).item.localTypes[type];
+          let localTypeDefaultFormatDefinition: FormatDefinition =
+            localTypeViewModel.formatDefinitions[localTypeViewModel.
+            defaultFormatKey[FormatDefinitionType.DEFAULT]];
+          let localTypeInstance: any = {};
+          for (let attributeName in localTypeDataModel.classProperties) {
+            let localTypeAttribute: any = localTypeDataModel.classProperties[
+              attributeName].definition;
+            let localTypeAttributeTypeName: string = (Array.isArray(
+              localTypeAttribute.type) ? localTypeAttribute.type[0] :
+              localTypeAttribute.type);
+            if (!(this._enclosingType ? this._enclosingType : this.
+              _selectedType).classLocalTypes[localTypeAttributeTypeName]) {
+              localTypeInstance[attributeName] = localTypeAttribute.default;
+              if (localTypeInstance[attributeName] == null) {
+                if (Array.isArray(localTypeAttribute.type)) {
+                  localTypeInstance[attributeName] = [];
                 } else {
-                  while (true) {
-                    if (elementTypeName === typeName) {
-                      return true;
-                    }
-                    
-                    let itemProxy: ItemProxy = TreeConfiguration.
-                      getWorkingTree().getProxyFor(elementTypeName);
-                    if (itemProxy) {
-                      elementTypeName = itemProxy.item.base;
-                    } else {
+                  // 'state-editor' by the attribute's default value
+                  switch (localTypeAttributeTypeName) {
+                    case 'boolean':
+                      localTypeInstance[attributeName] = false;
+                    case 'number':
+                      localTypeInstance[attributeName] = 0;
+                    case 'timestamp':
+                      localTypeInstance[attributeName] = new Date().getTime();
+                    case 'string':
+                      if (localTypeAttribute.relation) {
+                        // 'username' attribute reference
+                        localTypeAttribute[attributeName] = 'admin';
+                      } else {
+                        localTypeAttribute[attributeName] = '';
+                      }
                       break;
-                    }
+                    default:
+                      if (!localTypeAttribute.relation.contained) {
+                        localTypeAttribute[attributeName] = {
+                          id: ''
+                        };
+                      }
                   }
                 }
-                
-                return false;
-              },*/
-              getIcon: (element: any) => {
-                return this._itemRepository.getTreeConfig().getValue().config.
-                  getProxyFor('view-' + (element as ItemProxy).kind.
-                  toLowerCase()).item.icon;
-              },
-              allowMultiselect: true,
-              showSelections: true,
-              selection: (this._object[attributeName] ? this._object[
-                attributeName].map((reference: any) => {
-                return TreeConfiguration.getWorkingTree().getProxyFor(
-                  reference.id);
-              }) : []),
-              quickSelectElements: this._itemRepository.getRecentProxies()
+              }
             }
-          }).updateSize('90%', '90%').afterClosed().subscribe((selection:
-            Array<any>) => {
-            if (selection) {
-              this._object[attributeName].length = 0;
-              this._object[attributeName].push(...selection.map((element:
-                any) => {
-                return { id: (element as ItemProxy).item.id };
-              }));
-              
-              this._changeDetectorRef.markForCheck();
-            }
-          });
+          }
+          
+          return localTypeInstance;
+        } else {
+          return {
+            id: ''
+          };
         }
     }
-  }
-  
-  public removeValue(index: number, attributeName: string): void {
-    this._object[attributeName].splice(index, 1);
   }
   
   public getTableElements(attributeDefinition: PropertyDefinition):

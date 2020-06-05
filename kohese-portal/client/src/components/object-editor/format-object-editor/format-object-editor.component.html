@@ -65,7 +65,9 @@
                         {{attributeDefinition.propertyName}}"
                         class="flex-right-align"
                         [disabled]="!attributeDefinition.editable"
-                        (click)="addValue(attributeDefinition)">
+                        (click)="object[attributeDefinition.propertyName].push(
+                        addValue(selectedType.classProperties[
+                        attributeDefinition.propertyName].definition))">
                         <mat-icon class="fa fa-plus"></mat-icon>
                       </button>
                     </div>
@@ -73,26 +75,212 @@
                       <ng-container *ngFor="let value of object[
                         attributeDefinition.propertyName]; let j = index">
                         <div style="display: flex; flex-direction: row;">
-                          <button mat-button
-                            matTooltip="{{itemRepository.
-                            getStringRepresentation(object,
-                            attributeDefinition.propertyName, j, (enclosingType
-                            ? enclosingType : selectedType), selectedType,
-                            viewModel, formatDefinitionType)}}"
-                            [disabled]="(!attributeDefinition.editable ||
-                            isDisabled)" (click)="editValue(j,
-                            attributeDefinition)" style="white-space: nowrap;
-                            overflow: hidden; text-overflow: ellipsis; width:
-                            100%; text-align: left;">
-                            {{itemRepository.getStringRepresentation(object,
-                              attributeDefinition.propertyName, j,
-                              (enclosingType ? enclosingType : selectedType),
-                              selectedType, viewModel, formatDefinitionType)}}
-                          </button>
+                          <ng-container [ngSwitch]="attributeDefinition.kind">
+                            <ng-container *ngSwitchCase="'boolean'">
+                              <mat-checkbox [(ngModel)]="object[
+                                attributeDefinition.propertyName][j]"
+                                [disabled]="!attributeDefinition.editable"
+                                style="width: 100%;">
+                              </mat-checkbox>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'number'">
+                              <mat-form-field style="width: 100%;">
+                                <input matInput type="number"
+                                  [(ngModel)]="object[attributeDefinition.
+                                  propertyName][j]"
+                                  [disabled]="!attributeDefinition.editable"/>
+                              </mat-form-field>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'date'">
+                              <mat-form-field style="width: 100%;">
+                                <input matInput [matDatepicker]="matDatepicker"
+                                  [ngModel]="getDateString(object[
+                                  attributeDefinition.propertyName][j])"
+                                  (ngModelChange)="($event ? object[
+                                  attributeDefinition.propertyName][j] =
+                                  $event.getTime() : '')"
+                                  [disabled]="!attributeDefinition.editable"/>
+                                <mat-datepicker-toggle matSuffix
+                                  [for]="matDatepicker">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #matDatepicker>
+                                </mat-datepicker>
+                              </mat-form-field>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'string'">
+                              <mat-form-field style="width: 100%;">
+                                <input matInput type="text"
+                                  [(ngModel)]="object[attributeDefinition.
+                                  propertyName][j]"
+                                  [disabled]="!attributeDefinition.editable"/>
+                              </mat-form-field>
+                            </ng-container>
+                            <!--
+                              Hopefully the case below can be removed
+                              eventually.
+                            -->
+                            <ng-container *ngSwitchCase="'text'">
+                              <mat-form-field style="width: 100%;">
+                                <input matInput type="text"
+                                  [(ngModel)]="object[attributeDefinition.
+                                  propertyName][j]"
+                                  [disabled]="!attributeDefinition.editable"/>
+                              </mat-form-field>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'maskedString'">
+                              <mat-form-field style="width: 100%;">
+                                <input matInput type="password"
+                                  [(ngModel)]="object[attributeDefinition.
+                                  propertyName][j]"
+                                  [disabled]="!attributeDefinition.editable"/>
+                              </mat-form-field>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'markdown'">
+                              <ng-container *ngIf="!attributeDefinition.
+                                editable else editableBlock">
+                                <markdown [data]="object[attributeDefinition.
+                                  propertyName][j]">
+                                </markdown>
+                              </ng-container>
+                              <ng-template #editableBlock>
+                                <markdown-editor [value]="object[
+                                  attributeDefinition.propertyName][j]"
+                                  (valueChanged)="object[attributeDefinition.
+                                  propertyName][j] = $event">
+                                </markdown-editor>
+                                <br/>
+                              </ng-template>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'state-editor'">
+                              <div style="display: flex; flex-direction: row;">
+                                <div style="display: flex; flex-direction:
+                                  column; justify-content: center;">
+                                  <label style="margin-bottom: unset;">
+                                    {{object[attributeDefinition.propertyName][
+                                      j]}}&nbsp;
+                                  </label>
+                                </div>
+                                <ng-container
+                                  *ngFor="let transitionCandidateName of
+                                  getStateTransitionCandidates(
+                                  attributeDefinition); let j = index">
+                                  <button mat-raised-button
+                                    [disabled]="!attributeDefinition.editable"
+                                    style="margin: 0px 3px 0px 3px;"
+                                    [ngStyle]="{ 'margin-left': ((j === 0) ?
+                                    'auto' : '') }" (click)="object[
+                                    attributeDefinition.propertyName][j] =
+                                    selectedType.classProperties[
+                                    attributeDefinition.propertyName].
+                                    definition.properties.transition[
+                                    transitionCandidateName].target">
+                                    {{transitionCandidateName}}
+                                  </button>
+                                </ng-container>
+                              </div>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'user-selector'">
+                              <mat-form-field style="width: 100%;">
+                                <mat-select [(ngModel)]="object[
+                                  attributeDefinition.propertyName][j]"
+                                  [disabled]="!attributeDefinition.editable">
+                                  <ng-container *ngFor="let username of
+                                    usernames">
+                                    <mat-option [value]="username">
+                                      {{username}}
+                                    </mat-option>
+                                  </ng-container>
+                                </mat-select>
+                              </mat-form-field>
+                            </ng-container>
+                            <ng-container *ngSwitchDefault>
+                              <div style="width: 100%; display: flex;
+                                flex-direction: row;"
+                                [ngStyle]="{ 'align-items':
+                                (isLocalTypeAttribute(attributeDefinition.
+                                propertyName) ? '' : 'center') }">
+                                <ng-container *ngIf="object[
+                                  attributeDefinition.propertyName]">
+                                  <ng-container *ngIf="isLocalTypeAttribute(
+                                    attributeDefinition.propertyName) else
+                                    globalTypeAttribute">
+                                    <mat-expansion-panel style="width: 100%;">
+                                      <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                          {{itemRepository.
+                                            getStringRepresentation(object,
+                                            attributeDefinition.propertyName,
+                                            j, (enclosingType ? enclosingType :
+                                            selectedType), selectedType,
+                                            viewModel, formatDefinitionType)}}
+                                        </mat-panel-title>
+                                      </mat-expansion-panel-header>
+                                      <ng-template matExpansionPanelContent>
+                                        <format-object-editor
+                                          [enclosingType]="(enclosingType ?
+                                          enclosingType : selectedType)"
+                                          [type]="selectedType.classLocalTypes[
+                                          (enclosingType ? enclosingType :
+                                          selectedType).classProperties[
+                                          attributeDefinition.propertyName].
+                                          definition.type].definition"
+                                          [object]="object[attributeDefinition.
+                                          propertyName][j]"
+                                          [formatDefinitionType]="formatDefinitionType"
+                                          [disabled]="isDisabled">
+                                        </format-object-editor>
+                                      </ng-template>
+                                    </mat-expansion-panel>
+                                  </ng-container>
+                                  <ng-template #globalTypeAttribute>
+                                    <button mat-button [disabled]="true"
+                                      style="width: 100%; margin: 0px 3px 0px
+                                      3px; white-space: nowrap; overflow:
+                                      hidden; text-overflow: ellipsis;">
+                                      {{itemRepository.getStringRepresentation(
+                                        object, attributeDefinition.
+                                        propertyName, j, (enclosingType ?
+                                        enclosingType : selectedType),
+                                        selectedType, viewModel,
+                                        formatDefinitionType)}}
+                                    </button>
+                                  </ng-template>
+                                </ng-container>
+                                <ng-container *ngIf="isLocalTypeAttribute(
+                                  attributeDefinition.propertyName) else
+                                  globalTypeAttribute">
+                                  <ng-container *ngIf="!object[
+                                    attributeDefinition.propertyName][j]">
+                                    <button mat-icon-button matTooltip="Set a
+                                      value for {{attributeDefinition.
+                                      propertyName}}"
+                                      [disabled]="!attributeDefinition.
+                                      editable" style="margin-left: auto;"
+                                      (click)="object[attributeDefinition.
+                                      propertyName] = addValue(selectedType.
+                                      classProperties[attributeDefinition.
+                                      propertyName].definition)">
+                                      <mat-icon class="fa fa-plus"></mat-icon>
+                                    </button>
+                                  </ng-container>
+                                </ng-container>
+                                <ng-template #globalTypeAttribute>
+                                  <button mat-icon-button matTooltip="Select an
+                                    Item" [disabled]="!attributeDefinition.
+                                    editable" (click)="openObjectSelector(
+                                    attributeDefinition.propertyName)"
+                                    style="margin-left: auto;">
+                                    <mat-icon class="fa fa-ellipsis-h">
+                                    </mat-icon>
+                                  </button>
+                                </ng-template>
+                              </div>
+                            </ng-container>
+                          </ng-container>
                           <button mat-icon-button matTooltip="Remove this
                             value" [disabled]="!attributeDefinition.editable"
-                            (click)="removeValue(j, attributeDefinition.
-                            propertyName)" style="margin-left: auto;">
+                            (click)="object[attributeDefinition.propertyName].
+                            splice(j, 1)" style="margin-left: auto;">
                             <mat-icon class="fa fa-times"></mat-icon>
                           </button>
                         </div>
@@ -223,24 +411,53 @@
                   </ng-container>
                   <ng-container *ngSwitchDefault>
                     <div style="width: 100%; display: flex; flex-direction:
-                      row; align-items: center;">
+                      row;" [ngStyle]="{ 'align-items': (isLocalTypeAttribute(
+                      attributeDefinition.propertyName) ? '' : 'center') }">
                       <label>
                         {{getAttributeRepresentation(
                           attributeDefinition)}}:&nbsp;
                       </label>
                       <ng-container *ngIf="object[attributeDefinition.
                         propertyName]">
-                        <button mat-raised-button 
-                          [disabled]="!isLocalTypeAttribute(attributeDefinition.
-                          propertyName)" style="width: 100%; margin: 0px 3px 0px
-                          3px; white-space: nowrap; overflow: hidden;
-                          text-overflow: ellipsis;" (click)="openObjectEditor(
-                          attributeDefinition, true)">
-                          {{itemRepository.getStringRepresentation(object,
-                            attributeDefinition.propertyName, undefined,
-                            (enclosingType ? enclosingType : selectedType),
-                            selectedType, viewModel, formatDefinitionType)}}
-                        </button>
+                        <ng-container *ngIf="isLocalTypeAttribute(
+                          attributeDefinition.propertyName) else
+                          globalTypeAttribute">
+                          <mat-expansion-panel style="width: 100%;">
+                            <mat-expansion-panel-header>
+                              <mat-panel-title>
+                                {{itemRepository.getStringRepresentation(
+                                  object, attributeDefinition.propertyName,
+                                  undefined, (enclosingType ? enclosingType :
+                                  selectedType), selectedType, viewModel,
+                                  formatDefinitionType)}}
+                              </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <ng-template matExpansionPanelContent>
+                              <format-object-editor
+                                [enclosingType]="(enclosingType ?
+                                enclosingType : selectedType)"
+                                [type]="(enclosingType ? enclosingType :
+                                selectedType).classLocalTypes[selectedType.
+                                classProperties[attributeDefinition.
+                                propertyName].definition.type].definition"
+                                [object]="object[attributeDefinition.
+                                propertyName]"
+                                [formatDefinitionType]="formatDefinitionType"
+                                [disabled]="isDisabled">
+                              </format-object-editor>
+                            </ng-template>
+                          </mat-expansion-panel>
+                        </ng-container>
+                        <ng-template #globalTypeAttribute>
+                          <button mat-button  [disabled]="true" style="width:
+                            100%; margin: 0px 3px 0px 3px; white-space: nowrap;
+                            overflow: hidden; text-overflow: ellipsis;">
+                            {{itemRepository.getStringRepresentation(object,
+                              attributeDefinition.propertyName, undefined,
+                              (enclosingType ? enclosingType : selectedType),
+                              selectedType, viewModel, formatDefinitionType)}}
+                          </button>
+                        </ng-template>
                       </ng-container>
                       <ng-container *ngIf="isLocalTypeAttribute(
                         attributeDefinition.propertyName) else
@@ -251,8 +468,9 @@
                             {{attributeDefinition.propertyName}}"
                             [disabled]="!attributeDefinition.editable"
                             style="margin-left: auto;"
-                            (click)="openObjectEditor(attributeDefinition,
-                            false)">
+                            (click)="object[attributeDefinition.propertyName] =
+                            addValue(selectedType.classProperties[
+                            attributeDefinition.propertyName].definition)">
                             <mat-icon class="fa fa-plus"></mat-icon>
                           </button>
                         </ng-container>
