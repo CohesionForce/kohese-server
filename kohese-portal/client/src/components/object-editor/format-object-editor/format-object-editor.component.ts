@@ -439,7 +439,7 @@ export class FormatObjectEditorComponent implements OnInit {
             }*/
           }
           
-          return false;
+          return true;
         },
         getIcon: (element: any) => {
           return this._itemRepository.getTreeConfig().getValue().config.
@@ -737,7 +737,7 @@ export class FormatObjectEditorComponent implements OnInit {
               }
             }
             
-            return false;
+            return true;
           },
           getIcon: (element: any) => {
             return this._itemRepository.getTreeConfig().getValue().config.
