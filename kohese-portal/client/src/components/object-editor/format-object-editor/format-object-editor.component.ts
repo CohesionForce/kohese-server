@@ -384,7 +384,7 @@ export class FormatObjectEditorComponent implements OnInit {
     let itemId = undefined;
     switch (typeof(this._object[attributeName])) {
       case 'object':
-        itemId = this._object[attributeName].item.id;
+        itemId = this._object[attributeName].id;
         break;
       case 'string':
         itemId = this._object[attributeName];
