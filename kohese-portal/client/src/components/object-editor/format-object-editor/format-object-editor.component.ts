@@ -89,6 +89,25 @@ export class FormatObjectEditorComponent implements OnInit {
       kind: FormatContainerKind.VERTICAL,
       contents: [...this._formatDefinition.header.contents]
     });
+    // Adjust PropertyDefinitions for references that are typed 'string'
+    for (let j: number = 0; j < this._formatDefinition.containers.length;
+      j++) {
+      let formatContainer: FormatContainer = this._formatDefinition.containers[
+        j];
+      for (let k: number = 0; k < formatContainer.contents.length; k++) {
+        let propertyDefinition: PropertyDefinition = formatContainer.contents[
+          k];
+        if ((propertyDefinition.kind === 'string') || (propertyDefinition.kind
+          === 'text')) {
+          let attribute: any = this._selectedType.classProperties[
+            propertyDefinition.propertyName].definition;
+          if (attribute.relation && (attribute.relation.foreignKey ===
+            'username')) {
+            propertyDefinition.kind = 'user-selector';
+          }
+        }
+      }
+    }
     
     for (let attributeName in this._selectedType.classProperties) {
       if (this._object[attributeName] == null) {
@@ -343,7 +362,7 @@ export class FormatObjectEditorComponent implements OnInit {
     let itemId = undefined;
     switch (typeof(this._object[attributeName])) {
       case 'object':
-        itemId = this._object[attributeName].item.id;
+        itemId = this._object[attributeName].id;
         break;
       case 'string':
         itemId = this._object[attributeName];
@@ -364,20 +383,21 @@ export class FormatObjectEditorComponent implements OnInit {
         maySelect: (element: any) => {
           let typeName: string = this._selectedType.classProperties[
             attributeName].definition.type;
+          if (typeName === 'Item') {
+            return true;
+          }
+          
           let elementTypeName: string = (element as ItemProxy).kind;
-          if ((elementTypeName === 'Item') || ((attributeName === 'parentId')
-            && !this._enclosingType)) {
-            if ((attributeName === 'parentId') && !this._enclosingType) {
-              let objectItemProxy: ItemProxy = TreeConfiguration.
-                getWorkingTree().getProxyFor(this._object.id);
-              let itemProxy: ItemProxy = (element as ItemProxy);
-              while (itemProxy) {
-                if (itemProxy === objectItemProxy) {
-                  return false;
-                }
-                
-                itemProxy = itemProxy.parentProxy;
+          if ((attributeName === 'parentId') && !this._enclosingType) {
+            let objectItemProxy: ItemProxy = TreeConfiguration.
+              getWorkingTree().getProxyFor(this._object.id);
+            let itemProxy: ItemProxy = (element as ItemProxy);
+            while (itemProxy) {
+              if (itemProxy === objectItemProxy) {
+                return false;
               }
+              
+              itemProxy = itemProxy.parentProxy;
             }
             
             return true;
@@ -397,7 +417,7 @@ export class FormatObjectEditorComponent implements OnInit {
             }*/
           }
           
-          return false;
+          return true;
         },
         getIcon: (element: any) => {
           return this._itemRepository.getTreeConfig().getValue().config.
@@ -556,26 +576,26 @@ export class FormatObjectEditorComponent implements OnInit {
           maySelect: (element: any) => {
             let typeName: string = this._selectedType.classProperties[
               attributeDefinition.propertyName].definition.type[0];
-            let elementTypeName: string = (element as ItemProxy).kind;
-            if (elementTypeName === 'Item') {
+            if (typeName === 'Item') {
               return true;
-            } else {
-              while (true) {
-                if (elementTypeName === typeName) {
-                  return true;
-                }
-                
-                let itemProxy: ItemProxy = TreeConfiguration.
-                  getWorkingTree().getProxyFor(elementTypeName);
-                if (itemProxy) {
-                  elementTypeName = itemProxy.item.base;
-                } else {
-                  break;
-                }
+            }
+            
+            let elementTypeName: string = (element as ItemProxy).kind;
+            while (true) {
+              if (elementTypeName === typeName) {
+                return true;
+              }
+              
+              let itemProxy: ItemProxy = TreeConfiguration.
+                getWorkingTree().getProxyFor(elementTypeName);
+              if (itemProxy) {
+                elementTypeName = itemProxy.item.base;
+              } else {
+                break;
               }
             }
             
-            return false;
+            return true;
           },
           getIcon: (element: any) => {
             return this._itemRepository.getTreeConfig().getValue().config.

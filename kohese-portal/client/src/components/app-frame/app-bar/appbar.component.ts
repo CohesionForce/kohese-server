@@ -3,7 +3,8 @@ import { Observable ,  Subscription } from 'rxjs';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { CurrentUserService } from '../../../services/user/current-user.service';
-import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates,
+  TreeConfigInfo } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import { NotificationService } from '../../../services/notifications/notification.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -28,19 +29,33 @@ export class AppBarComponent extends NavigatableComponent
   }
   public readonly State: any = RepoStates;
   public syncStatusString: string;
+  
+  private _modifiedItems: Array<any> = [];
+  get modifiedItems() {
+    return this._modifiedItems;
+  }
+  
   public messageCount: number = 0;
   public messages: Array<string> = [];
+  
+  private _treeConfigInfoSubscription: Subscription;
+  private _changeSubscription: Subscription;
+  
+  get itemRepository() {
+    return this._itemRepository;
+  }
 
   constructor(private sessionService: SessionService,
     protected NavigationService: NavigationService,
     private CurrentUserService: CurrentUserService,
     private _notificationService: NotificationService,
-    private itemRepository: ItemRepository) {
+    private _itemRepository: ItemRepository) {
     super(NavigationService);
   }
 
   ngOnInit(): void {
-    this.repositoryStatusSubscription = this.itemRepository.getRepoStatusSubject().subscribe((status: any) => {
+    this.repositoryStatusSubscription = this._itemRepository.
+      getRepoStatusSubject().subscribe((status: any) => {
       switch(status.state) {
         case(RepoStates.DISCONNECTED):
           this._itemRepositoryState = status.state;
@@ -75,9 +90,41 @@ export class AppBarComponent extends NavigatableComponent
       this.messageCount = notifications.totalNotifications;
       this.messages = notifications.message;
     });
+    
+    this._treeConfigInfoSubscription = this._itemRepository.getTreeConfig().
+      subscribe((treeConfigInfo: TreeConfigInfo) => {
+      if (this._changeSubscription) {
+        this._changeSubscription.unsubscribe();
+      }
+      
+      if (treeConfigInfo) {
+        this._changeSubscription = treeConfigInfo.config.getChangeSubject().
+          subscribe((notification: any) => {
+          if (notification.type === 'dirty') {
+            let index: number = this._modifiedItems.indexOf(notification.proxy.
+              item);
+            if (notification.dirty) {
+              if (index === -1) {
+                // Add item to list since it has become dirty
+                this._modifiedItems.push(notification.proxy.item);
+              }
+            } else {
+              if (index !== -1) {
+                // Remove item from the list since it is no longer dirty
+                this._modifiedItems.splice(index, 1);
+              }
+            }
+          }
+        });
+      }
+    });
   }
 
   ngOnDestroy(): void {
+    if (this._changeSubscription) {
+      this._changeSubscription.unsubscribe();
+    }
+    this._treeConfigInfoSubscription.unsubscribe();
     this.userSubscription.unsubscribe();
     this.repositoryStatusSubscription.unsubscribe();
     this.notificationSubscription.unsubscribe();

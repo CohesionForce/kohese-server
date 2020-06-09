@@ -34,7 +34,13 @@
   <div style="height: calc(100% - 44px);">
     <!-- Nav tabs -->
     <mat-tab-group id="details-tabs">
-      <mat-tab id="defaultTab" label="Document">
+      <mat-tab id="defaultTab">
+        <ng-template mat-tab-label>
+          Document
+          <ng-container *ngIf="shouldDocumentTabIndicateModification()">
+            <img src="assets/icons/versioncontrol/dirty.ico"/>
+          </ng-container>
+        </ng-template>
         <ng-template matTabContent>
           <document-view [proxyStream]="proxyStream" [incrementalLoad]="true">
           </document-view>

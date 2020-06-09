@@ -85,8 +85,8 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
   }
   
-  public discardChanges(itemProxy: ItemProxy): void {
-    this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
+  public async discardChanges(itemProxy: ItemProxy): Promise<void> {
+    await this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
     this.changeRef.markForCheck();

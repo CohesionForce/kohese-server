@@ -3,19 +3,13 @@ import { LevelCache } from '../common/src/level-cache';
 
 
 // Paths may be provided via arguments when starting via -kdb=PATH
-var baseRepoPath : string;
+var baseRepoPath = 'kohese-kdb';
 for (var i = 2; i < process.argv.length; i++) {
   var arg = process.argv[i].split('=');
   if((arg[0] === '-kdb') && (arg[1] !== '')) {
     baseRepoPath = arg[1];
     break;
   }
-}
-
-if (!baseRepoPath){
-  console.log('*** KDB repo must be supplied');
-  console.log('usage: node scripts/index-commits.js -kdb=repo-subdir');
-  process.exit(1);
 }
 
 //////////////////////////////////////////////////////////////////////////

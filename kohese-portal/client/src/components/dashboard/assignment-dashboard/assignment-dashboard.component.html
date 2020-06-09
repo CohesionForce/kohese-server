@@ -9,6 +9,9 @@
             <mat-icon class="{{getViewModel(assignment).icon}}">
             </mat-icon>
             {{assignment.item.name}}
+            <ng-container *ngIf="assignment.dirty">
+              <img src="assets/icons/versioncontrol/dirty.ico"/>
+            </ng-container>
           </h3>
           <ng-container *ngIf="(editableSet.indexOf(assignment.item.id) === -1)
             else editableBlock">
