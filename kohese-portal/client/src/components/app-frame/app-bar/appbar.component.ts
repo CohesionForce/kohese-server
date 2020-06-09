@@ -103,10 +103,16 @@ export class AppBarComponent extends NavigatableComponent
           if (notification.type === 'dirty') {
             let index: number = this._modifiedItems.indexOf(notification.proxy.
               item);
-            if (index === -1) {
-              this._modifiedItems.push(notification.proxy.item);
+            if (notification.dirty) {
+              if (index === -1) {
+                // Add item to list since it has become dirty
+                this._modifiedItems.push(notification.proxy.item);
+              }
             } else {
-              this._modifiedItems.splice(index, 1);
+              if (index !== -1) {
+                // Remove item from the list since it is no longer dirty
+                this._modifiedItems.splice(index, 1);
+              }
             }
           }
         });
