@@ -25,6 +25,15 @@
       {
         "type": "node",
         "request": "launch",
+        "name": "Launch MasterTestKDB",
+        "program": "${workspaceFolder}/build/server/server.js",
+        "args": [
+          "-kdb=master-test-kdb"
+        ]
+      },
+      {
+        "type": "node",
+        "request": "launch",
         "name": "Launch Test Load Commits: kohese-kdb",
         "program": "${workspaceFolder}/build/scripts/test-load-commits.js",
         "args": [
