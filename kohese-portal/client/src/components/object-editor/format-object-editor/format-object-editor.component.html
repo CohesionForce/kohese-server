@@ -61,17 +61,38 @@
                       <h3>
                         {{getAttributeRepresentation(attributeDefinition)}}
                       </h3>
+                      <ng-container *ngIf="(((attributeDefinition.kind === '')
+                        || (attributeDefinition.kind === 'proxy-selector')) &&
+                        isLocalTypeAttribute(attributeDefinition.
+                        propertyName))">
+                        <button mat-icon-button matTooltip="Expand all elements"
+                          style="margin-left: auto;" [disabled]="!object[
+                          attributeDefinition.propertyName]?.length"
+                          (click)="expandAllMultivaluedAttributeExpansionPanels(
+                          attributeDefinition.propertyName)">
+                          <mat-icon class="fa fa-chevron-down"></mat-icon>
+                        </button>
+                        <button mat-icon-button matTooltip="Collapse all
+                          elements" [disabled]="!object[attributeDefinition.
+                          propertyName]?.length"
+                          (click)="collapseAllMultivaluedAttributeExpansionPanels(
+                          attributeDefinition.propertyName)">
+                          <mat-icon class="fa fa-chevron-up"></mat-icon>
+                        </button>
+                      </ng-container>
                       <button mat-icon-button matTooltip="Add a value to
                         {{attributeDefinition.propertyName}}"
-                        class="flex-right-align"
                         [disabled]="!attributeDefinition.editable"
-                        (click)="object[attributeDefinition.propertyName].push(
-                        addValue(selectedType.classProperties[
-                        attributeDefinition.propertyName].definition))">
+                        (click)="addValue(selectedType.classProperties[
+                        attributeDefinition.propertyName].definition)"
+                        [ngStyle]="{ 'margin-left': ((((attributeDefinition.kind
+                        === '') || (attributeDefinition.kind ===
+                        'proxy-selector')) && isLocalTypeAttribute(
+                        attributeDefinition.propertyName)) ? '' : 'auto') }">
                         <mat-icon class="fa fa-plus"></mat-icon>
                       </button>
                     </div>
-                    <div style="height: 140px; overflow-y: auto;">
+                    <div style="overflow-y: auto;">
                       <ng-container *ngFor="let value of object[
                         attributeDefinition.propertyName]; let j = index">
                         <div style="display: flex; flex-direction: row;">
@@ -204,7 +225,10 @@
                                   <ng-container *ngIf="isLocalTypeAttribute(
                                     attributeDefinition.propertyName) else
                                     globalTypeAttribute">
-                                    <mat-expansion-panel style="width: 100%;">
+                                    <mat-expansion-panel
+                                      #multivaluedAttributeExpansionPanel
+                                      attr.attributeName="{{attributeDefinition.
+                                      propertyName}}" style="width: 100%;">
                                       <mat-expansion-panel-header>
                                         <mat-panel-title>
                                           {{itemRepository.

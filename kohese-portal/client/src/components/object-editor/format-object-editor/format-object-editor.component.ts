@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  Input, Optional, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  Input, Optional, Inject, ViewChildren, QueryList,
+  ElementRef } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef,
+  MatExpansionPanel } from '@angular/material';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -177,6 +179,13 @@ export class FormatObjectEditorComponent implements OnInit {
   get usernames() {
     return this._usernames;
   }
+  
+  @ViewChildren('multivaluedAttributeExpansionPanel')
+  private _multivaluedAttributeExpansionPanelQueryList:
+    QueryList<MatExpansionPanel>;
+  @ViewChildren('multivaluedAttributeExpansionPanel', { read: ElementRef })
+  private _multivaluedAttributeExpansionPanelElementQueryList:
+    QueryList<ElementRef>;
   
   get itemRepository() {
     return this._itemRepository;
@@ -412,7 +421,7 @@ export class FormatObjectEditorComponent implements OnInit {
     });
   }
   
-  public addValue(attribute: any): any {
+  public addValue(attribute: any): void {
     if (Array.isArray(attribute.type) && this._object[attribute.name] ==
       null) {
       this._object[attribute.name] = [];
@@ -420,7 +429,8 @@ export class FormatObjectEditorComponent implements OnInit {
     
     let defaultValue: any = attribute.default;
     if (defaultValue != null) {
-      return defaultValue;
+      this._object[attribute.name].push(defaultValue);
+      return;
     }
     
     let type: any = (Array.isArray(attribute.type) ? attribute.type[0] :
@@ -428,17 +438,17 @@ export class FormatObjectEditorComponent implements OnInit {
     // 'state-editor' case should be handled by the 'if' above
     switch (type) {
       case 'boolean':
-        return false;
+        this._object[attribute.name].push(false);
       case 'number':
-        return 0;
+        this._object[attribute.name].push(0);
       case 'timestamp':
-        return new Date().getTime();
+        this._object[attribute.name].push(new Date().getTime());
       case 'string':
         if (attribute.relation) {
           // 'username' attribute reference
-          return 'admin';
+          this._object[attribute.name].push('admin');
         } else {
-          return '';
+          this._object[attribute.name].push('');
         }
       default:
         let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
@@ -495,11 +505,11 @@ export class FormatObjectEditorComponent implements OnInit {
             }
           }
           
-          return localTypeInstance;
+          this._object[attribute.name].push(localTypeInstance);
         } else {
-          return {
+          this._object[attribute.name].push({
             id: ''
-          };
+          });
         }
     }
   }
@@ -712,5 +722,33 @@ export class FormatObjectEditorComponent implements OnInit {
     }
     
     return result;
+  }
+  
+  public expandAllMultivaluedAttributeExpansionPanels(attributeName: string):
+    void {
+    let expansionPanels: Array<MatExpansionPanel> = this.
+      _multivaluedAttributeExpansionPanelQueryList.toArray();
+    let expansionPanelElements: Array<ElementRef> = this.
+      _multivaluedAttributeExpansionPanelElementQueryList.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      if (expansionPanelElements[j].nativeElement.getAttribute('attributeName')
+        === attributeName) {
+        expansionPanels[j].open();
+      }
+    }
+  }
+  
+  public collapseAllMultivaluedAttributeExpansionPanels(attributeName: string):
+    void {
+    let expansionPanels: Array<MatExpansionPanel> = this.
+      _multivaluedAttributeExpansionPanelQueryList.toArray();
+    let expansionPanelElements: Array<ElementRef> = this.
+      _multivaluedAttributeExpansionPanelElementQueryList.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      if (expansionPanelElements[j].nativeElement.getAttribute('attributeName')
+        === attributeName) {
+        expansionPanels[j].close();
+      }
+    }
   }
 }
