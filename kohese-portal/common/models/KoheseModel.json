@@ -18,7 +18,7 @@
     },
     "isInternal": {
       "type": "boolean",
-      "default": false
+      "name": "isInternal"
     },
     "idInjection": {
       "type": "boolean",
@@ -65,6 +65,11 @@
       "type": "object",
       "derived": true,
       "name": "classLocalTypes"
+    },
+    "classParentTypes": {
+      "type": [ "string" ],
+      "derived": true,
+      "name": "classParentTypes"
     },
     "classProperties": {
       "type": "object",
