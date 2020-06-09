@@ -129,4 +129,18 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this._navigationService.navigate('Explore', { id: id });
     }
   }
+  
+  public shouldDocumentTabIndicateModification(): boolean {
+    let itemProxyStack: Array<ItemProxy> = [this.itemProxy];
+    while (itemProxyStack.length > 0) {
+      let ip: ItemProxy = itemProxyStack.pop();
+      if (ip.dirty) {
+        return true;
+      }
+      
+      itemProxyStack.push(...ip.children);
+    }
+    
+    return false;
+  }
 }

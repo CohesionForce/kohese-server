@@ -240,11 +240,13 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
           proxy.dirtyFields[path].to = clonedValue;
         }
 
+        let difference: any = proxy.dirtyFields[path];
         // Detect if the value has been reset to its original value
-        if (_.isEqual(proxy.dirtyFields[path].to, proxy.dirtyFields[path].from)) {
+        if (((difference.from == null) && (difference.to == null)) || _.
+          isEqual(difference.to, difference.from)) {
           // TODO: remove next console lines
           // console.log('--> Removing dirty for: ' + path);
-          // console.log(JSON.stringify(proxy.dirtyFields[path], null, '  '));
+          // console.log(JSON.stringify(difference, null, '  '));
           delete proxy.dirtyFields[path];
           if (Object.keys(proxy.dirtyFields).length === 0) {
             delete proxy.dirtyFields;
@@ -2076,6 +2078,14 @@ export class ItemProxy {
     // Copy the withItem into the current proxy
     let modifications = this.copyAttributes(withItem);
     this.clearDirtyFlags();
+    this.treeConfig.changeSubject.next({
+      type: 'dirty',
+      kind: this.kind,
+      id: this._item.id,
+      dirty: false,
+      dirtyFields: {},
+      proxy: this
+    });
 
     // console.log('%%% Modifications');
     // console.log(modifications);
