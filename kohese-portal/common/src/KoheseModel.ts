@@ -235,6 +235,7 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
       modelProxy._item.propertyStorageOrder = propertyStorageOrder.concat(Object.keys(modelProxy._item.properties));
     }
 
+    modelProxy._item.classParentTypes = _.clone(modelProxy.parentProxy._item.classParentTypes) || [];
     modelProxy._item.classLocalTypes = _.clone(modelProxy.parentProxy._item.classLocalTypes) || {};
     modelProxy._item.classProperties = _.clone(modelProxy.parentProxy._item.classProperties) || {};
     modelProxy._item.requiredProperties = _.clone(modelProxy.parentProxy._item.requiredProperties) || [];
@@ -243,6 +244,10 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
     modelProxy._item.stateProperties = _.clone(modelProxy.parentProxy._item.stateProperties) || [];
     modelProxy._item.relationProperties = _.clone(modelProxy.parentProxy._item.relationProperties) || [];
     modelProxy._item.idProperties = _.clone(modelProxy.parentProxy._item.idProperties) || [];
+
+    if (modelProxy.parentProxy instanceof KoheseModel){
+      modelProxy._item.classParentTypes.push(modelProxy.parentProxy._item.name);
+    }
 
     for (let dataType in modelProxy._item.localTypes){
       let localTypeSettings = modelProxy._item.localTypes[dataType];
