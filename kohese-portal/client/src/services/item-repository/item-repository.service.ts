@@ -803,9 +803,9 @@ export class ItemRepository {
       { reportName: reportName }, true);
   }
   
-  public getMarkdownRepresentation(koheseObject: any, dataModel: any,
-    viewModel: any, formatDefinitionType: FormatDefinitionType, headingLevel:
-    number, addLinks: boolean): string {
+  public getMarkdownRepresentation(koheseObject: any, enclosingType: any,
+    dataModel: any, viewModel: any, formatDefinitionType: FormatDefinitionType,
+    headingLevel: number, addLinks: boolean): string {
     let representation: string = '';
     let formatDefinition: FormatDefinition;
 	  let formatDefinitionId: string = viewModel.defaultFormatKey[
@@ -962,8 +962,12 @@ export class ItemRepository {
                   let isLocalTypeAttribute: boolean = (globalTypeNames.indexOf(
                     typeName) === -1);
                   if (isLocalTypeAttribute) {
-                    attributeTypeDataModel = dataModel.localTypes[typeName];
-                    attributeTypeViewModel = viewModel.localTypes[typeName];
+                    attributeTypeDataModel = (enclosingType ? enclosingType :
+                      dataModel).classLocalTypes[typeName].definition;
+                    attributeTypeViewModel = this.currentTreeConfigSubject.
+                      getValue().config.getProxyFor('view-' + (enclosingType ?
+                      enclosingType : dataModel).classLocalTypes[typeName].
+                      definedInKind.toLowerCase()).item.localTypes[typeName];
                     tableDefinition = attributeTypeViewModel.tableDefinitions[
                       propertyDefinition.tableDefinition];
                   } else {
@@ -1005,6 +1009,7 @@ export class ItemRepository {
                             tableDefinition.columns[m]].length; n++) {
                             body += ('<li>' + this.getStringRepresentation(
                               reference, tableDefinition.columns[m], n,
+                              (enclosingType ? enclosingType : dataModel),
                               attributeTypeDataModel, attributeTypeViewModel,
                               formatDefinitionType) + '</li>');
                           }
@@ -1012,6 +1017,7 @@ export class ItemRepository {
                         } else {
                           body += this.getStringRepresentation(reference,
                             tableDefinition.columns[m], undefined,
+                            (enclosingType ? enclosingType : dataModel),
                             attributeTypeDataModel, attributeTypeViewModel,
                             formatDefinitionType);
                         }
@@ -1035,30 +1041,27 @@ export class ItemRepository {
                     (globalTypeNames.indexOf(type) === -1)) {
                     /* The below condition is present to avoid errors caused by
                     attributes typed "object". */
-                    if (dataModel.localTypes[type]) {
+                    let classLocalTypesEntry: any = (enclosingType ?
+                      enclosingType : dataModel).classLocalTypes[type];
+                    if (classLocalTypesEntry) {
                       // Local type attribute
-                      let localTypeDataModelCopy: any = JSON.parse(JSON.
-                        stringify(dataModel.localTypes[type]));
-                      localTypeDataModelCopy.classProperties = {};
-                      for (let attributeName in localTypeDataModelCopy.
-                        properties) {
-                        localTypeDataModelCopy.classProperties[attributeName] =
-                          {
-                          definedInKind: type,
-                          definition: localTypeDataModelCopy.properties[
-                            attributeName]
-                        };
-                      }
-                      let localTypeViewModel: any = viewModel.localTypes[type];
+                      let localTypeDataModel: any = classLocalTypesEntry.
+                        definition;
+                      let localTypeViewModel: any = this.
+                        currentTreeConfigSubject.getValue().config.getProxyFor(
+                        'view-' + classLocalTypesEntry.definedInKind.
+                        toLowerCase()).item.localTypes[type];
                       if (Array.isArray(value)) {
                         body += value.map((v: any) => {
                           return this.getMarkdownRepresentation(v,
-                            localTypeDataModelCopy, localTypeViewModel,
+                            (enclosingType ? enclosingType : dataModel),
+                            localTypeDataModel, localTypeViewModel,
                             formatDefinitionType, -1, addLinks);
                         }).join('\n');
                       } else {
                         body += this.getMarkdownRepresentation(value,
-                          localTypeDataModelCopy, localTypeViewModel,
+                          (enclosingType ? enclosingType : dataModel),
+                          localTypeDataModel, localTypeViewModel,
                           formatDefinitionType, -1, addLinks);
                       }
                     }
@@ -1126,8 +1129,8 @@ export class ItemRepository {
   }
   
   public getStringRepresentation(koheseObject: any, attributeName: string,
-    index: number, dataModel: any, viewModel: any, formatDefinitionType:
-    FormatDefinitionType): string {
+    index: number, enclosingType: any, dataModel: any, viewModel: any,
+    formatDefinitionType: FormatDefinitionType): string {
     let value: any;
     if (index != null) {
       value = koheseObject[attributeName][index];
@@ -1146,13 +1149,17 @@ export class ItemRepository {
     if (representation === String({})) {
       let type: any = dataModel.classProperties[attributeName].definition.type;
       type = (Array.isArray(type) ? type[0] : type);
-      if (dataModel.localTypes && dataModel.localTypes[type]) {
+      let classLocalTypes: any = (enclosingType ? enclosingType : dataModel).
+        classLocalTypes;
+      if (classLocalTypes && classLocalTypes[type]) {
         if (value.name) {
           return value.name;
         } else if (value.id) {
           return value.id;
         } else {
-          viewModel = viewModel.localTypes[type];
+          viewModel = this.currentTreeConfigSubject.getValue().config.
+            getProxyFor('view-' + classLocalTypes[type].definedInKind.
+            toLowerCase()).item.localTypes[type];
           let formatDefinitionId: string = viewModel.defaultFormatKey[
             formatDefinitionType];
           if (!formatDefinitionId) {

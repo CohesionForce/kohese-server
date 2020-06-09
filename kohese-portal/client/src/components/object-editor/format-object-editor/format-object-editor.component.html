@@ -3,7 +3,8 @@
   'calc(100% - 40px)' : '100%' }">
   <ng-container *ngIf="isDisabled else enabled">
     <markdown [data]="itemRepository.getMarkdownRepresentation(object,
-      selectedType, viewModel, formatDefinitionType, 0, false)">
+      (enclosingType ? enclosingType : selectedType), selectedType, viewModel,
+      formatDefinitionType, 0, false)">
     </markdown>
   </ng-container>
   <ng-template #enabled>
@@ -75,7 +76,8 @@
                           <button mat-button
                             matTooltip="{{itemRepository.
                             getStringRepresentation(object,
-                            attributeDefinition.propertyName, j, selectedType,
+                            attributeDefinition.propertyName, j, (enclosingType
+                            ? enclosingType : selectedType), selectedType,
                             viewModel, formatDefinitionType)}}"
                             [disabled]="(!attributeDefinition.editable ||
                             isDisabled)" (click)="editValue(j,
@@ -83,8 +85,9 @@
                             overflow: hidden; text-overflow: ellipsis; width:
                             100%; text-align: left;">
                             {{itemRepository.getStringRepresentation(object,
-                              attributeDefinition.propertyName, j, selectedType,
-                              viewModel, formatDefinitionType)}}
+                              attributeDefinition.propertyName, j,
+                              (enclosingType ? enclosingType : selectedType),
+                              selectedType, viewModel, formatDefinitionType)}}
                           </button>
                           <button mat-icon-button matTooltip="Remove this
                             value" [disabled]="!attributeDefinition.editable"
@@ -235,6 +238,7 @@
                           attributeDefinition, true)">
                           {{itemRepository.getStringRepresentation(object,
                             attributeDefinition.propertyName, undefined,
+                            (enclosingType ? enclosingType : selectedType),
                             selectedType, viewModel, formatDefinitionType)}}
                         </button>
                       </ng-container>

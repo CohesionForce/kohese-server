@@ -144,7 +144,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
       }
       
       if (koheseType.dataModelProxy.item === this._contextualGlobalType) {
-        for (let localTypeName in this._contextualGlobalType.localTypes) {
+        for (let localTypeName in this._contextualGlobalType.classLocalTypes) {
           this._attributeTypes[localTypeName] = localTypeName;
         }
       }
