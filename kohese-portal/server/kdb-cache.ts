@@ -373,7 +373,7 @@ export class KDBCache extends LevelCache {
 
           if(!await this.getBlob(treeHashEntry.oid)){
             console.log('$$$ Mismatch oid for item id: ' + proxy.item.id + '  (oid not found in cache): ' + treeHashEntry.oid);
-            this.cacheBlob(treeHashEntry.oid, proxy.item);
+            this.cacheBlob(treeHashEntry.oid, proxy.cloneItemAndStripDerived());
             kdbFS.storeJSONDoc(this.blobMismatchDirectory + path.sep + treeHashEntry.oid + '.json', proxy.cloneItemAndStripDerived());
           }
         });
