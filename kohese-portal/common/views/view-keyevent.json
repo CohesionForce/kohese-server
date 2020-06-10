@@ -5,7 +5,7 @@
   "createdBy": "gmckune",
   "createdOn": 1566607211956,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1586900905257,
+  "modifiedOn": 1591737865749,
   "modelName": "KeyEvent",
   "icon": "fa fa-key",
   "color": "#000000",
@@ -386,6 +386,21 @@
         "EventInputData",
         "Responses",
         "EventOutputData"
+      ],
+      "expandedFormat": {
+        "column1": [],
+        "column2": [],
+        "column3": [],
+        "column4": []
+      }
+    },
+    "5b7cf180-aa97-11ea-b459-333ae1bfee22": {
+      "id": "5b7cf180-aa97-11ea-b459-333ae1bfee22",
+      "name": "KeyEventTableForUseCases",
+      "columns": [
+        "name",
+        "DetectionMechanism",
+        "Responses"
       ],
       "expandedFormat": {
         "column1": [],

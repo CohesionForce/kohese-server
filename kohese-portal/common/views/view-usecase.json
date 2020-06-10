@@ -5,7 +5,7 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169859,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1588793690702,
+  "modifiedOn": 1591742618536,
   "modelName": "UseCase",
   "icon": "fa fa-lemon-o",
   "color": "#000000",
@@ -126,7 +126,7 @@
                   "kind": "",
                   "visible": true,
                   "editable": true,
-                  "tableDefinition": "b1090aa0-fb86-11e9-be56-311e0135452a"
+                  "tableDefinition": ""
                 },
                 {
                   "propertyName": "Postconditions",
@@ -139,11 +139,70 @@
               ]
             }
           ]
+        },
+        "e23e9430-aaa1-11ea-b364-ab76a773089f": {
+          "id": "e23e9430-aaa1-11ea-b364-ab76a773089f",
+          "name": "DocumentFormatDefinition",
+          "header": {
+            "kind": "header",
+            "contents": []
+          },
+          "containers": [
+            {
+              "kind": "list",
+              "contents": [
+                {
+                  "propertyName": "PathName",
+                  "customLabel": "PathName",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "PathDescription",
+                  "customLabel": "PathDescription",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "tableDefinition": "",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "Preconditions",
+                  "customLabel": "Preconditions",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "tableDefinition": "",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "Flow",
+                  "customLabel": "Flow",
+                  "labelOrientation": "Top",
+                  "kind": "",
+                  "tableDefinition": "5b7cf180-aa97-11ea-b459-333ae1bfee22",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "Postconditions",
+                  "customLabel": "Postconditions",
+                  "labelOrientation": "Top",
+                  "kind": "text",
+                  "tableDefinition": "",
+                  "visible": true,
+                  "editable": true
+                }
+              ]
+            }
+          ]
         }
       },
       "defaultFormatKey": {
         "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
-        "document": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1"
+        "document": "e23e9430-aaa1-11ea-b364-ab76a773089f"
       },
       "tableDefinitions": {}
     }
@@ -395,7 +454,7 @@
       ]
     },
     "89324a90-a7af-11e8-8662-71e48f0160fe": {
-      "name": "New definition",
+      "name": "DocumentDefForUC",
       "header": {
         "kind": "header",
         "contents": [
