@@ -441,15 +441,17 @@ export class FormatObjectEditorComponent implements OnInit {
     });
   }
   
-  public addValue(attribute: any): void {
-    if (Array.isArray(attribute.type) && this._object[attribute.name] ==
+  public addValue(attributeName: string): void {
+    let attribute: any = this._selectedType.classProperties[attributeName].
+      definition;
+    if (Array.isArray(attribute.type) && this._object[attributeName] ==
       null) {
-      this._object[attribute.name] = [];
+      this._object[attributeName] = [];
     }
     
     let defaultValue: any = attribute.default;
     if (defaultValue != null) {
-      this._object[attribute.name].push(defaultValue);
+      this._object[attributeName].push(defaultValue);
       return;
     }
     
@@ -458,21 +460,21 @@ export class FormatObjectEditorComponent implements OnInit {
     // 'state-editor' case should be handled by the 'if' above
     switch (type) {
       case 'boolean':
-        this._object[attribute.name].push(false);
+        this._object[attributeName].push(false);
       case 'number':
-        this._object[attribute.name].push(0);
+        this._object[attributeName].push(0);
       case 'timestamp':
-        this._object[attribute.name].push(new Date().getTime());
+        this._object[attributeName].push(new Date().getTime());
       case 'string':
         if (attribute.relation) {
           // 'username' attribute reference
-          this._object[attribute.name].push('admin');
+          this._object[attributeName].push('admin');
         } else {
-          this._object[attribute.name].push('');
+          this._object[attributeName].push('');
         }
       default:
         let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
-          attribute.name);
+          attributeName);
         if (isLocalTypeAttribute) {
           let classLocalTypesEntry: any = (this._enclosingType ? this.
             _enclosingType : this._selectedType).classLocalTypes[type];
@@ -525,10 +527,66 @@ export class FormatObjectEditorComponent implements OnInit {
             }
           }
           
-          this._object[attribute.name].push(localTypeInstance);
+          this._object[attributeName].push(localTypeInstance);
         } else {
-          this._object[attribute.name].push({
-            id: ''
+          let treeConfiguration: TreeConfiguration = this._itemRepository.
+            getTreeConfig().getValue().config;
+          this._dialogService.openComponentDialog(TreeComponent, {
+            data: {
+              root: treeConfiguration.getRootProxy(),
+              getChildren: (element: any) => {
+                return (element as ItemProxy).children;
+              },
+              getText: (element: any) => {
+                return (element as ItemProxy).item.name;
+              },
+              /*maySelect: (element: any) => {
+                let typeName: string = this._selectedType.classProperties[
+                  attributeName].definition.type[0];
+                if (typeName === 'Item') {
+                  return true;
+                }
+                
+                let elementTypeName: string = (element as ItemProxy).kind;
+                while (true) {
+                  if (elementTypeName === typeName) {
+                    return true;
+                  }
+                  
+                  let itemProxy: ItemProxy = treeConfiguration.getProxyFor(
+                    elementTypeName);
+                  if (itemProxy) {
+                    elementTypeName = itemProxy.item.base;
+                  } else {
+                    break;
+                  }
+                }
+                
+                return true;
+              },*/
+              getIcon: (element: any) => {
+                return treeConfiguration.getProxyFor('view-' +
+                  (element as ItemProxy).kind.toLowerCase()).item.icon;
+              },
+              allowMultiselect: true,
+              showSelections: true,
+              selection: (this._object[attributeName] ? this._object[
+                attributeName].map((reference: any) => {
+                return treeConfiguration.getProxyFor(reference.id);
+              }) : []),
+              quickSelectElements: this._itemRepository.getRecentProxies()
+            }
+          }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+            Array<any>) => {
+            if (selection) {
+              this._object[attributeName].length = 0;
+              this._object[attributeName].push(...selection.map((element:
+                any) => {
+                return { id: (element as ItemProxy).item.id };
+              }));
+              
+              this._changeDetectorRef.markForCheck();
+            }
           });
         }
     }

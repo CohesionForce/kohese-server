@@ -83,8 +83,7 @@
                       <button mat-icon-button matTooltip="Add a value to
                         {{attributeDefinition.propertyName}}"
                         [disabled]="!attributeDefinition.editable"
-                        (click)="addValue(selectedType.classProperties[
-                        attributeDefinition.propertyName].definition)"
+                        (click)="addValue(attributeDefinition.propertyName)"
                         [ngStyle]="{ 'margin-left': ((((attributeDefinition.kind
                         === '') || (attributeDefinition.kind ===
                         'proxy-selector')) && isLocalTypeAttribute(
@@ -281,9 +280,8 @@
                                       [disabled]="!attributeDefinition.
                                       editable" style="margin-left: auto;"
                                       (click)="object[attributeDefinition.
-                                      propertyName] = addValue(selectedType.
-                                      classProperties[attributeDefinition.
-                                      propertyName].definition)">
+                                      propertyName] = addValue(
+                                      attributeDefinition.propertyName)">
                                       <mat-icon class="fa fa-plus"></mat-icon>
                                     </button>
                                   </ng-container>
