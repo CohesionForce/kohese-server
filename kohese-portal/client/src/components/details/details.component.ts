@@ -31,6 +31,11 @@ export class DetailsComponent implements OnInit, OnDestroy {
   set itemProxy(itemProxy: ItemProxy) {
     this._itemProxy = itemProxy;
     this._itemRepository.getHistoryFor(this.itemProxy);
+
+    if (this._itemProxy) {
+      this._itemRepository.registerRecentProxy(this._itemProxy);
+    }
+
     this.proxyStream.next(this._itemProxy);
   }
   
@@ -75,9 +80,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
         if (this._itemProxy) {
           this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.
             id);
-          if (this._itemProxy) {
-            this._itemRepository.registerRecentProxy(this._itemProxy);
-          }
         }
         
         this._changeDetectorRef.markForCheck();

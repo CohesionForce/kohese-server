@@ -164,7 +164,6 @@ implements OnInit, OnDestroy {
         this.proxyStreamSubscription = this.proxyStream.subscribe((newProxy) => {
           if (newProxy) {
             this.itemProxy = newProxy;
-            this.itemRepository.registerRecentProxy(newProxy);
             this.itemsLoaded = 0;
             // TODO - Determine if there is a way to cache and diff the new doc before
             // regenerating
