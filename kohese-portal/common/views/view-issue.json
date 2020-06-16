@@ -258,7 +258,7 @@
               "customLabel": "analysisAction",
               "labelOrientation": "Top",
               "visible": true,
-              "kind": "text",
+              "kind": "",
               "editable": true
             },
             {

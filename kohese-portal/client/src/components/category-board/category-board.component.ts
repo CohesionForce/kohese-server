@@ -83,6 +83,10 @@ export class CategoryBoardComponent {
     return this._changeDetectorRef;
   }
   
+  get itemRepository() {
+    return this._itemRepository;
+  }
+  
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }

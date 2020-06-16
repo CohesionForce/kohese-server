@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  Input, Optional, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  Input, Optional, Inject, ViewChildren, QueryList,
+  ElementRef } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef,
+  MatExpansionPanel } from '@angular/material';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -67,8 +69,8 @@ export class FormatObjectEditorComponent implements OnInit {
     
     if (this._enclosingType) {
       this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor(
-        'view-' + this._enclosingType.name.toLowerCase()).item.localTypes[this.
-        _selectedType.name];
+        'view-' + this._enclosingType.classLocalTypes[this._selectedType.name].
+        definedInKind.toLowerCase()).item.localTypes[this._selectedType.name];
     } else {
       this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
         this._selectedType.name.toLowerCase()).item;
@@ -87,6 +89,25 @@ export class FormatObjectEditorComponent implements OnInit {
       kind: FormatContainerKind.VERTICAL,
       contents: [...this._formatDefinition.header.contents]
     });
+    // Adjust PropertyDefinitions for references that are typed 'string'
+    for (let j: number = 0; j < this._formatDefinition.containers.length;
+      j++) {
+      let formatContainer: FormatContainer = this._formatDefinition.containers[
+        j];
+      for (let k: number = 0; k < formatContainer.contents.length; k++) {
+        let propertyDefinition: PropertyDefinition = formatContainer.contents[
+          k];
+        if ((propertyDefinition.kind === 'string') || (propertyDefinition.kind
+          === 'text')) {
+          let attribute: any = this._selectedType.classProperties[
+            propertyDefinition.propertyName].definition;
+          if (attribute.relation && (attribute.relation.foreignKey ===
+            'username')) {
+            propertyDefinition.kind = 'user-selector';
+          }
+        }
+      }
+    }
     
     for (let attributeName in this._selectedType.classProperties) {
       if (this._object[attributeName] == null) {
@@ -177,6 +198,13 @@ export class FormatObjectEditorComponent implements OnInit {
   get usernames() {
     return this._usernames;
   }
+  
+  @ViewChildren('multivaluedAttributeExpansionPanel')
+  private _multivaluedAttributeExpansionPanelQueryList:
+    QueryList<MatExpansionPanel>;
+  @ViewChildren('multivaluedAttributeExpansionPanel', { read: ElementRef })
+  private _multivaluedAttributeExpansionPanelElementQueryList:
+    QueryList<ElementRef>;
   
   get itemRepository() {
     return this._itemRepository;
@@ -272,44 +300,52 @@ export class FormatObjectEditorComponent implements OnInit {
           return '';
         }
         
-	      let type: any = this._selectedType.classProperties[attributeName].
-	        definition.type;
-	      type = (Array.isArray(type) ? type[0] : type);
-	      let treeConfiguration: TreeConfiguration = this._itemRepository.
-	        getTreeConfig().getValue().config;
-	      let dataModel: any = this._selectedType.localTypes[type];
-	      let viewModel: any;
-	      if (dataModel) {
-	        viewModel = this._viewModel.localTypes[type];
-	      } else {
-	        dataModel = treeConfiguration.getProxyFor(type).item;
-	        viewModel = treeConfiguration.getProxyFor('view-' + type.
-	          toLowerCase()).item;
-	      }
-	      if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
-	        return row[columnId].map((value: any, index: number) => {
-	          // Bullet-ize string representations
-	          return '\u2022 ' + this._itemRepository.getStringRepresentation(
-	            row, columnId, index, dataModel, viewModel, this.
-	            _formatDefinitionType);
-	        }).join('\n');
-	      } else {
-	        return this._itemRepository.getStringRepresentation(row, columnId,
-	          undefined, dataModel, viewModel, this._formatDefinitionType);
-	      }
-	    }
-	    
+        let type: any = this._selectedType.classProperties[attributeName].
+          definition.type;
+        type = (Array.isArray(type) ? type[0] : type);
+        let treeConfiguration: TreeConfiguration = this._itemRepository.
+          getTreeConfig().getValue().config;
+        let dataModel: any;
+        let viewModel: any;
+        let classLocalTypesEntry: any = (this._enclosingType ? this.
+          _enclosingType : this._selectedType).classLocalTypes[type];
+        if (classLocalTypesEntry) {
+          dataModel = classLocalTypesEntry.definition;
+          viewModel = this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + classLocalTypesEntry.definedInKind.
+            toLowerCase()).item.localTypes[type];
+        } else {
+          dataModel = treeConfiguration.getProxyFor(type).item;
+          viewModel = treeConfiguration.getProxyFor('view-' + type.
+            toLowerCase()).item;
+        }
+        if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
+          return row[columnId].map((value: any, index: number) => {
+            // Bullet-ize string representations
+            return '\u2022 ' + this._itemRepository.getStringRepresentation(
+              row, columnId, index, (this._enclosingType ? this.
+              _enclosingType : this._selectedType), dataModel, viewModel, this.
+              _formatDefinitionType);
+          }).join('\n');
+        } else {
+          return this._itemRepository.getStringRepresentation(row, columnId,
+            undefined, (this._enclosingType ? this._enclosingType : this.
+            _selectedType), dataModel, viewModel, this._formatDefinitionType);
+        }
+      }
+      
       return String(row[columnId]);
     };
   }
   
   public isLocalTypeAttribute(attributeName: string): boolean {
+    let type: any = (this._enclosingType ? this._enclosingType : this.
+      _selectedType);
     let attribute: any = this._selectedType.classProperties[attributeName].
       definition;
     let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
       0] : attribute.type);
-    return (this._selectedType.localTypes && this._selectedType.localTypes[
-      typeName]);
+    return (type.classLocalTypes && type.classLocalTypes[typeName]);
   }
   
   private getLocalType(attributeName: string): any {
@@ -317,55 +353,16 @@ export class FormatObjectEditorComponent implements OnInit {
       definition;
     let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
       0] : attribute.type);
-    let localTypeCopy: any = JSON.parse(JSON.stringify(this._selectedType.
-      localTypes[typeName]));
-    localTypeCopy.classProperties = {};
-    for (let attributeName in localTypeCopy.properties) {
-      localTypeCopy.classProperties[attributeName] = {
-        definedInKind: typeName,
-        definition: localTypeCopy.properties[attributeName]
-      };
-    }
-    
-    return localTypeCopy;
-  }
-  
-  public openObjectEditor(propertyDefinition: PropertyDefinition,
-    useExistingValue: boolean): void {
-    let value: any = this._object[propertyDefinition.propertyName];
-    let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
-      propertyDefinition.propertyName);
-    this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
-      data: {
-        object: (useExistingValue ? (isLocalTypeAttribute ? value : (value ?
-          this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
-          value.id).item : value)) : undefined),
-        enclosingType: (isLocalTypeAttribute ? this._selectedType : undefined),
-        formatDefinitionType: this._formatDefinitionType,
-        disabled: (!propertyDefinition.editable || this._isDisabled ||
-          !isLocalTypeAttribute),
-        type: (isLocalTypeAttribute ? this.getLocalType(propertyDefinition.
-          propertyName) : this._itemRepository.getTreeConfig().getValue().
-          config.getProxyFor(propertyDefinition.propertyName).item)
-      }
-    }).updateSize('90%', '90%').afterClosed().subscribe((result: any) => {
-      if (result) {
-        if (isLocalTypeAttribute) {
-          this._object[propertyDefinition.propertyName] = result.object;
-        } else {
-          this._itemRepository.upsertItem(result.type.name, result.object);
-        }
-        
-        this._changeDetectorRef.markForCheck();
-      }
-    });
+    let type: any = (this._enclosingType ? this._enclosingType : this.
+      _selectedType);
+    return type.classLocalTypes[typeName].definition;
   }
   
   public openObjectSelector(attributeName: string): void {
     let itemId = undefined;
     switch (typeof(this._object[attributeName])) {
       case 'object':
-        itemId = this._object[attributeName].item.id;
+        itemId = this._object[attributeName].id;
         break;
       case 'string':
         itemId = this._object[attributeName];
@@ -386,20 +383,21 @@ export class FormatObjectEditorComponent implements OnInit {
         maySelect: (element: any) => {
           let typeName: string = this._selectedType.classProperties[
             attributeName].definition.type;
+          if (typeName === 'Item') {
+            return true;
+          }
+          
           let elementTypeName: string = (element as ItemProxy).kind;
-          if ((elementTypeName === 'Item') || ((attributeName === 'parentId')
-            && !this._enclosingType)) {
-            if ((attributeName === 'parentId') && !this._enclosingType) {
-              let objectItemProxy: ItemProxy = TreeConfiguration.
-                getWorkingTree().getProxyFor(this._object.id);
-              let itemProxy: ItemProxy = (element as ItemProxy);
-              while (itemProxy) {
-                if (itemProxy === objectItemProxy) {
-                  return false;
-                }
-                
-                itemProxy = itemProxy.parentProxy;
+          if ((attributeName === 'parentId') && !this._enclosingType) {
+            let objectItemProxy: ItemProxy = TreeConfiguration.
+              getWorkingTree().getProxyFor(this._object.id);
+            let itemProxy: ItemProxy = (element as ItemProxy);
+            while (itemProxy) {
+              if (itemProxy === objectItemProxy) {
+                return false;
               }
+              
+              itemProxy = itemProxy.parentProxy;
             }
             
             return true;
@@ -419,7 +417,7 @@ export class FormatObjectEditorComponent implements OnInit {
             }*/
           }
           
-          return false;
+          return true;
         },
         getIcon: (element: any) => {
           return this._itemRepository.getTreeConfig().getValue().config.
@@ -443,155 +441,99 @@ export class FormatObjectEditorComponent implements OnInit {
     });
   }
   
-  public addValue(attributeDefinition: PropertyDefinition): void {
-    if (this._object[attributeDefinition.propertyName] == null) {
-      this._object[attributeDefinition.propertyName] = [];
+  public addValue(attributeName: string): void {
+    let attribute: any = this._selectedType.classProperties[attributeName].
+      definition;
+    if (Array.isArray(attribute.type) && this._object[attributeName] ==
+      null) {
+      this._object[attributeName] = [];
     }
-
-    this.editValue(this._object[attributeDefinition.propertyName].length,
-      attributeDefinition);
-  }
-  
-  public async editValue(index: number, attributeDefinition:
-    PropertyDefinition): Promise<void> {
-    let attributeName: string = attributeDefinition.propertyName;
-    const DIALOG_TITLE: string = 'Specify Value';
-    let value: any = this._object[attributeName][index];
-    let type: any = this._selectedType.classProperties[attributeDefinition.
-      propertyName].definition.type;
-    type = (Array.isArray(type) ? type[0] : type);
+    
+    let defaultValue: any = attribute.default;
+    if (defaultValue != null) {
+      this._object[attributeName].push(defaultValue);
+      return;
+    }
+    
+    let type: any = (Array.isArray(attribute.type) ? attribute.type[0] :
+      attribute.type);
+    // 'state-editor' case should be handled by the 'if' above
     switch (type) {
       case 'boolean':
-        if (value == null) {
-          value = false;
-        }
-        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE, '',
-          attributeName, value, undefined, [true, false]);
-        if (value != null) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
+        this._object[attributeName].push(false);
       case 'number':
-        if (value == null) {
-          value = 0;
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.NUMBER, attributeName, value, undefined);
-        if (value != null) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'date':
-        if (value == null) {
-          value = new Date().getTime();
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.DATE, attributeName, value, undefined);
-        if (value != null) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
+        this._object[attributeName].push(0);
+      case 'timestamp':
+        this._object[attributeName].push(new Date().getTime());
       case 'string':
-        if (value == null) {
-          value = '';
+        if (attribute.relation) {
+          // 'username' attribute reference
+          this._object[attributeName].push('admin');
+        } else {
+          this._object[attributeName].push('');
         }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.STRING, attributeName, value, undefined);
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'text':
-        if (value == null) {
-          value = '';
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.STRING, attributeName, value, undefined);
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'maskedString':
-        if (value == null) {
-          value = '';
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.MASKED_STRING, attributeName, value, undefined);
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'markdown':
-        if (value == null) {
-          value = '';
-        }
-        
-        value = await this._dialogService.openInputDialog(DIALOG_TITLE, '',
-          InputDialogKind.MARKDOWN, attributeName, value, undefined);
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'state-editor':
-        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE,
-          attributeName + ': ' + this._object[attributeName], 'Target', value,
-          undefined, this.getStateTransitionCandidates(attributeDefinition).
-          map((transitionCandidateName: string) => {
-          return this._selectedType.classProperties[attributeName].definition.
-            properties.transition[transitionCandidateName].target;
-        }));
-        if (value) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
-      case 'user-selector':
-        if (value == null) {
-          value = 'admin';
-        }
-        
-        value = await this._dialogService.openDropdownDialog(DIALOG_TITLE, '',
-          attributeName, value, undefined, this._usernames);
-        if (value != null) {
-          this._object[attributeName].splice(index, 1, value);
-          this._changeDetectorRef.markForCheck();
-        }
-        break;
       default:
         let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
           attributeName);
         if (isLocalTypeAttribute) {
-          this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
-            data: {
-              object: value,
-              enclosingType: this._selectedType,
-              formatDefinitionType: this._formatDefinitionType,
-              disabled: (!attributeDefinition.editable || this._isDisabled),
-              type: this.getLocalType(attributeDefinition.propertyName)
+          let classLocalTypesEntry: any = (this._enclosingType ? this.
+            _enclosingType : this._selectedType).classLocalTypes[type];
+          let localTypeDataModel: any = classLocalTypesEntry.definition;
+          let localTypeViewModel: any = this._itemRepository.getTreeConfig().
+            getValue().config.getProxyFor('view-' + classLocalTypesEntry.
+            definedInKind.toLowerCase()).item.localTypes[type];
+          let localTypeDefaultFormatDefinition: FormatDefinition =
+            localTypeViewModel.formatDefinitions[localTypeViewModel.
+            defaultFormatKey[FormatDefinitionType.DEFAULT]];
+          let localTypeInstance: any = {};
+          for (let attributeName in localTypeDataModel.classProperties) {
+            let localTypeAttribute: any = localTypeDataModel.classProperties[
+              attributeName].definition;
+            let localTypeAttributeTypeName: string = (Array.isArray(
+              localTypeAttribute.type) ? localTypeAttribute.type[0] :
+              localTypeAttribute.type);
+            if (!(this._enclosingType ? this._enclosingType : this.
+              _selectedType).classLocalTypes[localTypeAttributeTypeName]) {
+              localTypeInstance[attributeName] = localTypeAttribute.default;
+              if (localTypeInstance[attributeName] == null) {
+                if (Array.isArray(localTypeAttribute.type)) {
+                  localTypeInstance[attributeName] = [];
+                } else {
+                  // 'state-editor' by the attribute's default value
+                  switch (localTypeAttributeTypeName) {
+                    case 'boolean':
+                      localTypeInstance[attributeName] = false;
+                    case 'number':
+                      localTypeInstance[attributeName] = 0;
+                    case 'timestamp':
+                      localTypeInstance[attributeName] = new Date().getTime();
+                    case 'string':
+                      if (localTypeAttribute.relation) {
+                        // 'username' attribute reference
+                        localTypeAttribute[attributeName] = 'admin';
+                      } else {
+                        localTypeAttribute[attributeName] = '';
+                      }
+                      break;
+                    default:
+                      if (!localTypeAttribute.relation.contained) {
+                        localTypeAttribute[attributeName] = {
+                          id: ''
+                        };
+                      }
+                  }
+                }
+              }
             }
-          }).updateSize('90%', '90%').afterClosed().subscribe((result:
-            any) => {
-            if (result) {
-              this._object[attributeName].splice(index, 1, result.object);
-              this._changeDetectorRef.markForCheck();
-            }
-          });
+          }
+          
+          this._object[attributeName].push(localTypeInstance);
         } else {
+          let treeConfiguration: TreeConfiguration = this._itemRepository.
+            getTreeConfig().getValue().config;
           this._dialogService.openComponentDialog(TreeComponent, {
             data: {
-              root: TreeConfiguration.getWorkingTree().getRootProxy(),
+              root: treeConfiguration.getRootProxy(),
               getChildren: (element: any) => {
                 return (element as ItemProxy).children;
               },
@@ -601,38 +543,36 @@ export class FormatObjectEditorComponent implements OnInit {
               /*maySelect: (element: any) => {
                 let typeName: string = this._selectedType.classProperties[
                   attributeName].definition.type[0];
-                let elementTypeName: string = (element as ItemProxy).kind;
-                if (elementTypeName === 'Item') {
+                if (typeName === 'Item') {
                   return true;
-                } else {
-                  while (true) {
-                    if (elementTypeName === typeName) {
-                      return true;
-                    }
-                    
-                    let itemProxy: ItemProxy = TreeConfiguration.
-                      getWorkingTree().getProxyFor(elementTypeName);
-                    if (itemProxy) {
-                      elementTypeName = itemProxy.item.base;
-                    } else {
-                      break;
-                    }
+                }
+                
+                let elementTypeName: string = (element as ItemProxy).kind;
+                while (true) {
+                  if (elementTypeName === typeName) {
+                    return true;
+                  }
+                  
+                  let itemProxy: ItemProxy = treeConfiguration.getProxyFor(
+                    elementTypeName);
+                  if (itemProxy) {
+                    elementTypeName = itemProxy.item.base;
+                  } else {
+                    break;
                   }
                 }
                 
-                return false;
+                return true;
               },*/
               getIcon: (element: any) => {
-                return this._itemRepository.getTreeConfig().getValue().config.
-                  getProxyFor('view-' + (element as ItemProxy).kind.
-                  toLowerCase()).item.icon;
+                return treeConfiguration.getProxyFor('view-' +
+                  (element as ItemProxy).kind.toLowerCase()).item.icon;
               },
               allowMultiselect: true,
               showSelections: true,
               selection: (this._object[attributeName] ? this._object[
                 attributeName].map((reference: any) => {
-                return TreeConfiguration.getWorkingTree().getProxyFor(
-                  reference.id);
+                return treeConfiguration.getProxyFor(reference.id);
               }) : []),
               quickSelectElements: this._itemRepository.getRecentProxies()
             }
@@ -650,10 +590,6 @@ export class FormatObjectEditorComponent implements OnInit {
           });
         }
     }
-  }
-  
-  public removeValue(index: number, attributeName: string): void {
-    this._object[attributeName].splice(index, 1);
   }
   
   public getTableElements(attributeDefinition: PropertyDefinition):
@@ -698,26 +634,26 @@ export class FormatObjectEditorComponent implements OnInit {
           maySelect: (element: any) => {
             let typeName: string = this._selectedType.classProperties[
               attributeDefinition.propertyName].definition.type[0];
-            let elementTypeName: string = (element as ItemProxy).kind;
-            if (elementTypeName === 'Item') {
+            if (typeName === 'Item') {
               return true;
-            } else {
-              while (true) {
-                if (elementTypeName === typeName) {
-                  return true;
-                }
-                
-                let itemProxy: ItemProxy = TreeConfiguration.
-                  getWorkingTree().getProxyFor(elementTypeName);
-                if (itemProxy) {
-                  elementTypeName = itemProxy.item.base;
-                } else {
-                  break;
-                }
+            }
+            
+            let elementTypeName: string = (element as ItemProxy).kind;
+            while (true) {
+              if (elementTypeName === typeName) {
+                return true;
+              }
+              
+              let itemProxy: ItemProxy = TreeConfiguration.
+                getWorkingTree().getProxyFor(elementTypeName);
+              if (itemProxy) {
+                elementTypeName = itemProxy.item.base;
+              } else {
+                break;
               }
             }
             
-            return false;
+            return true;
           },
           getIcon: (element: any) => {
             return this._itemRepository.getTreeConfig().getValue().config.
@@ -864,5 +800,33 @@ export class FormatObjectEditorComponent implements OnInit {
     }
     
     return result;
+  }
+  
+  public expandAllMultivaluedAttributeExpansionPanels(attributeName: string):
+    void {
+    let expansionPanels: Array<MatExpansionPanel> = this.
+      _multivaluedAttributeExpansionPanelQueryList.toArray();
+    let expansionPanelElements: Array<ElementRef> = this.
+      _multivaluedAttributeExpansionPanelElementQueryList.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      if (expansionPanelElements[j].nativeElement.getAttribute('attributeName')
+        === attributeName) {
+        expansionPanels[j].open();
+      }
+    }
+  }
+  
+  public collapseAllMultivaluedAttributeExpansionPanels(attributeName: string):
+    void {
+    let expansionPanels: Array<MatExpansionPanel> = this.
+      _multivaluedAttributeExpansionPanelQueryList.toArray();
+    let expansionPanelElements: Array<ElementRef> = this.
+      _multivaluedAttributeExpansionPanelElementQueryList.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      if (expansionPanelElements[j].nativeElement.getAttribute('attributeName')
+        === attributeName) {
+        expansionPanels[j].close();
+      }
+    }
   }
 }
