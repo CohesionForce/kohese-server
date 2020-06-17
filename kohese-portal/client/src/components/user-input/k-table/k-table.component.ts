@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { ItemProxy } from './../../../../../common/src/item-proxy';
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { TableDefinition } from '../../type-editor/TableDefinition.interface';
+import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { TreeConfiguration } from './../../../../../common/src/tree-configuration';
 import { ProxyTableComponent } from '../k-proxy-selector/proxy-table/proxy-table.component';
 

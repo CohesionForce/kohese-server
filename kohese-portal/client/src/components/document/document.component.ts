@@ -12,7 +12,7 @@ import { TreeComponent, Action, ToggleAction } from '../tree/tree.component';
 import { CopyComponent, CopySpecifications } from '../copy/copy.component';
 import { TextEditorComponent } from '../text-editor/text-editor.component';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
-import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { AttributeInsertionComponent, AttributeInsertionSpecification,
   InsertionLocation,
   HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';

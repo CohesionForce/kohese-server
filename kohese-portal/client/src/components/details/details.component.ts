@@ -8,7 +8,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
-import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 

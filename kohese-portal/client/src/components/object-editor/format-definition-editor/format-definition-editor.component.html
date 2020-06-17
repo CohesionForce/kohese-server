@@ -36,9 +36,9 @@
           [(ngModel)]="formatDefinition.header.contents[0].kind"
           [compareWith]="areUserInterfaceTypeValuesEqual">
           <ng-container *ngFor="let userInterfaceType of getUserInterfaceTypes(
-            formatDefinition.header.contents[0].propertyName)">
+            formatDefinition.header.contents[0])">
             <mat-option [value]="getUserInterfaceTypeValue(formatDefinition.
-              header.contents[0].propertyName, userInterfaceType)">
+              header.contents[0], userInterfaceType)">
               {{userInterfaceType}}
             </mat-option>
           </ng-container>
@@ -260,11 +260,9 @@
                           [(ngModel)]="propertyDefinition.kind"
                           [compareWith]="areUserInterfaceTypeValuesEqual">
                           <ng-container *ngFor="let userInterfaceType of
-                            getUserInterfaceTypes(propertyDefinition.
-                            propertyName)">
+                            getUserInterfaceTypes(propertyDefinition)">
                             <mat-option [value]="getUserInterfaceTypeValue(
-                              propertyDefinition.propertyName,
-                              userInterfaceType)">
+                              propertyDefinition, userInterfaceType)">
                               {{userInterfaceType}}
                             </mat-option>
                           </ng-container>

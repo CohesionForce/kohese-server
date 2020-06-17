@@ -10,7 +10,7 @@ import {
 } from './../../../../../../common/src/item-proxy';
 import {
   PropertyDefinition
-} from './../../../type-editor/PropertyDefinition.interface';
+} from '../../../../../../common/src/PropertyDefinition.interface';
 import { TreeComponent } from '../../../tree/tree.component';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 import {

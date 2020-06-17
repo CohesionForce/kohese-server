@@ -6,9 +6,9 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { FormatDefinition,
-  FormatDefinitionType } from './FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
-  FormatContainerKind } from './FormatContainer.interface';
+  FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
 import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';

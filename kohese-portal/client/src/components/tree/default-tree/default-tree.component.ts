@@ -11,7 +11,7 @@ import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-typ
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { FormatDefinition,
-  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';

@@ -7,14 +7,16 @@ import { MAT_DIALOG_DATA, MatDialogRef,
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatDefinition,
-  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
-  FormatContainerKind } from '../../type-editor/FormatContainer.interface';
-import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
+  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 import { TreeComponent } from '../../tree/tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { TypeKind } from '../../../../../common/src/Type.interface';
+import { EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 
 @Component({
   selector: 'format-object-editor',
@@ -461,10 +463,13 @@ export class FormatObjectEditorComponent implements OnInit {
     switch (type) {
       case 'boolean':
         this._object[attributeName].push(false);
+        break;
       case 'number':
         this._object[attributeName].push(0);
+        break;
       case 'timestamp':
         this._object[attributeName].push(new Date().getTime());
+        break;
       case 'string':
         if (attribute.relation) {
           // 'username' attribute reference
@@ -472,6 +477,7 @@ export class FormatObjectEditorComponent implements OnInit {
         } else {
           this._object[attributeName].push('');
         }
+        break;
       default:
         let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
           attributeName);
@@ -479,12 +485,11 @@ export class FormatObjectEditorComponent implements OnInit {
           let classLocalTypesEntry: any = (this._enclosingType ? this.
             _enclosingType : this._selectedType).classLocalTypes[type];
           let localTypeDataModel: any = classLocalTypesEntry.definition;
-          let localTypeViewModel: any = this._itemRepository.getTreeConfig().
-            getValue().config.getProxyFor('view-' + classLocalTypesEntry.
-            definedInKind.toLowerCase()).item.localTypes[type];
-          let localTypeDefaultFormatDefinition: FormatDefinition =
-            localTypeViewModel.formatDefinitions[localTypeViewModel.
-            defaultFormatKey[FormatDefinitionType.DEFAULT]];
+          if (localTypeDataModel.typeKind === TypeKind.ENUMERATION) {
+            this._object[attributeName].push(null);
+            return;
+          }
+
           let localTypeInstance: any = {};
           for (let attributeName in localTypeDataModel.classProperties) {
             let localTypeAttribute: any = localTypeDataModel.classProperties[
@@ -492,10 +497,18 @@ export class FormatObjectEditorComponent implements OnInit {
             let localTypeAttributeTypeName: string = (Array.isArray(
               localTypeAttribute.type) ? localTypeAttribute.type[0] :
               localTypeAttribute.type);
-            if (!(this._enclosingType ? this._enclosingType : this.
-              _selectedType).classLocalTypes[localTypeAttributeTypeName]) {
-              localTypeInstance[attributeName] = localTypeAttribute.default;
-              if (localTypeInstance[attributeName] == null) {
+            localTypeInstance[attributeName] = localTypeAttribute.default;
+            if (localTypeInstance[attributeName] == null) {
+              let classLocalTypesEntry:
+                { definedInKind: string, definition: any } = (this.
+                _enclosingType ? this._enclosingType : this._selectedType).
+                classLocalTypes[localTypeAttributeTypeName];
+              if (classLocalTypesEntry) {
+                if (classLocalTypesEntry.definition.typeKind === TypeKind.
+                  ENUMERATION) {
+                  localTypeInstance[attributeName] = null;
+                }
+              } else {
                 if (Array.isArray(localTypeAttribute.type)) {
                   localTypeInstance[attributeName] = [];
                 } else {
@@ -503,24 +516,25 @@ export class FormatObjectEditorComponent implements OnInit {
                   switch (localTypeAttributeTypeName) {
                     case 'boolean':
                       localTypeInstance[attributeName] = false;
+                      break;
                     case 'number':
                       localTypeInstance[attributeName] = 0;
+                      break;
                     case 'timestamp':
                       localTypeInstance[attributeName] = new Date().getTime();
+                      break;
                     case 'string':
                       if (localTypeAttribute.relation) {
                         // 'username' attribute reference
-                        localTypeAttribute[attributeName] = 'admin';
+                        localTypeInstance[attributeName] = 'admin';
                       } else {
-                        localTypeAttribute[attributeName] = '';
+                        localTypeInstance[attributeName] = '';
                       }
                       break;
                     default:
-                      if (!localTypeAttribute.relation.contained) {
-                        localTypeAttribute[attributeName] = {
-                          id: ''
-                        };
-                      }
+                      localTypeInstance[attributeName] = {
+                        id: ''
+                      };
                   }
                 }
               }
@@ -743,6 +757,11 @@ export class FormatObjectEditorComponent implements OnInit {
     };
   }
   
+  public getMultivaluedAttributeValueIdentifier(index: number, element: any):
+    string {
+    return index.toString();
+  }
+  
   public getAttributeRepresentation(attributeDefinition: PropertyDefinition):
     string {
     // Only customLabel should be used in the first part of the statement below
@@ -828,5 +847,36 @@ export class FormatObjectEditorComponent implements OnInit {
         expansionPanels[j].close();
       }
     }
+  }
+  
+  public isEnumerationAttribute(propertyDefinition: PropertyDefinition):
+    boolean {
+    let type: any = this._selectedType.classProperties[propertyDefinition.
+      propertyName].definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    return ((this._enclosingType ? this._enclosingType : this._selectedType).
+      classLocalTypes[type].definition.typeKind === TypeKind.ENUMERATION);
+  }
+  
+  public getOptions(attributeName: string): Array<string> {
+    let type: any = this._selectedType.classProperties[attributeName].
+      definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    return (this._enclosingType ? this._enclosingType : this._selectedType).
+      classLocalTypes[type].definition.values;
+  }
+
+  public getEnumerationValueRepresentation(propertyDefinition:
+    PropertyDefinition, enumerationValue: EnumerationValue): string {
+    let type: any = this._selectedType.classProperties[propertyDefinition.
+      propertyName].definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    let classLocalTypesEntry: { definedInKind: string, definition: any } =
+      (this._enclosingType ? this._enclosingType : this._selectedType).
+      classLocalTypes[type];
+    return this._itemRepository.getTreeConfig().getValue().config.
+      getProxyFor('view-' + classLocalTypesEntry.definedInKind.toLowerCase()).
+      item.localTypes[type].values[classLocalTypesEntry.definition.values.
+      indexOf(enumerationValue)];
   }
 }

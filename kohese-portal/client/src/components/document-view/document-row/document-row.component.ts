@@ -30,7 +30,7 @@ import {
 } from 'commonmark';
 import * as commonmark from 'commonmark';
 
-import { FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 
 @Component({
   selector: 'document-row',

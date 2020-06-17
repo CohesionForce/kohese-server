@@ -1,6 +1,6 @@
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { Component, OnInit, Optional, Inject, ElementRef } from '@angular/core';
-import { FormatDefinition } from '../../FormatDefinition.interface';
+import { FormatDefinition } from '../../../../../../common/src/FormatDefinition.interface';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 
 let textDefault = 'Example Text'

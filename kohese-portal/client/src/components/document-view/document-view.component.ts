@@ -10,7 +10,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 
 import * as commonmark from 'commonmark';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';

@@ -11,11 +11,11 @@ import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
 import { FormatDefinition,
-  FormatDefinitionType } from '../../components/type-editor/FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
-  FormatContainerKind } from '../../components/type-editor/FormatContainer.interface';
-import { PropertyDefinition } from '../../components/type-editor/PropertyDefinition.interface';
-import { TableDefinition } from '../../components/type-editor/TableDefinition.interface';
+  FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
+import { PropertyDefinition } from '../../../../common/src/PropertyDefinition.interface';
+import { TableDefinition } from '../../../../common/src/TableDefinition.interface';
 import { LocationMap } from '../../constants/LocationMap.data';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
@@ -27,6 +27,8 @@ import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback 
 
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
+import { TypeKind } from '../../../../common/src/Type.interface';
+import { EnumerationValue } from '../../../../common/src/Enumeration.interface';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -1051,18 +1053,37 @@ export class ItemRepository {
                         currentTreeConfigSubject.getValue().config.getProxyFor(
                         'view-' + classLocalTypesEntry.definedInKind.
                         toLowerCase()).item.localTypes[type];
-                      if (Array.isArray(value)) {
-                        body += value.map((v: any) => {
-                          return this.getMarkdownRepresentation(v,
+                      if (localTypeDataModel.typeKind === TypeKind.
+                        ENUMERATION) {
+                        if (Array.isArray(value)) {
+                          body += value.map((v: any, index: number) => {
+                            return this.getStringRepresentation(koheseObject,
+                              propertyDefinition.propertyName, index,
+                              (enclosingType ? enclosingType : dataModel),
+                              localTypeDataModel, localTypeViewModel,
+                              formatDefinitionType);
+                          }).join('\n\n');
+                        } else {
+                          body += this.getStringRepresentation(koheseObject,
+                            propertyDefinition.propertyName, undefined,
+                            (enclosingType ? enclosingType : dataModel),
+                            localTypeDataModel, localTypeViewModel,
+                            formatDefinitionType);
+                        }
+                      } else {
+                        if (Array.isArray(value)) {
+                          body += value.map((v: any) => {
+                            return this.getMarkdownRepresentation(v,
+                              (enclosingType ? enclosingType : dataModel),
+                              localTypeDataModel, localTypeViewModel,
+                              formatDefinitionType, -1, addLinks);
+                          }).join('\n');
+                        } else {
+                          body += this.getMarkdownRepresentation(value,
                             (enclosingType ? enclosingType : dataModel),
                             localTypeDataModel, localTypeViewModel,
                             formatDefinitionType, -1, addLinks);
-                        }).join('\n');
-                      } else {
-                        body += this.getMarkdownRepresentation(value,
-                          (enclosingType ? enclosingType : dataModel),
-                          localTypeDataModel, localTypeViewModel,
-                          formatDefinitionType, -1, addLinks);
+                        }
                       }
                     }
                   } else {
@@ -1145,6 +1166,16 @@ export class ItemRepository {
         value).item.name;
     }
     
+    if (viewModel.typeKind === TypeKind.ENUMERATION) {
+      let type: any = enclosingType.classProperties[attributeName].definition.
+        type;
+      type = (Array.isArray(type) ? type[0] : type);
+      return viewModel.values[enclosingType.classLocalTypes[type].definition.
+        values.map((enumerationValue: EnumerationValue) => {
+        return enumerationValue.name;
+      }).indexOf(value)];
+    }
+
     let representation: string = String(value);
     if (representation === String({})) {
       let type: any = dataModel.classProperties[attributeName].definition.type;

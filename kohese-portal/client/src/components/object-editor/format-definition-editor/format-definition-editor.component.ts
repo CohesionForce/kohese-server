@@ -3,13 +3,14 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatDefinition,
-  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
-  FormatContainerKind } from '../../type-editor/FormatContainer.interface';
-import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
-import { TableDefinition } from '../../type-editor/TableDefinition.interface';
+  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
+import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { TypeKind } from '../../../../../common/src/Type.interface';
 
 @Component({
   selector: 'format-definition-editor',
@@ -387,23 +388,38 @@ export class FormatDefinitionEditorComponent implements OnInit {
     formatContainer.contents.push(propertyDefinition);
   }
   
-  public getUserInterfaceTypes(attributeName: string): Array<string> {
-    let type: any = this._dataModel.classProperties[attributeName].definition.
-      type;
+  public getUserInterfaceTypes(propertyDefinition: PropertyDefinition):
+    Array<string> {
+    let type: any = this._dataModel.classProperties[propertyDefinition.
+      propertyName].definition.type;
     type = (Array.isArray(type) ? type[0] : type);
-    if ((type === 'string') && this._dataModel.classProperties[attributeName].
-      definition.relation) {
+    if ((type === 'string') && this._dataModel.classProperties[
+      propertyDefinition.propertyName].definition.relation) {
       return Object.keys(this._userInterfaceTypes['user-selector']);
     } else if (this._userInterfaceTypes[type]) {
       return Object.keys(this._userInterfaceTypes[type]);
     } else {
-      return ['Reference'];
+      if (this.isEnumerationAttribute(propertyDefinition)) {
+        return ['Dropdown'];
+      } else {
+        return ['Reference'];
+      }
     }
+  }
+  
+  public isEnumerationAttribute(propertyDefinition: PropertyDefinition):
+    boolean {
+    let type: any = this._dataModel.classProperties[propertyDefinition.
+      propertyName].definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    return ((this._enclosingType ? this._enclosingType : this._dataModel).
+      classLocalTypes[type].definition.typeKind === TypeKind.ENUMERATION);
   }
   
   public getUserInterfaceTypeValue(attributeName: string, userInterfaceType:
     string): string {
-    if (userInterfaceType === 'Reference') {
+    if ((userInterfaceType === 'Reference') || (userInterfaceType ===
+      'Dropdown')) {
       return '';
     } else {
       if ((userInterfaceType === Object.keys(this._userInterfaceTypes[

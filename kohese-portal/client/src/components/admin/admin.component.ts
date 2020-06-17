@@ -7,7 +7,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { LensService,
   ApplicationLens } from '../../services/lens-service/lens.service';
 import { DialogService } from '../../services/dialog/dialog.service';
-import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
