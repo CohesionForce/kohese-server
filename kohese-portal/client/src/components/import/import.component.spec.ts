@@ -9,11 +9,12 @@ import { TreeViewModule } from '../tree/tree.module';
 import { ImportComponent } from './import.component';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MAT_DIALOG_DATA } from '@angular/material';
 
 describe('Component: ', ()=>{
   let importComponent: ImportComponent;
   let importFixture : ComponentFixture<ImportComponent>;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ImportComponent],
@@ -26,7 +27,8 @@ describe('Component: ', ()=>{
       ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
-        {provide: ItemRepository, useClass: MockItemRepository}
+        {provide: ItemRepository, useClass: MockItemRepository},
+        {provide: MAT_DIALOG_DATA, useValue: {}},
       ]
     }).compileComponents();
 
@@ -34,10 +36,11 @@ describe('Component: ', ()=>{
     importComponent = importFixture.componentInstance;
 
     importFixture.detectChanges();
-    
+
   })
 
   it('instantiates the Import component', ()=>{
-    expect(importComponent).toBeTruthy(); 
+    //pending();
+    expect(importComponent).toBeTruthy();
   })
 })
