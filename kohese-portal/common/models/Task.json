@@ -16,6 +16,10 @@
             "name": "Proposed",
             "description": "A task that is Proposed."
           },
+          "Ready": {
+            "name": "Ready",
+            "description": "A task that is Ready to be Assigned."
+          },
           "Assigned": {
             "name": "Assigned",
             "description": "A task that is Assigned."
@@ -43,16 +47,35 @@
           "Completed": {
             "name": "Completed",
             "description": "A task that is Completed."
+          },
+          "Rejected": {
+            "name": "Rejected",
+            "description": ""
           }
         },
         "transition": {
-          "Assign": {
+          "Reject": {
             "source": "Proposed",
+            "target": "Rejected",
+            "guard": {}
+          },
+          "Ready": {
+            "source": "Proposed",
+            "target": "Ready",
+            "guard": {}
+          },
+          "Assign": {
+            "source": "Ready",
             "target": "Assigned",
             "guard": {},
             "requires": [
               "assignment:Assignee"
             ]
+          },
+          "Request Reassign": {
+            "source": "Assigned",
+            "target": "PendingReassign",
+            "guard": {}
           },
           "Accept": {
             "source": "Assigned",
@@ -70,9 +93,9 @@
             "guard": {},
             "requires": ""
           },
-          "Request Reassign": {
-            "source": "Assigned",
-            "target": "PendingReassign",
+          "Remove Assignment": {
+            "source": "PendingReassign",
+            "target": "Ready",
             "guard": {}
           },
           "Reassign": {
@@ -83,11 +106,6 @@
           },
           "Revert To Proposed": {
             "source": "InWork",
-            "target": "Proposed",
-            "guard": {}
-          },
-          "Remove Assignment": {
-            "source": "PendingReassign",
             "target": "Proposed",
             "guard": {}
           },
@@ -104,6 +122,11 @@
           "Verify": {
             "source": "InVerification",
             "target": "Verified",
+            "guard": {}
+          },
+          "Revert To In Verification": {
+            "source": "Verified",
+            "target": "InVerification",
             "guard": {}
           },
           "Complete": {
