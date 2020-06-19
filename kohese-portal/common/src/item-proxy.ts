@@ -78,7 +78,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
       }
       if (propertyDefinition && !propertyDefinition.definition) {
         propertyDefinition = undefined;
-      } 
+      }
 
       // Set returnValue for automatic properties
       if (!target.hasOwnProperty(property)) {
@@ -87,7 +87,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
         if (property === '$isItemChangeHandler') {
           return true;
         }
-  
+
         if (property === '$typeDecl') {
           return typeDecl;
         }
@@ -132,7 +132,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
                 nestedTypeDecl].definition.classProperties;
             }
           }
-          
+
           if (Array.isArray(typeDecl)){
             nestedTypeDecl = typeDecl[0];
             if (proxy.model.item.classLocalTypes[nestedTypeDecl]){
@@ -173,7 +173,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
         case '__deletedProperty':
           if (!propertyPath){
             target[property] = value;
-            return true;  
+            return true;
           }
       }
 
@@ -193,7 +193,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
 
       if (propertyDefinition && !propertyDefinition.definition) {
         propertyDefinition = undefined;
-      } 
+      }
 
       // Detect unexpected properties
       if (!propertyDefinition && proxy && proxy.model && !Array.isArray(typeDecl)) {
@@ -210,7 +210,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
       if (!propertyDefinition || (propertyDefinition && !propertyDefinition.definition.derived)) {
 
         // console.log('$$$ Trying to set property: ' + property.toString() + ' -> ' + value + '<-');
-        
+
         if (!proxy.dirtyFields) {
           proxy.dirtyFields = {};
         }
@@ -230,7 +230,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
             clonedOriginalValue = JSON.parse(JSON.stringify(target[property]));
           }
 
-          proxy.dirtyFields[path] = 
+          proxy.dirtyFields[path] =
             {
               from: clonedOriginalValue,
               to: clonedValue
@@ -278,7 +278,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
       path += property.toString();
 
       if (target.hasOwnProperty(property)) {
-        
+
         // console.log('$$$ Trying to delete property: ' + property.toString());
 
         if (!proxy.dirtyFields) {
@@ -313,7 +313,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
 
       return true;
     }
-  });  
+  });
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -420,7 +420,7 @@ export class ItemProxy {
       // console.log('::: Constructor called for ' + itemId);
     }
 
-    // Perform validation before proxy creation and storage in the map since invalid items should not be allowed 
+    // Perform validation before proxy creation and storage in the map since invalid items should not be allowed
     // after loading complete
     let validationResult = ItemProxy.validateItemContent(kind, forItem, treeConfig, true);
 
@@ -442,7 +442,7 @@ export class ItemProxy {
         referencedBy: {}
       };
       proxy.descendantCount = 0;
-      
+
       // Store a reference to this new proxy in the map
       proxy.treeConfig.proxyMap[itemId] = proxy;
     }
@@ -594,9 +594,9 @@ export class ItemProxy {
               ItemProxy.validateItemContent(kind, forItem, treeConfig, false);
             } else {
               console.log('*** Error: Invalid data item');
-              console.log(validation);  
+              console.log(validation);
             }
-        
+
           } else {
             throw ({
               error: 'Not-Valid',
@@ -629,7 +629,7 @@ export class ItemProxy {
           forItem[property] = [ forItem[property] ]
         }
 
-      }  
+      }
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -654,7 +654,7 @@ export class ItemProxy {
           let convertedNumber = Number(forItem[property]);
           if (convertedNumber !== NaN) {
             forItem[property] = convertedNumber;
-          }  
+          }
         }
       }
     }
@@ -676,7 +676,7 @@ export class ItemProxy {
         if (validation.kind == 'UseCase') {
           if (validation.invalidData.Actors) {
             forItem.Actors = [ forItem.Actors ]
-          }  
+          }
         }
 
       }
@@ -704,7 +704,7 @@ export class ItemProxy {
           convertTimestamp('actualCompletion');
         }
       }
-      
+
     }
 
   }
@@ -847,22 +847,24 @@ export class ItemProxy {
       } else {
         prefix = '';
       }
-  
+
       for(let relationPropertyIdx in withType.relationProperties){
         let relationProperty = withType.relationProperties[relationPropertyIdx];
         let prefixedRelationProperty = prefix + relationProperty;
         let relationPropertyDefn = withType.classProperties[relationProperty].definition;
-  
+
         let relationDefn;
         if (typeof relationPropertyDefn.relation === 'object'){
           relationDefn = relationPropertyDefn.relation;
         }
-  
-        // Ignore relation for children
-        if (relationProperty === "children"){
-          continue;
+
+        // Ignore relation for parent/children since they are processed differently
+        switch (prefixedRelationProperty) {
+          case 'parentId':
+          case 'children':
+            continue;
         }
-  
+
         // Capture state of relations before update
         let isSingle = true;
         let oldRelationIds = [];
@@ -879,11 +881,10 @@ export class ItemProxy {
 
         if (forObject){
           if(relationDefn && relationDefn.contained){
-            let containedTypeDefn = thisProxy.model._item.classLocalTypes[relationPropertyDefn.type];
+            let containedTypeDefn = thisProxy.model._item.classLocalTypes[relationPropertyDefn.type].definition;
             let relationValue = forObject[relationProperty];
             if (relationValue){
               updateReferencesForRelations(relationValue, containedTypeDefn, prefixedRelationProperty);
-
             }
           } else {
 
@@ -893,7 +894,7 @@ export class ItemProxy {
                 if (relationValue) {
                   if(Array.isArray(relationValue)){
                     isSingle = false;
-        
+
                     // Check for reference style
                     let updatedRelationValue = [];
                     let valueUpdated = false;
@@ -905,20 +906,20 @@ export class ItemProxy {
                       }
                       updatedRelationValue.push(thisRelationValue);
                     }
-        
+
                     if(valueUpdated){
                       forObject[objIdx][relationProperty] = updatedRelationValue;
                     }
                     relationList.push(...updatedRelationValue);
                   } else {
-        
+
                     // Check for reference style
                     if(!relationDefn && !relationValue.hasOwnProperty('id')){
                       // Update the property to have the correct reference style
                       relationValue = {id: relationValue};
                       forObject[objIdx][relationProperty] = relationValue;
                     }
-        
+
                     relationList.push(relationValue);
                   }
                 }
@@ -928,7 +929,7 @@ export class ItemProxy {
               if (relationValue){
                 if(Array.isArray(relationValue)){
                   isSingle = false;
-      
+
                   // Check for reference style
                   let updatedRelationValue = [];
                   let valueUpdated = false;
@@ -940,20 +941,20 @@ export class ItemProxy {
                     }
                     updatedRelationValue.push(thisRelationValue);
                   }
-      
+
                   if(valueUpdated){
                     forObject[relationProperty] = updatedRelationValue;
                   }
                   relationList.push(...updatedRelationValue);
                 } else {
-      
+
                   // Check for reference style
                   if(!relationDefn && !relationValue.hasOwnProperty('id')){
                     // Update the property to have the correct reference style
                     relationValue = {id: relationValue};
                     forObject[relationProperty] = relationValue;
                   }
-      
+
                   relationList.push(relationValue);
                 }
               }
@@ -1011,7 +1012,7 @@ export class ItemProxy {
 
       }
     }
-    
+
     //////////////////////////////////////////////////////////////////////////
     if (thisProxy.model && thisProxy.model._item && thisProxy.model._item.relationProperties){
       updateReferencesForRelations(thisProxy._item, thisProxy.model._item);
@@ -1129,7 +1130,7 @@ export class ItemProxy {
               console.log('>>> Remove reference:  ' + relationList[index]._item.id);
               this.removeReference(relationList[index], relationKey, false);
             }
-          }  
+          }
         } else {
           if (relationList){
             if (kindKey !== 'Item' && relationKey !== 'parent'){
@@ -1173,7 +1174,7 @@ export class ItemProxy {
       if (this._item.itemIds){
         newItem.itemIds = this._item.itemIds;
       }
-      
+
       var newKeys = Object.keys(newItem);
       if (!_.isEqual(oldKeys, newKeys)){
         let deletedKeys = _.difference(oldKeys, newKeys);
@@ -1184,7 +1185,7 @@ export class ItemProxy {
           });
         // } else {
         //   console.log('!!! Warning: Properties are in a different order: ');
-        //   console.log('>>> Old Keys: ' + oldKeys);  
+        //   console.log('>>> Old Keys: ' + oldKeys);
         //   console.log('>>> New Keys: ' + newKeys);
         }
         this._item = newItem;
@@ -1233,7 +1234,7 @@ export class ItemProxy {
         delete clone[key];
       }
     }
-    
+
     if (this.kind === 'KoheseModel') {
       for (let localTypeName in this._item.localTypes) {
         let localType: any = clone.localTypes[localTypeName];
@@ -1244,7 +1245,7 @@ export class ItemProxy {
         }
       }
     }
-    
+
     return clone;
   }
 
@@ -1796,7 +1797,7 @@ export class ItemProxy {
       this.treeConfig.root.addChild(this.treeConfig.lostAndFound);
     }
 
-    // Note: 
+    // Note:
     // * It is possible that this new child is the parent for an existing lost item that will soon be removed.
     // * Since the child has already been updated, an alphabeticaly sort may result in an incorrect sorting order.
     // * The sortChildren routine should be called instead of trying to do an alphabetical insertion.
@@ -2107,7 +2108,7 @@ export class ItemProxy {
     if (this.children.length === 0){
       this._item.children = [];
     }
-    
+
     // Determine if the parent changed
     var oldParentId = '';
     if (this.parentProxy) {
@@ -2173,7 +2174,7 @@ export class ItemProxy {
         dirty: this.dirty,
         dirtyFields: clonedFields,
         proxy: this
-      });  
+      });
     }
   }
 
@@ -2294,15 +2295,15 @@ export class ItemProxy {
       }
     }
 
-    let dataModel = this.model; 
+    let dataModel = this.model;
 
     // Check for unexpected values
     for ( var toKey in this._item) {
-      let isDerivedAttribute = (dataModel && dataModel._item.classProperties && dataModel._item.classProperties[toKey] 
+      let isDerivedAttribute = (dataModel && dataModel._item.classProperties && dataModel._item.classProperties[toKey]
         && dataModel._item.classProperties[toKey].definition.derived);
-      if (!isDerivedAttribute && toKey !== '__deletedProperty' && (toKey.charAt(0) !== '$') 
+      if (!isDerivedAttribute && toKey !== '__deletedProperty' && (toKey.charAt(0) !== '$')
           && this._item.hasOwnProperty(toKey)
-          && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey))) 
+          && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey)))
       {
         // console.log('!!! Deleted Property: ' + toKey + ' in ' + this._item.name);
         if (!this._item.__deletedProperty) {
