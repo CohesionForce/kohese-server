@@ -565,11 +565,13 @@ export class DataModelEditorComponent {
       
       localTypeDataModel = ({
         typeKind: TypeKind.ENUMERATION,
+        id: name,
         name: name,
         values: []
       } as Enumeration);
       localTypeViewModel = ({
         typeKind: TypeKind.ENUMERATION,
+        id: 'view-' + name.toLowerCase(),
         name: name,
         values: []
       } as Enumeration);
@@ -604,6 +606,7 @@ export class DataModelEditorComponent {
       
       let koheseDataModel: KoheseDataModel = {
         typeKind: TypeKind.KOHESE_MODEL,
+        id: results[0],
         name: results[0],
         base: null,
         idInjection: true,
@@ -618,6 +621,7 @@ export class DataModelEditorComponent {
       
       let koheseViewModel: KoheseViewModel = {
         typeKind: TypeKind.KOHESE_MODEL,
+        id: 'view-' + results[0].toLowerCase(),
         name: results[0],
         modelName: results[0],
         icon: '',
@@ -705,19 +709,6 @@ export class DataModelEditorComponent {
     this._editable = true;
     
     this._changeDetectorRef.markForCheck();
-  }
-
-  public async renameLocalType(localType: Type): Promise<void> {
-    let name: any = await this._dialogService.openInputDialog('Rename ' +
-      localType.name, '', InputDialogKind.STRING, 'Name', localType.name,
-      (value: any) => {
-      return (value && !this._dataModel.classLocalTypes[value]);
-    });
-    if (name) {
-      localType.name = name.toString();
-      // Update all occurrences
-      this._changeDetectorRef.markForCheck();
-    }
   }
   
   public async removeLocalType(name: string): Promise<void> {

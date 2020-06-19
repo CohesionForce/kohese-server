@@ -212,11 +212,6 @@
             <mat-panel-title style="align-items: center;">
               {{localType.name}}
             </mat-panel-title>
-            <button mat-icon-button matTooltip="Rename this local type"
-              [disabled]="!editable" style="margin-left: auto;"
-              (click)="renameLocalType(localType)">
-              <mat-icon class="fa fa-i-cursor"></mat-icon>
-            </button>
             <button mat-icon-button matTooltip="Remove this local type"
               (click)="removeLocalType(localType.name)" [disabled]="!editable">
               <mat-icon class="fa fa-trash"></mat-icon>

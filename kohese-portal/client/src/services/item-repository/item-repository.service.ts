@@ -1009,19 +1009,38 @@ export class ItemRepository {
                           body += '<ul>';
                           for (let n: number = 0; n < reference[
                             tableDefinition.columns[m]].length; n++) {
-                            body += ('<li>' + this.getStringRepresentation(
-                              reference, tableDefinition.columns[m], n,
-                              (enclosingType ? enclosingType : dataModel),
-                              attributeTypeDataModel, attributeTypeViewModel,
-                              formatDefinitionType) + '</li>');
+                            if (attributeTypeDataModel.typeKind === TypeKind.
+                              ENUMERATION) {
+                              body += ('<li>' + attributeTypeViewModel.values[
+                                attributeTypeDataModel.values.map(
+                                (enumerationValue: EnumerationValue) => {
+                                return enumerationValue.name;
+                              }).indexOf(reference[tableDefinition.columns[m]][
+                                n])] + '</li>');
+                            } else {
+                              body += ('<li>' + this.getStringRepresentation(
+                                reference, tableDefinition.columns[m], n,
+                                (enclosingType ? enclosingType : dataModel),
+                                attributeTypeDataModel, attributeTypeViewModel,
+                                formatDefinitionType) + '</li>');
+                            }
                           }
                           body += '</ul>';
                         } else {
-                          body += this.getStringRepresentation(reference,
-                            tableDefinition.columns[m], undefined,
-                            (enclosingType ? enclosingType : dataModel),
-                            attributeTypeDataModel, attributeTypeViewModel,
-                            formatDefinitionType);
+                          if (attributeTypeDataModel.typeKind === TypeKind.
+                            ENUMERATION) {
+                            body += attributeTypeViewModel.values[
+                              attributeTypeDataModel.values.map(
+                              (enumerationValue: EnumerationValue) => {
+                              return enumerationValue.name;
+                            }).indexOf(reference[tableDefinition.columns[m]])];
+                          } else {
+                            body += this.getStringRepresentation(reference,
+                              tableDefinition.columns[m], undefined,
+                              (enclosingType ? enclosingType : dataModel),
+                              attributeTypeDataModel, attributeTypeViewModel,
+                              formatDefinitionType);
+                          }
                         }
                       }
                       
@@ -1057,18 +1076,18 @@ export class ItemRepository {
                         ENUMERATION) {
                         if (Array.isArray(value)) {
                           body += value.map((v: any, index: number) => {
-                            return this.getStringRepresentation(koheseObject,
-                              propertyDefinition.propertyName, index,
-                              (enclosingType ? enclosingType : dataModel),
-                              localTypeDataModel, localTypeViewModel,
-                              formatDefinitionType);
+                            return localTypeViewModel.values[
+                              localTypeDataModel.values.map((enumerationValue:
+                              EnumerationValue) => {
+                              return enumerationValue.name;
+                            }).indexOf(v)];
                           }).join('\n\n');
                         } else {
-                          body += this.getStringRepresentation(koheseObject,
-                            propertyDefinition.propertyName, undefined,
-                            (enclosingType ? enclosingType : dataModel),
-                            localTypeDataModel, localTypeViewModel,
-                            formatDefinitionType);
+                          body += localTypeViewModel.values[
+                            localTypeDataModel.values.map((enumerationValue:
+                            EnumerationValue) => {
+                            return enumerationValue.name;
+                          }).indexOf(value)];
                         }
                       } else {
                         if (Array.isArray(value)) {
@@ -1164,16 +1183,6 @@ export class ItemRepository {
       'string')) {
       return this.currentTreeConfigSubject.getValue().config.getProxyFor(
         value).item.name;
-    }
-    
-    if (viewModel.typeKind === TypeKind.ENUMERATION) {
-      let type: any = enclosingType.classProperties[attributeName].definition.
-        type;
-      type = (Array.isArray(type) ? type[0] : type);
-      return viewModel.values[enclosingType.classLocalTypes[type].definition.
-        values.map((enumerationValue: EnumerationValue) => {
-        return enumerationValue.name;
-      }).indexOf(value)];
     }
 
     let representation: string = String(value);

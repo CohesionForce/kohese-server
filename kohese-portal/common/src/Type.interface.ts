@@ -1,6 +1,8 @@
 export interface Type {
-  typeKind?: TypeKind;
+  typeKind: TypeKind;
+  id: string;
   name: string;
+  localTypes?: { [localTypeName: string]: Type };
 }
 
 export enum TypeKind {

@@ -21,4 +21,3 @@ export interface KoheseViewModel extends Type {
   defaultFormatKey: { [formatDefintionType: string]: string };
   tableDefinitions: { [tableDefinitionId: string]: TableDefinition };
 }
-

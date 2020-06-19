@@ -81,10 +81,24 @@
                           <mat-icon class="fa fa-chevron-up"></mat-icon>
                         </button>
                       </ng-container>
+                      <!--
+                        The 'addValue' function is intentionally called
+                        potentially twice below - the first time to set the
+                        value of 'object[attributeDefinition.propertyName]' to
+                        an empty Array, and the second time to push a value
+                        onto that Array.
+                      -->
                       <button mat-icon-button matTooltip="Add a value to
                         {{attributeDefinition.propertyName}}"
                         [disabled]="!attributeDefinition.editable"
-                        (click)="addValue(attributeDefinition.propertyName)"
+                        (click)="addValue(attributeDefinition.propertyName);
+                        ((((attributeDefinition.kind === '') ||
+                        (attributeDefinition.kind === 'proxy-selector')) &&
+                        !isLocalTypeAttribute(attributeDefinition.
+                        propertyName)) ? openObjectSelector(
+                        attributeDefinition.propertyName) : object[
+                        attributeDefinition.propertyName].push(addValue(
+                        attributeDefinition.propertyName)))"
                         [ngStyle]="{ 'margin-left': ((((attributeDefinition.kind
                         === '') || (attributeDefinition.kind ===
                         'proxy-selector')) && isLocalTypeAttribute(
@@ -306,8 +320,10 @@
                                       [disabled]="!attributeDefinition.
                                       editable" style="margin-left: auto;"
                                       (click)="object[attributeDefinition.
-                                      propertyName] = addValue(
-                                      attributeDefinition.propertyName)">
+                                      propertyName][j] = getDefaultValue(
+                                      selectedType.classProperties[
+                                      attributeDefinition.propertyName].
+                                      definition)">
                                       <mat-icon class="fa fa-plus"></mat-icon>
                                     </button>
                                   </ng-container>
@@ -538,7 +554,8 @@
                               [disabled]="!attributeDefinition.editable"
                               style="margin-left: auto;"
                               (click)="object[attributeDefinition.propertyName] =
-                              addValue(attributeDefinition.propertyName)">
+                              getDefaultValue(selectedType.classProperties[
+                              attributeDefinition.propertyName].definition)">
                               <mat-icon class="fa fa-plus"></mat-icon>
                             </button>
                           </ng-container>

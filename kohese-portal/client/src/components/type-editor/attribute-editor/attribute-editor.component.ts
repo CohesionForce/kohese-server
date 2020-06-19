@@ -253,7 +253,8 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     } else if (this._displayTypes[dataModelType]) {
       return Object.keys(this._displayTypes[dataModelType]);
     } else {
-      if (this._contextualGlobalType.classLocalTypes[dataModelType].definition.
+      if (this._contextualGlobalType.classLocalTypes[dataModelType] && this.
+        _contextualGlobalType.classLocalTypes[dataModelType].definition.
         typeKind === TypeKind.ENUMERATION) {
         return ['Dropdown'];
       } else {
