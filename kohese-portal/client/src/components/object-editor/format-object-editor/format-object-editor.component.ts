@@ -701,6 +701,11 @@ export class FormatObjectEditorComponent implements OnInit {
       this._changeDetectorRef.markForCheck();
     };
   }
+
+  public getMultivaluedAttributeValueIdentifier(index: number, element: any):
+    string {
+    return index.toString();
+  }
   
   public getAttributeRepresentation(attributeDefinition: PropertyDefinition):
     string {
