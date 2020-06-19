@@ -858,7 +858,7 @@ export class ItemProxy {
           relationDefn = relationPropertyDefn.relation;
         }
 
-        // Ignore relation for parent/children snce they are processed differently
+        // Ignore relation for parent/children since they are processed differently
         switch (prefixedRelationProperty) {
           case 'parentId':
           case 'children':
