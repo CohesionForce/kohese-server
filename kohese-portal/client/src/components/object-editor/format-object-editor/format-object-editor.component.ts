@@ -359,22 +359,39 @@ export class FormatObjectEditorComponent implements OnInit {
     return type.classLocalTypes[typeName].definition;
   }
   
-  public async openObjectSelector(attributeName: string): Promise<void> {
+  public async openObjectSelector(attributeName: string, index: number):
+    Promise<void> {
     let attribute: Attribute = this._selectedType.classProperties[
       attributeName].definition;
     let treeConfiguration: TreeConfiguration = this._itemRepository.
       getTreeConfig().getValue().config;
-    let itemId = undefined;
-    switch (typeof(this._object[attributeName])) {
-      case 'object':
-        itemId = this._object[attributeName].id;
-        break;
-      case 'string':
-        itemId = this._object[attributeName];
+    let allowMultiselect: boolean = (Array.isArray(attribute.type) && (index ==
+      null));
+    let selection: Array<any>;
+    if (allowMultiselect) {
+      selection = this._object[attributeName].map((reference: any) => {
+        return treeConfiguration.getProxyFor(reference.id);
+      });
+    } else {
+      if (index == null) {
+        if (this._object[attributeName]) {
+          selection = [treeConfiguration.getProxyFor(((attributeName ===
+            'parentId') && !this._enclosingType) ? this._object[attributeName]
+            : this._object[attributeName].id).item];
+        } else {
+          selection = [];
+        }
+      } else {
+        if (this._object[attributeName][index]) {
+          selection = [treeConfiguration.getProxyFor(this._object[
+            attributeName][index].id).item];
+        } else {
+          selection = [];
+        }
+      }
     }
 
-    let selection: Array<any> = await this._dialogService.openComponentDialog(
-      TreeComponent, {
+    selection = await this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: treeConfiguration.getRootProxy(),
         getChildren: (element: any) => {
@@ -426,29 +443,30 @@ export class FormatObjectEditorComponent implements OnInit {
           return treeConfiguration.getProxyFor('view-' +
             (element as ItemProxy).kind.toLowerCase()).item.icon;
         },
-        selection: (this._object[attribute.name] ? (Array.isArray(attribute.
-          type) ? this._object[attribute.name].map((reference: any) => {
-          return treeConfiguration.getProxyFor(reference.id);
-        }) : [treeConfiguration.getProxyFor(itemId).item]) : []),
-        allowMultiselect: Array.isArray(attribute.type),
-        showSelections: Array.isArray(attribute.type),
+        selection: selection,
+        allowMultiselect: allowMultiselect,
+        showSelections: allowMultiselect,
         quickSelectElements: this._itemRepository.getRecentProxies()
       }
     }).updateSize('90%', '90%').afterClosed().toPromise();
     
     if (selection) {
-      if (Array.isArray(attribute.type)) {
-        this._object[attribute.name].length = 0;
-        this._object[attribute.name].push(...selection.map((element:
+      if (allowMultiselect) {
+        this._object[attributeName].length = 0;
+        this._object[attributeName].push(...selection.map((element:
           any) => {
           return { id: (element as ItemProxy).item.id };
         }));
       } else {
-        let id: string = selection[0].item.id;
-        if (attributeName === 'parentId') {
-          this._object[attributeName] = id;
+        if (Array.isArray(attribute.type)) {
+          this._object[attributeName][index] = { id: selection[0].item.id };
         } else {
-          this._object[attributeName] = { id: id };
+          let id: string = selection[0].item.id;
+          if (attributeName === 'parentId') {
+            this._object[attributeName] = id;
+          } else {
+            this._object[attributeName] = { id: id };
+          }
         }
       }
       

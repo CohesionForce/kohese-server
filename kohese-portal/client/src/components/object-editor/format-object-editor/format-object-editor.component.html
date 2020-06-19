@@ -95,7 +95,7 @@
                         (attributeDefinition.kind === 'proxy-selector')) &&
                         !isLocalTypeAttribute(attributeDefinition.
                         propertyName)) ? openObjectSelector(
-                        attributeDefinition.propertyName) : object[
+                        attributeDefinition.propertyName, undefined) : object[
                         attributeDefinition.propertyName].push(addValue(
                         attributeDefinition.propertyName)))"
                         [ngStyle]="{ 'margin-left': ((((attributeDefinition.kind
@@ -307,7 +307,7 @@
                                   <button mat-icon-button matTooltip="Select an
                                     Item" [disabled]="!attributeDefinition.
                                     editable" (click)="openObjectSelector(
-                                    attributeDefinition.propertyName)"
+                                    attributeDefinition.propertyName, j)"
                                     style="margin-left: auto;">
                                     <mat-icon class="fa fa-ellipsis-h">
                                     </mat-icon>
@@ -518,7 +518,7 @@
                         <button mat-icon-button matTooltip="Select an Item"
                           [disabled]="!attributeDefinition.editable"
                           (click)="openObjectSelector(attributeDefinition.
-                          propertyName)" style="margin-left: auto;">
+                          propertyName, undefined)" style="margin-left: auto;">
                           <mat-icon class="fa fa-ellipsis-h"></mat-icon>
                         </button>
                       </ng-template>
