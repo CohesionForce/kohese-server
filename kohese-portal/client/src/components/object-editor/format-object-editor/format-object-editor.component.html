@@ -108,7 +108,8 @@
                     </div>
                     <div style="overflow-y: auto;">
                       <ng-container *ngFor="let value of object[
-                        attributeDefinition.propertyName]; let j = index">
+                        attributeDefinition.propertyName]; let j = index;
+                        trackBy: getMultivaluedAttributeValueIdentifier">
                         <div style="display: flex; flex-direction: row;">
                           <ng-container [ngSwitch]="attributeDefinition.kind">
                             <ng-container *ngSwitchCase="'boolean'">
