@@ -793,7 +793,7 @@ export function ModelDefinitions() {
             }
           },
           "analysisAction": {
-            "type": "string",
+            "type": "Item",
             "relation": {
               "kind": "Item",
               "foreignKey": "id"
@@ -1040,6 +1040,10 @@ export function ModelDefinitions() {
             "type": "boolean",
             "name": "isMetaModel"
           },
+          "isInternal": {
+            "type": "boolean",
+            "name": "isInternal"
+          },
           "idInjection": {
             "type": "boolean",
             "required": true,
@@ -1085,6 +1089,13 @@ export function ModelDefinitions() {
             "type": "object",
             "derived": true,
             "name": "classLocalTypes"
+          },
+          "classParentTypes": {
+            "type": [
+              "string"
+            ],
+            "derived": true,
+            "name": "classParentTypes"
           },
           "classProperties": {
             "type": "object",
@@ -1242,7 +1253,7 @@ export function ModelDefinitions() {
         "parentId": "Item",
         "base": "Item",
         "idInjection": true,
-        "isMetamodel": true,
+        "isMetaModel": true,
         "invertItemOrder": true,
         "properties": {
           "password": {
@@ -1314,6 +1325,11 @@ export function ModelDefinitions() {
             "type": "object",
             "required": true,
             "name": "tableDefinitions"
+          },
+          "ungroupDefaultFormatDefinitionStateAttributes": {
+            "name": "ungroupDefaultFormatDefinitionStateAttributes",
+            "type": "boolean",
+            "defaultValue": false
           }
         },
         "validations": [],
@@ -1627,9 +1643,7 @@ export function ModelDefinitions() {
             "type": "FlowOfEvents",
             "required": false,
             "relation": {
-              "contained": true,
-              "kind": "Item",
-              "foreignKey": "id"
+              "contained": true
             }
           },
           "AlternativePaths": {
@@ -1639,9 +1653,7 @@ export function ModelDefinitions() {
             ],
             "required": false,
             "relation": {
-              "contained": true,
-              "kind": "Item",
-              "foreignKey": "id"
+              "contained": true
             }
           }
         },
@@ -1859,6 +1871,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -1923,20 +1951,52 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
-                  },
-                  {
-                    "propertyName": "decisionState",
-                    "customLabel": "decisionState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
                   },
                   {
                     "propertyName": "approvedBy",
@@ -1992,14 +2052,6 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
-                    "editable": true
-                  },
-                  {
-                    "propertyName": "actionState",
-                    "customLabel": "actionState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
                     "editable": true
                   },
                   {
@@ -2080,6 +2132,27 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "number",
+                    "editable": true
+                  }
+                ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "decisionState",
+                    "customLabel": "decisionState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "actionState",
+                    "customLabel": "actionState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
                     "editable": true
                   }
                 ]
@@ -2287,6 +2360,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -2351,20 +2440,52 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
-                  },
-                  {
-                    "propertyName": "decisionState",
-                    "customLabel": "decisionState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
                   },
                   {
                     "propertyName": "approvedBy",
@@ -2420,6 +2541,19 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  }
+                ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "decisionState",
+                    "customLabel": "decisionState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
                     "editable": true
                   }
                 ]
@@ -2513,6 +2647,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -2574,6 +2724,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -2715,6 +2905,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -2779,20 +2985,52 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
-                  },
-                  {
-                    "propertyName": "decisionState",
-                    "customLabel": "decisionState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
                   },
                   {
                     "propertyName": "approvedBy",
@@ -2848,6 +3086,19 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  }
+                ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "decisionState",
+                    "customLabel": "decisionState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
                     "editable": true
                   }
                 ]
@@ -2925,6 +3176,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -2986,6 +3253,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -3058,6 +3365,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -3122,20 +3445,52 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
-                  },
-                  {
-                    "propertyName": "decisionState",
-                    "customLabel": "decisionState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
                   },
                   {
                     "propertyName": "approvedBy",
@@ -3191,6 +3546,19 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  }
+                ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "decisionState",
+                    "customLabel": "decisionState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
                     "editable": true
                   }
                 ]
@@ -3279,6 +3647,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -3340,6 +3724,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -3474,6 +3898,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -3535,6 +3975,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -3684,6 +4164,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -3748,6 +4244,46 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
@@ -3780,14 +4316,6 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
-                    "propertyName": "issueState",
-                    "customLabel": "issueState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
-                  },
-                  {
                     "propertyName": "relatedIssues",
                     "customLabel": "relatedIssues",
                     "labelOrientation": "Top",
@@ -3800,7 +4328,7 @@ export function ModelDefinitions() {
                     "customLabel": "analysisAction",
                     "labelOrientation": "Top",
                     "visible": true,
-                    "kind": "text",
+                    "kind": "",
                     "editable": true
                   },
                   {
@@ -3817,6 +4345,19 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "markdown",
+                    "editable": true
+                  }
+                ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "issueState",
+                    "customLabel": "issueState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
                     "editable": true
                   }
                 ]
@@ -3897,7 +4438,7 @@ export function ModelDefinitions() {
         "parentId": "View-Model-Definitions",
         "modelName": "Item",
         "icon": "fa fa-sticky-note",
-        "color": "#000000",
+        "color": "#565656",
         "localTypes": {},
         "viewProperties": {
           "name": {
@@ -3978,6 +4519,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -4039,6 +4596,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -4130,7 +4727,9 @@ export function ModelDefinitions() {
         },
         "defaultFormatKey": {
           "default": "cf123860-5a76-11ea-8c15-5359dfa592ed",
-          "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+          "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+          "card": "89324a90-a7af-11e8-8662-71e48f0160fe",
+          "board": "89324a90-a7af-11e8-8662-71e48f0160fe"
         },
         "tableDefinitions": {
           "3b4d68d0-e603-11e9-bf30-55b2f7a3af55": {
@@ -4147,8 +4746,7 @@ export function ModelDefinitions() {
               "column4": []
             }
           }
-        },
-        "itemIds": []
+        }
       },
       "KeyEvent": {
         "id": "view-keyevent",
@@ -4157,7 +4755,7 @@ export function ModelDefinitions() {
         "createdBy": "gmckune",
         "createdOn": 1566607211956,
         "modifiedBy": "gmckune",
-        "modifiedOn": 1586900905257,
+        "modifiedOn": 1591737865749,
         "modelName": "KeyEvent",
         "icon": "fa fa-key",
         "color": "#000000",
@@ -4217,6 +4815,22 @@ export function ModelDefinitions() {
               {
                 "kind": "list",
                 "contents": [
+                  {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
                   {
                     "propertyName": "id",
                     "customLabel": "ID",
@@ -4282,20 +4896,52 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
-                  },
-                  {
-                    "propertyName": "decisionState",
-                    "customLabel": "decisionState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
                   },
                   {
                     "propertyName": "approvedBy",
@@ -4383,6 +5029,19 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
+                    "editable": true
+                  }
+                ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "decisionState",
+                    "customLabel": "decisionState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
                     "editable": true
                   }
                 ]
@@ -4484,6 +5143,21 @@ export function ModelDefinitions() {
               "column3": [],
               "column4": []
             }
+          },
+          "5b7cf180-aa97-11ea-b459-333ae1bfee22": {
+            "id": "5b7cf180-aa97-11ea-b459-333ae1bfee22",
+            "name": "KeyEventTableForUseCases",
+            "columns": [
+              "name",
+              "DetectionMechanism",
+              "Responses"
+            ],
+            "expandedFormat": {
+              "column1": [],
+              "column2": [],
+              "column3": [],
+              "column4": []
+            }
           }
         }
       },
@@ -4530,6 +5204,22 @@ export function ModelDefinitions() {
               {
                 "kind": "list",
                 "contents": [
+                  {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
                   {
                     "propertyName": "id",
                     "customLabel": "ID",
@@ -4595,20 +5285,52 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
-                  },
-                  {
-                    "propertyName": "decisionState",
-                    "customLabel": "decisionState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
                   },
                   {
                     "propertyName": "approvedBy",
@@ -4672,6 +5394,19 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  }
+                ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "decisionState",
+                    "customLabel": "decisionState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
                     "editable": true
                   }
                 ]
@@ -4973,6 +5708,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -5034,6 +5785,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -5114,6 +5905,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -5175,6 +5982,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -5283,6 +6130,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -5347,6 +6210,46 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
@@ -5371,7 +6274,7 @@ export function ModelDefinitions() {
         "parentId": "view-item",
         "modelName": "Observation",
         "icon": "fa fa-comment",
-        "color": "#ffd700",
+        "color": "#bcc00a",
         "viewProperties": {
           "observedBy": {
             "inputType": {
@@ -5430,6 +6333,22 @@ export function ModelDefinitions() {
               {
                 "kind": "list",
                 "contents": [
+                  {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
                   {
                     "propertyName": "id",
                     "customLabel": "ID",
@@ -5492,6 +6411,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -5634,6 +6593,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -5695,6 +6670,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -5788,6 +6803,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -5849,6 +6880,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -5950,6 +7021,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -6011,6 +7098,46 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "kind": "date",
                     "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
                     "editable": false
                   },
                   {
@@ -6229,6 +7356,22 @@ export function ModelDefinitions() {
                 "kind": "list",
                 "contents": [
                   {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "id",
                     "customLabel": "ID",
                     "labelOrientation": "Top",
@@ -6293,20 +7436,52 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
-                  },
-                  {
-                    "propertyName": "taskState",
-                    "customLabel": "taskState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
                   },
                   {
                     "propertyName": "predecessors",
@@ -6378,6 +7553,19 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "number",
+                    "editable": true
+                  }
+                ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "taskState",
+                    "customLabel": "taskState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
                     "editable": true
                   }
                 ]
@@ -6540,7 +7728,7 @@ export function ModelDefinitions() {
         "createdBy": "gmckune",
         "createdOn": 1570033169859,
         "modifiedBy": "gmckune",
-        "modifiedOn": 1587074533594,
+        "modifiedOn": 1591742618536,
         "modelName": "UseCase",
         "icon": "fa fa-lemon-o",
         "color": "#000000",
@@ -6660,7 +7848,8 @@ export function ModelDefinitions() {
                         "labelOrientation": "Top",
                         "kind": "",
                         "visible": true,
-                        "editable": true
+                        "editable": true,
+                        "tableDefinition": ""
                       },
                       {
                         "propertyName": "Postconditions",
@@ -6673,10 +7862,70 @@ export function ModelDefinitions() {
                     ]
                   }
                 ]
+              },
+              "e23e9430-aaa1-11ea-b364-ab76a773089f": {
+                "id": "e23e9430-aaa1-11ea-b364-ab76a773089f",
+                "name": "DocumentFormatDefinition",
+                "header": {
+                  "kind": "header",
+                  "contents": []
+                },
+                "containers": [
+                  {
+                    "kind": "list",
+                    "contents": [
+                      {
+                        "propertyName": "PathName",
+                        "customLabel": "PathName",
+                        "labelOrientation": "Top",
+                        "kind": "text",
+                        "visible": true,
+                        "editable": true
+                      },
+                      {
+                        "propertyName": "PathDescription",
+                        "customLabel": "PathDescription",
+                        "labelOrientation": "Top",
+                        "kind": "text",
+                        "tableDefinition": "",
+                        "visible": true,
+                        "editable": true
+                      },
+                      {
+                        "propertyName": "Preconditions",
+                        "customLabel": "Preconditions",
+                        "labelOrientation": "Top",
+                        "kind": "text",
+                        "tableDefinition": "",
+                        "visible": true,
+                        "editable": true
+                      },
+                      {
+                        "propertyName": "Flow",
+                        "customLabel": "Flow",
+                        "labelOrientation": "Top",
+                        "kind": "",
+                        "tableDefinition": "5b7cf180-aa97-11ea-b459-333ae1bfee22",
+                        "visible": true,
+                        "editable": true
+                      },
+                      {
+                        "propertyName": "Postconditions",
+                        "customLabel": "Postconditions",
+                        "labelOrientation": "Top",
+                        "kind": "text",
+                        "tableDefinition": "",
+                        "visible": true,
+                        "editable": true
+                      }
+                    ]
+                  }
+                ]
               }
             },
             "defaultFormatKey": {
-              "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1"
+              "default": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
+              "document": "e23e9430-aaa1-11ea-b364-ab76a773089f"
             },
             "tableDefinitions": {}
           }
@@ -6702,6 +7951,22 @@ export function ModelDefinitions() {
               {
                 "kind": "list",
                 "contents": [
+                  {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
                   {
                     "propertyName": "id",
                     "customLabel": "ID",
@@ -6767,20 +8032,52 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "children",
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
-                  },
-                  {
-                    "propertyName": "decisionState",
-                    "customLabel": "decisionState",
-                    "labelOrientation": "Top",
-                    "visible": true,
-                    "kind": "state-editor",
-                    "editable": true
                   },
                   {
                     "propertyName": "approvedBy",
@@ -6843,7 +8140,7 @@ export function ModelDefinitions() {
                     "customLabel": "Actors",
                     "labelOrientation": "Top",
                     "visible": true,
-                    "kind": "text",
+                    "kind": "",
                     "editable": true
                   },
                   {
@@ -6863,11 +8160,24 @@ export function ModelDefinitions() {
                     "editable": true
                   }
                 ]
+              },
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "decisionState",
+                    "customLabel": "decisionState",
+                    "labelOrientation": "Top",
+                    "visible": true,
+                    "kind": "state-editor",
+                    "editable": true
+                  }
+                ]
               }
             ]
           },
           "89324a90-a7af-11e8-8662-71e48f0160fe": {
-            "name": "New definition",
+            "name": "DocumentDefForUC",
             "header": {
               "kind": "header",
               "contents": [
