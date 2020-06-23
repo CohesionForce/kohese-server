@@ -43,11 +43,11 @@ describe('Component: Admin', ()=>{
 
     adminFixture = TestBed.createComponent(AdminComponent);
     adminComponent = adminFixture.componentInstance;
-    
+
     let koheseUserDataModel: any = MockItem();
     koheseUserDataModel.id = 'KoheseUser';
     new ItemProxy('Item', koheseUserDataModel);
-    
+
     let koheseUserViewModel: any = MockItem();
     koheseUserViewModel.id = 'view-koheseuser';
     new ItemProxy('Item', koheseUserViewModel);
