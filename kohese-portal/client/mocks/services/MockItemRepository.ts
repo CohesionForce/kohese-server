@@ -13,6 +13,10 @@ import { RepoStates,
 import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
 import { MockItemCache } from './MockItemCache';
 import { ItemCache } from '../../../common/src/item-cache';
+import { Type, TypeKind } from '../../../common/src/Type.interface';
+import { KoheseDataModel,
+  KoheseViewModel } from '../../../common/src/KoheseModel.interface';
+import { FormatDefinitionType } from '../../../common/src/FormatDefinition.interface';
 
 export class MockItemRepository {
   static modelDefinitions = ModelDefinitions();
@@ -41,14 +45,53 @@ export class MockItemRepository {
 
     for(let modelName in MockItemRepository.modelDefinitions.model) {
       console.log('::: Loading ' + modelName);
-      let modelDefn = MockItemRepository.modelDefinitions.model[modelName];
-      let model = new KoheseModel(modelDefn);
+      let dataModel: KoheseDataModel = MockItemRepository.modelDefinitions.
+        model[modelName];
+      if (dataModel.name === 'KoheseModel') {
+        dataModel.localTypes['Enumeration'] = {
+          typeKind: TypeKind.ENUMERATION,
+          id: 'Enumeration',
+          name: 'Enumeration',
+          values: [{
+            name: 'EnumerationValue',
+            description: '',
+          }]
+        } as Type;
+    
+        dataModel.properties['enumerationAttribute'] = {
+          name: 'enumerationAttribute',
+          type: 'Enumeration',
+          relation: { contained: true }
+        };
+      }
+
+      new KoheseModel(dataModel);
     }
 
     for(let viewName in MockItemRepository.modelDefinitions.view) {
       console.log('::: Loading ' + viewName);
-      let viewDefn = MockItemRepository.modelDefinitions.view[viewName];
-      let view = new ItemProxy('KoheseView',viewDefn)
+      let viewModel: KoheseViewModel = MockItemRepository.modelDefinitions.view[
+        viewName];
+      if (viewModel.modelName === 'KoheseModel') {
+        viewModel.localTypes['Enumeration'] = {
+          typeKind: TypeKind.ENUMERATION,
+          id: 'Enumeration',
+          name: 'Enumeration',
+          values: ['Enumeration Value']
+        } as Type;
+
+        viewModel.formatDefinitions[viewModel.defaultFormatKey[
+          FormatDefinitionType.DEFAULT]].containers[0].contents.push({
+          propertyName: 'enumerationAttribute',
+          customLabel: 'Enumeration Attribute',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        });
+      }
+
+      new ItemProxy('KoheseView', viewModel);
     }
 
     KoheseModel.modelDefinitionLoadingComplete();
@@ -127,8 +170,8 @@ export class MockItemRepository {
 
   }
 
-  upsertItem() {
-
+  public upsertItem(kind: string, item: any): Promise<ItemProxy> {
+    return Promise.resolve(new ItemProxy(kind, item));
   }
 
   public getChangeSubject(): Subject<any> {
@@ -141,6 +184,14 @@ export class MockItemRepository {
     proxy.item.id = id;
     return Promise.resolve(proxy);
   }
+
+  public getStringRepresentation(koheseObject: any, attributeName: string,
+    index: number, enclosingType: KoheseDataModel, dataModel: KoheseDataModel,
+    viewModel: KoheseViewModel, formatDefinitionType: FormatDefinitionType):
+    string {
+    return String(koheseObject[attributeName]);
+  }
+
   async setTreeConfig() {
 
   }

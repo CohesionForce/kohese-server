@@ -1,10 +1,9 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   ViewChild, Output, EventEmitter } from '@angular/core';
 import { MatTable } from '@angular/material';
-import * as Uuid from 'uuid/v1';
+import * as Uuid from 'uuid';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
 import { FormatDefinition,
@@ -186,8 +185,8 @@ export class DataModelEditorComponent {
   }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _dialogService: DialogService, private _dynamicTypesService:
-    DynamicTypesService, private _itemRepository: ItemRepository) {
+    private _dialogService: DialogService, private _itemRepository:
+    ItemRepository) {
   }
   
   public save(): void {
@@ -634,7 +633,7 @@ export class DataModelEditorComponent {
       koheseViewModel.viewProperties[results[1].attribute.name] = results[
         1].view;
       
-      let formatDefinitionId: string = (<any> Uuid).default();
+      let formatDefinitionId: string = Uuid.v1();
       let defaultFormatDefinition: FormatDefinition = {
         id: formatDefinitionId,
         name: 'Default Format Definition',

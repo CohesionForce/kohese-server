@@ -78,8 +78,7 @@
         <mat-select [ngModel]="element.type" (ngModelChange)="typeSelected(
           element, $event)" [compareWith]="areTypesSame"
           [disabled]="!editable">
-          <mat-option *ngFor="let attributeType of (attributeTypes |
-            mapKey)"
+          <mat-option *ngFor="let attributeType of Object.keys(attributeTypes)"
             [value]="attributeTypes[attributeType]">
             {{attributeType}}
           </mat-option>
@@ -102,7 +101,7 @@
             [ngModel]="element.relation" (ngModelChange)="element.
             relation = $event; modifiedEventEmitter.emit()"
             [compareWith]="areRelationsEqual" [disabled]="!editable">
-            <mat-optgroup *ngFor="let typeName of (idAttributes | mapKey)"
+            <mat-optgroup *ngFor="let typeName of Object.keys(idAttributes)"
               [label]="typeName">
               <mat-option *ngFor="let attributeName of idAttributes[
                 typeName]" [value]="{ kind: typeName, foreignKey:

@@ -839,6 +839,16 @@ export class FormatObjectEditorComponent implements OnInit {
     }
   }
   
+  /**
+   * Should determine whether the given PropertyDefinition corresponds to an
+   * enumeration attribute
+   * 
+   * This method assumes that the attribute corresponding to the given
+   * PropertyDefinition has already been determined to be a local type-typed
+   * attribute.
+   * 
+   * @param propertyDefinition
+   */
   public isEnumerationAttribute(propertyDefinition: PropertyDefinition):
     boolean {
     let type: any = this._selectedType.classProperties[propertyDefinition.

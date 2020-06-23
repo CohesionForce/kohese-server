@@ -29,6 +29,8 @@ import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
 import { TypeKind } from '../../../../common/src/Type.interface';
 import { EnumerationValue } from '../../../../common/src/Enumeration.interface';
+import { KoheseDataModel,
+  KoheseViewModel } from '../../../../common/src/KoheseModel.interface';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -1169,8 +1171,9 @@ export class ItemRepository {
   }
   
   public getStringRepresentation(koheseObject: any, attributeName: string,
-    index: number, enclosingType: any, dataModel: any, viewModel: any,
-    formatDefinitionType: FormatDefinitionType): string {
+    index: number, enclosingType: KoheseDataModel, dataModel: KoheseDataModel,
+    viewModel: KoheseViewModel, formatDefinitionType: FormatDefinitionType):
+    string {
     let value: any;
     if (index != null) {
       value = koheseObject[attributeName][index];
@@ -1178,7 +1181,7 @@ export class ItemRepository {
       value = koheseObject[attributeName];
     }
     
-    if ((attributeName === 'parentId') && (dataModel.classProperties[
+    if ((attributeName === 'parentId') && (dataModel['classProperties'][
       attributeName].definedInKind === 'Item') && ((typeof value) ===
       'string')) {
       return this.currentTreeConfigSubject.getValue().config.getProxyFor(
@@ -1187,10 +1190,11 @@ export class ItemRepository {
 
     let representation: string = String(value);
     if (representation === String({})) {
-      let type: any = dataModel.classProperties[attributeName].definition.type;
+      let type: any = dataModel['classProperties'][attributeName].definition.
+        type;
       type = (Array.isArray(type) ? type[0] : type);
-      let classLocalTypes: any = (enclosingType ? enclosingType : dataModel).
-        classLocalTypes;
+      let classLocalTypes: any = (enclosingType ? enclosingType : dataModel)[
+        'classLocalTypes'];
       if (classLocalTypes && classLocalTypes[type]) {
         if (value.name) {
           return value.name;

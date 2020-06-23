@@ -10,7 +10,7 @@ import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition
 import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { TypeKind } from '../../../../../common/src/Type.interface';
+import { Type, TypeKind } from '../../../../../common/src/Type.interface';
 
 @Component({
   selector: 'format-definition-editor',
@@ -218,10 +218,11 @@ export class FormatDefinitionEditorComponent implements OnInit {
           0] : attribute.type);
         let classLocalTypesEntry: any = (this._enclosingType ? this.
           _enclosingType : this._dataModel).classLocalTypes[typeName];
-        return (!classLocalTypesEntry || (Object.values(this._itemRepository.
-          getTreeConfig().getValue().config.getProxyFor('view-' +
-          classLocalTypesEntry.definedInKind.toLowerCase()).item.localTypes[
-          typeName].formatDefinitions).length > 0));
+        return (!classLocalTypesEntry || (classLocalTypesEntry.definition.
+          typeKind === TypeKind.ENUMERATION) || (Object.values(this.
+          _itemRepository.getTreeConfig().getValue().config.getProxyFor(
+          'view-' + classLocalTypesEntry.definedInKind.toLowerCase()).item.
+          localTypes[typeName].formatDefinitions).length > 0));
       });
     } else {
       return this._attributes;
@@ -399,7 +400,11 @@ export class FormatDefinitionEditorComponent implements OnInit {
     } else if (this._userInterfaceTypes[type]) {
       return Object.keys(this._userInterfaceTypes[type]);
     } else {
-      if (this.isEnumerationAttribute(propertyDefinition)) {
+      let classLocalTypesEntry: { definedInKind: string, definition: Type } =
+        (this._enclosingType ? this._enclosingType : this._dataModel).
+        classLocalTypes[type];
+      if (classLocalTypesEntry && (classLocalTypesEntry.definition.typeKind ===
+        TypeKind.ENUMERATION)) {
         return ['Dropdown'];
       } else {
         return ['Reference'];
@@ -407,28 +412,19 @@ export class FormatDefinitionEditorComponent implements OnInit {
     }
   }
   
-  public isEnumerationAttribute(propertyDefinition: PropertyDefinition):
-    boolean {
-    let type: any = this._dataModel.classProperties[propertyDefinition.
-      propertyName].definition.type;
-    type = (Array.isArray(type) ? type[0] : type);
-    return ((this._enclosingType ? this._enclosingType : this._dataModel).
-      classLocalTypes[type].definition.typeKind === TypeKind.ENUMERATION);
-  }
-  
-  public getUserInterfaceTypeValue(attributeName: string, userInterfaceType:
-    string): string {
+  public getUserInterfaceTypeValue(propertyDefinition: PropertyDefinition,
+    userInterfaceType: string): string {
     if ((userInterfaceType === 'Reference') || (userInterfaceType ===
       'Dropdown')) {
       return '';
     } else {
       if ((userInterfaceType === Object.keys(this._userInterfaceTypes[
         'user-selector'])[0]) && this._dataModel.classProperties[
-        attributeName].definition.relation) {
+        propertyDefinition.propertyName].definition.relation) {
         return 'user-selector';
       } else {
-        let type: any = this._dataModel.classProperties[attributeName].
-          definition.type;
+        let type: any = this._dataModel.classProperties[propertyDefinition.
+          propertyName].definition.type;
         type = (Array.isArray(type) ? type[0] : type);
         return this._userInterfaceTypes[type][userInterfaceType];
       }

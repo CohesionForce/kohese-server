@@ -1,6 +1,10 @@
+import { ComponentType } from '@angular/cdk/portal';
+import { MatDialogRef } from '@angular/material';
 import { of as observableOf } from 'rxjs';
 
 import { TreeConfiguration } from '../../../common/src/tree-configuration';
+import { ComponentDialogComponent,
+  ComponentDialogConfiguration } from '../../src/components/dialog/component-dialog/component-dialog.component';
 
 export class MockDialogService {
   public constructor() {
@@ -26,7 +30,8 @@ export class MockDialogService {
     return Promise.resolve(options[0]);
   }
 
-  public openComponentDialog(componentReference: any, data: any): any {
+  public openComponentDialog<T>(componentReference: ComponentType<T>, data:
+    any): MatDialogRef<T> {
     let dialogRefPlaceholder: any = {
       'updateSize': (width: string, height: string) => {
         return dialogRefPlaceholder;
@@ -40,5 +45,20 @@ export class MockDialogService {
     };
 
     return dialogRefPlaceholder;
+  }
+
+  public openComponentsDialog(componentDialogConfigurations:
+    Array<ComponentDialogConfiguration>, dialogConfiguration: any):
+    MatDialogRef<ComponentDialogComponent> {
+    let matDialogRefPlaceholder: MatDialogRef<ComponentDialogComponent> = ({
+      'updateSize': (width: string, height: string) => {
+        return matDialogRefPlaceholder;
+      },
+      'afterClosed': () => {
+        return observableOf(componentDialogConfigurations);
+      }
+    } as MatDialogRef<ComponentDialogComponent>);
+
+    return matDialogRefPlaceholder;
   }
 }
