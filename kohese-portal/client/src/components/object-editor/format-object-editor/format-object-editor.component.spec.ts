@@ -18,7 +18,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 
-fdescribe('FormatObjectEditorComponent', () => {
+describe('FormatObjectEditorComponent', () => {
   let component: FormatObjectEditorComponent;
 
   beforeEach(() => {
