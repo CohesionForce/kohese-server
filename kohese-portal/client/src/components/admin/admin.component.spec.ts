@@ -17,45 +17,45 @@ import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { PipesModule } from '../../pipes/pipes.module';
 import { MockUserData } from '../../../mocks/data/MockUser';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { LensModule } from '../lens/lens.module';
 
-describe('Component: Admin', ()=>{
+import { LensModule } from '../lens/lens.module';
+import { LensService } from '../../services/lens-service/lens.service';
+import { MockLensService } from '../../../mocks/services/MockLensService';
+
+describe('Component: Admin', () => {
   let adminComponent: AdminComponent;
   let adminFixture : ComponentFixture<AdminComponent>;
 
-  beforeEach(()=>{
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [AdminComponent],
-      imports : [CommonModule,
-         MaterialModule,
-         BrowserAnimationsModule,
-         PipesModule,
-         FormsModule,
-         ReactiveFormsModule
-         ],
+      imports : [
+        CommonModule,
+        MaterialModule,
+        BrowserAnimationsModule,
+        PipesModule,
+        FormsModule,
+        ReactiveFormsModule
+        ],
       schemas: [NO_ERRORS_SCHEMA],
+
       providers: [
-        {provide: ItemRepository, useClass: MockItemRepository},
-        {provide: SessionService, useClass: MockSessionService},
-        { provide: DialogService, useClass: MockDialogService }
+        { provide: ItemRepository, useClass: MockItemRepository },
+        { provide: SessionService, useClass: MockSessionService },
+        { provide: DialogService, useClass: MockDialogService },
+        { provide: LensService, useClass: MockLensService },
+
       ]
     }).compileComponents();
 
     adminFixture = TestBed.createComponent(AdminComponent);
     adminComponent = adminFixture.componentInstance;
-    
-    let koheseUserDataModel: any = MockItem();
-    koheseUserDataModel.id = 'KoheseUser';
-    new ItemProxy('Item', koheseUserDataModel);
-    
-    let koheseUserViewModel: any = MockItem();
-    koheseUserViewModel.id = 'view-koheseuser';
-    new ItemProxy('Item', koheseUserViewModel);
 
     adminFixture.detectChanges();
   });
 
-  //it('instantiates the admin component', ()=>{
-  //  expect(adminComponent).toBeTruthy();
-  //});
+  it('should instantiate the admin component', () => {
+   expect(AdminComponent).toBeTruthy();
+  });
+
 });
