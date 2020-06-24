@@ -15,4 +15,3 @@ export interface NonContainmentReferenceSpecification {
   type: string;
   foreignKey: string;
 }
-

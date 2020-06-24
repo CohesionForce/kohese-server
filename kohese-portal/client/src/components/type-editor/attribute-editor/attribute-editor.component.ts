@@ -4,10 +4,9 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { Dialog } from '../../dialog/Dialog.interface';
-import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
+import { TypeKind } from '../../../../../common/src/Type.interface';
 
 @Component({
   selector: 'attribute-editor',
@@ -94,7 +93,8 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     },
     'string': {
       'Text': 'text',
-      'Markdown': 'markdown'
+      'Markdown': 'markdown',
+      'Masked String': 'maskedString'
     },
     'StateMachine': {
       'State': 'state-editor'
@@ -253,12 +253,18 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     } else if (this._displayTypes[dataModelType]) {
       return Object.keys(this._displayTypes[dataModelType]);
     } else {
-      return ['Reference'];
+      if (this._contextualGlobalType.classLocalTypes[dataModelType] && this.
+        _contextualGlobalType.classLocalTypes[dataModelType].definition.
+        typeKind === TypeKind.ENUMERATION) {
+        return ['Dropdown'];
+      } else {
+        return ['Reference'];
+      }
     }
   }
   
   public getTypeValue(type: string): string {
-    if (type === 'Reference') {
+    if ((type === 'Reference') || (type === 'Dropdown')) {
       return '';
     } else {
       if ((type === Object.keys(this._displayTypes['user-selector'])[0]) &&

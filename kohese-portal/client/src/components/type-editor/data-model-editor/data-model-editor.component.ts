@@ -1,22 +1,26 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   ViewChild, Output, EventEmitter } from '@angular/core';
 import { MatTable } from '@angular/material';
-import * as Uuid from 'uuid/v1';
+import * as Uuid from 'uuid';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
 import { FormatDefinition,
-  FormatDefinitionType } from '../FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
-  FormatContainerKind } from '../FormatContainer.interface';
-import { PropertyDefinition } from '../PropertyDefinition.interface';
+  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 import { InputDialogKind,
   InputDialogComponent } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { Type, TypeKind } from '../../../../../common/src/Type.interface';
+import { KoheseDataModel,
+  KoheseViewModel } from '../../../../../common/src/KoheseModel.interface';
+import { Enumeration,
+  EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 
 @Component({
   selector: 'data-model-editor',
@@ -168,6 +172,10 @@ export class DataModelEditorComponent {
     return this._attributes;
   }
   
+  get TypeKind() {
+    return TypeKind;
+  }
+  
   get Array() {
     return Array;
   }
@@ -177,8 +185,8 @@ export class DataModelEditorComponent {
   }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _dialogService: DialogService, private _dynamicTypesService:
-    DynamicTypesService, private _itemRepository: ItemRepository) {
+    private _dialogService: DialogService, private _itemRepository:
+    ItemRepository) {
   }
   
   public save(): void {
@@ -527,7 +535,7 @@ export class DataModelEditorComponent {
     return (option.name === selection);
   }
   
-  public async addLocalType(): Promise<void> {
+  public async addLocalType(typeKind: TypeKind): Promise<void> {
     let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('view-' + this._dataModel.name.toLowerCase());
     if (this._hasUnsavedChanges || viewModelProxy.dirty) {
@@ -540,126 +548,166 @@ export class DataModelEditorComponent {
       }
     }
     
-    this._dialogService.openComponentsDialog([{
-      component: InputDialogComponent,
-      matDialogData: {
-        inputDialogConfiguration: {
-          title: 'Local Type',
-          text: '',
-          fieldName: 'Name',
-          value: 'Local Type',
-          validate: (input: any) => {
-            return !!input;
-          },
-          inputDialogKind: InputDialogKind.STRING
-        }
-      },
-      label: 'Name'
-    }, {
-      component: AttributeEditorComponent,
-      matDialogData: {
-        contextualGlobalType: this._dataModel
-      },
-      label: 'Attribute'
-    }], { data: {} }).updateSize('90%', '90%').afterClosed().subscribe(
-      (results: Array<any>) => {
-      if (results) {
-        let dataModel: any = {
-          name: results[0],
-          base: null,
-          idInjection: true,
-          properties: {},
-          validations: [],
-          relations: {},
-          acls: [],
-          methods: []
-        };
-        dataModel.properties[results[1].attribute.name] = results[1].attribute;
-        
-        let viewModel: any = {
-          name: results[0],
-          modelName: results[0],
-          icon: '',
-          color: '#000000',
-          viewProperties: {},
-          formatDefinitions: {},
-          defaultFormatKey: {},
-          tableDefinitions: {}
-        };
-        viewModel.viewProperties[results[1].attribute.name] = results[1].view;
-        
-        let formatDefinitionId: string = (<any> Uuid).default();
-        let defaultFormatDefinition: FormatDefinition = {
-          id: formatDefinitionId,
-          name: 'Default Format Definition',
-          header: {
-            kind: FormatContainerKind.HEADER,
-            contents: []
-          },
-          containers: [{
-            kind: FormatContainerKind.VERTICAL,
-            contents: []
-          }]
-        };
-        
-        let propertyDefinition: PropertyDefinition = {
-          propertyName: results[1].attribute.name,
-          customLabel: results[1].view.displayName,
-          labelOrientation: 'Top',
-          kind: '',
-          visible: true,
-          editable: true
-        };
-        let type: any = results[1].attribute.type;
-        type = (Array.isArray(type) ? type[0] : type);
-        switch (type) {
-          case 'boolean':
-            propertyDefinition.kind = 'boolean';
-            break;
-          case 'number':
-            propertyDefinition.kind = 'number';
-            break;
-          case 'string':
-            propertyDefinition.kind = 'text';
-            break;
-          case 'StateMachine':
-            propertyDefinition.kind = 'state-editor';
-            break;
-          case 'timestamp':
-            propertyDefinition.kind = 'date';
-            break;
-          case 'user-selector':
-            propertyDefinition.kind = 'user-selector';
-            break;
-        }
-        
-        if (type === 'StateMachine') {
-          defaultFormatDefinition.containers.push({
-            kind: FormatContainerKind.VERTICAL,
-            contents: [propertyDefinition]
-          });
-        } else {
-          defaultFormatDefinition.containers[0].contents.push(
-            propertyDefinition);
-        }
-        
-        viewModel.formatDefinitions[formatDefinitionId] =
-          defaultFormatDefinition;
-        viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
-          formatDefinitionId;
-
-        this._dataModel.localTypes[results[0]] = dataModel;
-        viewModelProxy.item.localTypes[results[0]] = viewModel;
-        
-        this.save();
-        this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
-        
-        // Re-enter edit mode
-        this._editable = true;
-        
-        this._changeDetectorRef.markForCheck();
+    let localTypeDataModel: Type;
+    let localTypeViewModel: Type;
+    if (typeKind === TypeKind.ENUMERATION) {
+      let name: string = await this._dialogService.openInputDialog('Add ' +
+        'Enumeration', '', InputDialogKind.STRING, 'Name', 'Enumeration',
+        (value: any) => {
+        return (value && !(this._enclosingType ? this._enclosingType : this.
+          _dataModel).classLocalTypes[value]);
+      });
+      
+      if (!name) {
+        return;
       }
-    });
+      
+      localTypeDataModel = ({
+        typeKind: TypeKind.ENUMERATION,
+        id: name,
+        name: name,
+        values: []
+      } as Enumeration);
+      localTypeViewModel = ({
+        typeKind: TypeKind.ENUMERATION,
+        id: 'view-' + name.toLowerCase(),
+        name: name,
+        values: []
+      } as Enumeration);
+    } else {
+      let results: Array<any> = await this._dialogService.
+        openComponentsDialog([{
+        component: InputDialogComponent,
+        matDialogData: {
+          inputDialogConfiguration: {
+            title: 'Local Type',
+            text: '',
+            fieldName: 'Name',
+            value: 'Local Type',
+            validate: (input: any) => {
+              return !!input;
+            },
+            inputDialogKind: InputDialogKind.STRING
+          }
+        },
+        label: 'Name'
+      }, {
+        component: AttributeEditorComponent,
+        matDialogData: {
+          contextualGlobalType: this._dataModel
+        },
+        label: 'Attribute'
+      }], { data: {} }).updateSize('90%', '90%').afterClosed().toPromise();
+      
+      if (!results) {
+        return;
+      }
+      
+      let koheseDataModel: KoheseDataModel = {
+        typeKind: TypeKind.KOHESE_MODEL,
+        id: results[0],
+        name: results[0],
+        base: null,
+        idInjection: true,
+        properties: {},
+        validations: [],
+        relations: {},
+        acls: [],
+        methods: []
+      };
+      koheseDataModel.properties[results[1].attribute.name] = results[1].
+        attribute;
+      
+      let koheseViewModel: KoheseViewModel = {
+        typeKind: TypeKind.KOHESE_MODEL,
+        id: 'view-' + results[0].toLowerCase(),
+        name: results[0],
+        modelName: results[0],
+        icon: '',
+        color: '#000000',
+        viewProperties: {},
+        formatDefinitions: {},
+        defaultFormatKey: {},
+        tableDefinitions: {}
+      };
+      koheseViewModel.viewProperties[results[1].attribute.name] = results[
+        1].view;
+      
+      let formatDefinitionId: string = Uuid.v1();
+      let defaultFormatDefinition: FormatDefinition = {
+        id: formatDefinitionId,
+        name: 'Default Format Definition',
+        header: {
+          kind: FormatContainerKind.HEADER,
+          contents: []
+        },
+        containers: [{
+          kind: FormatContainerKind.VERTICAL,
+          contents: []
+        }]
+      };
+      
+      let propertyDefinition: PropertyDefinition = {
+        propertyName: results[1].attribute.name,
+        customLabel: results[1].view.displayName,
+        labelOrientation: 'Top',
+        kind: '',
+        visible: true,
+        editable: true
+      };
+      let type: any = results[1].attribute.type;
+      type = (Array.isArray(type) ? type[0] : type);
+      switch (type) {
+        case 'boolean':
+          propertyDefinition.kind = 'boolean';
+          break;
+        case 'number':
+          propertyDefinition.kind = 'number';
+          break;
+        case 'string':
+          propertyDefinition.kind = 'text';
+          break;
+        case 'StateMachine':
+          propertyDefinition.kind = 'state-editor';
+          break;
+        case 'timestamp':
+          propertyDefinition.kind = 'date';
+          break;
+        case 'user-selector':
+          propertyDefinition.kind = 'user-selector';
+          break;
+      }
+      
+      if (type === 'StateMachine') {
+        defaultFormatDefinition.containers.push({
+          kind: FormatContainerKind.VERTICAL,
+          contents: [propertyDefinition]
+        });
+      } else {
+        defaultFormatDefinition.containers[0].contents.push(
+          propertyDefinition);
+      }
+      
+      koheseViewModel.formatDefinitions[formatDefinitionId] =
+        defaultFormatDefinition;
+      koheseViewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
+        formatDefinitionId;
+      
+      localTypeDataModel = koheseDataModel;
+      localTypeViewModel = koheseViewModel;
+    }
+    
+    this._dataModel.localTypes[localTypeDataModel.name] = localTypeDataModel;
+    viewModelProxy.item.localTypes[localTypeViewModel.name] =
+      localTypeViewModel;
+    
+    this.save();
+    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+    
+    // Re-enter edit mode
+    this._editable = true;
+    
+    this._changeDetectorRef.markForCheck();
   }
   
   public async removeLocalType(name: string): Promise<void> {
@@ -1613,5 +1661,70 @@ export class DataModelEditorComponent {
         this._changeDetectorRef.markForCheck();
       }
     }
+  }
+  
+  public async addEnumerationValue(enumeration: Enumeration): Promise<void> {
+    let viewModelProxy: ItemProxy = this._itemRepository.getTreeConfig().
+      getValue().config.getProxyFor('view-' + (this._enclosingType ? this.
+      _enclosingType : this._dataModel).name.toLowerCase());
+    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
+      let response: any = await this._dialogService.openYesNoDialog(
+        'Display Modifications', 'All unsaved modifications to this kind ' +
+        'are to be saved if a value is added to this enumeration. Do you ' +
+        'want to proceed?');
+      if (!response) {
+        return;
+      }
+    }
+
+    let enumerationValueName: any = await this._dialogService.
+      openInputDialog('Enumeration Value', '', InputDialogKind.STRING, 'Name',
+      'Enumeration Value', (input: any) => {
+      return (input && (enumeration.values.map((enumerationValue:
+        EnumerationValue) => {
+        return enumerationValue.name;
+      }).indexOf(input) === -1));
+    });
+    if (enumerationValueName) {
+      enumeration.values.push({
+        name: enumerationValueName.toString(),
+        description: ''
+      });
+
+      viewModelProxy.item.localTypes[enumeration.name].values.push(
+        enumerationValueName.toString());
+
+      this.save();
+      this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+      
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+  
+  public async removeEnumerationValue(enumeration: Enumeration,
+    enumerationValue: EnumerationValue): Promise<void> {
+    let viewModelProxy: ItemProxy = this._itemRepository.getTreeConfig().
+      getValue().config.getProxyFor('view-' + (this._enclosingType ? this.
+      _enclosingType : this._dataModel).name.toLowerCase());
+    if (this._hasUnsavedChanges || viewModelProxy.dirty) {
+      let response: any = await this._dialogService.openYesNoDialog(
+        'Display Modifications', 'All unsaved modifications to this kind ' +
+        'are to be saved if this value is removed from this enumeration. Do ' +
+        'you want to proceed?');
+      if (!response) {
+        return;
+      }
+    }
+
+    let enumerationValueIndex: number = enumeration.values.indexOf(
+      enumerationValue);
+    enumeration.values.splice(enumerationValueIndex, 1);
+    viewModelProxy.item.localTypes[enumeration.name].values.splice(
+      enumerationValueIndex, 1);
+    
+    this.save();
+    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+
+    this._changeDetectorRef.markForCheck();
   }
 }

@@ -78,8 +78,7 @@
         <mat-select [ngModel]="element.type" (ngModelChange)="typeSelected(
           element, $event)" [compareWith]="areTypesSame"
           [disabled]="!editable">
-          <mat-option *ngFor="let attributeType of (attributeTypes |
-            mapKey)"
+          <mat-option *ngFor="let attributeType of Object.keys(attributeTypes)"
             [value]="attributeTypes[attributeType]">
             {{attributeType}}
           </mat-option>
@@ -102,7 +101,7 @@
             [ngModel]="element.relation" (ngModelChange)="element.
             relation = $event; modifiedEventEmitter.emit()"
             [compareWith]="areRelationsEqual" [disabled]="!editable">
-            <mat-optgroup *ngFor="let typeName of (idAttributes | mapKey)"
+            <mat-optgroup *ngFor="let typeName of Object.keys(idAttributes)"
               [label]="typeName">
               <mat-option *ngFor="let attributeName of idAttributes[
                 typeName]" [value]="{ kind: typeName, foreignKey:
@@ -193,32 +192,70 @@
       Local Types
     </h3>
     <span class="flex-right-align">
-      <button mat-icon-button matTooltip="Add a local type"
-        (click)="addLocalType()" [disabled]="!editable">
+      <button mat-icon-button [matMenuTriggerFor]="addLocalTypeMenu"
+        [disabled]="!editable">
         <mat-icon class="fa fa-plus"></mat-icon>
       </button>
+      <mat-menu #addLocalTypeMenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item (click)="addLocalType(TypeKind.KOHESE_MODEL)">
+          Kohese Model
+        </button>
+        <button mat-menu-item (click)="addLocalType(TypeKind.ENUMERATION)">
+          Enumeration
+        </button>
+      </mat-menu>
     </span>
     <ng-container *ngFor="let localType of Object.values(dataModel.localTypes)">
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title style="align-items: center;">
-            {{localType.name}}
-          </mat-panel-title>
-          <button mat-icon-button matTooltip="Remove this local type"
-            (click)="removeLocalType(localType.name)" [disabled]="!editable"
-            class="flex-right-align">
-            <mat-icon class="fa fa-trash"></mat-icon>
-          </button>
-        </mat-expansion-panel-header>
-        <ng-template matExpansionPanelContent>
-          <!-- The use of hasUnsavedChanges below is bad but preferred over
-          changing API. -->
-          <data-model-editor [dataModel]="localType"
-            [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
-            emit()" [enclosingType]="dataModel">
-          </data-model-editor>
-        </ng-template>
-      </mat-expansion-panel>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title style="align-items: center;">
+              {{localType.name}}
+            </mat-panel-title>
+            <button mat-icon-button matTooltip="Remove this local type"
+              (click)="removeLocalType(localType.name)" [disabled]="!editable">
+              <mat-icon class="fa fa-trash"></mat-icon>
+            </button>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <ng-container *ngIf="(localType.typeKind === TypeKind.ENUMERATION) else
+              koheseModel">
+              <div style="width: 100%; display: flex; flex-direction: row;">
+                <button mat-icon-button [disabled]="!editable" style="margin-left:
+                  auto;" (click)="addEnumerationValue(localType)">
+                  <mat-icon class="fa fa-plus"></mat-icon>
+                </button>
+              </div>
+              <ng-container *ngFor="let enumerationValue of localType.values">
+                <div style="width: 100%; display: flex; flex-direction: row;">
+                  <mat-form-field style="width: 30%; margin: 0px 3px 0px 3px;">
+                    <input matInput type="text" placeholder="Name"
+                      [disabled]="!editable" [(ngModel)]="enumerationValue.
+                      name"/>
+                  </mat-form-field>
+                  <mat-form-field style="width: 70%; margin: 0px 3px 0px 3px;">
+                    <textarea matInput placeholder="Description"
+                      [disabled]="!editable" [(ngModel)]="enumerationValue.
+                      description" cdkTextareaAutosize>
+                    </textarea>
+                  </mat-form-field>
+                  <button mat-icon-button [disabled]="!editable" style="margin-left:
+                    auto;" (click)="removeEnumerationValue(localType,
+                    enumerationValue)">
+                    <mat-icon class="fa fa-trash"></mat-icon>
+                  </button>
+                </div>
+              </ng-container>
+            </ng-container>
+            <ng-template #koheseModel>
+              <!-- The use of hasUnsavedChanges below is bad but preferred over
+              changing API. -->
+              <data-model-editor [dataModel]="localType"
+                [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
+                emit()" [enclosingType]="dataModel">
+              </data-model-editor>
+            </ng-template>
+          </ng-template>
+        </mat-expansion-panel>
     </ng-container>
   </div>
 </ng-container>

@@ -5,8 +5,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../details/details.component';
 import { FormatDefinition,
-  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
-import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';

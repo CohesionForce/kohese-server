@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatStepper, MatDialogRef } from '@angular/material';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { SessionService } from '../../services/user/session.service';
-import { FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';

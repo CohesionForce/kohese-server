@@ -6,15 +6,17 @@ import { MatTable } from '@angular/material';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatPreviewComponent } from '../format-editor/format-preview/format-preview.component';
-import { TableDefinition } from '../TableDefinition.interface';
+import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { FormatDefinition,
-  FormatDefinitionType } from '../FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
-  FormatContainerKind } from '../FormatContainer.interface';
-import { PropertyDefinition } from '../PropertyDefinition.interface';
+  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { TypeKind } from '../../../../../common/src/Type.interface';
+import { EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 
 interface Icon {
   name: string,
@@ -139,7 +141,8 @@ export class ViewModelEditorComponent {
     },
     'string': {
       'Text': 'text',
-      'Markdown': 'markdown'
+      'Markdown': 'markdown',
+      'Masked String': 'maskedString'
     },
     'StateMachine': {
       'State': 'state-editor'
@@ -154,6 +157,10 @@ export class ViewModelEditorComponent {
   
   get FormatDefinitionType() {
     return FormatDefinitionType;
+  }
+  
+  get TypeKind() {
+    return TypeKind;
   }
   
   get Object() {
@@ -561,5 +568,10 @@ export class ViewModelEditorComponent {
     } else {
       return (option === selection);
     }
+  }
+
+  public getEnumerationValueIdentifier(index: number, enumerationValue:
+    EnumerationValue): string {
+    return index.toString();
   }
 }

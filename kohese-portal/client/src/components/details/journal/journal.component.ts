@@ -6,7 +6,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { SessionService } from '../../../services/user/session.service';
 import { FormatDefinition,
-  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';

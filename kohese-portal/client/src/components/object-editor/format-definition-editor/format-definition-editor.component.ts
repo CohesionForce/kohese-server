@@ -3,13 +3,14 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatDefinition,
-  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
-  FormatContainerKind } from '../../type-editor/FormatContainer.interface';
-import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
-import { TableDefinition } from '../../type-editor/TableDefinition.interface';
+  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
+import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { Type, TypeKind } from '../../../../../common/src/Type.interface';
 
 @Component({
   selector: 'format-definition-editor',
@@ -217,10 +218,11 @@ export class FormatDefinitionEditorComponent implements OnInit {
           0] : attribute.type);
         let classLocalTypesEntry: any = (this._enclosingType ? this.
           _enclosingType : this._dataModel).classLocalTypes[typeName];
-        return (!classLocalTypesEntry || (Object.values(this._itemRepository.
-          getTreeConfig().getValue().config.getProxyFor('view-' +
-          classLocalTypesEntry.definedInKind.toLowerCase()).item.localTypes[
-          typeName].formatDefinitions).length > 0));
+        return (!classLocalTypesEntry || (classLocalTypesEntry.definition.
+          typeKind === TypeKind.ENUMERATION) || (Object.values(this.
+          _itemRepository.getTreeConfig().getValue().config.getProxyFor(
+          'view-' + classLocalTypesEntry.definedInKind.toLowerCase()).item.
+          localTypes[typeName].formatDefinitions).length > 0));
       });
     } else {
       return this._attributes;
@@ -387,32 +389,42 @@ export class FormatDefinitionEditorComponent implements OnInit {
     formatContainer.contents.push(propertyDefinition);
   }
   
-  public getUserInterfaceTypes(attributeName: string): Array<string> {
-    let type: any = this._dataModel.classProperties[attributeName].definition.
-      type;
+  public getUserInterfaceTypes(propertyDefinition: PropertyDefinition):
+    Array<string> {
+    let type: any = this._dataModel.classProperties[propertyDefinition.
+      propertyName].definition.type;
     type = (Array.isArray(type) ? type[0] : type);
-    if ((type === 'string') && this._dataModel.classProperties[attributeName].
-      definition.relation) {
+    if ((type === 'string') && this._dataModel.classProperties[
+      propertyDefinition.propertyName].definition.relation) {
       return Object.keys(this._userInterfaceTypes['user-selector']);
     } else if (this._userInterfaceTypes[type]) {
       return Object.keys(this._userInterfaceTypes[type]);
     } else {
-      return ['Reference'];
+      let classLocalTypesEntry: { definedInKind: string, definition: Type } =
+        (this._enclosingType ? this._enclosingType : this._dataModel).
+        classLocalTypes[type];
+      if (classLocalTypesEntry && (classLocalTypesEntry.definition.typeKind ===
+        TypeKind.ENUMERATION)) {
+        return ['Dropdown'];
+      } else {
+        return ['Reference'];
+      }
     }
   }
   
-  public getUserInterfaceTypeValue(attributeName: string, userInterfaceType:
-    string): string {
-    if (userInterfaceType === 'Reference') {
+  public getUserInterfaceTypeValue(propertyDefinition: PropertyDefinition,
+    userInterfaceType: string): string {
+    if ((userInterfaceType === 'Reference') || (userInterfaceType ===
+      'Dropdown')) {
       return '';
     } else {
       if ((userInterfaceType === Object.keys(this._userInterfaceTypes[
         'user-selector'])[0]) && this._dataModel.classProperties[
-        attributeName].definition.relation) {
+        propertyDefinition.propertyName].definition.relation) {
         return 'user-selector';
       } else {
-        let type: any = this._dataModel.classProperties[attributeName].
-          definition.type;
+        let type: any = this._dataModel.classProperties[propertyDefinition.
+          propertyName].definition.type;
         type = (Array.isArray(type) ? type[0] : type);
         return this._userInterfaceTypes[type][userInterfaceType];
       }

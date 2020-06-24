@@ -6,7 +6,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DetailsComponent } from '../details/details.component';
 import { FormatDefinition,
-  FormatDefinitionType } from '../type-editor/FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 

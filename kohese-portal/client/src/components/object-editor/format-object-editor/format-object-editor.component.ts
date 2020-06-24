@@ -7,15 +7,17 @@ import { MAT_DIALOG_DATA, MatDialogRef,
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatDefinition,
-  FormatDefinitionType } from '../../type-editor/FormatDefinition.interface';
+  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
-  FormatContainerKind } from '../../type-editor/FormatContainer.interface';
-import { PropertyDefinition } from '../../type-editor/PropertyDefinition.interface';
+  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 import { TreeComponent } from '../../tree/tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { TypeKind } from '../../../../../common/src/Type.interface';
 import { Attribute } from '../../../../../common/src/Attribute.interface';
+import { EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 
 @Component({
   selector: 'format-object-editor',
@@ -322,16 +324,33 @@ export class FormatObjectEditorComponent implements OnInit {
         }
         if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
           return row[columnId].map((value: any, index: number) => {
-            // Bullet-ize string representations
-            return '\u2022 ' + this._itemRepository.getStringRepresentation(
-              row, columnId, index, (this._enclosingType ? this.
-              _enclosingType : this._selectedType), dataModel, viewModel, this.
-              _formatDefinitionType);
+            let representation: string;
+            if (dataModel.typeKind === TypeKind.ENUMERATION) {
+              representation = viewModel.values[dataModel.values.map(
+                (enumerationValue: EnumerationValue) => {
+                return enumerationValue.name;
+              }).indexOf(value)];
+            } else {
+              representation = this._itemRepository.getStringRepresentation(
+                row, columnId, index, (this._enclosingType ? this.
+                _enclosingType : this._selectedType), dataModel, viewModel, this.
+                _formatDefinitionType);
+            }
+
+            // Bullet-ize string representation
+            return ('\u2022 ' + representation);
           }).join('\n');
         } else {
-          return this._itemRepository.getStringRepresentation(row, columnId,
-            undefined, (this._enclosingType ? this._enclosingType : this.
-            _selectedType), dataModel, viewModel, this._formatDefinitionType);
+          if (dataModel.typeKind === TypeKind.ENUMERATION) {
+            return viewModel.values[dataModel.values.map((enumerationValue:
+              EnumerationValue) => {
+              return enumerationValue.name;
+            }).indexOf(row[columnId])];
+          } else {
+            return this._itemRepository.getStringRepresentation(row, columnId,
+              undefined, (this._enclosingType ? this._enclosingType : this.
+              _selectedType), dataModel, viewModel, this._formatDefinitionType);
+          }
         }
       }
       
@@ -517,6 +536,10 @@ export class FormatObjectEditorComponent implements OnInit {
           let classLocalTypesEntry: any = (this._enclosingType ? this.
             _enclosingType : this._selectedType).classLocalTypes[type];
           let localTypeDataModel: any = classLocalTypesEntry.definition;
+          if (localTypeDataModel.typeKind === TypeKind.ENUMERATION) {
+            return null;
+          }
+
           let localTypeInstance: any = {};
           for (let attributeName in localTypeDataModel.classProperties) {
             let localTypeAttribute: any = localTypeDataModel.classProperties[
@@ -531,6 +554,10 @@ export class FormatObjectEditorComponent implements OnInit {
                 _enclosingType ? this._enclosingType : this._selectedType).
                 classLocalTypes[localTypeAttributeTypeName];
               if (classLocalTypesEntry) {
+                if (classLocalTypesEntry.definition.typeKind === TypeKind.
+                  ENUMERATION) {
+                  localTypeInstance[attributeName] = null;
+                }
               } else {
                 if (Array.isArray(localTypeAttribute.type)) {
                   localTypeInstance[attributeName] = [];
@@ -719,7 +746,7 @@ export class FormatObjectEditorComponent implements OnInit {
       this._changeDetectorRef.markForCheck();
     };
   }
-
+  
   public getMultivaluedAttributeValueIdentifier(index: number, element: any):
     string {
     return index.toString();
@@ -810,5 +837,46 @@ export class FormatObjectEditorComponent implements OnInit {
         expansionPanels[j].close();
       }
     }
+  }
+  
+  /**
+   * Should determine whether the given PropertyDefinition corresponds to an
+   * enumeration attribute
+   * 
+   * This method assumes that the attribute corresponding to the given
+   * PropertyDefinition has already been determined to be a local type-typed
+   * attribute.
+   * 
+   * @param propertyDefinition
+   */
+  public isEnumerationAttribute(propertyDefinition: PropertyDefinition):
+    boolean {
+    let type: any = this._selectedType.classProperties[propertyDefinition.
+      propertyName].definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    return ((this._enclosingType ? this._enclosingType : this._selectedType).
+      classLocalTypes[type].definition.typeKind === TypeKind.ENUMERATION);
+  }
+  
+  public getOptions(attributeName: string): Array<string> {
+    let type: any = this._selectedType.classProperties[attributeName].
+      definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    return (this._enclosingType ? this._enclosingType : this._selectedType).
+      classLocalTypes[type].definition.values;
+  }
+
+  public getEnumerationValueRepresentation(propertyDefinition:
+    PropertyDefinition, enumerationValue: EnumerationValue): string {
+    let type: any = this._selectedType.classProperties[propertyDefinition.
+      propertyName].definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    let classLocalTypesEntry: { definedInKind: string, definition: any } =
+      (this._enclosingType ? this._enclosingType : this._selectedType).
+      classLocalTypes[type];
+    return this._itemRepository.getTreeConfig().getValue().config.
+      getProxyFor('view-' + classLocalTypesEntry.definedInKind.toLowerCase()).
+      item.localTypes[type].values[classLocalTypesEntry.definition.values.
+      indexOf(enumerationValue)];
   }
 }
