@@ -5,7 +5,6 @@
   "modelName": "Decision",
   "icon": "fa fa-gavel",
   "color": "#add8e6",
-  "localTypes": {},
   "viewProperties": {
     "decisionState": {
       "inputType": {
@@ -20,7 +19,8 @@
       },
       "required": true,
       "default": "Proposed",
-      "displayName": "DecisionState"
+      "displayName": "DecisionState",
+      "name": "decisionState"
     },
     "approvedBy": {
       "inputType": {
@@ -29,7 +29,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "approvedBy"
+      "displayName": "approvedBy",
+      "name": "approvedBy"
     },
     "approvedOn": {
       "inputType": {
@@ -38,7 +39,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "approvedOn"
+      "displayName": "approvedOn",
+      "name": "approvedOn"
     },
     "rationale": {
       "inputType": {
@@ -49,7 +51,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "rationale"
+      "displayName": "rationale",
+      "name": "rationale"
     },
     "alternatives": {
       "inputType": {
@@ -60,9 +63,19 @@
       },
       "required": false,
       "default": null,
-      "displayName": "alternatives"
+      "displayName": "alternatives",
+      "name": "alternatives"
+    },
+    "supportedDecisions": {
+      "name": "supportedDecisions",
+      "displayName": "Supported Decisions",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "7aa458a0-5d71-11ea-8553-c51caee8a5fd": {
       "id": "7aa458a0-5d71-11ea-8553-c51caee8a5fd",
@@ -267,6 +280,14 @@
               "visible": true,
               "kind": "",
               "editable": true
+            },
+            {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": true
             }
           ]
         },
@@ -322,6 +343,5 @@
     "default": "7aa458a0-5d71-11ea-8553-c51caee8a5fd",
     "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }
