@@ -455,13 +455,13 @@ export class ItemRepository {
 
     let workingTree = ItemProxy.getWorkingTree();
     let proxy: ItemProxy = workingTree.getProxyFor(itemId);
-    
+
     if (itemStatus) {
       if (!proxy) {
         console.log('+++ Creating lost-item for missing proxy to update status: ' + itemId + ' - ' + itemStatus);
         // TODO: Need to evaluate and remove the creation of missing proxies from this location
         proxy = ItemProxy.createMissingProxy('Item','id', itemId, workingTree);
-  
+
       }
 
       console.log('^^^ Updating status for: ' + itemId + ' - ' + itemStatus);
@@ -473,7 +473,7 @@ export class ItemRepository {
         type: 'update',
         proxy: proxy
       });
-    } 
+    }
 
   }
 
@@ -489,7 +489,8 @@ export class ItemRepository {
       this.recentProxies.splice(recentProxyIndex, 1);
     }
 
-    this.recentProxies.push(itemProxy);
+    // Add the recent proxy to the front of list
+    this.recentProxies.unshift(itemProxy);
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -643,7 +644,7 @@ export class ItemRepository {
       }
     });
   }
-  
+
   public async getIcons(): Promise<Array<string>> {
     return (await this.sendMessageToWorker('getIcons', {}, true)).data;
   }
@@ -806,7 +807,7 @@ export class ItemRepository {
     return await this.sendMessageToWorker('removeReport',
       { reportName: reportName }, true);
   }
-  
+
   public getMarkdownRepresentation(koheseObject: any, enclosingType: any,
     dataModel: any, viewModel: any, formatDefinitionType: FormatDefinitionType,
     headingLevel: number, addLinks: boolean): string {
@@ -831,17 +832,17 @@ export class ItemRepository {
 	          formatDefinitionId];
 	        break;
 	      }
-	      
+
 	      dataModelItemProxy = treeConfiguration.getProxyFor(
 	        dataModelItemProxy.item.base);
 	    }
-	    
+
 	    if (!formatDefinition) {
 	      formatDefinition = viewModel.formatDefinitions[viewModel.
 	        defaultFormatKey[FormatDefinitionType.DEFAULT]];
 	    }
 	  }
-    
+
     let globalTypeNames: Array<string> = [];
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
@@ -849,7 +850,7 @@ export class ItemRepository {
         globalTypeNames.push(itemProxy.item.name);
       }
     }, undefined);
-    
+
     if (headingLevel > -1) {
       if (headingLevel === 0) {
         representation += '<div style="font-size: xxx-large;">';
@@ -857,11 +858,11 @@ export class ItemRepository {
         for (let j: number = 0; j < headingLevel; j++) {
 	        representation += '#';
 	      }
-	      
+
 	      representation += ' ';
 	    }
 	  }
-	  
+
 	  if (formatDefinition.header.contents.length > 0) {
   	  if (addLinks) {
 	      representation += ('[' + koheseObject[formatDefinition.header.contents[
@@ -872,11 +873,11 @@ export class ItemRepository {
 	        propertyName] + '\n\n');
 	    }
 	  }
-	  
+
 	  if (headingLevel === 0) {
 	    representation += '</div>\n\n';
 	  }
-    
+
     for (let j: number = 0; j < formatDefinition.containers.length; j++) {
       let formatContainer: FormatContainer = formatDefinition.containers[j];
       if (formatContainer.kind === FormatContainerKind.
@@ -886,10 +887,10 @@ export class ItemRepository {
           return '* ' + propertyDefinition.propertyName.kind + '\'s ' +
             propertyDefinition.propertyName.attribute;
         }).join('\n');
-        
+
         representation += '\n\n<table><tr><th>' +
           'Name</th></tr>';
-        
+
         let reverseReferencesObject: any = TreeConfiguration.getWorkingTree().
           getProxyFor(koheseObject.id).relations.referencedBy;
         for (let j: number = 0; j < formatContainer.contents.length; j++) {
@@ -907,7 +908,7 @@ export class ItemRepository {
             }
           }
         }
-        
+
         representation += '</table>\n\n';
       } else {
         let header: string;
@@ -919,13 +920,13 @@ export class ItemRepository {
           header = '<tr>';
           body = '<tr style="vertical-align: top;">';
         }
-        
+
         for (let k: number = 0; k < formatContainer.contents.length; k++) {
           if (isVerticalFormatContainer) {
             header = '';
             body = '';
           }
-          
+
           let propertyDefinition: PropertyDefinition = formatContainer.
             contents[k];
           if (propertyDefinition.visible) {
@@ -938,15 +939,15 @@ export class ItemRepository {
                   '</th>');
               }
             }
-            
+
             if (!isVerticalFormatContainer) {
               body += '<td>';
             }
-            
+
             if (propertyDefinition.labelOrientation === 'Left') {
               body += ('**' + propertyDefinition.customLabel + ':** ');
             }
-            
+
             let value: any = koheseObject[propertyDefinition.propertyName];
             if (value != null) {
               if ((propertyDefinition.kind === '') || (propertyDefinition.kind
@@ -957,7 +958,7 @@ export class ItemRepository {
                   } else {
                     body += '<table><tr>';
                   }
-                  
+
                   let attributeTypeDataModel: any;
                   let attributeTypeViewModel: any;
                   let tableDefinition: TableDefinition;
@@ -983,14 +984,14 @@ export class ItemRepository {
                     tableDefinition = attributeTypeViewModel.tableDefinitions[
                       propertyDefinition.tableDefinition];
                   }
-                  
+
                   for (let l: number = 0; l < tableDefinition.columns.length;
                     l++) {
                     body += ('<th>' + tableDefinition.columns[l] + '</th>');
                   }
-                  
+
                   body += '</tr>';
-                  
+
                   for (let l: number = 0; l < value.length; l++) {
                     let reference: any;
                     if (isLocalTypeAttribute) {
@@ -999,9 +1000,9 @@ export class ItemRepository {
                       reference = TreeConfiguration.getWorkingTree().
                         getProxyFor(value[l].id).item;
                     }
-                    
+
                     body += '<tr style="vertical-align: top;">';
-                    
+
                     for (let m: number = 0; m < tableDefinition.columns.length;
                       m++) {
                       body += '<td>';
@@ -1045,13 +1046,13 @@ export class ItemRepository {
                           }
                         }
                       }
-                      
+
                       body += '</td>';
                     }
-                    
+
                     body += '</tr>';
                   }
-                  
+
                   body += '</table>';
                   if (isVerticalFormatContainer) {
                     body += '\n\n';
@@ -1120,11 +1121,11 @@ export class ItemRepository {
                           // Accommodation code
                           id = arrayComponent;
                         }
-                        
+
                         stringComponents.push('* ' + TreeConfiguration.
                           getWorkingTree().getProxyFor(id).item.name);
                       }
-                      
+
                       body += stringComponents.join('\n');
                     } else {
                       let id: string;
@@ -1134,7 +1135,7 @@ export class ItemRepository {
                         // Accommodation code
                         id = value;
                       }
-                      
+
                       body += TreeConfiguration.getWorkingTree().
                         getProxyFor(id).item.name;
                     }
@@ -1150,7 +1151,7 @@ export class ItemRepository {
                 body += value;
               }
             }
-            
+
             body += '\n\n'
             if (isVerticalFormatContainer) {
               representation += (header + body);
@@ -1159,17 +1160,17 @@ export class ItemRepository {
             }
           }
         }
-        
+
         if (!isVerticalFormatContainer) {
           representation += (header + '</tr>' + body + '</tr>' +
             '\n</table>\n\n');
         }
       }
     }
-    
+
     return representation;
   }
-  
+
   public getStringRepresentation(koheseObject: any, attributeName: string,
     index: number, enclosingType: KoheseDataModel, dataModel: KoheseDataModel,
     viewModel: KoheseViewModel, formatDefinitionType: FormatDefinitionType):
@@ -1180,7 +1181,7 @@ export class ItemRepository {
     } else {
       value = koheseObject[attributeName];
     }
-    
+
     if ((attributeName === 'parentId') && (dataModel['classProperties'][
       attributeName].definedInKind === 'Item') && ((typeof value) ===
       'string')) {
@@ -1224,7 +1225,7 @@ export class ItemRepository {
                 propertyDefinition.propertyName]);
             }
           }
-          
+
           let firstAttributeName: string = Object.keys(value)[0];
           return firstAttributeName + ': ' + String(value[firstAttributeName]);
         }
@@ -1243,7 +1244,7 @@ export class ItemRepository {
     proxy.history = await this._cache.getHistory(proxy.item.id);
     proxy.newHistoryNewStyle = await this._cache.getHistoryWithNewStyle(proxy.item.id);
     // TODO: Determine why subscribers are changing the returned history
-    
+
     /* Return a copy of the history so that subscribers may modify the
     returned history, if desired. */
     return JSON.parse(JSON.stringify(proxy.history));
