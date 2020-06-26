@@ -183,6 +183,16 @@
     "actualHoursEffort": {
       "type": "number",
       "name": "actualHoursEffort"
+    },
+    "supportedDecisions": {
+      "name": "supportedDecisions",
+      "type": [
+        "Decision"
+      ],
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     }
   },
   "validations": [],

@@ -87,32 +87,50 @@
             "guard": {}
           }
         }
-      }
+      },
+      "name": "decisionState"
     },
     "approvedBy": {
-      "type": "string"
+      "type": "string",
+      "name": "approvedBy"
     },
     "approvedOn": {
-      "type": "timestamp"
+      "type": "timestamp",
+      "name": "approvedOn"
     },
     "rationale": {
-      "type": "string"
+      "type": "string",
+      "name": "rationale"
     },
     "alternatives": {
       "type": [
         "object"
-      ]
+      ],
+      "name": "alternatives"
     },
     "costImpact": {
-      "type": "object"
+      "type": "object",
+      "name": "costImpact"
     },
     "scheduleImpact": {
-      "type": "object"
+      "type": "object",
+      "name": "scheduleImpact"
     },
     "otherImpacts": {
       "type": [
         "object"
-      ]
+      ],
+      "name": "otherImpacts"
+    },
+    "supportedDecisions": {
+      "name": "supportedDecisions",
+      "type": [
+        "Decision"
+      ],
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     }
   },
   "validations": [],

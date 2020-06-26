@@ -121,6 +121,14 @@
       "default": null,
       "displayName": "predecessors",
       "name": "predecessors"
+    },
+    "supportedDecisions": {
+      "name": "supportedDecisions",
+      "displayName": "Supported Decisions",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
     }
   },
   "localTypes": {},
@@ -343,6 +351,14 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "number",
+              "editable": true
+            },
+            {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
               "editable": true
             }
           ]
