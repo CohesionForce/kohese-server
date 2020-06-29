@@ -6,7 +6,7 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169840,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1587074473129,
+  "modifiedOn": 1593445545790,
   "base": "Decision",
   "idInjection": true,
   "properties": {
@@ -83,6 +83,16 @@
           "type": [
             "KeyEvent"
           ],
+          "required": false,
+          "id": false,
+          "relation": {
+            "kind": "Item",
+            "foreignKey": "id"
+          }
+        },
+        "OnStep": {
+          "name": "OnStep",
+          "type": "KeyEvent",
           "required": false,
           "id": false,
           "relation": {
