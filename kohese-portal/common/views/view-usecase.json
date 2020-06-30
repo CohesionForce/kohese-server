@@ -5,7 +5,7 @@
   "createdBy": "gmckune",
   "createdOn": 1570033169859,
   "modifiedBy": "gmckune",
-  "modifiedOn": 1591742618536,
+  "modifiedOn": 1593445614266,
   "modelName": "UseCase",
   "icon": "fa fa-lemon-o",
   "color": "#000000",
@@ -81,6 +81,14 @@
             "type": "",
             "options": {}
           }
+        },
+        "OnStep": {
+          "name": "OnStep",
+          "displayName": "On Step",
+          "inputType": {
+            "type": "",
+            "options": {}
+          }
         }
       },
       "formatDefinitions": {
@@ -116,6 +124,14 @@
                   "customLabel": "Preconditions",
                   "labelOrientation": "Top",
                   "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "OnStep",
+                  "customLabel": "On Step",
+                  "labelOrientation": "Top",
+                  "kind": "",
                   "visible": true,
                   "editable": true
                 },
@@ -173,6 +189,15 @@
                   "customLabel": "Preconditions",
                   "labelOrientation": "Top",
                   "kind": "text",
+                  "tableDefinition": "",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "OnStep",
+                  "customLabel": "OnStep",
+                  "labelOrientation": "Top",
+                  "kind": "",
                   "tableDefinition": "",
                   "visible": true,
                   "editable": true
