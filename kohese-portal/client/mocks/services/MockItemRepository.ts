@@ -16,7 +16,11 @@ import { ItemCache } from '../../../common/src/item-cache';
 import { Type, TypeKind } from '../../../common/src/Type.interface';
 import { KoheseDataModel,
   KoheseViewModel } from '../../../common/src/KoheseModel.interface';
-import { FormatDefinitionType } from '../../../common/src/FormatDefinition.interface';
+import { Attribute } from '../../../common/src/Attribute.interface';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../../common/src/FormatDefinition.interface';
+import { FormatContainerKind } from '../../../common/src/FormatContainer.interface';
+import { PropertyDefinition } from '../../../common/src/PropertyDefinition.interface';
 
 export class MockItemRepository {
   static modelDefinitions = ModelDefinitions();
@@ -45,24 +49,150 @@ export class MockItemRepository {
 
     for(let modelName in MockItemRepository.modelDefinitions.model) {
       console.log('::: Loading ' + modelName);
-      let dataModel: KoheseDataModel = MockItemRepository.modelDefinitions.
-        model[modelName];
+      let dataModel: KoheseDataModel = JSON.parse(JSON.stringify(
+        MockItemRepository.modelDefinitions.model[modelName]));
       if (dataModel.name === 'KoheseModel') {
+        let globalTypeAttribute: Attribute = {
+          name: 'globalTypeAttribute',
+          type: 'KoheseModel',
+          required: false,
+          default: null,
+          relation: {
+            kind: 'Item',
+            foreignKey: 'id'
+          }
+        };
+        dataModel.properties['globalTypeAttribute'] = globalTypeAttribute;
+
+        let multivaluedGlobalTypeAttribute: Attribute = {
+          name: 'multivaluedGlobalTypeAttribute',
+          type: ['KoheseModel'],
+          required: false,
+          default: null,
+          relation: {
+            kind: 'Item',
+            foreignKey: 'id'
+          }
+        };
+        dataModel.properties['multivaluedGlobalTypeAttribute'] =
+          multivaluedGlobalTypeAttribute;
+
+        let localTypeAttribute: Attribute = {
+          name: 'localTypeAttribute',
+          type: 'Local Type',
+          required: false,
+          default: null,
+          relation: { contained: true }
+        };
+        dataModel.properties['localTypeAttribute'] = localTypeAttribute;
+
+        let multivaluedLocalTypeAttribute: Attribute = {
+          name: 'multivaluedLocalTypeAttribute',
+          type: ['Local Type'],
+          required: false,
+          default: null,
+          relation: { contained: true }
+        };
+        dataModel.properties['multivaluedLocalTypeAttribute'] =
+          multivaluedLocalTypeAttribute;
+
+        let enumerationAttribute: Attribute = {
+          name: 'enumerationAttribute',
+          type: 'Enumeration',
+          required: false,
+          default: null,
+          relation: { contained: true }
+        };
+        dataModel.properties['enumerationAttribute'] = enumerationAttribute;
+
+        let multivaluedEnumerationAttribute: Attribute = {
+          name: 'multivaluedEnumerationAttribute',
+          type: ['Enumeration'],
+          required: false,
+          default: null,
+          relation: { contained: true }
+        };
+        dataModel.properties['multivaluedEnumerationAttribute'] =
+          multivaluedEnumerationAttribute;
+
+        dataModel.localTypes['Local Type'] = ({
+          typeKind: TypeKind.KOHESE_MODEL,
+          id: 'Local Type',
+          name: 'Local Type',
+          base: '',
+          idInjection: true,
+          properties: {
+            globalTypeAttribute: globalTypeAttribute,
+            multivaluedGlobalTypeAttribute: multivaluedGlobalTypeAttribute,
+            localTypeAttribute: localTypeAttribute,
+            multivaluedLocalTypeAttribute: multivaluedLocalTypeAttribute,
+            enumerationAttribute: enumerationAttribute,
+            multivaluedEnumerationAttribute: multivaluedEnumerationAttribute
+          },
+          validations: [],
+          relations: {},
+          acls: [],
+          methods: []
+        } as Type);
+
         dataModel.localTypes['Enumeration'] = {
           typeKind: TypeKind.ENUMERATION,
           id: 'Enumeration',
           name: 'Enumeration',
           values: [{
-            name: 'EnumerationValue',
+            name: 'EnumerationValue1',
             description: '',
+          }, {
+            name: 'EnumerationValue2',
+            description: ''
           }]
         } as Type;
-    
-        dataModel.properties['enumerationAttribute'] = {
-          name: 'enumerationAttribute',
-          type: 'Enumeration',
-          relation: { contained: true }
+
+        dataModel['globalTypeAttribute'] = {
+          id: 'KoheseModel'
         };
+        dataModel['multivaluedGlobalTypeAttribute'] = [{
+          id: 'KoheseModel'
+        }, {
+          id: 'KoheseModel'
+        }];
+
+        let localTypeInstance: any = {
+          globalTypeAttribute: {
+            id: 'KoheseModel'
+          },
+          multivaluedGlobalTypeAttribute: [{
+            id: 'KoheseModel'
+          }, {
+            id: 'KoheseModel'
+          }],
+          localTypeAttribute: null,
+          multivaluedLocalTypeAttribute: [],
+          enumerationAttribute: 'EnumerationValue1',
+          multivaluedEnumerationAttribute: [
+            'EnumerationValue1',
+            'EnumerationValue2'
+          ]
+        };
+        
+        localTypeInstance['localTypeAttribute'] = JSON.parse(JSON.stringify(
+          localTypeInstance));
+        localTypeInstance['multivaluedLocalTypeAttribute'].push(JSON.parse(
+          JSON.stringify(localTypeInstance)));
+        localTypeInstance['multivaluedLocalTypeAttribute'].push(JSON.parse(
+          JSON.stringify(localTypeInstance)));
+
+        dataModel['localTypeAttribute'] = JSON.parse(JSON.stringify(
+          localTypeInstance));
+        dataModel['multivaluedLocalTypeAttribute'] = [
+          JSON.parse(JSON.stringify(localTypeInstance)),
+          JSON.parse(JSON.stringify(localTypeInstance))
+        ];
+        dataModel['enumerationAttribute'] = 'EnumerationValue1';
+        dataModel['multivaluedEnumerationAttribute'] = [
+          'EnumerationValue1',
+          'EnumerationValue2'
+        ];
       }
 
       new KoheseModel(dataModel);
@@ -70,25 +200,179 @@ export class MockItemRepository {
 
     for(let viewName in MockItemRepository.modelDefinitions.view) {
       console.log('::: Loading ' + viewName);
-      let viewModel: KoheseViewModel = MockItemRepository.modelDefinitions.view[
-        viewName];
+      let viewModel: KoheseViewModel = JSON.parse(JSON.stringify(
+        MockItemRepository.modelDefinitions.view[viewName]));
       if (viewModel.modelName === 'KoheseModel') {
-        viewModel.localTypes['Enumeration'] = {
-          typeKind: TypeKind.ENUMERATION,
-          id: 'Enumeration',
-          name: 'Enumeration',
-          values: ['Enumeration Value']
-        } as Type;
+        let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
+          viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
+        let propertyDefinitions: Array<PropertyDefinition> = formatDefinition.
+          containers[0].contents;
+        let globalTypeAttibutePropertyDefinition: PropertyDefinition = {
+          propertyName: 'globalTypeAttribute',
+          customLabel: 'Global Type Attribute',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(globalTypeAttibutePropertyDefinition);
 
-        viewModel.formatDefinitions[viewModel.defaultFormatKey[
-          FormatDefinitionType.DEFAULT]].containers[0].contents.push({
+        let multivaluedGlobalTypeAttributePropertyDefinition:
+          PropertyDefinition = {
+          propertyName: 'multivaluedGlobalTypeAttribute',
+          customLabel: 'Multivalued Global Type Attribute',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedGlobalTypeAttributePropertyDefinition);
+        
+        let localTypeAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'localTypeAttribute',
+          customLabel: 'Local Type Attribute',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(localTypeAttributePropertyDefinition);
+        
+        let multivaluedLocalTypeAttributePropertyDefinition:
+          PropertyDefinition = {
+          propertyName: 'multivaluedLocalTypeAttribute',
+          customLabel: 'Multivalued Local Type Attribute',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedLocalTypeAttributePropertyDefinition);
+
+        let enumerationAttributePropertyDefinition: PropertyDefinition = {
           propertyName: 'enumerationAttribute',
           customLabel: 'Enumeration Attribute',
           labelOrientation: 'Top',
           kind: '',
           visible: true,
           editable: true
+        };
+        propertyDefinitions.push(enumerationAttributePropertyDefinition);
+        
+        let multivaluedEnumerationAttributePropertyDefinition:
+          PropertyDefinition = {
+          propertyName: 'multivaluedEnumerationAttribute',
+          customLabel: 'Multivalued Enumeration Attribute',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedEnumerationAttributePropertyDefinition);
+
+        viewModel.localTypes['Local Type'] = ({
+          typeKind: TypeKind.KOHESE_MODEL,
+          id: 'view-localtype',
+          name: 'view-localtype',
+          modelName: 'Local Type',
+          icon: '',
+          color: '#000000',
+          viewProperties: {},
+          formatDefinitions: {
+            '0d8f76a0-b631-11ea-94f5-ad77c3385785': {
+              id: '0d8f76a0-b631-11ea-94f5-ad77c3385785',
+              name: 'Default Format Definition',
+              header: {
+                kind: FormatContainerKind.HEADER,
+                contents: []
+              },
+              containers: [{
+                kind: FormatContainerKind.VERTICAL,
+                contents: [
+                  globalTypeAttibutePropertyDefinition,
+                  multivaluedGlobalTypeAttributePropertyDefinition,
+                  localTypeAttributePropertyDefinition,
+                  multivaluedLocalTypeAttributePropertyDefinition,
+                  enumerationAttributePropertyDefinition,
+                  multivaluedEnumerationAttributePropertyDefinition
+                ]
+              }]
+            }
+          },
+          defaultFormatKey: {
+            default: '0d8f76a0-b631-11ea-94f5-ad77c3385785'
+          },
+          tableDefinitions: {
+            '502ae8c0-b71f-11ea-bdf1-99cdd4c272d8': {
+              id: '502ae8c0-b71f-11ea-bdf1-99cdd4c272d8',
+              name: 'Local Type Table Definition',
+              columns: [
+                'globalTypeAttribute',
+                'multivaluedGlobalTypeAttribute',
+                'localTypeAttribute',
+                'multivaluedLocalTypeAttribute',
+                'enumerationAttribute',
+                'multivaluedEnumerationAttribute'
+              ],
+              expandedFormat: {
+                column1: [],
+                column2: [],
+                column3: [],
+                column4: []
+              }
+            }
+          }
+        } as Type);
+
+        viewModel.localTypes['Enumeration'] = {
+          typeKind: TypeKind.ENUMERATION,
+          id: 'Enumeration',
+          name: 'Enumeration',
+          values: ['Enumeration Value 1', 'Enumeration Value 2']
+        } as Type;
+
+        formatDefinition.containers.push({
+          kind: FormatContainerKind.HORIZONTAL,
+          contents: [{
+            propertyName: 'multivaluedGlobalTypeAttribute',
+            customLabel: 'Multivalued Global Type Attribute Table',
+            labelOrientation: 'Top',
+            kind: '',
+            visible: true,
+            editable: true,
+            tableDefinition: '975f0030-b7e9-11ea-ac23-8b3d84d820e2'
+          }, {
+            propertyName: 'multivaluedLocalTypeAttribute',
+            customLabel: 'Multivalued Local Type Attribute Table',
+            labelOrientation: 'Top',
+            kind: '',
+            visible: true,
+            editable: true,
+            tableDefinition: '502ae8c0-b71f-11ea-bdf1-99cdd4c272d8'
+          }]
         });
+
+        viewModel.tableDefinitions['975f0030-b7e9-11ea-ac23-8b3d84d820e2'] = {
+          id: '975f0030-b7e9-11ea-ac23-8b3d84d820e2',
+          name: 'Kohese Model Table Definition',
+          columns: [
+            'globalTypeAttribute',
+            'multivaluedGlobalTypeAttribute',
+            'localTypeAttribute',
+            'multivaluedLocalTypeAttribute',
+            'enumerationAttribute',
+            'multivaluedEnumerationAttribute'
+          ],
+          expandedFormat: {
+            column1: [],
+            column2: [],
+            column3: [],
+            column4: []
+          }
+        };
       }
 
       new ItemProxy('KoheseView', viewModel);
@@ -176,6 +460,10 @@ export class MockItemRepository {
 
   public getChangeSubject(): Subject<any> {
     return ItemProxy.getWorkingTree().getChangeSubject();
+  }
+
+  public getIcons(): Promise<Array<string>> {
+    return Promise.resolve(['fa fa-star']);
   }
 
   public fetchItem(proxy: ItemProxy): Promise<ItemProxy> {

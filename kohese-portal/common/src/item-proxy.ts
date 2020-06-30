@@ -226,7 +226,7 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
           // Copy the original value for comparison
           let clonedOriginalValue;
 
-          if (target.hasOwnProperty(property)) {
+          if (target[property] != null) {
             clonedOriginalValue = JSON.parse(JSON.stringify(target[property]));
           }
 

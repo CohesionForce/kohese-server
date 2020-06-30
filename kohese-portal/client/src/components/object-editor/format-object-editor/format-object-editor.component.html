@@ -48,8 +48,11 @@
                     [columns]="getTableColumns(attributeDefinition)"
                     [getText]="getTableCellTextRetrievalFunction(
                     attributeDefinition.propertyName)"
-                    [add]="getTableElementAdditionFunction(attributeDefinition)"
-                    [move]="getTableElementMovementFunction(attributeDefinition)"
+                    [add]="(isLocalTypeAttribute(attributeDefinition.
+                    propertyName) ? undefined :
+                    getTableElementAdditionFunction(attributeDefinition))"
+                    [move]="getTableElementMovementFunction(
+                    attributeDefinition)"
                     [remove]="getTableElementRemovalFunction(
                     attributeDefinition)" [disabled]="!attributeDefinition.
                     editable" style="width: 100%;">

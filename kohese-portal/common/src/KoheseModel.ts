@@ -14,8 +14,7 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  constructor(withItem){
-    let forItem = JSON.parse(JSON.stringify(withItem));
+  constructor(forItem){
     let itemId = forItem.id;
 
     console.log('::: Loading KoheseModel: ' + forItem.name);
@@ -38,7 +37,7 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
 
     super('KoheseModel', forItem);
 
-    if (withItem.isInternal){
+    if (forItem.isInternal){
       this.internal = true;
     }
 

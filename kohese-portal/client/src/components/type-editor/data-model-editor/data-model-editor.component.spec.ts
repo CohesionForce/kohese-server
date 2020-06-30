@@ -61,7 +61,7 @@ describe('DataModelEditorComponent', () => {
         return matDialogRefPlaceholder;
       },
       'afterClosed': () => {
-        return observableOf(['Local Type', {
+        return observableOf(['Another Local Type', {
           attribute: {
             name: 'attribute'
           },

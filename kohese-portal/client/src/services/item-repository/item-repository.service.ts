@@ -1011,38 +1011,20 @@ export class ItemRepository {
                           body += '<ul>';
                           for (let n: number = 0; n < reference[
                             tableDefinition.columns[m]].length; n++) {
-                            if (attributeTypeDataModel.typeKind === TypeKind.
-                              ENUMERATION) {
-                              body += ('<li>' + attributeTypeViewModel.values[
-                                attributeTypeDataModel.values.map(
-                                (enumerationValue: EnumerationValue) => {
-                                return enumerationValue.name;
-                              }).indexOf(reference[tableDefinition.columns[m]][
-                                n])] + '</li>');
-                            } else {
-                              body += ('<li>' + this.getStringRepresentation(
-                                reference, tableDefinition.columns[m], n,
-                                (enclosingType ? enclosingType : dataModel),
-                                attributeTypeDataModel, attributeTypeViewModel,
-                                formatDefinitionType) + '</li>');
-                            }
-                          }
-                          body += '</ul>';
-                        } else {
-                          if (attributeTypeDataModel.typeKind === TypeKind.
-                            ENUMERATION) {
-                            body += attributeTypeViewModel.values[
-                              attributeTypeDataModel.values.map(
-                              (enumerationValue: EnumerationValue) => {
-                              return enumerationValue.name;
-                            }).indexOf(reference[tableDefinition.columns[m]])];
-                          } else {
-                            body += this.getStringRepresentation(reference,
-                              tableDefinition.columns[m], undefined,
+                            body += ('<li>' + this.getStringRepresentation(
+                              reference, tableDefinition.columns[m], n,
                               (enclosingType ? enclosingType : dataModel),
                               attributeTypeDataModel, attributeTypeViewModel,
-                              formatDefinitionType);
+                              formatDefinitionType) + '</li>');
                           }
+                          
+                          body += '</ul>';
+                        } else {
+                          body += this.getStringRepresentation(reference,
+                            tableDefinition.columns[m], undefined,
+                            (enclosingType ? enclosingType : dataModel),
+                            attributeTypeDataModel, attributeTypeViewModel,
+                            formatDefinitionType);
                         }
                       }
                       
@@ -1188,13 +1170,23 @@ export class ItemRepository {
         value).item.name;
     }
 
+    let type: any = dataModel['classProperties'][attributeName].definition.
+      type;
+    type = (Array.isArray(type) ? type[0] : type);
+    let classLocalTypes: any = (enclosingType ? enclosingType : dataModel)[
+      'classLocalTypes'];
+    if (classLocalTypes && classLocalTypes[type] && (classLocalTypes[type].
+      definition.typeKind === TypeKind.ENUMERATION)) {
+      return this.currentTreeConfigSubject.getValue().config.getProxyFor(
+        'view-' + classLocalTypes[type].definedInKind.toLowerCase()).item.
+        localTypes[type].values[classLocalTypes[type].definition.values.map(
+        (enumerationValue: EnumerationValue) => {
+        return enumerationValue.name;
+      }).indexOf(value)];
+    }
+
     let representation: string = String(value);
     if (representation === String({})) {
-      let type: any = dataModel['classProperties'][attributeName].definition.
-        type;
-      type = (Array.isArray(type) ? type[0] : type);
-      let classLocalTypes: any = (enclosingType ? enclosingType : dataModel)[
-        'classLocalTypes'];
       if (classLocalTypes && classLocalTypes[type]) {
         if (value.name) {
           return value.name;

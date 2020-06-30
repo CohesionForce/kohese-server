@@ -44,6 +44,9 @@ describe('Component: attribute-editor', ()=>{
 
     fixture = TestBed.createComponent(AttributeEditorComponent);
     component = fixture.componentInstance;
+    component.contextualGlobalType = TestBed.get(ItemRepository).
+      getTreeConfig().getValue().config.getProxyFor('KoheseModel').item;
+
     fixture.detectChanges();
   });
   
@@ -86,5 +89,35 @@ describe('Component: attribute-editor', ()=>{
 
     expect(component.areRelationsEqual(secondRelation, firstRelation)).toEqual(false);
     expect(component.areRelationsEqual(thirdRelation, firstRelation)).toEqual(true);
+  });
+
+  it('retrieves appropriate display options', () => {
+    component.attribute.type = 'Enumeration';
+    expect(component.getTypes()).toEqual(['Dropdown']);
+    component.attribute.type = 'PropertyType';
+    expect(component.getTypes()).toEqual(['Reference']);
+    component.attribute.type = 'Item';
+    expect(component.getTypes()).toEqual(['Reference']);
+    component.attribute.type = ['string'];
+    expect(component.getTypes()).toEqual(['Text', 'Markdown',
+      'Masked String']);
+    component.attribute.relation = {
+      kind: 'KoheseUser',
+      foreignKey: 'username'
+    };
+    expect(component.getTypes()).toEqual(['Username']);
+  });
+
+  it('retrieves the display option representation for the given display ' +
+    'option', () => {
+    expect(component.getTypeValue('Dropdown')).toBe('');
+    expect(component.getTypeValue('Reference')).toBe('');
+    component.attribute.type = ['string'];
+    expect(component.getTypeValue('Masked String')).toBe('maskedString');
+    component.attribute.relation = {
+      kind: 'KoheseUser',
+      foreignKey: 'username'
+    };
+    expect(component.getTypeValue('Username')).toBe('user-selector');
   });
 });
