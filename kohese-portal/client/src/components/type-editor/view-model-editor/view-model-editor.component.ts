@@ -16,6 +16,7 @@ import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.componen
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { TypeKind } from '../../../../../common/src/Type.interface';
+import { KoheseDataModel } from '../../../../../common/src/KoheseModel.interface';
 import { EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 
 interface Icon {
@@ -96,6 +97,15 @@ export class ViewModelEditorComponent {
   @Output('modified')
   get modifiedEventEmitter() {
     return this._modifiedEventEmitter;
+  }
+
+  private _enclosingDataModel: KoheseDataModel;
+  get enclosingDataModel() {
+    return this._enclosingDataModel;
+  }
+  @Input('enclosingDataModel')
+  set enclosingDataModel(enclosingDataModel: KoheseDataModel) {
+    this._enclosingDataModel = enclosingDataModel;
   }
    
   private _dataModel: any;
