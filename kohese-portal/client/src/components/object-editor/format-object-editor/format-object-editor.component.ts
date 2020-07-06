@@ -582,9 +582,7 @@ export class FormatObjectEditorComponent implements OnInit {
                       }
                       break;
                     default:
-                      localTypeInstance[attributeName] = {
-                        id: ''
-                      };
+                      // Do nothing for now
                   }
                 }
               }
