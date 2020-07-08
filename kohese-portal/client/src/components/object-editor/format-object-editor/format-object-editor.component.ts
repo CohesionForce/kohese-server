@@ -16,6 +16,7 @@ import { TreeComponent } from '../../tree/tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { TypeKind } from '../../../../../common/src/Type.interface';
+import { KoheseDataModel } from '../../../../../common/src/KoheseModel.interface';
 import { Attribute } from '../../../../../common/src/Attribute.interface';
 import { EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 
@@ -322,6 +323,7 @@ export class FormatObjectEditorComponent implements OnInit {
           viewModel = treeConfiguration.getProxyFor('view-' + type.
             toLowerCase()).item;
         }
+        
         if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
           return row[columnId].map((value: any, index: number) => {
             let representation: string;
@@ -601,8 +603,15 @@ export class FormatObjectEditorComponent implements OnInit {
     let value: Array<any> = this._object[attributeDefinition.propertyName];
     if (value) {
       return value.map((reference: { id: string }) => {
-        return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
-          item;
+        let typeName: string = this._selectedType.classProperties[
+          attributeDefinition.propertyName].definition.type[0];
+        if ((this._enclosingType ? this._enclosingType : this._selectedType).
+          classLocalTypes[typeName]) {
+          return reference;
+        } else {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor(reference.id).item;
+        }
       });
     }
     
@@ -611,10 +620,24 @@ export class FormatObjectEditorComponent implements OnInit {
   
   public getTableColumns(attributeDefinition: PropertyDefinition):
     Array<string> {
-    return TreeConfiguration.getWorkingTree().getProxyFor('view-' + this.
-      _selectedType.classProperties[attributeDefinition.propertyName].
-      definition.type[0].toLowerCase()).item.tableDefinitions[
-      attributeDefinition.tableDefinition].columns;
+    let typeName: string = this._selectedType.classProperties[
+      attributeDefinition.propertyName].definition.type[0];
+    let treeConfiguration: TreeConfiguration = this._itemRepository.
+      getTreeConfig().getValue().config;
+    let classLocalTypesEntry:
+      { definedInKind: string, definition: KoheseDataModel } = (this.
+      _enclosingType ? this._enclosingType : this._selectedType).
+      classLocalTypes[typeName];
+    if (classLocalTypesEntry) {
+      return treeConfiguration.getProxyFor('view-' + classLocalTypesEntry.
+        definedInKind.toLowerCase()).item.localTypes[typeName].
+        tableDefinitions[attributeDefinition.tableDefinition].columns;
+    } else {
+      return treeConfiguration.getProxyFor('view-' + this._selectedType.
+        classProperties[attributeDefinition.propertyName].definition.type[0].
+        toLowerCase()).item.tableDefinitions[attributeDefinition.
+        tableDefinition].columns;
+    }
   }
   
   public getTableElementAdditionFunction(attributeDefinition:
@@ -702,31 +725,50 @@ export class FormatObjectEditorComponent implements OnInit {
     moveBefore: boolean) => void {
     return (elements: Array<any>, referenceElement: any,
       moveBefore: boolean) => {
-      let references: Array<{ id: string }> = this._object[attributeDefinition.
+      let references: Array<any> = this._object[attributeDefinition.
         propertyName];
-      for (let j: number = 0; j < elements.length; j++) {
-        references.splice(references.map((reference: { id: string }) => {
-          return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
-            item;
-        }).indexOf(elements[j]), 1);
+      let treeConfiguration: TreeConfiguration = this._itemRepository.
+        getTreeConfig().getValue().config;
+      let isLocalTypeAttribute: boolean = (this._enclosingType ? this.
+        _enclosingType : this._selectedType).classLocalTypes[this.
+        _selectedType.classProperties[attributeDefinition.propertyName].
+        definition.type[0]];
+      if (isLocalTypeAttribute) {
+        for (let j: number = 0; j < elements.length; j++) {
+          references.splice(references.indexOf(elements[j]), 1);
+        }
+      } else {
+        for (let j: number = 0; j < elements.length; j++) {
+          references.splice(references.map((reference: { id: string }) => {
+            return treeConfiguration.getProxyFor(reference.id).item;
+          }).indexOf(elements[j]), 1);
+        }
       }
       
       if (moveBefore) {
-        references.splice(references.map((reference: { id: string }) => {
-          return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
-            item;
-        }).indexOf(referenceElement), 0, ...elements.map((item: any) => {
-          return { id: item.id };
-        }));
+        if (isLocalTypeAttribute) {
+          references.splice(references.indexOf(referenceElement), 0,
+            ...elements);
+        } else {
+          references.splice(references.map((reference: { id: string }) => {
+            return treeConfiguration.getProxyFor(reference.id).item;
+          }).indexOf(referenceElement), 0, ...elements.map((item: any) => {
+            return { id: item.id };
+          }));
+        }
       } else {
-        references.splice(references.map((reference: { id: string }) => {
-          return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
-            item;
-        }).indexOf(referenceElement) + 1, 0, ...elements.map((item: any) => {
-          return { id: item.id };
-        }));
+        if (isLocalTypeAttribute) {
+          references.splice(references.indexOf(referenceElement) + 1, 0,
+            ...elements);
+        } else {
+          references.splice(references.map((reference: { id: string }) => {
+            return treeConfiguration.getProxyFor(reference.id).item;
+          }).indexOf(referenceElement) + 1, 0, ...elements.map((item: any) => {
+            return { id: item.id };
+          }));
+        }
       }
-      
+
       this._changeDetectorRef.markForCheck();
     };
   }
@@ -734,13 +776,23 @@ export class FormatObjectEditorComponent implements OnInit {
   public getTableElementRemovalFunction(attributeDefinition:
     PropertyDefinition): (elements: Array<any>) => void {
     return (elements: Array<any>) => {
-      for (let j: number = 0; j < elements.length; j++) {
-        this._object[attributeDefinition.propertyName].splice(this._object[
-          attributeDefinition.propertyName].map((reference: { id:
-          string }) => {
-            return TreeConfiguration.getWorkingTree().getProxyFor(reference.
-              id).item;
-        }).indexOf(elements[j]), 1);
+      let references: Array<any> = this._object[attributeDefinition.
+        propertyName];
+      let isLocalTypeAttribute: boolean = (this._enclosingType ? this.
+        _enclosingType : this._selectedType).classLocalTypes[this.
+        _selectedType.classProperties[attributeDefinition.propertyName].
+        definition.type[0]];
+      if (isLocalTypeAttribute) {
+        for (let j: number = 0; j < elements.length; j++) {
+          references.splice(references.indexOf(elements[j]), 1);
+        }
+      } else {
+        for (let j: number = 0; j < elements.length; j++) {
+          references.splice(references.map((reference: { id: string }) => {
+            return this._itemRepository.getTreeConfig().getValue().config.
+              getProxyFor(reference.id).item;
+          }).indexOf(elements[j]), 1);
+        }
       }
       
       this._changeDetectorRef.markForCheck();

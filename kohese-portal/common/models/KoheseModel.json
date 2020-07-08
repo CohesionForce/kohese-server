@@ -177,9 +177,7 @@
           "name": "relation",
           "type": "RelationType",
           "relation": {
-            "contained": true,
-            "type": "Item",
-            "foreignKey": "id"
+            "contained": true
           }
         }
       },

@@ -357,6 +357,182 @@
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
+            },
+            {
+              "propertyName": "base",
+              "customLabel": "Base",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "isMetaModel",
+              "customLabel": "Is Metamodel",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "isInternal",
+              "customLabel": "Is Internal",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "idInjection",
+              "customLabel": "ID Injection",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "invertItemOrder",
+              "customLabel": "Invert Item Order",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "properties",
+              "customLabel": "Properties",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "validations",
+              "customLabel": "Validations",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "relations",
+              "customLabel": "Relations",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "acls",
+              "customLabel": "ACLs",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "methods",
+              "customLabel": "Methods",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "classLocalTypes",
+              "customLabel": "Class Local Types",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "classParentTypes",
+              "customLabel": "Class Parent Types",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "classProperties",
+              "customLabel": "Class Properties",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "propertyOrder",
+              "customLabel": "Property Order",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "propertyStorageOrder",
+              "customLabel": "Property Storage Order",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "requiredProperties",
+              "customLabel": "Required Properties",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "derivedProperties",
+              "customLabel": "Derived Properties",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "calculatedProperties",
+              "customLabel": "Calculated Properties",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "stateProperties",
+              "customLabel": "State Properties",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "relationProperties",
+              "customLabel": "Relation Properties",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "idProperties",
+              "customLabel": "ID Properties",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "localTypes",
+              "customLabel": "Local Types",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
             }
           ]
         }

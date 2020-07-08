@@ -55,11 +55,135 @@ describe('FormatObjectEditorComponent', () => {
     let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
       getTreeConfig().getValue().config;
     component.object = treeConfiguration.getProxyFor('KoheseModel').item;
-    component.object['enumerationAttribute'] = 'EnumerationValue';
     component.formatDefinitionType = FormatDefinitionType.DEFAULT;
     component.type = component.object;
 
     componentFixture.detectChanges();
+  });
+
+  it('retrieves elements to display in a table based on the given ' +
+    'PropertyDefinition', () => {
+    let propertyDefinitions: Array<PropertyDefinition> = component.viewModel.
+      formatDefinitions[component.viewModel.defaultFormatKey[
+      FormatDefinitionType.DEFAULT]].containers[0].contents;
+    expect(component.getTableElements(propertyDefinitions.filter(
+      (propertyDefinition: PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedGlobalTypeAttribute');
+    })[0])).toEqual(component.object['multivaluedGlobalTypeAttribute'].map(
+      (reference: { id: string }) => {
+      return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).item;
+    }));
+    expect(component.getTableElements(propertyDefinitions.filter(
+      (propertyDefinition: PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedLocalTypeAttribute');
+    })[0])).toEqual(component.object['multivaluedLocalTypeAttribute']);
+  });
+
+  it('retrieves column identifiers for a given PropertyDefinition', () => {
+    let propertyDefinitions: Array<PropertyDefinition> = component.viewModel.
+      formatDefinitions[component.viewModel.defaultFormatKey[
+      FormatDefinitionType.DEFAULT]].containers[1].contents;
+    expect(component.getTableColumns(propertyDefinitions.filter(
+      (propertyDefinition: PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedGlobalTypeAttribute');
+    })[0])).toEqual([
+      'globalTypeAttribute',
+      'multivaluedGlobalTypeAttribute',
+      'localTypeAttribute',
+      'multivaluedLocalTypeAttribute',
+      'enumerationAttribute',
+      'multivaluedEnumerationAttribute'
+    ]);
+    expect(component.getTableColumns(propertyDefinitions.filter(
+      (propertyDefinition: PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedLocalTypeAttribute');
+    })[0])).toEqual([
+      'globalTypeAttribute',
+      'multivaluedGlobalTypeAttribute',
+      'localTypeAttribute',
+      'multivaluedLocalTypeAttribute',
+      'enumerationAttribute',
+      'multivaluedEnumerationAttribute'
+    ]);
+  });
+
+  it('handles moving elements in tables', () => {
+    let moveHandler: (elements: Array<any>, referenceElement: any, moveBefore:
+      boolean) => void = component.getTableElementMovementFunction(component.
+      viewModel.formatDefinitions[component.viewModel.defaultFormatKey[
+      FormatDefinitionType.DEFAULT]].containers[1].contents.filter(
+      (propertyDefinition: PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedGlobalTypeAttribute');
+    })[0]);
+    let elements: Array<any> = component.object[
+      'multivaluedGlobalTypeAttribute'].map((reference: { id: string }) => {
+      return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).item;
+    });
+    moveHandler([elements[1]], elements[0], true);
+    expect(component.object['multivaluedGlobalTypeAttribute'][0].id).toBe(
+      elements[1].id);
+    expect(component.object['multivaluedGlobalTypeAttribute'][1].id).toBe(
+      elements[0].id);
+    moveHandler([elements[1]], elements[0], false);
+    expect(component.object['multivaluedGlobalTypeAttribute'][0].id).toBe(
+      elements[0].id);
+    expect(component.object['multivaluedGlobalTypeAttribute'][1].id).toBe(
+      elements[1].id);
+    
+    moveHandler = component.getTableElementMovementFunction(component.
+      viewModel.formatDefinitions[component.viewModel.defaultFormatKey[
+      FormatDefinitionType.DEFAULT]].containers[1].contents.filter(
+      (propertyDefinition: PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedLocalTypeAttribute');
+    })[0]);
+    elements = [...component.object['multivaluedLocalTypeAttribute']];
+    moveHandler([elements[1]], elements[0], true);
+    // expect(component.object['multivaluedLocalTypeAttribute'][0]).toBe(elements[
+    //   1]);
+    // expect(component.object['multivaluedLocalTypeAttribute'][1]).toBe(elements[
+    //   0]);
+    moveHandler([elements[0]], elements[1], false);
+    // expect(component.object['multivaluedLocalTypeAttribute'][0]).toBe(elements[
+    //   0]);
+    // expect(component.object['multivaluedLocalTypeAttribute'][1]).toBe(elements[
+    //   1]);
+  });
+
+  it('handles removing elements from tables', () => {
+    let removeHandler: (elements: Array<any>) => void = component.
+      getTableElementRemovalFunction(component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[1].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedGlobalTypeAttribute');
+    })[0]);
+    let references: Array<{ id: string }> = component.object[
+      'multivaluedGlobalTypeAttribute'];
+    let elements: Array<any> = references.map((reference: { id: string }) => {
+      return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).item;
+    });
+    removeHandler([elements[1]]);
+    expect(component.object['multivaluedGlobalTypeAttribute'].indexOf(
+      references[1])).toBe(-1);
+
+    removeHandler = component.getTableElementRemovalFunction(component.
+      viewModel.formatDefinitions[component.viewModel.defaultFormatKey[
+      FormatDefinitionType.DEFAULT]].containers[1].contents.filter(
+      (propertyDefinition: PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedLocalTypeAttribute');
+    })[0]);
+    elements = component.object['multivaluedLocalTypeAttribute'].slice(0);
+    removeHandler([elements[1]]);
+    expect(component.object['multivaluedLocalTypeAttribute'].indexOf(elements[
+      1])).toBe(-1);
   });
 
   it('determines whether a given PropertyDefinition corresponds to an ' +
@@ -80,6 +204,6 @@ describe('FormatObjectEditorComponent', () => {
       (propertyDefinition: PropertyDefinition) => {
       return (propertyDefinition.propertyName === 'enumerationAttribute');
     })[0], component.selectedType.localTypes['Enumeration'].values[0])).toBe(
-      'Enumeration Value');
+      'Enumeration Value 1');
   });
 });

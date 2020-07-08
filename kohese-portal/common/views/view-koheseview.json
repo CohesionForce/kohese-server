@@ -154,6 +154,78 @@
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
+            },
+            {
+              "propertyName": "modelName",
+              "customLabel": "Model Name",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "icon",
+              "customLabel": "Icon",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "color",
+              "customLabel": "Color",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "viewProperties",
+              "customLabel": "View Properties",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "localTypes",
+              "customLabel": "Local Types",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "formatDefinitions",
+              "customLabel": "Format Definitions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "defaultFormatKey",
+              "customLabel": "Default Format Key",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "tableDefinitions",
+              "customLabel": "Table Definitions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "ungroupDefaultFormatDefinitionStateAttributes",
+              "customLabel": "Ungroup Default Format Definition State Attributes",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
             }
           ]
         }

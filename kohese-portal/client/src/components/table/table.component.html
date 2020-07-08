@@ -9,7 +9,8 @@
     <ng-container *ngIf="remove">
       <button mat-icon-button matTooltip="Remove the selected elements"
         [disabled]="(isDisabled || (selection.length === 0))"
-        (click)="remove(selection)">
+        [ngStyle]="{ 'margin-left': (add ? '' : 'auto') }" (click)="remove(
+        selection)">
         <mat-icon class="fa fa-times"></mat-icon>
       </button>
     </ng-container>

@@ -1203,9 +1203,7 @@ export function ModelDefinitions() {
                 "name": "relation",
                 "type": "RelationType",
                 "relation": {
-                  "contained": true,
-                  "type": "Item",
-                  "foreignKey": "id"
+                  "contained": true
                 }
               }
             },
@@ -1463,6 +1461,10 @@ export function ModelDefinitions() {
                   "name": "Proposed",
                   "description": "A task that is Proposed."
                 },
+                "Ready": {
+                  "name": "Ready",
+                  "description": "A task that is Ready to be Assigned."
+                },
                 "Assigned": {
                   "name": "Assigned",
                   "description": "A task that is Assigned."
@@ -1490,16 +1492,35 @@ export function ModelDefinitions() {
                 "Completed": {
                   "name": "Completed",
                   "description": "A task that is Completed."
+                },
+                "Rejected": {
+                  "name": "Rejected",
+                  "description": ""
                 }
               },
               "transition": {
-                "Assign": {
+                "Reject": {
                   "source": "Proposed",
+                  "target": "Rejected",
+                  "guard": {}
+                },
+                "Ready": {
+                  "source": "Proposed",
+                  "target": "Ready",
+                  "guard": {}
+                },
+                "Assign": {
+                  "source": "Ready",
                   "target": "Assigned",
                   "guard": {},
                   "requires": [
                     "assignment:Assignee"
                   ]
+                },
+                "Request Reassign": {
+                  "source": "Assigned",
+                  "target": "PendingReassign",
+                  "guard": {}
                 },
                 "Accept": {
                   "source": "Assigned",
@@ -1517,9 +1538,9 @@ export function ModelDefinitions() {
                   "guard": {},
                   "requires": ""
                 },
-                "Request Reassign": {
-                  "source": "Assigned",
-                  "target": "PendingReassign",
+                "Remove Assignment": {
+                  "source": "PendingReassign",
+                  "target": "Ready",
                   "guard": {}
                 },
                 "Reassign": {
@@ -1530,11 +1551,6 @@ export function ModelDefinitions() {
                 },
                 "Revert To Proposed": {
                   "source": "InWork",
-                  "target": "Proposed",
-                  "guard": {}
-                },
-                "Remove Assignment": {
-                  "source": "PendingReassign",
                   "target": "Proposed",
                   "guard": {}
                 },
@@ -1551,6 +1567,11 @@ export function ModelDefinitions() {
                 "Verify": {
                   "source": "InVerification",
                   "target": "Verified",
+                  "guard": {}
+                },
+                "Revert To In Verification": {
+                  "source": "Verified",
+                  "target": "InVerification",
                   "guard": {}
                 },
                 "Complete": {
@@ -5834,6 +5855,182 @@ export function ModelDefinitions() {
                     "kind": "proxy-selector",
                     "visible": true,
                     "editable": false
+                  },
+                  {
+                    "propertyName": "base",
+                    "customLabel": "Base",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "isMetaModel",
+                    "customLabel": "Is Metamodel",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "isInternal",
+                    "customLabel": "Is Internal",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "idInjection",
+                    "customLabel": "ID Injection",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "invertItemOrder",
+                    "customLabel": "Invert Item Order",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "properties",
+                    "customLabel": "Properties",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "validations",
+                    "customLabel": "Validations",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "relations",
+                    "customLabel": "Relations",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "acls",
+                    "customLabel": "ACLs",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "methods",
+                    "customLabel": "Methods",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "classLocalTypes",
+                    "customLabel": "Class Local Types",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "classParentTypes",
+                    "customLabel": "Class Parent Types",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "classProperties",
+                    "customLabel": "Class Properties",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "propertyOrder",
+                    "customLabel": "Property Order",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "propertyStorageOrder",
+                    "customLabel": "Property Storage Order",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "requiredProperties",
+                    "customLabel": "Required Properties",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "derivedProperties",
+                    "customLabel": "Derived Properties",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "calculatedProperties",
+                    "customLabel": "Calculated Properties",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "stateProperties",
+                    "customLabel": "State Properties",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "relationProperties",
+                    "customLabel": "Relation Properties",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "idProperties",
+                    "customLabel": "ID Properties",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "localTypes",
+                    "customLabel": "Local Types",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
                   }
                 ]
               }
@@ -6254,6 +6451,78 @@ export function ModelDefinitions() {
                     "customLabel": "Children",
                     "labelOrientation": "Top",
                     "kind": "proxy-selector",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "modelName",
+                    "customLabel": "Model Name",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "icon",
+                    "customLabel": "Icon",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "color",
+                    "customLabel": "Color",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "viewProperties",
+                    "customLabel": "View Properties",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "localTypes",
+                    "customLabel": "Local Types",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "formatDefinitions",
+                    "customLabel": "Format Definitions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "defaultFormatKey",
+                    "customLabel": "Default Format Key",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "tableDefinitions",
+                    "customLabel": "Table Definitions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "ungroupDefaultFormatDefinitionStateAttributes",
+                    "customLabel": "Ungroup Default Format Definition State Attributes",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   }

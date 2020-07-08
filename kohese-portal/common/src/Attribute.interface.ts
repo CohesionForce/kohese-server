@@ -12,6 +12,6 @@ export interface ContainmentReferenceSpecification {
 }
 
 export interface NonContainmentReferenceSpecification {
-  type: string;
+  kind: string;
   foreignKey: string;
 }
