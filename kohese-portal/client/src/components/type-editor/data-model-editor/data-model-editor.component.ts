@@ -21,6 +21,7 @@ import { KoheseDataModel,
   KoheseViewModel } from '../../../../../common/src/KoheseModel.interface';
 import { Enumeration,
   EnumerationValue } from '../../../../../common/src/Enumeration.interface';
+import { Union } from '../../../../../common/src/Union.interface';
 
 @Component({
   selector: 'data-model-editor',
@@ -171,6 +172,10 @@ export class DataModelEditorComponent {
   get attributes() {
     return this._attributes;
   }
+
+  get itemRepository() {
+    return this._itemRepository;
+  }
   
   get TypeKind() {
     return TypeKind;
@@ -189,15 +194,13 @@ export class DataModelEditorComponent {
     ItemRepository) {
   }
   
-  public save(): void {
+  public async save(): Promise<void> {
     let dataModel: any = (this._enclosingType ? this._enclosingType : this.
       _dataModel);
     
-    this._itemRepository.upsertItem('KoheseModel', dataModel).then(
-      (itemProxy: ItemProxy) => {
-      this._changeDetectorRef.markForCheck();
-    });
     this._editable = false;
+    await this._itemRepository.upsertItem('KoheseModel', dataModel);
+    this._changeDetectorRef.markForCheck();
   }
   
   public discardChanges(): void {
@@ -522,8 +525,8 @@ export class DataModelEditorComponent {
     
     this._modifiedEventEmitter.emit();
     
-    this.save();
-    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+    await this.save();
+    await this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
     
     // Re-enter edit mode
     this._editable = true;
@@ -550,31 +553,7 @@ export class DataModelEditorComponent {
     
     let localTypeDataModel: Type;
     let localTypeViewModel: Type;
-    if (typeKind === TypeKind.ENUMERATION) {
-      let name: string = await this._dialogService.openInputDialog('Add ' +
-        'Enumeration', '', InputDialogKind.STRING, 'Name', 'Enumeration',
-        (value: any) => {
-        return (value && !(this._enclosingType ? this._enclosingType : this.
-          _dataModel).classLocalTypes[value]);
-      });
-      
-      if (!name) {
-        return;
-      }
-      
-      localTypeDataModel = ({
-        typeKind: TypeKind.ENUMERATION,
-        id: name,
-        name: name,
-        values: []
-      } as Enumeration);
-      localTypeViewModel = ({
-        typeKind: TypeKind.ENUMERATION,
-        id: 'view-' + name.toLowerCase(),
-        name: name,
-        values: []
-      } as Enumeration);
-    } else {
+    if (typeKind === TypeKind.KOHESE_MODEL) {
       let results: Array<any> = await this._dialogService.
         openComponentsDialog([{
         component: InputDialogComponent,
@@ -695,14 +674,53 @@ export class DataModelEditorComponent {
       
       localTypeDataModel = koheseDataModel;
       localTypeViewModel = koheseViewModel;
+    } else {
+      let name: string = await this._dialogService.openInputDialog('Add ' +
+        typeKind, '', InputDialogKind.STRING, 'Name', typeKind, (value:
+        any) => {
+        return (value && !(this._enclosingType ? this._enclosingType : this.
+          _dataModel).classLocalTypes[value]);
+      });
+      
+      if (!name) {
+        return;
+      }
+      
+      if (typeKind === TypeKind.ENUMERATION) {
+        localTypeDataModel = ({
+          typeKind: TypeKind.ENUMERATION,
+          id: name,
+          name: name,
+          values: []
+        } as Enumeration);
+        localTypeViewModel = ({
+          typeKind: TypeKind.ENUMERATION,
+          id: 'view-' + name.toLowerCase(),
+          name: name,
+          values: []
+        } as Enumeration);
+      } else {
+        localTypeDataModel = ({
+          typeKind: TypeKind.UNION,
+          id: name,
+          name: name,
+          variantMemberMap: {}
+        } as Union);
+        localTypeViewModel = ({
+          typeKind: TypeKind.UNION,
+          id: 'view-' + name.toLowerCase(),
+          name: name,
+          variantMemberMap: {}
+        } as Union);
+      }
     }
     
     this._dataModel.localTypes[localTypeDataModel.name] = localTypeDataModel;
     viewModelProxy.item.localTypes[localTypeViewModel.name] =
       localTypeViewModel;
     
-    this.save();
-    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+    await this.save();
+    await this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
     
     // Re-enter edit mode
     this._editable = true;
@@ -720,8 +738,8 @@ export class DataModelEditorComponent {
       delete this._dataModel.localTypes[name];
       delete viewModel.localTypes[name];
       
-      this.save();
-      this._itemRepository.upsertItem('KoheseView', viewModel);
+      await this.save();
+      await this._itemRepository.upsertItem('KoheseView', viewModel);
       
       // Re-enter edit mode
       this._editable = true;
@@ -809,7 +827,7 @@ export class DataModelEditorComponent {
         contextualGlobalType: (this._enclosingType ? this._enclosingType :
           this._dataModel)
       }
-    }], { data: {} }).afterClosed().subscribe((results: Array<any>) => {
+    }], { data: {} }).afterClosed().subscribe(async (results: Array<any>) => {
       if (results) {
         let viewModel: any = (this._enclosingType ? viewModelProxy.item.
           localTypes[this._dataModel.name] : viewModelProxy.item);
@@ -897,8 +915,8 @@ export class DataModelEditorComponent {
         viewModel.viewProperties[results[0].attribute.name] =
           results[0].view;
         
-        this.save();
-        this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+        await this.save();
+        await this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
         this._attributes.push(results[0].attribute);
         this._attributeTable.renderRows();
         
@@ -1416,8 +1434,8 @@ export class DataModelEditorComponent {
       }
     }
     
-    this.save();
-    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+    await this.save();
+    await this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
     
     // Re-enter edit mode
     this._editable = true;
@@ -1550,7 +1568,7 @@ export class DataModelEditorComponent {
     let attribute: any = this._dataModel.properties[propertyId];
     let type: any = attribute.type;
     type = (Array.isArray(type) ? type[0] : type);
-    let removeFromModels: () => void = () => {
+    let removeFromModels: () => Promise<void> = async () => {
       delete this._dataModel.properties[propertyId];
       delete viewModel.viewProperties[propertyId];
       let formatDefinitions: Array<FormatDefinition> = Object.values(viewModel.
@@ -1598,14 +1616,14 @@ export class DataModelEditorComponent {
         }
       }
       
-      this.save();
+      await this.save();
       
       if (this._enclosingType) {
-        this._itemRepository.upsertItem('KoheseView', TreeConfiguration.
+        await this._itemRepository.upsertItem('KoheseView', TreeConfiguration.
           getWorkingTree().getProxyFor('view-' + this._enclosingType.name.
           toLowerCase()).item);
       } else {
-        this._itemRepository.upsertItem('KoheseView', viewModel);
+        await this._itemRepository.upsertItem('KoheseView', viewModel);
       }
       
       this._attributes.splice(Object.keys(this._dataModel.properties).indexOf(
@@ -1621,7 +1639,7 @@ export class DataModelEditorComponent {
         'Remove ' + propertyId, 'All unsaved modifications to this type are ' +
         'to be saved if this attribute is removed. Do you want to proceed?');
       if (choiceValue) {
-        removeFromModels();
+        await removeFromModels();
         this._changeDetectorRef.markForCheck();
       }
     } else {
@@ -1657,7 +1675,7 @@ export class DataModelEditorComponent {
           this._itemRepository.upsertItem('KoheseView', paths[j][0]);
         }
         
-        removeFromModels();
+        await removeFromModels();
         this._changeDetectorRef.markForCheck();
       }
     }
@@ -1694,8 +1712,8 @@ export class DataModelEditorComponent {
       viewModelProxy.item.localTypes[enumeration.name].values.push(
         enumerationValueName.toString());
 
-      this.save();
-      this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+      await this.save();
+      await this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
       
       this._changeDetectorRef.markForCheck();
     }
@@ -1722,9 +1740,57 @@ export class DataModelEditorComponent {
     viewModelProxy.item.localTypes[enumeration.name].values.splice(
       enumerationValueIndex, 1);
     
-    this.save();
-    this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
+    await this.save();
+    await this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
 
     this._changeDetectorRef.markForCheck();
+  }
+
+  public async addVariantMember(union: Union): Promise<void> {
+    let name: string = await this._dialogService.openInputDialog('Variant ' +
+      'Member', '', InputDialogKind.STRING, 'Name', 'Variant Member', (value:
+      any) => {
+      return ((value !== '') && (union.variantMemberMap[value] == null));
+    });
+    if (name != null) {
+      union.variantMemberMap[name] = {
+        name: name,
+        type: 'boolean',
+        required: false,
+        default: false
+      };
+
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+
+  public async renameVariantMember(union: Union, variantMemberName: string):
+    Promise<void> {
+    let name: string = await this._dialogService.openInputDialog('Rename ' +
+      variantMemberName, '', InputDialogKind.STRING, 'Name', variantMemberName,
+      (value: any) => {
+      return ((value !== '') && (union.variantMemberMap[value] == null));
+    });
+    if (name != null) {
+      let intermediate: any = {};
+      for (let key in union.variantMemberMap) {
+        intermediate[key] = union.variantMemberMap[key];
+        delete union.variantMemberMap[key];
+      }
+
+      for (let key in intermediate) {
+        if (key === variantMemberName) {
+          union.variantMemberMap[name] = intermediate[key];
+        } else {
+          union.variantMemberMap[key] = intermediate[key];
+        }
+      }
+
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+
+  public removeVariantMember(union: Union, variantMemberName: string): void {
+    delete union.variantMemberMap[variantMemberName];
   }
 }

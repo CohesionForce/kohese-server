@@ -258,25 +258,26 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <ng-container *ngIf="(localType.typeKind === TypeKind.ENUMERATION)
-            else koheseModel">
-            <ng-container *ngFor="let value of localType.values; let j =
-              index; trackBy: getEnumerationValueIdentifier">
-              <mat-form-field style="width: 100%;">
-                <input matInput type="text" placeholder="Display Name"
-                  [disabled]="!editable" [(ngModel)]="localType.values[j]"/>
-              </mat-form-field>
+          <ng-container [ngSwitch]="localType.typeKind">
+            <ng-container *ngSwitchCase="TypeKind.KOHESE_MODEL">
+              <!-- The use of hasUnsavedChanges below is bad but preferred over
+              changing API. -->
+              <view-model-editor [viewModel]="localType"
+                [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
+                emit()" [enclosingDataModel]="dataModel" [dataModel]="dataModel.
+                localTypes[localType.name]">
+              </view-model-editor>
+            </ng-container>
+            <ng-container *ngSwitchCase="TypeKind.ENUMERATION">
+              <ng-container *ngFor="let value of localType.values; let j =
+                index; trackBy: getEnumerationValueIdentifier">
+                <mat-form-field style="width: 100%;">
+                  <input matInput type="text" placeholder="Display Name"
+                    [disabled]="!editable" [(ngModel)]="localType.values[j]"/>
+                </mat-form-field>
+              </ng-container>
             </ng-container>
           </ng-container>
-          <ng-template #koheseModel>
-            <!-- The use of hasUnsavedChanges below is bad but preferred over
-            changing API. -->
-            <view-model-editor [viewModel]="localType"
-              [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
-              emit()" [enclosingDataModel]="dataModel" [dataModel]="dataModel.
-              localTypes[localType.name]">
-            </view-model-editor>
-          </ng-template>
         </ng-template>
       </mat-expansion-panel>
     </ng-container>
