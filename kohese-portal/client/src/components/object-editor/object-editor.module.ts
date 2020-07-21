@@ -12,11 +12,15 @@ import { DocumentConfigurationEditorComponent } from './document-configuration/d
 import { FormatObjectEditorComponent } from './format-object-editor/format-object-editor.component';
 import { FormatDefinitionEditorComponent } from './format-definition-editor/format-definition-editor.component';
 import { TableModule } from '../table/table.module';
+import { MultivaluedFieldComponent } from './format-object-editor/field/multivalued-field/multivalued-field.component';
+import { SinglevaluedFieldComponent } from './format-object-editor/field/singlevalued-field/singlevalued-field.component';
 
 @NgModule({
   declarations: [
     DocumentConfigurationEditorComponent,
     FormatObjectEditorComponent,
+    MultivaluedFieldComponent,
+    SinglevaluedFieldComponent,
     FormatDefinitionEditorComponent
   ],
   entryComponents: [

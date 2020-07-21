@@ -1,0 +1,352 @@
+<ng-container *ngIf="propertyDefinition.tableDefinition else notTableBlock">
+  <h3>
+    {{getAttributeRepresentation(propertyDefinition)}}
+  </h3>
+  <table_ [rows]="getTableElements(propertyDefinition.propertyName)"
+    [columns]="getTableColumns(propertyDefinition)"
+    [getText]="getTableCellTextRetrievalFunction(propertyDefinition.
+    propertyName)" [add]="(isLocalTypeAttribute(propertyDefinition.
+    propertyName) ? undefined : getTableElementAdditionFunction(
+    propertyDefinition.propertyName))"
+    [move]="getTableElementMovementFunction(propertyDefinition.propertyName)"
+    [remove]="getTableElementRemovalFunction(propertyDefinition.propertyName)"
+    [disabled]="!propertyDefinition.editable" style="width: 100%;">
+  </table_>
+</ng-container>
+<ng-template #notTableBlock>
+  <div style="display: flex; flex-direction: column;">
+    <div style="display: flex; flex-direction: row;">
+      <h3>
+        {{getAttributeRepresentation(propertyDefinition)}}
+      </h3>
+      <ng-container *ngIf="(((propertyDefinition.kind === '') ||
+        (propertyDefinition.kind === 'proxy-selector')) &&
+        isLocalTypeAttribute(propertyDefinition.propertyName) &&
+        (getLocalTypeDataModel(propertyDefinition.propertyName).typeKind ===
+        TypeKind.KOHESE_MODEL))">
+        <button mat-icon-button matTooltip="Expand all elements"
+          style="margin-left: auto;" [disabled]="!koheseObject[
+          isVariantField ? 'value' : propertyDefinition.propertyName]?.length"
+          (click)="expandAllMultivaluedAttributeExpansionPanels(
+          propertyDefinition.propertyName)">
+          <mat-icon class="fa fa-chevron-down"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Collapse all elements"
+          [disabled]="!koheseObject[isVariantField ? 'value' :
+          propertyDefinition.propertyName]?.length"
+          (click)="collapseAllMultivaluedAttributeExpansionPanels(
+          propertyDefinition.propertyName)">
+          <mat-icon class="fa fa-chevron-up"></mat-icon>
+        </button>
+      </ng-container>
+      <!--
+        The 'addValue' function is intentionally called potentially twice
+        below - the first time to set the value of 'koheseObject[isVariantField
+        ? 'value' : propertyDefinition.propertyName]' to an empty Array, and
+        the second time to push a value onto that Array.
+      -->
+      <button mat-icon-button matTooltip="Add a value to {{propertyDefinition.
+        propertyName}}" [disabled]="!propertyDefinition.editable"
+        (click)="addValue(propertyDefinition.propertyName);
+        ((((propertyDefinition.kind === '') || (propertyDefinition.kind ===
+        'proxy-selector')) && !isLocalTypeAttribute(propertyDefinition.
+        propertyName)) ? openObjectSelector(propertyDefinition.propertyName,
+        undefined) : koheseObject[isVariantField ? 'value' :
+        propertyDefinition.propertyName].push(addValue(propertyDefinition.
+        propertyName)))" [ngStyle]="{ 'margin-left': ((((propertyDefinition.
+        kind === '') || (propertyDefinition.kind === 'proxy-selector')) &&
+        isLocalTypeAttribute(propertyDefinition.propertyName) &&
+        (getLocalTypeDataModel(propertyDefinition.propertyName).typeKind ===
+        TypeKind.KOHESE_MODEL)) ? '' : 'auto') }">
+        <mat-icon class="fa fa-plus"></mat-icon>
+      </button>
+    </div>
+    <div style="overflow-y: auto;">
+      <ng-container *ngFor="let value of koheseObject[isVariantField ? 'value'
+        : propertyDefinition.propertyName]; let j = index; trackBy:
+        getMultivaluedAttributeValueIdentifier">
+        <div style="display: flex; flex-direction: row;">
+          <ng-container [ngSwitch]="propertyDefinition.kind">
+            <ng-container *ngSwitchCase="'boolean'">
+              <mat-checkbox [(ngModel)]="koheseObject[isVariantField ?
+                'value' : propertyDefinition.propertyName][j]"
+                [disabled]="!propertyDefinition.editable" style="width: 100%;">
+              </mat-checkbox>
+            </ng-container>
+            <ng-container *ngSwitchCase="'number'">
+              <mat-form-field style="width: 100%;">
+                <input matInput type="number" [(ngModel)]="koheseObject[
+                  isVariantField ? 'value' : propertyDefinition.propertyName][
+                  j]" [disabled]="!propertyDefinition.editable"/>
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngSwitchCase="'date'">
+              <mat-form-field style="width: 100%;">
+                <input matInput [matDatepicker]="matDatepicker"
+                  [ngModel]="getDateString(koheseObject[isVariantField ?
+                  'value' : propertyDefinition.propertyName][j])"
+                  (ngModelChange)="($event ? koheseObject[propertyDefinition.
+                  propertyName][j] = $event.getTime() : '')"
+                  [disabled]="!propertyDefinition.editable"/>
+                <mat-datepicker-toggle matSuffix [for]="matDatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #matDatepicker></mat-datepicker>
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngSwitchCase="'string'">
+              <mat-form-field style="width: 100%;">
+                <input matInput type="text" [(ngModel)]="koheseObject[
+                  isVariantField ? 'value' : propertyDefinition.propertyName][
+                  j]" [disabled]="!propertyDefinition.editable"/>
+              </mat-form-field>
+            </ng-container>
+            <!--
+              Hopefully the case below can be removed eventually.
+            -->
+            <ng-container *ngSwitchCase="'text'">
+              <mat-form-field style="width: 100%;">
+                <input matInput type="text" [(ngModel)]="koheseObject[
+                  isVariantField ? 'value' : propertyDefinition.propertyName][
+                  j]" [disabled]="!propertyDefinition.editable"/>
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngSwitchCase="'maskedString'">
+              <mat-form-field style="width: 100%;">
+                <input matInput type="password" [(ngModel)]="koheseObject[
+                  isVariantField ? 'value' : propertyDefinition.propertyName][
+                  j]" [disabled]="!propertyDefinition.editable"/>
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngSwitchCase="'markdown'">
+              <ng-container *ngIf="!propertyDefinition.editable else
+                editableBlock">
+                <markdown [data]="koheseObject[isVariantField ? 'value' :
+                  propertyDefinition.propertyName][j]">
+                </markdown>
+              </ng-container>
+              <ng-template #editableBlock>
+                <markdown-editor [value]="koheseObject[isVariantField ? 'value'
+                  : propertyDefinition.propertyName][j]"
+                  (valueChanged)="koheseObject[isVariantField ? 'value' :
+                  propertyDefinition.propertyName][j] = $event">
+                </markdown-editor>
+                <br/>
+              </ng-template>
+            </ng-container>
+            <ng-container *ngSwitchCase="'state-editor'">
+              <div style="display: flex; flex-direction: row;">
+                <div style="display: flex; flex-direction: column;
+                  justify-content: center;">
+                  <label style="margin-bottom: unset;">
+                    {{koheseObject[isVariantField ? 'value' :
+                      propertyDefinition.propertyName][j]}}&nbsp;
+                  </label>
+                </div>
+                <ng-container
+                  *ngFor="let transitionCandidateName of
+                  getStateTransitionCandidates(propertyDefinition.
+                  propertyName); let j = index">
+                  <button mat-raised-button
+                    [disabled]="!propertyDefinition.editable" style="margin:
+                    0px 3px 0px 3px;" [ngStyle]="{ 'margin-left': ((j === 0) ?
+                    'auto' : '') }" (click)="koheseObject[isVariantField ?
+                    'value' : propertyDefinition.propertyName][j] = dataModel.
+                    classProperties[propertyDefinition.propertyName].
+                    definition.properties.transition[transitionCandidateName].
+                    target">
+                    {{transitionCandidateName}}
+                  </button>
+                </ng-container>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'user-selector'">
+              <mat-form-field style="width: 100%;">
+                <mat-select [(ngModel)]="koheseObject[isVariantField ? 'value'
+                  : propertyDefinition.propertyName][j]"
+                  [disabled]="!propertyDefinition.editable">
+                  <ng-container *ngFor="let user of sessionService.users">
+                    <mat-option [value]="user.name">
+                      {{user.name}}
+                    </mat-option>
+                  </ng-container>
+                </mat-select>
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <div style="width: 100%; display: flex; flex-direction: row;"
+                [ngStyle]="{ 'align-items': (isLocalTypeAttribute(
+                propertyDefinition.propertyName) ? '' : 'center') }">
+                <ng-container *ngIf="koheseObject[isVariantField ? 'value' :
+                  propertyDefinition.propertyName]">
+                  <ng-container *ngIf="isLocalTypeAttribute(
+                    propertyDefinition.propertyName) else
+                    globalTypeAttribute">
+                    <ng-container [ngSwitch]="getLocalTypeDataModel(
+                      propertyDefinition.propertyName).typeKind">
+                      <ng-container *ngSwitchCase="TypeKind.KOHESE_MODEL">
+                        <mat-expansion-panel
+                          #multivaluedAttributeExpansionPanel
+                          attr.attributeName="{{propertyDefinition.
+                          propertyName}}" style="width: 100%;">
+                          <mat-expansion-panel-header>
+                            <mat-panel-title>
+                              {{itemRepository.getStringRepresentation(
+                                koheseObject, propertyDefinition.propertyName,
+                                j, (enclosingDataModel ? enclosingDataModel :
+                                dataModel), dataModel, viewModel,
+                                formatDefinitionType)}}
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-template matExpansionPanelContent>
+                            <format-object-editor
+                              [enclosingType]="(enclosingDataModel ?
+                              enclosingDataModel : dataModel)"
+                              [type]="(enclosingDataModel ? enclosingDataModel
+                              : dataModel).classLocalTypes[dataModel.
+                              classProperties[propertyDefinition.propertyName].
+                              definition.type].definition"
+                              [object]="koheseObject[isVariantField ? 'value' :
+                              propertyDefinition.propertyName][j]"
+                              [formatDefinitionType]="formatDefinitionType"
+                              [disabled]="isDisabled">
+                            </format-object-editor>
+                          </ng-template>
+                        </mat-expansion-panel>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="TypeKind.ENUMERATION">
+                        <mat-form-field style="width: 100%;">
+                          <mat-select [(ngModel)]="koheseObject[
+                            isVariantField ? 'value' : propertyDefinition.
+                            propertyName][j]" [disabled]="!propertyDefinition.
+                            editable">
+                            <ng-container *ngFor="let option of
+                              getLocalTypeDataModel(propertyDefinition.
+                              propertyName).values">
+                              <mat-option [value]="option.name">
+                                {{getLocalTypeViewModel(propertyDefinition.
+                                  propertyName).values[getLocalTypeDataModel(
+                                  propertyDefinition.propertyName).values.
+                                  indexOf(option)]}}
+                              </mat-option>
+                            </ng-container>
+                          </mat-select>
+                        </mat-form-field>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="TypeKind.VARIANT">
+                        <div style="width: 100%; display: flex; flex-direction:
+                          column;">
+                          <mat-form-field style="width: 100%;">
+                            <mat-select [(ngModel)]="koheseObject[
+                              isVariantField ? 'value' : propertyDefinition.
+                              propertyName][j]"
+                              [compareWith]="areVariantDiscriminantsEqual"
+                              [disabled]="!propertyDefinition.editable">
+                              <ng-container *ngFor="let variantMemberName of
+                                Object.keys(getLocalTypeDataModel(
+                                propertyDefinition.propertyName).properties)">
+                                <mat-option
+                                  [value]="{ discriminant: variantMemberName,
+                                  value: null }">
+                                  {{variantMemberName}}
+                                </mat-option>
+                              </ng-container>
+                            </mat-select>
+                          </mat-form-field>
+                          <ng-container *ngIf="(koheseObject[isVariantField ?
+                            'value' : propertyDefinition.propertyName][j] !=
+                            null)">
+                            <ng-container *ngIf="Array.isArray(
+                              getLocalTypeDataModel(propertyDefinition.
+                              propertyName)['classProperties'][koheseObject[
+                              isVariantField ? 'value' : propertyDefinition.
+                              propertyName][j].discriminant].definition.type)
+                              else singlevalued">
+                              <multivalued-field [koheseObject]="koheseObject[
+                                isVariantField ? 'value' : propertyDefinition.
+                                propertyName][j]"
+                                [dataModel]="getLocalTypeDataModel(
+                                propertyDefinition.propertyName)"
+                                [viewModel]="getLocalTypeViewModel(
+                                propertyDefinition.propertyName)"
+                                [enclosingDataModel]="(enclosingDataModel ?
+                                enclosingDataModel : dataModel)"
+                                [propertyDefinition]="getVariantPropertyDefinition(
+                                propertyDefinition.propertyName, koheseObject[
+                                isVariantField ? 'value' : propertyDefinition.
+                                propertyName][j].discriminant)"
+                                [formatDefinitionType]="formatDefinitionType">
+                              </multivalued-field>
+                            </ng-container>
+                            <ng-template #singlevalued>
+                              <singlevalued-field [koheseObject]="koheseObject[
+                                isVariantField ? 'value' : propertyDefinition.
+                                propertyName][j]"
+                                [dataModel]="getLocalTypeDataModel(
+                                propertyDefinition.propertyName)"
+                                [viewModel]="getLocalTypeViewModel(
+                                propertyDefinition.propertyName)"
+                                [enclosingDataModel]="(enclosingDataModel ?
+                                enclosingDataModel : dataModel)"
+                                [propertyDefinition]="getVariantPropertyDefinition(
+                                propertyDefinition.propertyName, koheseObject[
+                                isVariantField ? 'value' : propertyDefinition.
+                                propertyName][j].discriminant)"
+                                [formatDefinitionType]="formatDefinitionType">
+                              </singlevalued-field>
+                            </ng-template>
+                          </ng-container>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </ng-container>
+                  <ng-template #globalTypeAttribute>
+                    <button mat-button [disabled]="true" style="width: 100%;
+                      margin: 0px 3px 0px 3px; white-space: nowrap; overflow:
+                      hidden; text-overflow: ellipsis;">
+                      {{itemRepository.getStringRepresentation(koheseObject,
+                        propertyDefinition.propertyName, j,
+                        (enclosingDataModel ? enclosingDataModel : dataModel),
+                        dataModel, viewModel, formatDefinitionType)}}
+                    </button>
+                  </ng-template>
+                </ng-container>
+                <ng-container *ngIf="isLocalTypeAttribute(propertyDefinition.
+                  propertyName) else globalTypeAttribute">
+                  <ng-container *ngIf="(getLocalTypeDataModel(
+                    propertyDefinition.propertyName).typeKind === TypeKind.
+                    KOHESE_MODEL) && !koheseObject[isVariantField ? 'value' :
+                    propertyDefinition.propertyName][j]">
+                    <button mat-icon-button matTooltip="Set a value for {{
+                      propertyDefinition.propertyName}}"
+                      [disabled]="!propertyDefinition.editable"
+                      style="margin-left: auto;" (click)="koheseObject[
+                      isVariantField ? 'value' : propertyDefinition.
+                      propertyName][j] = getDefaultValue(dataModel.
+                      classProperties[propertyDefinition.propertyName].
+                      definition)">
+                      <mat-icon class="fa fa-plus"></mat-icon>
+                    </button>
+                  </ng-container>
+                </ng-container>
+                <ng-template #globalTypeAttribute>
+                  <button mat-icon-button matTooltip="Select an Item"
+                    [disabled]="!propertyDefinition.editable"
+                    (click)="openObjectSelector(propertyDefinition.
+                    propertyName, j)" style="margin-left: auto;">
+                    <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+                  </button>
+                </ng-template>
+              </div>
+            </ng-container>
+          </ng-container>
+          <button mat-icon-button matTooltip="Remove this value"
+            [disabled]="!propertyDefinition.editable" (click)="koheseObject[
+            isVariantField ? 'value' : propertyDefinition.propertyName].splice(
+            j, 1)" style="margin-left: auto;">
+            <mat-icon class="fa fa-times"></mat-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

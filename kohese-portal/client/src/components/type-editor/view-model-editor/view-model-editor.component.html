@@ -277,6 +277,15 @@
                 </mat-form-field>
               </ng-container>
             </ng-container>
+            <ng-container *ngSwitchCase="TypeKind.VARIANT">
+              <!-- The use of hasUnsavedChanges below is bad but preferred over
+              changing API. -->
+              <view-model-editor [viewModel]="localType"
+                [hasUnsavedChanges]="editable" (modified)="modifiedEventEmitter.
+                emit()" [enclosingDataModel]="dataModel" [dataModel]="dataModel.
+                localTypes[localType.name]">
+              </view-model-editor>
+            </ng-container>
           </ng-container>
         </ng-template>
       </mat-expansion-panel>

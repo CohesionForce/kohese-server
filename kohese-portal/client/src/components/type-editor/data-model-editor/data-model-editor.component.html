@@ -203,8 +203,8 @@
         <button mat-menu-item (click)="addLocalType(TypeKind.ENUMERATION)">
           Enumeration
         </button>
-        <button mat-menu-item (click)="addLocalType(TypeKind.UNION)">
-          Union
+        <button mat-menu-item (click)="addLocalType(TypeKind.VARIANT)">
+          Variant
         </button>
       </mat-menu>
     </span>
@@ -229,7 +229,7 @@
                 -->
                 <data-model-editor [dataModel]="localType"
                   [hasUnsavedChanges]="editable"
-                  (modified)="modifiedEventEmitter. emit()"
+                  (modified)="modifiedEventEmitter.emit()"
                   [enclosingType]="dataModel">
                 </data-model-editor>
               </ng-container>
@@ -267,42 +267,16 @@
                   </div>
                 </ng-container>
               </ng-container>
-              <ng-container *ngSwitchCase="TypeKind.UNION">
-                <div style="width: 100%; display: flex; flex-direction: row;">
-                  <button mat-icon-button [disabled]="!editable" style="margin-left:
-                    auto;" (click)="addVariantMember(localType)">
-                    <mat-icon class="fa fa-plus"></mat-icon>
-                  </button>
-                </div>
-                <ng-container *ngFor="let variantMemberName of Object.keys(
-                  localType.variantMemberMap)">
-                  <mat-expansion-panel>
-                    <mat-expansion-panel-header>
-                      <mat-panel-title style="align-items: center;">
-                        {{variantMemberName}}
-                      </mat-panel-title>
-                      <button mat-icon-button matTooltip="Rename this variant
-                        member" [disabled]="!editable" style="margin-left:
-                        auto;" (click)="$event.preventDefault();
-                        renameVariantMember(localType, variantMemberName)">
-                        <mat-icon class="fa fa-i-cursor"></mat-icon>
-                      </button>
-                      <button mat-icon-button matTooltip="Remove this variant
-                        member" [disabled]="!editable" (click)="$event.
-                        preventDefault(); removeVariantMember(localType,
-                        variantMemberName)">
-                        <mat-icon class="fa fa-trash"></mat-icon>
-                      </button>
-                    </mat-expansion-panel-header>
-                    <ng-template matExpansionPanelContent>
-                      <attribute-editor [attribute]="localType.variantMemberMap[
-                        variantMemberName]"
-                        [contextualGlobalType]="(enclosingType ? enclosingType :
-                        dataModel)">
-                      </attribute-editor>
-                    </ng-template>
-                  </mat-expansion-panel>
-                </ng-container>
+              <ng-container *ngSwitchCase="TypeKind.VARIANT">
+                <!--
+                  The use of hasUnsavedChanges below is bad but preferred over
+                  changing API.
+                -->
+                <data-model-editor [dataModel]="localType"
+                  [hasUnsavedChanges]="editable"
+                  (modified)="modifiedEventEmitter.emit()"
+                  [enclosingType]="dataModel">
+                </data-model-editor>
               </ng-container>
             </ng-container>
           </ng-template>

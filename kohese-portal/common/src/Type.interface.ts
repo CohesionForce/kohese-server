@@ -6,5 +6,5 @@ export interface Type {
 }
 
 export enum TypeKind {
-  KOHESE_MODEL = 'Kohese Model', ENUMERATION = 'Enumeration', UNION = 'Union'
+  KOHESE_MODEL = 'Kohese Model', ENUMERATION = 'Enumeration', VARIANT = 'Variant'
 }

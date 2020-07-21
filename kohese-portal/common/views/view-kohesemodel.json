@@ -8,6 +8,7 @@
   "viewProperties": {},
   "localTypes": {
     "PropertyType": {
+      "typeKind": "Kohese Model",
       "name": "PropertyType",
       "modelName": "PropertyType",
       "icon": "",
@@ -133,6 +134,7 @@
       "tableDefinitions": {}
     },
     "RelationType": {
+      "typeKind": "Kohese Model",
       "name": "RelationType",
       "modelName": "RelationType",
       "icon": "",

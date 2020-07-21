@@ -1057,37 +1057,57 @@ export class ItemRepository {
                         currentTreeConfigSubject.getValue().config.getProxyFor(
                         'view-' + classLocalTypesEntry.definedInKind.
                         toLowerCase()).item.localTypes[type];
-                      if (localTypeDataModel.typeKind === TypeKind.
-                        ENUMERATION) {
-                        if (Array.isArray(value)) {
-                          body += value.map((v: any, index: number) => {
-                            return localTypeViewModel.values[
-                              localTypeDataModel.values.map((enumerationValue:
-                              EnumerationValue) => {
-                              return enumerationValue.name;
-                            }).indexOf(v)];
-                          }).join('\n\n');
-                        } else {
-                          body += localTypeViewModel.values[
-                            localTypeDataModel.values.map((enumerationValue:
-                            EnumerationValue) => {
-                            return enumerationValue.name;
-                          }).indexOf(value)];
-                        }
-                      } else {
-                        if (Array.isArray(value)) {
-                          body += value.map((v: any) => {
-                            return this.getMarkdownRepresentation(v,
+                      switch (localTypeDataModel.typeKind) {
+                        case TypeKind.KOHESE_MODEL:
+                          if (Array.isArray(value)) {
+                            body += value.map((v: any) => {
+                              return this.getMarkdownRepresentation(v,
+                                (enclosingType ? enclosingType : dataModel),
+                                localTypeDataModel, localTypeViewModel,
+                                formatDefinitionType, -1, addLinks);
+                            }).join('\n');
+                          } else {
+                            body += this.getMarkdownRepresentation(value,
                               (enclosingType ? enclosingType : dataModel),
                               localTypeDataModel, localTypeViewModel,
                               formatDefinitionType, -1, addLinks);
-                          }).join('\n');
-                        } else {
-                          body += this.getMarkdownRepresentation(value,
-                            (enclosingType ? enclosingType : dataModel),
-                            localTypeDataModel, localTypeViewModel,
-                            formatDefinitionType, -1, addLinks);
-                        }
+                          }
+
+                          break;
+                        case TypeKind.ENUMERATION:
+                          if (Array.isArray(value)) {
+                            body += value.map((v: any, index: number) => {
+                              return localTypeViewModel.values[
+                                localTypeDataModel.values.map((enumerationValue:
+                                EnumerationValue) => {
+                                return enumerationValue.name;
+                              }).indexOf(v)];
+                            }).join('\n\n');
+                          } else {
+                            body += localTypeViewModel.values[
+                              localTypeDataModel.values.map((enumerationValue:
+                              EnumerationValue) => {
+                              return enumerationValue.name;
+                            }).indexOf(value)];
+                          }
+
+                          break;
+                        case TypeKind.VARIANT:
+                          if (Array.isArray(value)) {
+                            body += value.map((v: any, index: number) => {
+                              return this.getStringRepresentation(koheseObject,
+                                propertyDefinition.propertyName, index,
+                                enclosingType, dataModel, viewModel,
+                                formatDefinitionType);
+                            }).join('\n\n');
+                          } else {
+                            body += this.getStringRepresentation(koheseObject,
+                              propertyDefinition.propertyName, undefined,
+                              enclosingType, dataModel, viewModel,
+                              formatDefinitionType);
+                          }
+
+                          break;
                       }
                     }
                   } else {
@@ -1097,7 +1117,7 @@ export class ItemRepository {
                       for (let l: number = 0; l < value.length; l++) {
                         let arrayComponent: any = value[l];
                         let id: string;
-                        if (arrayComponent.id) {
+                        if (arrayComponent.id != null) {
                           id = arrayComponent.id;
                         } else {
                           // Accommodation code
@@ -1111,7 +1131,7 @@ export class ItemRepository {
                       body += stringComponents.join('\n');
                     } else {
                       let id: string;
-                      if (value.id) {
+                      if (value.id != null) {
                         id = value.id;
                       } else {
                         // Accommodation code
@@ -1159,9 +1179,11 @@ export class ItemRepository {
     string {
     let value: any;
     if (index != null) {
-      value = koheseObject[attributeName][index];
+      value = koheseObject[(dataModel.typeKind === TypeKind.VARIANT) ? 'value'
+        : attributeName][index];
     } else {
-      value = koheseObject[attributeName];
+      value = koheseObject[(dataModel.typeKind === TypeKind.VARIANT) ? 'value'
+        : attributeName];
     }
 
     if ((attributeName === 'parentId') && (dataModel['classProperties'][
@@ -1176,14 +1198,16 @@ export class ItemRepository {
     type = (Array.isArray(type) ? type[0] : type);
     let classLocalTypes: any = (enclosingType ? enclosingType : dataModel)[
       'classLocalTypes'];
-    if (classLocalTypes && classLocalTypes[type] && (classLocalTypes[type].
-      definition.typeKind === TypeKind.ENUMERATION)) {
-      return this.currentTreeConfigSubject.getValue().config.getProxyFor(
-        'view-' + classLocalTypes[type].definedInKind.toLowerCase()).item.
-        localTypes[type].values[classLocalTypes[type].definition.values.map(
-        (enumerationValue: EnumerationValue) => {
-        return enumerationValue.name;
-      }).indexOf(value)];
+    if (classLocalTypes && classLocalTypes[type]) {
+      switch (classLocalTypes[type].definition.typeKind) {
+        case TypeKind.ENUMERATION:
+          return this.currentTreeConfigSubject.getValue().config.getProxyFor(
+            'view-' + classLocalTypes[type].definedInKind.toLowerCase()).item.
+            localTypes[type].values[classLocalTypes[type].definition.values.
+            map((enumerationValue: EnumerationValue) => {
+            return enumerationValue.name;
+          }).indexOf(value)];
+      }
     }
 
     let representation: string = String(value);
@@ -1213,8 +1237,52 @@ export class ItemRepository {
               contents.length > 0)) {
               let propertyDefinition: PropertyDefinition = formatDefinition.
                 containers[0].contents[0];
-              return propertyDefinition.customLabel + ': ' + String(value[
-                propertyDefinition.propertyName]);
+              if (classLocalTypes[type].definition.typeKind === TypeKind.
+                VARIANT) {
+                formatDefinitionId = viewModel.defaultFormatKey[
+                  formatDefinitionType];
+                if (formatDefinitionId == null) {
+                  formatDefinitionId = viewModel.defaultFormatKey[
+                    FormatDefinitionType.DEFAULT];
+                }
+                formatDefinition = viewModel.formatDefinitions[
+                  formatDefinitionId];
+                for (let k: number = 0; k < formatDefinition.containers.length;
+                  k++) {
+                  let formatContainer: FormatContainer = formatDefinition.
+                    containers[k];
+                  if (formatContainer.kind !== FormatContainerKind.
+                    REVERSE_REFERENCE_TABLE) {
+                    for (let l: number = 0; l < formatContainer.contents.
+                      length; l++) {
+                      if (value.discriminant === formatContainer.contents[l].
+                        propertyName) {
+                        if (Array.isArray(value.value)) {
+                          return (formatContainer.contents[l].customLabel +
+                            ':\n\n' + value.value.map((element: any, valueIndex:
+                            number) => {
+                            return this.getStringRepresentation(value, value.
+                              discriminant, valueIndex, (enclosingType ?
+                              enclosingType : dataModel), classLocalTypes[
+                              type].definition, viewModel,
+                              formatDefinitionType);
+                          }).join('\n\n'));
+                        } else {
+                          return (formatContainer.contents[l].customLabel +
+                            ': ' + this.getStringRepresentation(value, value.
+                            discriminant, undefined, (enclosingType ?
+                            enclosingType : dataModel), classLocalTypes[
+                            type].definition, viewModel,
+                            formatDefinitionType));
+                        }
+                      }
+                    }
+                  }
+                }
+              } else {
+                return propertyDefinition.customLabel + ': ' + String(value[
+                  propertyDefinition.propertyName]);
+              }
             }
           }
 

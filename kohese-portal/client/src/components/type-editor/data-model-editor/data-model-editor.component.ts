@@ -21,7 +21,6 @@ import { KoheseDataModel,
   KoheseViewModel } from '../../../../../common/src/KoheseModel.interface';
 import { Enumeration,
   EnumerationValue } from '../../../../../common/src/Enumeration.interface';
-import { Union } from '../../../../../common/src/Union.interface';
 
 @Component({
   selector: 'data-model-editor',
@@ -538,6 +537,11 @@ export class DataModelEditorComponent {
     return (option.name === selection);
   }
   
+  /**
+   * Adds a local type of the given TypeKind to the selected data model
+   * 
+   * @param typeKind
+   */
   public async addLocalType(typeKind: TypeKind): Promise<void> {
     let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('view-' + this._dataModel.name.toLowerCase());
@@ -553,7 +557,31 @@ export class DataModelEditorComponent {
     
     let localTypeDataModel: Type;
     let localTypeViewModel: Type;
-    if (typeKind === TypeKind.KOHESE_MODEL) {
+    if (typeKind === TypeKind.ENUMERATION) {
+      let name: string = await this._dialogService.openInputDialog('Add ' +
+        typeKind, '', InputDialogKind.STRING, 'Name', typeKind, (value:
+        any) => {
+        return (value && !(this._enclosingType ? this._enclosingType : this.
+          _dataModel).classLocalTypes[value]);
+      });
+      
+      if (!name) {
+        return;
+      }
+      
+      localTypeDataModel = ({
+        typeKind: TypeKind.ENUMERATION,
+        id: name,
+        name: name,
+        values: []
+      } as Enumeration);
+      localTypeViewModel = ({
+        typeKind: TypeKind.ENUMERATION,
+        id: 'view-' + name.toLowerCase(),
+        name: name,
+        values: []
+      } as Enumeration);
+    } else {
       let results: Array<any> = await this._dialogService.
         openComponentsDialog([{
         component: InputDialogComponent,
@@ -583,7 +611,7 @@ export class DataModelEditorComponent {
       }
       
       let koheseDataModel: KoheseDataModel = {
-        typeKind: TypeKind.KOHESE_MODEL,
+        typeKind: typeKind,
         id: results[0],
         name: results[0],
         base: null,
@@ -598,7 +626,7 @@ export class DataModelEditorComponent {
         attribute;
       
       let koheseViewModel: KoheseViewModel = {
-        typeKind: TypeKind.KOHESE_MODEL,
+        typeKind: typeKind,
         id: 'view-' + results[0].toLowerCase(),
         name: results[0],
         modelName: results[0],
@@ -674,45 +702,6 @@ export class DataModelEditorComponent {
       
       localTypeDataModel = koheseDataModel;
       localTypeViewModel = koheseViewModel;
-    } else {
-      let name: string = await this._dialogService.openInputDialog('Add ' +
-        typeKind, '', InputDialogKind.STRING, 'Name', typeKind, (value:
-        any) => {
-        return (value && !(this._enclosingType ? this._enclosingType : this.
-          _dataModel).classLocalTypes[value]);
-      });
-      
-      if (!name) {
-        return;
-      }
-      
-      if (typeKind === TypeKind.ENUMERATION) {
-        localTypeDataModel = ({
-          typeKind: TypeKind.ENUMERATION,
-          id: name,
-          name: name,
-          values: []
-        } as Enumeration);
-        localTypeViewModel = ({
-          typeKind: TypeKind.ENUMERATION,
-          id: 'view-' + name.toLowerCase(),
-          name: name,
-          values: []
-        } as Enumeration);
-      } else {
-        localTypeDataModel = ({
-          typeKind: TypeKind.UNION,
-          id: name,
-          name: name,
-          variantMemberMap: {}
-        } as Union);
-        localTypeViewModel = ({
-          typeKind: TypeKind.UNION,
-          id: 'view-' + name.toLowerCase(),
-          name: name,
-          variantMemberMap: {}
-        } as Union);
-      }
     }
     
     this._dataModel.localTypes[localTypeDataModel.name] = localTypeDataModel;
@@ -1744,53 +1733,5 @@ export class DataModelEditorComponent {
     await this._itemRepository.upsertItem('KoheseView', viewModelProxy.item);
 
     this._changeDetectorRef.markForCheck();
-  }
-
-  public async addVariantMember(union: Union): Promise<void> {
-    let name: string = await this._dialogService.openInputDialog('Variant ' +
-      'Member', '', InputDialogKind.STRING, 'Name', 'Variant Member', (value:
-      any) => {
-      return ((value !== '') && (union.variantMemberMap[value] == null));
-    });
-    if (name != null) {
-      union.variantMemberMap[name] = {
-        name: name,
-        type: 'boolean',
-        required: false,
-        default: false
-      };
-
-      this._changeDetectorRef.markForCheck();
-    }
-  }
-
-  public async renameVariantMember(union: Union, variantMemberName: string):
-    Promise<void> {
-    let name: string = await this._dialogService.openInputDialog('Rename ' +
-      variantMemberName, '', InputDialogKind.STRING, 'Name', variantMemberName,
-      (value: any) => {
-      return ((value !== '') && (union.variantMemberMap[value] == null));
-    });
-    if (name != null) {
-      let intermediate: any = {};
-      for (let key in union.variantMemberMap) {
-        intermediate[key] = union.variantMemberMap[key];
-        delete union.variantMemberMap[key];
-      }
-
-      for (let key in intermediate) {
-        if (key === variantMemberName) {
-          union.variantMemberMap[name] = intermediate[key];
-        } else {
-          union.variantMemberMap[key] = intermediate[key];
-        }
-      }
-
-      this._changeDetectorRef.markForCheck();
-    }
-  }
-
-  public removeVariantMember(union: Union, variantMemberName: string): void {
-    delete union.variantMemberMap[variantMemberName];
   }
 }
