@@ -89,6 +89,19 @@ describe('DataModelEditorComponent', () => {
       localTypeNames.length - 1]];
     expect(localTypeDataModel.typeKind).toEqual(TypeKind.ENUMERATION);
     expect(localTypeDataModel.name).toBeTruthy();
+
+    matDialogRefPlaceholder.afterClosed = () => {
+      return observableOf(['Another Variant', { attribute:
+        { name: 'attribute' }, view: { displayName: 'Attribute' } }]);
+    };
+    await component.addLocalType(TypeKind.VARIANT);
+    localTypeNames = Object.keys(component.dataModel.localTypes);
+    localTypeDataModel = component.dataModel.localTypes[localTypeNames[
+      localTypeNames.length - 1]];
+    expect(localTypeDataModel.typeKind).toEqual(TypeKind.VARIANT);
+    expect(localTypeDataModel.name).toBeTruthy();
+    expect(Object.keys((localTypeDataModel as KoheseDataModel).properties).
+      length).toBeGreaterThan(0);
   });
   
   // it('removes an attribute', fakeAsync(() => {

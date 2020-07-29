@@ -1,11 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCheckboxModule, MatDatepickerModule, MatDialogModule,
   MatExpansionModule, MatIconModule, MatInputModule, MatSelectModule,
   MatTooltipModule } from '@angular/material';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { MarkdownEditorModule } from '../../../../../components/markdown-editor/markdown-editor.module';
+import { KoheseViewModel } from '../../../../../../../common/src/KoheseModel.interface';
 import { FormatDefinitionType } from '../../../../../../../common/src/FormatDefinition.interface';
 import { PropertyDefinition } from '../../../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
@@ -18,6 +20,7 @@ import { SessionService } from '../../../../../services/user/session.service';
 import { FormatObjectEditorComponent } from '../../format-object-editor.component';
 import { MultivaluedFieldComponent } from '../multivalued-field/multivalued-field.component';
 import { SinglevaluedFieldComponent } from './singlevalued-field.component';
+import { TableModule } from '../../../../../components/table/table.module';
 
 describe('SinglevaluedFieldComponent', () => {
   let component: SinglevaluedFieldComponent;
@@ -31,6 +34,7 @@ describe('SinglevaluedFieldComponent', () => {
       ],
       imports: [
         FormsModule,
+        BrowserAnimationsModule,
         MatTooltipModule,
         MatCheckboxModule,
         MatInputModule,
@@ -40,7 +44,8 @@ describe('SinglevaluedFieldComponent', () => {
         MatExpansionModule,
         MatDialogModule,
         MarkdownModule,
-        MarkdownEditorModule
+        MarkdownEditorModule,
+        TableModule
       ],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },
@@ -60,12 +65,294 @@ describe('SinglevaluedFieldComponent', () => {
     component.viewModel = treeConfiguration.getProxyFor('view-kohesemodel').item;
     component.propertyDefinition = component.viewModel.formatDefinitions[
       component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
-      containers[0].contents.filter((propertyDefinition:
-      PropertyDefinition) => {
-      return (propertyDefinition.propertyName === 'id');
-    })[0];
+      header.contents[0];
     component.formatDefinitionType = FormatDefinitionType.DEFAULT;
 
     componentFixture.detectChanges();
+  });
+
+  it('retrieves a string representation of the associated attribute', () => {
+    expect(component.getAttributeRepresentation()).toBe('Name*');
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'description');
+    })[0];
+    expect(component.getAttributeRepresentation()).toBe('Description');
+  });
+
+  it('retrieves a string representation of a given Date', () => {
+    expect(component.getDateString(0)).toBe('1970-01-01T00:00:00.000Z');
+    expect(component.getDateString(null)).toBeUndefined();
+  });
+
+  it('retrieves candidate state transitions for the associated attribute',
+    () => {
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'stateAttribute');
+    })[0];
+    expect(component.getStateTransitionCandidates()).toEqual(['FirstToSecond',
+      'FirstToThird']);
+  });
+
+  it('determines if the associated PropertyDefinition corresponds to a ' +
+    'local type-typed attribute', () => {
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'localTypeAttribute');
+    })[0];
+    expect(component.isLocalTypeAttribute()).toBe(true);
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'enumerationAttribute');
+    })[0];
+    expect(component.isLocalTypeAttribute()).toBe(true);
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'variantAttribute');
+    })[0];
+    expect(component.isLocalTypeAttribute()).toBe(true);
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'globalTypeAttribute');
+    })[0];
+    expect(component.isLocalTypeAttribute()).toBe(false);
+  });
+
+  it('allows selection of global type references', async () => {
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'globalTypeAttribute');
+    })[0];
+    await component.openObjectSelector(undefined);
+    expect(component.koheseObject[component.propertyDefinition.propertyName].
+      id).toBe(TreeConfiguration.getWorkingTree().getRootProxy().item.id);
+    
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'parentId');
+    })[0];
+    await component.openObjectSelector(undefined);
+    expect(component.koheseObject[component.propertyDefinition.propertyName]).
+      toBe(TreeConfiguration.getWorkingTree().getRootProxy().item.id);
+    
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedGlobalTypeAttribute');
+    })[0];
+    await component.openObjectSelector(undefined);
+    expect(component.koheseObject[component.propertyDefinition.propertyName][
+      0].id).toBe(TreeConfiguration.getWorkingTree().getRootProxy().item.id);
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName ===
+        'multivaluedGlobalTypeAttribute');
+    })[0];
+    await component.openObjectSelector(1);
+    expect(component.koheseObject[component.propertyDefinition.propertyName][
+      1].id).toBe(TreeConfiguration.getWorkingTree().getRootProxy().item.id);
+  });
+
+  it('provides a default value for the attribute corresponding to the ' +
+    'associated PropertyDefinition', () => {
+    Date.prototype.getTime = () => { return -1; };
+
+    // Default value
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'stateAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBe('First');
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'booleanAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBe(false);
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'numberAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBe(0);
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'timeAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBe(-1);
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'usernameAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBe('admin');
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'stringAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBe('');
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'maskedStringAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBe('');
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'markdownAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBe('');
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'globalTypeAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBeUndefined();
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'localTypeAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toEqual({
+      booleanAttribute: false,
+      multivaluedBooleanAttribute: [],
+      numberAttribute: 0,
+      multivaluedNumberAttribute: [],
+      timeAttribute: -1,
+      multivaluedTimeAttribute: [],
+      stateAttribute: 'First',
+      multivaluedStateAttribute: ['First', 'First'],
+      usernameAttribute: 'admin',
+      multivaluedUsernameAttribute: [],
+      stringAttribute: '',
+      multivaluedStringAttribute: [],
+      maskedStringAttribute: '',
+      multivaluedMaskedStringAttribute: [],
+      markdownAttribute: '',
+      multivaluedMarkdownAttribute: [],
+      globalTypeAttribute: null,
+      multivaluedGlobalTypeAttribute: [],
+      localTypeAttribute: null,
+      multivaluedLocalTypeAttribute: [],
+      enumerationAttribute: null,
+      multivaluedEnumerationAttribute: [],
+      variantAttribute: { discriminant: 'booleanAttribute', value: null },
+      multivaluedVariantAttribute: []
+    });
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'enumerationAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toBeNull();
+
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'variantAttribute');
+    })[0];
+    expect(component.getDefaultValue()).toEqual(
+      { discriminant: 'booleanAttribute', value: null });
+  });
+
+  it('determines whether two Variant references are equal', () => {
+    expect(component.areVariantDiscriminantsEqual(
+      { discriminant: '', value: null },
+      { discriminant: '', value: ''})).toBe(true);
+  });
+
+  it('retrieves the data model for the local type-typed attribute ' +
+    'corresponding to the associated PropertyDefinition', () => {
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'localTypeAttribute');
+    })[0];
+    expect(component.getLocalTypeDataModel()).toBe(component.dataModel.
+      localTypes['Local Type']);
+  });
+
+  it('retrieves the view model for the local type-typed attribute ' +
+    'corresponding to the associated PropertyDefinition', () => {
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'localTypeAttribute');
+    })[0];
+    expect(component.getLocalTypeViewModel()).toBe(component.viewModel.
+      localTypes['Local Type']);
+  });
+
+  it('retrieves the PropertyDefinition corresponding to a Variant member',
+    () => {
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'variantAttribute');
+    })[0];
+    component.formatDefinitionType = FormatDefinitionType.DOCUMENT;
+    expect(component.getVariantPropertyDefinition('booleanAttribute')).toBe(
+      (component.viewModel.localTypes['Variant'] as KoheseViewModel).
+      formatDefinitions[(component.viewModel.localTypes[
+      'Variant'] as KoheseViewModel).defaultFormatKey[FormatDefinitionType.
+      DEFAULT]].containers[0].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return (propertyDefinition.propertyName === 'booleanAttribute');
+    })[0]);
   });
 });

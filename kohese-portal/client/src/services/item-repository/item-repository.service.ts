@@ -1143,14 +1143,16 @@ export class ItemRepository {
                     }
                   }
                 }
-              } else if (propertyDefinition.kind === 'date') {
-                body += new Date(value).toLocaleDateString();
               } else if (Array.isArray(value)) {
-                body += value.map((v: any) => {
-                  return ('* ' + v);
+                body += value.map((v: any, index: number) => {
+                  return ('* ' + this.getStringRepresentation(koheseObject,
+                    propertyDefinition.propertyName, index, enclosingType,
+                    dataModel, viewModel, formatDefinitionType));
                 }).join('\n');
               } else {
-                body += value;
+                body += this.getStringRepresentation(koheseObject,
+                  propertyDefinition.propertyName, undefined, enclosingType,
+                  dataModel, viewModel, formatDefinitionType);
               }
             }
 
@@ -1196,6 +1198,11 @@ export class ItemRepository {
     let type: any = dataModel['classProperties'][attributeName].definition.
       type;
     type = (Array.isArray(type) ? type[0] : type);
+
+    if (type === 'timestamp') {
+      return new Date(value).toLocaleDateString();
+    }
+
     let classLocalTypes: any = (enclosingType ? enclosingType : dataModel)[
       'classLocalTypes'];
     if (classLocalTypes && classLocalTypes[type]) {

@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { QueryList } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule, MatDatepickerModule, MatDialogModule,
   MatExpansionModule, MatIconModule, MatInputModule, MatSelectModule,
-  MatTooltipModule } from '@angular/material';
+  MatTooltipModule, MatExpansionPanel} from '@angular/material';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { FormatDefinitionType } from '../../../../../../../common/src/FormatDefinition.interface';
@@ -73,66 +74,119 @@ describe('MultivaluedFieldComponent', () => {
     componentFixture.detectChanges();
   });
 
-  it('retrieves elements to display in a table based on the given ' +
+  it('retrieves elements to display in a table based on the associated ' +
     'PropertyDefinition', () => {
     let propertyDefinitions: Array<PropertyDefinition> = component.viewModel.
       formatDefinitions[component.viewModel.defaultFormatKey[
       FormatDefinitionType.DEFAULT]].containers[0].contents;
-    expect(component.getTableElements(propertyDefinitions.filter(
-      (propertyDefinition: PropertyDefinition) => {
-      return (propertyDefinition.propertyName ===
-        'multivaluedGlobalTypeAttribute');
-    })[0].propertyName)).toEqual(component.koheseObject[
+    expect(component.getTableElements()).toEqual(component.koheseObject[
       'multivaluedGlobalTypeAttribute'].map((reference: { id: string }) => {
       return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).item;
     }));
-    expect(component.getTableElements(propertyDefinitions.filter(
+
+    component.propertyDefinition = propertyDefinitions.filter(
       (propertyDefinition: PropertyDefinition) => {
       return (propertyDefinition.propertyName ===
         'multivaluedLocalTypeAttribute');
-    })[0].propertyName)).toEqual(component.koheseObject[
+    })[0];
+    expect(component.getTableElements()).toEqual(component.koheseObject[
       'multivaluedLocalTypeAttribute']);
   });
 
-  it('retrieves column identifiers for a given PropertyDefinition', () => {
+  it('retrieves column identifiers for the associated PropertyDefinition',
+    () => {
     let propertyDefinitions: Array<PropertyDefinition> = component.viewModel.
       formatDefinitions[component.viewModel.defaultFormatKey[
       FormatDefinitionType.DEFAULT]].containers[1].contents;
-    expect(component.getTableColumns(propertyDefinitions.filter(
-      (propertyDefinition: PropertyDefinition) => {
-      return (propertyDefinition.propertyName ===
-        'multivaluedGlobalTypeAttribute');
-    })[0])).toEqual([
+    expect(component.getTableColumns()).toEqual([
+      'booleanAttribute',
+      'multivaluedBooleanAttribute',
+      'numberAttribute',
+      'multivaluedNumberAttribute',
+      'timeAttribute',
+      'multivaluedTimeAttribute',
+      'stateAttribute',
+      'multivaluedStateAttribute',
+      'usernameAttribute',
+      'multivaluedUsernameAttribute',
+      'stringAttribute',
+      'multivaluedStringAttribute',
+      'maskedStringAttribute',
+      'multivaluedMaskedStringAttribute',
+      'markdownAttribute',
+      'multivaluedMarkdownAttribute',
       'globalTypeAttribute',
       'multivaluedGlobalTypeAttribute',
       'localTypeAttribute',
       'multivaluedLocalTypeAttribute',
       'enumerationAttribute',
-      'multivaluedEnumerationAttribute'
+      'multivaluedEnumerationAttribute',
+      'variantAttribute',
+      'multivaluedVariantAttribute'
     ]);
-    expect(component.getTableColumns(propertyDefinitions.filter(
+
+    component.propertyDefinition = propertyDefinitions.filter(
       (propertyDefinition: PropertyDefinition) => {
       return (propertyDefinition.propertyName ===
         'multivaluedLocalTypeAttribute');
-    })[0])).toEqual([
+    })[0];
+    expect(component.getTableColumns()).toEqual([
+      'booleanAttribute',
+      'multivaluedBooleanAttribute',
+      'numberAttribute',
+      'multivaluedNumberAttribute',
+      'timeAttribute',
+      'multivaluedTimeAttribute',
+      'stateAttribute',
+      'multivaluedStateAttribute',
+      'usernameAttribute',
+      'multivaluedUsernameAttribute',
+      'stringAttribute',
+      'multivaluedStringAttribute',
+      'maskedStringAttribute',
+      'multivaluedMaskedStringAttribute',
+      'markdownAttribute',
+      'multivaluedMarkdownAttribute',
       'globalTypeAttribute',
       'multivaluedGlobalTypeAttribute',
       'localTypeAttribute',
       'multivaluedLocalTypeAttribute',
       'enumerationAttribute',
-      'multivaluedEnumerationAttribute'
+      'multivaluedEnumerationAttribute',
+      'variantAttribute',
+      'multivaluedVariantAttribute'
     ]);
   });
 
-  it('handles moving elements in tables', () => {
+  it('provides a function that retrieves text for a table cell', () => {
+    let textRetrievalFunction: (row: any, columnId: string) => string =
+      component.getTableCellTextRetrievalFunction();
+    let referencedItem: any = TreeConfiguration.getWorkingTree().getProxyFor(
+      component.koheseObject['multivaluedGlobalTypeAttribute'][0].id).item;
+    expect(textRetrievalFunction(referencedItem, 'globalTypeAttribute')).toBe(
+      'KoheseModel');
+    let textLines: Array<string> = textRetrievalFunction(referencedItem,
+      'multivaluedGlobalTypeAttribute').split('\n');
+    for (let j: number = 0; j < textLines.length; j++) {
+      expect(textLines[j].substring(0, 2)).toBe('\u2022 ');
+    }
+    
+    expect(textRetrievalFunction(referencedItem, 'enumerationAttribute').
+      substring(0, 2)).not.toBe('\u2022 ');
+  });
+
+  it('provides a function via which elements can be added to a multivalued ' +
+    'attribute', async () => {
+    let elementAdditionFunction: () => Promise<Array<any>> = component.
+      getTableElementAdditionFunction();
+    expect(await elementAdditionFunction()).toEqual([TreeConfiguration.
+      getWorkingTree().getRootProxy().item]);
+  });
+
+  it('provides a function via which elements within a multivalued attribute ' +
+    'can be moved', () => {
     let moveHandler: (elements: Array<any>, referenceElement: any, moveBefore:
-      boolean) => void = component.getTableElementMovementFunction(component.
-      viewModel.formatDefinitions[component.viewModel.defaultFormatKey[
-      FormatDefinitionType.DEFAULT]].containers[1].contents.filter(
-      (propertyDefinition: PropertyDefinition) => {
-      return (propertyDefinition.propertyName ===
-        'multivaluedGlobalTypeAttribute');
-    })[0].propertyName);
+      boolean) => void = component.getTableElementMovementFunction();
     let elements: Array<any> = component.koheseObject[
       'multivaluedGlobalTypeAttribute'].map((reference: { id: string }) => {
       return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).item;
@@ -148,13 +202,14 @@ describe('MultivaluedFieldComponent', () => {
     expect(component.koheseObject['multivaluedGlobalTypeAttribute'][1].id).
       toBe(elements[1].id);
     
-    moveHandler = component.getTableElementMovementFunction(component.
-      viewModel.formatDefinitions[component.viewModel.defaultFormatKey[
-      FormatDefinitionType.DEFAULT]].containers[1].contents.filter(
-      (propertyDefinition: PropertyDefinition) => {
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[1].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
       return (propertyDefinition.propertyName ===
         'multivaluedLocalTypeAttribute');
-    })[0].propertyName);
+    })[0];
+    moveHandler = component.getTableElementMovementFunction();
     elements = [...component.koheseObject['multivaluedLocalTypeAttribute']];
     moveHandler([elements[1]], elements[0], true);
     // expect(component.object['multivaluedLocalTypeAttribute'][0]).toBe(elements[
@@ -168,15 +223,10 @@ describe('MultivaluedFieldComponent', () => {
     //   1]);
   });
 
-  it('handles removing elements from tables', () => {
+  it('provides a function via which elements can be removed from a ' +
+    'multivalued attribute', () => {
     let removeHandler: (elements: Array<any>) => void = component.
-      getTableElementRemovalFunction(component.viewModel.formatDefinitions[
-      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
-      containers[1].contents.filter((propertyDefinition:
-      PropertyDefinition) => {
-      return (propertyDefinition.propertyName ===
-        'multivaluedGlobalTypeAttribute');
-    })[0].propertyName);
+      getTableElementRemovalFunction();
     let references: Array<{ id: string }> = component.koheseObject[
       'multivaluedGlobalTypeAttribute'];
     let elements: Array<any> = references.map((reference: { id: string }) => {
@@ -186,17 +236,46 @@ describe('MultivaluedFieldComponent', () => {
     expect(component.koheseObject['multivaluedGlobalTypeAttribute'].indexOf(
       references[1])).toBe(-1);
 
-    removeHandler = component.getTableElementRemovalFunction(component.
-      viewModel.formatDefinitions[component.viewModel.defaultFormatKey[
-      FormatDefinitionType.DEFAULT]].containers[1].contents.filter(
-      (propertyDefinition: PropertyDefinition) => {
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[1].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
       return (propertyDefinition.propertyName ===
         'multivaluedLocalTypeAttribute');
-    })[0].propertyName);
+    })[0];
+    removeHandler = component.getTableElementRemovalFunction();
     elements = component.koheseObject['multivaluedLocalTypeAttribute'].slice(
       0);
     removeHandler([elements[1]]);
     expect(component.koheseObject['multivaluedLocalTypeAttribute'].indexOf(
       elements[1])).toBe(-1);
+  });
+
+  it('adds a value to a multivalued attribute', () => {
+    expect(component.addValue()).toBeUndefined();
+  });
+
+  it('retrieves an identifier for a given object and index', () => {
+    expect(component.getMultivaluedAttributeValueIdentifier(3, {})).toBe('3');
+  });
+
+  it('expands all Kohese Model local type-typed attribute values', () => {
+    component.expandAllMultivaluedAttributeExpansionPanels();
+    let expansionPanels: Array<MatExpansionPanel> = (component[
+      '_multivaluedAttributeExpansionPanelQueryList'] as QueryList<MatExpansionPanel>).
+      toArray();
+    expect(expansionPanels.filter((expansionPanel: MatExpansionPanel) => {
+      return (expansionPanel.expanded === false);
+    }).length).toBe(0);
+  });
+
+  it('collapses all Kohese Model local type-typed attribute values', () => {
+    component.collapseAllMultivaluedAttributeExpansionPanels();
+    let expansionPanels: Array<MatExpansionPanel> = (component[
+      '_multivaluedAttributeExpansionPanelQueryList'] as QueryList<MatExpansionPanel>).
+      toArray();
+    expect(expansionPanels.filter((expansionPanel: MatExpansionPanel) => {
+      return (expansionPanel.expanded === true);
+    }).length).toBe(0);
   });
 });

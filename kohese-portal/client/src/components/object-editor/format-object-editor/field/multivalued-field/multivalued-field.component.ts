@@ -1,14 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef,
-  QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, QueryList,
+  ViewChildren } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material';
 
 import { Attribute } from '../../../../../../../common/src/Attribute.interface';
-import { EnumerationValue } from '../../../../../../../common/src/Enumeration.interface';
 import { ItemProxy } from '../../../../../../../common/src/item-proxy';
 import { KoheseDataModel } from '../../../../../../../common/src/KoheseModel.interface';
-import { PropertyDefinition } from '../../../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
-import { TypeKind } from '../../../../../../../common/src/Type.interface';
 import { TreeComponent } from '../../../../../components/tree/tree.component';
 import { DialogService } from '../../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../../services/item-repository/item-repository.service';
@@ -28,9 +25,6 @@ export class MultivaluedFieldComponent extends Field {
   @ViewChildren('multivaluedAttributeExpansionPanel')
   private _multivaluedAttributeExpansionPanelQueryList:
     QueryList<MatExpansionPanel>;
-  @ViewChildren('multivaluedAttributeExpansionPanel', { read: ElementRef })
-  private _multivaluedAttributeExpansionPanelElementQueryList:
-    QueryList<ElementRef>;
     
   public constructor(changeDetectorRef: ChangeDetectorRef, itemRepository:
     ItemRepository, dialogService: DialogService, sessionService:
@@ -39,19 +33,16 @@ export class MultivaluedFieldComponent extends Field {
   }
 
   /**
-   * Returns the values of the multivalued attribute corresponding to the given
-   * PropertyDefinition
-   * 
-   * @param attributeName The name of a multivalued attribute for which a table
-   * is to be displayed
+   * Returns the values of the multivalued attribute corresponding to the
+   * associated PropertyDefinition
    */
-  public getTableElements(attributeName: string): Array<any> {
+  public getTableElements(): Array<any> {
     let value: Array<any> = this._koheseObject[this._isVariantField ? 'value' :
-      attributeName];
+      this._propertyDefinition.propertyName];
     if (value) {
       return value.map((reference: { id: string }) => {
         let typeName: string = this._dataModel['classProperties'][
-          attributeName].definition.type[0];
+          this._propertyDefinition.propertyName].definition.type[0];
         if ((this._enclosingDataModel ? this._enclosingDataModel : this.
           _dataModel)['classLocalTypes'][typeName]) {
           return reference;
@@ -67,16 +58,12 @@ export class MultivaluedFieldComponent extends Field {
   
   /**
    * Returns the attribute names from the TableDefinition associated with the
-   * given PropertyDefinition that corresponds to the type of the
+   * associated PropertyDefinition that corresponds to the type of the
    * corresponding multivalued attribute
-   * 
-   * @param propertyDefinition A PropertyDefinition with an associated
-   * TableDefinition corresponding to a multivalued attribute
    */
-  public getTableColumns(propertyDefinition: PropertyDefinition):
-    Array<string> {
+  public getTableColumns(): Array<string> {
     let typeName: string = this._dataModel['classProperties'][
-      propertyDefinition.propertyName].definition.type[0];
+      this._propertyDefinition.propertyName].definition.type[0];
     let treeConfiguration: TreeConfiguration = this._itemRepository.
       getTreeConfig().getValue().config;
     let classLocalTypesEntry:
@@ -86,11 +73,11 @@ export class MultivaluedFieldComponent extends Field {
     if (classLocalTypesEntry) {
       return treeConfiguration.getProxyFor('view-' + classLocalTypesEntry.
         definedInKind.toLowerCase()).item.localTypes[typeName].
-        tableDefinitions[propertyDefinition.tableDefinition].columns;
+        tableDefinitions[this._propertyDefinition.tableDefinition].columns;
     } else {
       return treeConfiguration.getProxyFor('view-' + this._dataModel[
-        'classProperties'][propertyDefinition.propertyName].definition.type[0].
-        toLowerCase()).item.tableDefinitions[propertyDefinition.
+        'classProperties'][this._propertyDefinition.propertyName].definition.type[0].
+        toLowerCase()).item.tableDefinitions[this._propertyDefinition.
         tableDefinition].columns;
     }
   }
@@ -98,80 +85,55 @@ export class MultivaluedFieldComponent extends Field {
   /**
    * Returns a function intended to be called by TableComponent to retrieve
    * text for the table cell indicated by the given row and column identifier
-   * 
-   * @param attributeName The name of a multivalued attribute for which a table
-   * is to be displayed
    */
-  public getTableCellTextRetrievalFunction(attributeName: string): (row: any,
-    columnId: string) => string {
+  public getTableCellTextRetrievalFunction(): (row: any, columnId:
+    string) => string {
+    let type: any = this._dataModel['classProperties'][this.
+      _propertyDefinition.propertyName].definition.type;
+    type = (Array.isArray(type) ? type[0] : type);
+    let treeConfiguration: TreeConfiguration = this._itemRepository.
+      getTreeConfig().getValue().config;
+    let dataModel: any;
+    let viewModel: any;
+    let classLocalTypesEntry: any = (this._enclosingDataModel ? this.
+      _enclosingDataModel : this._dataModel)['classLocalTypes'][type];
+    if (classLocalTypesEntry) {
+      dataModel = classLocalTypesEntry.definition;
+      viewModel = this._itemRepository.getTreeConfig().getValue().config.
+        getProxyFor('view-' + classLocalTypesEntry.definedInKind.
+        toLowerCase()).item.localTypes[type];
+    } else {
+      dataModel = treeConfiguration.getProxyFor(type).item;
+      viewModel = treeConfiguration.getProxyFor('view-' + type.
+        toLowerCase()).item;
+    }
+
     return (row: any, columnId: string) => {
       if (row[columnId] == null) {
         return '';
       }
       
-      let type: any = this._dataModel['classProperties'][attributeName].
-        definition.type;
-      type = (Array.isArray(type) ? type[0] : type);
-      let treeConfiguration: TreeConfiguration = this._itemRepository.
-        getTreeConfig().getValue().config;
-      let dataModel: any;
-      let viewModel: any;
-      let classLocalTypesEntry: any = (this._enclosingDataModel ? this.
-        _enclosingDataModel : this._dataModel)['classLocalTypes'][type];
-      if (classLocalTypesEntry) {
-        dataModel = classLocalTypesEntry.definition;
-        viewModel = this._itemRepository.getTreeConfig().getValue().config.
-          getProxyFor('view-' + classLocalTypesEntry.definedInKind.
-          toLowerCase()).item.localTypes[type];
-      } else {
-        dataModel = treeConfiguration.getProxyFor(type).item;
-        viewModel = treeConfiguration.getProxyFor('view-' + type.
-          toLowerCase()).item;
-      }
-      
-      if (Array.isArray(dataModel.classProperties[columnId].definition.type)) {
+      if (Array.isArray(dataModel['classProperties'][columnId].definition.
+        type)) {
         return row[columnId].map((value: any, index: number) => {
-          let representation: string;
-          if (dataModel.typeKind === TypeKind.ENUMERATION) {
-            representation = viewModel.values[dataModel.values.map(
-              (enumerationValue: EnumerationValue) => {
-              return enumerationValue.name;
-            }).indexOf(value)];
-          } else {
-            representation = this._itemRepository.getStringRepresentation(
-              row, columnId, index, (this._enclosingDataModel ? this.
-              _enclosingDataModel : this._dataModel), dataModel, viewModel,
-              this._formatDefinitionType);
-          }
-
-          // Bullet-ize string representation
-          return ('\u2022 ' + representation);
+          return ('\u2022 ' + this._itemRepository.getStringRepresentation(row,
+            columnId, index, this._enclosingDataModel, dataModel, viewModel,
+            this._formatDefinitionType));
         }).join('\n');
       } else {
-        if (dataModel.typeKind === TypeKind.ENUMERATION) {
-          return viewModel.values[dataModel.values.map((enumerationValue:
-            EnumerationValue) => {
-            return enumerationValue.name;
-          }).indexOf(row[columnId])];
-        } else {
-          return this._itemRepository.getStringRepresentation(row, columnId,
-            undefined, (this._enclosingDataModel ? this._enclosingDataModel :
-            this._dataModel), dataModel, viewModel, this.
-            _formatDefinitionType);
-        }
+        return this._itemRepository.getStringRepresentation(row, columnId,
+          undefined, this._enclosingDataModel, dataModel, viewModel, this.
+          _formatDefinitionType);
       }
     };
   }
   
   /**
    * Returns a function intended to be called by TableComponent to add elements
-   * to a multivalued attribute
-   * 
-   * @param attributeName The name of a multivalued attribute for which a table
-   * is to be displayed and to which elements are to be added
+   * to the associated multivalued attribute
    */
-  public getTableElementAdditionFunction(attributeName: string):
-    () => Promise<Array<any>> {
+  public getTableElementAdditionFunction(): () => Promise<Array<any>> {
+    let attributeName: string = this._propertyDefinition.propertyName;
     return async () => {
       let references: Array<{ id: string }> = this._koheseObject[this.
         _isVariantField ? 'value' : attributeName];
@@ -255,21 +217,18 @@ export class MultivaluedFieldComponent extends Field {
   /**
    * Returns a function intended to be called by TableComponent to move the
    * given elements before or after the given reference element
-   * 
-   * @param attributeName The name of a multivalued attribute for which a table
-   * is to be displayed and elements are to be moved
    */
-  public getTableElementMovementFunction(attributeName: string): (elements:
-    Array<any>, referenceElement: any, moveBefore: boolean) => void {
-    return (elements: Array<any>, referenceElement: any,
-      moveBefore: boolean) => {
+  public getTableElementMovementFunction(): (elements: Array<any>,
+    referenceElement: any, moveBefore: boolean) => void {
+    return (elements: Array<any>, referenceElement: any, moveBefore:
+      boolean) => {
       let references: Array<any> = this._koheseObject[this._isVariantField ?
-        'value' : attributeName];
+        'value' : this._propertyDefinition.propertyName];
       let treeConfiguration: TreeConfiguration = this._itemRepository.
         getTreeConfig().getValue().config;
       let isLocalTypeAttribute: boolean = (this._enclosingDataModel ? this.
         _enclosingDataModel : this._dataModel)['classLocalTypes'][this.
-        _dataModel['classProperties'][attributeName].
+        _dataModel['classProperties'][this._propertyDefinition.propertyName].
         definition.type[0]];
       if (isLocalTypeAttribute) {
         for (let j: number = 0; j < elements.length; j++) {
@@ -314,18 +273,15 @@ export class MultivaluedFieldComponent extends Field {
   /**
    * Returns a function intended to be called by TableComponent to remove the
    * given elements from a multivalued attribute
-   * 
-   * @param attributeName The name of a multivalued attribute for which a table
-   * is to be displayed and from which elements are to be removed
    */
-  public getTableElementRemovalFunction(attributeName: string): (elements:
-    Array<any>) => void {
+  public getTableElementRemovalFunction(): (elements: Array<any>) => void {
     return (elements: Array<any>) => {
       let references: Array<any> = this._koheseObject[this._isVariantField ?
-        'value' : attributeName];
+        'value' : this._propertyDefinition.propertyName];
       let isLocalTypeAttribute: boolean = (this._enclosingDataModel ? this.
         _enclosingDataModel : this._dataModel)['classLocalTypes'][this.
-        _dataModel['classProperties'][attributeName].definition.type[0]];
+        _dataModel['classProperties'][this._propertyDefinition.propertyName].
+        definition.type[0]];
       if (isLocalTypeAttribute) {
         for (let j: number = 0; j < elements.length; j++) {
           references.splice(references.indexOf(elements[j]), 1);
@@ -344,12 +300,11 @@ export class MultivaluedFieldComponent extends Field {
   }
 
   /**
-   * Adds a value to the multivalued attribute represented by the given name
-   * 
-   * @param attributeName The name of a multivalued attribute to which to add a
-   * value
+   * Adds a value to the multivalued attribute corresponding to the associated
+   * PropertyDefinition
    */
-  public addValue(attributeName: string): any {
+  public addValue(): any {
+    let attributeName: string = this._propertyDefinition.propertyName;
     let attribute: Attribute = this._dataModel['classProperties'][
       attributeName].definition;
     if (Array.isArray(attribute.type) && this._koheseObject[this.
@@ -358,8 +313,7 @@ export class MultivaluedFieldComponent extends Field {
       return;
     }
     
-    attribute.name = attributeName;
-    return this.getDefaultValue(attribute);
+    return this.getDefaultValue();
   }
 
   /**
@@ -375,43 +329,25 @@ export class MultivaluedFieldComponent extends Field {
 
   /**
    * Expands all expansion panels for the multivalued Kohese Model local type-
-   * typed attribute represented by the given name
-   * 
-   * @param attributeName The name of a multivalued Kohese Model local type-
-   * typed attribute
+   * typed attribute corresponding to the associated PropertyDefinition
    */
-  public expandAllMultivaluedAttributeExpansionPanels(attributeName: string):
-    void {
+  public expandAllMultivaluedAttributeExpansionPanels(): void {
     let expansionPanels: Array<MatExpansionPanel> = this.
       _multivaluedAttributeExpansionPanelQueryList.toArray();
-    let expansionPanelElements: Array<ElementRef> = this.
-      _multivaluedAttributeExpansionPanelElementQueryList.toArray();
     for (let j: number = 0; j < expansionPanels.length; j++) {
-      if (expansionPanelElements[j].nativeElement.getAttribute('attributeName')
-        === attributeName) {
-        expansionPanels[j].open();
-      }
+      expansionPanels[j].open();
     }
   }
   
   /**
    * Collapses all expansion panels for the multivalued Kohese Model local
-   * type-typed attribute represented by the given name
-   * 
-   * @param attributeName The name of a multivalued Kohese Model local type-
-   * typed attribute
+   * type-typed attribute corresponding to the associated PropertyDefinition
    */
-  public collapseAllMultivaluedAttributeExpansionPanels(attributeName: string):
-    void {
+  public collapseAllMultivaluedAttributeExpansionPanels(): void {
     let expansionPanels: Array<MatExpansionPanel> = this.
       _multivaluedAttributeExpansionPanelQueryList.toArray();
-    let expansionPanelElements: Array<ElementRef> = this.
-      _multivaluedAttributeExpansionPanelElementQueryList.toArray();
     for (let j: number = 0; j < expansionPanels.length; j++) {
-      if (expansionPanelElements[j].nativeElement.getAttribute('attributeName')
-        === attributeName) {
-        expansionPanels[j].close();
-      }
+      expansionPanels[j].close();
     }
   }
 }

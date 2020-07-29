@@ -193,12 +193,13 @@ export class DataModelEditorComponent {
     ItemRepository) {
   }
   
+  /**
+   * Saves the selected global type
+   */
   public async save(): Promise<void> {
-    let dataModel: any = (this._enclosingType ? this._enclosingType : this.
-      _dataModel);
-    
     this._editable = false;
-    await this._itemRepository.upsertItem('KoheseModel', dataModel);
+    await this._itemRepository.upsertItem('KoheseModel', (this._enclosingType ?
+      this._enclosingType : this._dataModel));
     this._changeDetectorRef.markForCheck();
   }
   

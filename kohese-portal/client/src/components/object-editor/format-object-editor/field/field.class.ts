@@ -105,17 +105,15 @@ export class Field {
   }
 
   /**
-   * Returns the representation of an attribute based on the given
+   * Returns the representation of an attribute based on the associated
    * PropertyDefinition
-   * 
-   * @param propertyDefinition
    */
-  public getAttributeRepresentation(propertyDefinition: PropertyDefinition):
-    string {
+  public getAttributeRepresentation(): string {
     // Only customLabel should be used in the first part of the statement below
-    return ((propertyDefinition.customLabel ? propertyDefinition.customLabel :
-      propertyDefinition.propertyName) + (this._dataModel['classProperties'][
-      propertyDefinition.propertyName].definition.required ? '*' : ''));
+    return ((this._propertyDefinition.customLabel ? this._propertyDefinition.
+      customLabel : this._propertyDefinition.propertyName) + (this._dataModel[
+      'classProperties'][this._propertyDefinition.propertyName].definition.
+      required ? '*' : ''));
   }
   
   /**
@@ -133,17 +131,15 @@ export class Field {
   }
   
   /**
-   * Returns the names of states to which the attribute represented by the
-   * given name may be transitioned
-   * 
-   * @param attributeName
+   * Returns the names of states to which the attribute corresponding to the
+   * associated PropertyDefinition may be transitioned
    */
-  public getStateTransitionCandidates(attributeName: string): Array<string> {
+  public getStateTransitionCandidates(): Array<string> {
     let stateTransitionCandidates: Array<string> = [];
     let currentStateName: string = this._koheseObject[this._isVariantField ?
-      'value' : attributeName];
+      'value' : this._propertyDefinition.propertyName];
     let stateMachine: any = this._dataModel['classProperties'][
-      attributeName].definition.properties;
+      this._propertyDefinition.propertyName].definition.properties;
     for (let transitionName in stateMachine.transition) {
       if (stateMachine.transition[transitionName].source ===
         currentStateName) {
@@ -155,24 +151,23 @@ export class Field {
   }
 
   /**
-   * Returns whether the attribute represented by the given name is a local
-   * type-typed attribute
-   * 
-   * @param attributeName 
+   * Returns whether the attribute represented by the associated
+   * PropertyDefinition is a local type-typed attribute
    */
-  public isLocalTypeAttribute(attributeName: string): boolean {
+  public isLocalTypeAttribute(): boolean {
     let type: any = (this._enclosingDataModel ? this._enclosingDataModel :
       this._dataModel);
-    let attribute: any = this._dataModel['classProperties'][attributeName].
-      definition;
+    let attribute: any = this._dataModel['classProperties'][this.
+      _propertyDefinition.propertyName].definition;
     let typeName: string = (Array.isArray(attribute.type) ? attribute.type[
       0] : attribute.type);
-    return (type.classLocalTypes && type.classLocalTypes[typeName]);
+    return ((type.classLocalTypes != null) && (type.classLocalTypes[typeName]
+      != null));
   }
   
   /**
-   * Allows selection of one or more references for the attribute represented
-   * by the given name
+   * Allows selection of one or more references for the attribute corresponding
+   * to the associated PropertyDefinition
    * 
    * This method is used for the following cases:
    *   - Selecting a value for a singlevalued attribute
@@ -185,8 +180,8 @@ export class Field {
    * @param attributeName 
    * @param index 
    */
-  public async openObjectSelector(attributeName: string, index: number):
-    Promise<void> {
+  public async openObjectSelector(index: number): Promise<void> {
+    let attributeName: string = this._propertyDefinition.propertyName;
     let attribute: Attribute = this._dataModel['classProperties'][
       attributeName].definition;
     let treeConfiguration: TreeConfiguration = this._itemRepository.
@@ -311,11 +306,11 @@ export class Field {
   }
 
   /**
-   * Returns an appropriate default value for the given Attribute
-   * 
-   * @param attribute
+   * Returns an appropriate default value for the associated PropertyDefinition
    */
-  public getDefaultValue(attribute: Attribute): any {
+  public getDefaultValue(): any {
+    let attribute: Attribute = this._dataModel['classProperties'][this.
+      _propertyDefinition.propertyName].definition;
     let defaultValue: any = attribute.default;
     if (defaultValue != null) {
       return defaultValue;
@@ -339,9 +334,7 @@ export class Field {
           return '';
         }
       default:
-        let isLocalTypeAttribute: boolean = this.isLocalTypeAttribute(
-          attribute.name);
-        if (isLocalTypeAttribute) {
+        if (this.isLocalTypeAttribute()) {
           let classLocalTypesEntry: any = (this._enclosingDataModel ? this.
             _enclosingDataModel : this._dataModel)['classLocalTypes'][type];
           let localTypeDataModel: any = classLocalTypesEntry.definition;
@@ -363,27 +356,28 @@ export class Field {
               localTypeAttribute.type);
             localTypeInstance[attributeName] = localTypeAttribute.default;
             if (localTypeInstance[attributeName] == null) {
-              let classLocalTypesEntry:
-                { definedInKind: string, definition: any } = (this.
-                _enclosingDataModel ? this._enclosingDataModel : this.
-                _dataModel)['classLocalTypes'][localTypeAttributeTypeName];
-              if (classLocalTypesEntry) {
-                if (classLocalTypesEntry.definition.typeKind === TypeKind.
-                  ENUMERATION) {
-                  localTypeInstance[attributeName] = null;
-                } else if (classLocalTypesEntry.definition.typeKind ===
-                  TypeKind.VARIANT) {
-                  localTypeInstance[attributeName] = {
-                    discriminant: Object.keys(classLocalTypesEntry.
-                      definition.properties)[0],
-                    value: null
-                  };
-                }
+              if (Array.isArray(localTypeAttribute.type)) {
+                localTypeInstance[attributeName] = [];
               } else {
-                if (Array.isArray(localTypeAttribute.type)) {
-                  localTypeInstance[attributeName] = [];
+                let classLocalTypesEntry:
+                  { definedInKind: string, definition: any } = (this.
+                  _enclosingDataModel ? this._enclosingDataModel : this.
+                  _dataModel)['classLocalTypes'][localTypeAttributeTypeName];
+                if (classLocalTypesEntry) {
+                  if (classLocalTypesEntry.definition.typeKind === TypeKind.
+                    ENUMERATION) {
+                    localTypeInstance[attributeName] = null;
+                  } else if (classLocalTypesEntry.definition.typeKind ===
+                    TypeKind.VARIANT) {
+                    localTypeInstance[attributeName] = {
+                      discriminant: Object.keys(classLocalTypesEntry.
+                        definition.properties)[0],
+                      value: null
+                    };
+                  }
                 } else {
-                  // 'state-editor' by the attribute's default value
+                  /* 'state-editor' case should be handled by the attribute's
+                  default value */
                   switch (localTypeAttributeTypeName) {
                     case 'boolean':
                       localTypeInstance[attributeName] = false;
@@ -427,14 +421,11 @@ export class Field {
 
   /**
    * Returns the local type data model corresponding to the type of attribute
-   * corresponding to the given attribute name
-   * 
-   * @param attributeName The name of the attribute for which to retrieve the
-   * data model
+   * corresponding to the associated PropertyDefinition
    */
-  public getLocalTypeDataModel(attributeName: string): Type {
-    let type: any = this._dataModel['classProperties'][attributeName].
-      definition.type;
+  public getLocalTypeDataModel(): Type {
+    let type: any = this._dataModel['classProperties'][this.
+      _propertyDefinition.propertyName].definition.type;
     type = (Array.isArray(type) ? type[0] : type);
     return (this._enclosingDataModel ? this._enclosingDataModel : this.
       _dataModel)['classLocalTypes'][type].definition;
@@ -442,14 +433,11 @@ export class Field {
 
   /**
    * Returns the local type view model corresponding to the type of attribute
-   * corresponding to the given attribute name
-   * 
-   * @param attributeName The name of the attribute for which to retrieve the
-   * view model
+   * corresponding to the associated PropertyDefinition
    */
-  public getLocalTypeViewModel(attributeName: string): Type {
-    let type: any = this._dataModel['classProperties'][attributeName].
-      definition.type;
+  public getLocalTypeViewModel(): Type {
+    let type: any = this._dataModel['classProperties'][this.
+      _propertyDefinition.propertyName].definition.type;
     type = (Array.isArray(type) ? type[0] : type);
     let classLocalTypesEntry: { definedInKind: string, definition: any } =
       (this._enclosingDataModel ? this._enclosingDataModel : this._dataModel)[
@@ -462,16 +450,16 @@ export class Field {
   /**
    * Returns the PropertyDefinition corresponding to the Variant member
    * represented by the given Variant member name from the view model
-   * corresponding to the attribute represented by the given attribute name
+   * corresponding to the attribute corresponding to the associated
+   * PropertyDefinition
    * 
-   * @param variantAttributeName 
    * @param variantMemberName 
    */
-  public getVariantPropertyDefinition(variantAttributeName: string,
-    variantMemberName: string): PropertyDefinition {
+  public getVariantPropertyDefinition(variantMemberName: string):
+    PropertyDefinition {
     let propertyDefinition: PropertyDefinition;
-    let viewModel: KoheseViewModel = (this.getLocalTypeViewModel(
-      variantAttributeName) as KoheseViewModel);
+    let viewModel: KoheseViewModel =
+      (this.getLocalTypeViewModel() as KoheseViewModel);
     let formatDefinitionId: string = viewModel.defaultFormatKey[this.
       _formatDefinitionType];
     if (formatDefinitionId == null) {

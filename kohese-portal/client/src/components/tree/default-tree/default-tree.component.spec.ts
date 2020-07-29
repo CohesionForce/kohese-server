@@ -75,7 +75,7 @@ describe('Component: default-tree', () => {
       }
     }
 
-    expect(newRowIndex).toEqual(4);
+    expect(newRowIndex).toEqual(5);
   }));
   
   it('removes the TreeRow for a deleted Item', fakeAsync(() => {
