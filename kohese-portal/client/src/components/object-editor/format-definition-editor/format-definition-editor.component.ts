@@ -10,7 +10,7 @@ import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition
 import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { Type, TypeKind } from '../../../../../common/src/Type.interface';
+import { Type, Metatype } from '../../../../../common/src/Type.interface';
 
 @Component({
   selector: 'format-definition-editor',
@@ -219,7 +219,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
         let classLocalTypesEntry: any = (this._enclosingType ? this.
           _enclosingType : this._dataModel).classLocalTypes[typeName];
         return (!classLocalTypesEntry || (classLocalTypesEntry.definition.
-          typeKind === TypeKind.ENUMERATION) || (Object.values(this.
+          metatype === Metatype.ENUMERATION) || (Object.values(this.
           _itemRepository.getTreeConfig().getValue().config.getProxyFor(
           'view-' + classLocalTypesEntry.definedInKind.toLowerCase()).item.
           localTypes[typeName].formatDefinitions).length > 0));
@@ -403,8 +403,8 @@ export class FormatDefinitionEditorComponent implements OnInit {
       let classLocalTypesEntry: { definedInKind: string, definition: Type } =
         (this._enclosingType ? this._enclosingType : this._dataModel).
         classLocalTypes[type];
-      if (classLocalTypesEntry && (classLocalTypesEntry.definition.typeKind ===
-        TypeKind.ENUMERATION)) {
+      if (classLocalTypesEntry && (classLocalTypesEntry.definition.metatype ===
+        Metatype.ENUMERATION)) {
         return ['Dropdown'];
       } else {
         return ['Reference'];

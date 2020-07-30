@@ -37,7 +37,7 @@
   },
   "localTypes": {
     "FlowOfEvents": {
-      "typeKind": "Kohese Model",
+      "metatype": "Structure",
       "name": "FlowOfEvents",
       "modelName": "FlowOfEvents",
       "icon": "",

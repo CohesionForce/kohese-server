@@ -27,7 +27,7 @@ import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback 
 
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
-import { TypeKind } from '../../../../common/src/Type.interface';
+import { Metatype } from '../../../../common/src/Type.interface';
 import { EnumerationValue } from '../../../../common/src/Enumeration.interface';
 import { KoheseDataModel,
   KoheseViewModel } from '../../../../common/src/KoheseModel.interface';
@@ -1057,8 +1057,8 @@ export class ItemRepository {
                         currentTreeConfigSubject.getValue().config.getProxyFor(
                         'view-' + classLocalTypesEntry.definedInKind.
                         toLowerCase()).item.localTypes[type];
-                      switch (localTypeDataModel.typeKind) {
-                        case TypeKind.KOHESE_MODEL:
+                      switch (localTypeDataModel.metatype) {
+                        case Metatype.STRUCTURE:
                           if (Array.isArray(value)) {
                             body += value.map((v: any) => {
                               return this.getMarkdownRepresentation(v,
@@ -1074,7 +1074,7 @@ export class ItemRepository {
                           }
 
                           break;
-                        case TypeKind.ENUMERATION:
+                        case Metatype.ENUMERATION:
                           if (Array.isArray(value)) {
                             body += value.map((v: any, index: number) => {
                               return localTypeViewModel.values[
@@ -1092,7 +1092,7 @@ export class ItemRepository {
                           }
 
                           break;
-                        case TypeKind.VARIANT:
+                        case Metatype.VARIANT:
                           if (Array.isArray(value)) {
                             body += value.map((v: any, index: number) => {
                               return this.getStringRepresentation(koheseObject,
@@ -1181,10 +1181,10 @@ export class ItemRepository {
     string {
     let value: any;
     if (index != null) {
-      value = koheseObject[(dataModel.typeKind === TypeKind.VARIANT) ? 'value'
+      value = koheseObject[(dataModel.metatype === Metatype.VARIANT) ? 'value'
         : attributeName][index];
     } else {
-      value = koheseObject[(dataModel.typeKind === TypeKind.VARIANT) ? 'value'
+      value = koheseObject[(dataModel.metatype === Metatype.VARIANT) ? 'value'
         : attributeName];
     }
 
@@ -1206,8 +1206,8 @@ export class ItemRepository {
     let classLocalTypes: any = (enclosingType ? enclosingType : dataModel)[
       'classLocalTypes'];
     if (classLocalTypes && classLocalTypes[type]) {
-      switch (classLocalTypes[type].definition.typeKind) {
-        case TypeKind.ENUMERATION:
+      switch (classLocalTypes[type].definition.metatype) {
+        case Metatype.ENUMERATION:
           return this.currentTreeConfigSubject.getValue().config.getProxyFor(
             'view-' + classLocalTypes[type].definedInKind.toLowerCase()).item.
             localTypes[type].values[classLocalTypes[type].definition.values.
@@ -1244,7 +1244,7 @@ export class ItemRepository {
               contents.length > 0)) {
               let propertyDefinition: PropertyDefinition = formatDefinition.
                 containers[0].contents[0];
-              if (classLocalTypes[type].definition.typeKind === TypeKind.
+              if (classLocalTypes[type].definition.metatype === Metatype.
                 VARIANT) {
                 formatDefinitionId = viewModel.defaultFormatKey[
                   formatDefinitionType];

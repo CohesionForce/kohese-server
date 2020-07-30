@@ -16,7 +16,7 @@ import { InputDialogKind,
   InputDialogComponent } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { Type, TypeKind } from '../../../../../common/src/Type.interface';
+import { Type, Metatype } from '../../../../../common/src/Type.interface';
 import { KoheseDataModel,
   KoheseViewModel } from '../../../../../common/src/KoheseModel.interface';
 import { Enumeration,
@@ -176,8 +176,8 @@ export class DataModelEditorComponent {
     return this._itemRepository;
   }
   
-  get TypeKind() {
-    return TypeKind;
+  get Metatype() {
+    return Metatype;
   }
   
   get Array() {
@@ -539,11 +539,11 @@ export class DataModelEditorComponent {
   }
   
   /**
-   * Adds a local type of the given TypeKind to the selected data model
+   * Adds a local type of the given Metatype to the selected data model
    * 
-   * @param typeKind
+   * @param metatype
    */
-  public async addLocalType(typeKind: TypeKind): Promise<void> {
+  public async addLocalType(metatype: Metatype): Promise<void> {
     let viewModelProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('view-' + this._dataModel.name.toLowerCase());
     if (this._hasUnsavedChanges || viewModelProxy.dirty) {
@@ -558,9 +558,9 @@ export class DataModelEditorComponent {
     
     let localTypeDataModel: Type;
     let localTypeViewModel: Type;
-    if (typeKind === TypeKind.ENUMERATION) {
+    if (metatype === Metatype.ENUMERATION) {
       let name: string = await this._dialogService.openInputDialog('Add ' +
-        typeKind, '', InputDialogKind.STRING, 'Name', typeKind, (value:
+        metatype, '', InputDialogKind.STRING, 'Name', metatype, (value:
         any) => {
         return (value && !(this._enclosingType ? this._enclosingType : this.
           _dataModel).classLocalTypes[value]);
@@ -571,13 +571,13 @@ export class DataModelEditorComponent {
       }
       
       localTypeDataModel = ({
-        typeKind: TypeKind.ENUMERATION,
+        metatype: Metatype.ENUMERATION,
         id: name,
         name: name,
         values: []
       } as Enumeration);
       localTypeViewModel = ({
-        typeKind: TypeKind.ENUMERATION,
+        metatype: Metatype.ENUMERATION,
         id: 'view-' + name.toLowerCase(),
         name: name,
         values: []
@@ -612,7 +612,7 @@ export class DataModelEditorComponent {
       }
       
       let koheseDataModel: KoheseDataModel = {
-        typeKind: typeKind,
+        metatype: metatype,
         id: results[0],
         name: results[0],
         base: null,
@@ -627,7 +627,7 @@ export class DataModelEditorComponent {
         attribute;
       
       let koheseViewModel: KoheseViewModel = {
-        typeKind: typeKind,
+        metatype: metatype,
         id: 'view-' + results[0].toLowerCase(),
         name: results[0],
         modelName: results[0],

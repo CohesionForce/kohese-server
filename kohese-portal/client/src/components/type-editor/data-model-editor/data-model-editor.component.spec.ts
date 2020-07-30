@@ -13,7 +13,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { ComponentDialogComponent } from '../../dialog/component-dialog/component-dialog.component';
 import { DataModelEditorComponent } from './data-model-editor.component';
-import { Type, TypeKind } from '../../../../../common/src/Type.interface';
+import { Type, Metatype } from '../../../../../common/src/Type.interface';
 import { KoheseDataModel } from '../../../../../common/src/KoheseModel.interface';
 import { Enumeration,
   EnumerationValue } from '../../../../../common/src/Enumeration.interface';
@@ -73,32 +73,32 @@ describe('DataModelEditorComponent', () => {
     } as MatDialogRef<ComponentDialogComponent>);
     spyOn(TestBed.get(DialogService), 'openComponentsDialog').and.returnValue(
       matDialogRefPlaceholder);
-    await component.addLocalType(TypeKind.KOHESE_MODEL);
+    await component.addLocalType(Metatype.STRUCTURE);
     let localTypeNames: Array<string> = Object.keys(component.dataModel.
       localTypes);
     let localTypeDataModel: Type = component.dataModel.localTypes[
       localTypeNames[localTypeNames.length - 1]];
-    expect(localTypeDataModel.typeKind).toEqual(TypeKind.KOHESE_MODEL);
+    expect(localTypeDataModel.metatype).toEqual(Metatype.STRUCTURE);
     expect(localTypeDataModel.name).toBeTruthy();
     expect(Object.keys((localTypeDataModel as KoheseDataModel).properties).
       length).toBeGreaterThan(0);
 
-    await component.addLocalType(TypeKind.ENUMERATION);
+    await component.addLocalType(Metatype.ENUMERATION);
     localTypeNames = Object.keys(component.dataModel.localTypes);
     localTypeDataModel = component.dataModel.localTypes[localTypeNames[
       localTypeNames.length - 1]];
-    expect(localTypeDataModel.typeKind).toEqual(TypeKind.ENUMERATION);
+    expect(localTypeDataModel.metatype).toEqual(Metatype.ENUMERATION);
     expect(localTypeDataModel.name).toBeTruthy();
 
     matDialogRefPlaceholder.afterClosed = () => {
       return observableOf(['Another Variant', { attribute:
         { name: 'attribute' }, view: { displayName: 'Attribute' } }]);
     };
-    await component.addLocalType(TypeKind.VARIANT);
+    await component.addLocalType(Metatype.VARIANT);
     localTypeNames = Object.keys(component.dataModel.localTypes);
     localTypeDataModel = component.dataModel.localTypes[localTypeNames[
       localTypeNames.length - 1]];
-    expect(localTypeDataModel.typeKind).toEqual(TypeKind.VARIANT);
+    expect(localTypeDataModel.metatype).toEqual(Metatype.VARIANT);
     expect(localTypeDataModel.name).toBeTruthy();
     expect(Object.keys((localTypeDataModel as KoheseDataModel).properties).
       length).toBeGreaterThan(0);
@@ -146,7 +146,7 @@ describe('DataModelEditorComponent', () => {
 
   it('adds an EnumerationValue', async () => {
     let enumeration: Enumeration = {
-      typeKind: TypeKind.ENUMERATION,
+      metatype: Metatype.ENUMERATION,
       id: 'Enumeration',
       name: 'Enumeration',
       values: []
@@ -162,7 +162,7 @@ describe('DataModelEditorComponent', () => {
       description: 'Description'
     };
     let enumeration: Enumeration = {
-      typeKind: TypeKind.ENUMERATION,
+      metatype: Metatype.ENUMERATION,
       id: 'Enumeration',
       name: 'Enumeration',
       values: [enumerationValue]

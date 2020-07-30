@@ -46,7 +46,7 @@
   "methods": [],
   "localTypes": {
     "FlowOfEvents": {
-      "typeKind": "Kohese Model",
+      "metatype": "Structure",
       "name": "FlowOfEvents",
       "base": "Item",
       "idInjection": true,

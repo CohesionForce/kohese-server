@@ -258,7 +258,7 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <ng-container [ngSwitch]="localType.typeKind">
+          <ng-container [ngSwitch]="localType.metatype">
             <ng-container *ngSwitchCase="TypeKind.KOHESE_MODEL">
               <!-- The use of hasUnsavedChanges below is bad but preferred over
               changing API. -->

@@ -115,9 +115,9 @@
         {{getAttributeRepresentation()}}:&nbsp;
       </label>
       <ng-container *ngIf="(isLocalTypeAttribute() && (getLocalTypeDataModel().
-        typeKind !== TypeKind.KOHESE_MODEL)) else koheseModel">
-        <ng-container [ngSwitch]="getLocalTypeDataModel().typeKind">
-          <ng-container *ngSwitchCase="TypeKind.ENUMERATION">
+        metatype !== Metatype.STRUCTURE)) else structure">
+        <ng-container [ngSwitch]="getLocalTypeDataModel().metatype">
+          <ng-container *ngSwitchCase="Metatype.ENUMERATION">
             <mat-form-field style="width: 100%;">
               <mat-select placeholder="{{getAttributeRepresentation()}}"
                 [(ngModel)]="koheseObject[isVariantField ? 'value' :
@@ -133,7 +133,7 @@
               </mat-select>
             </mat-form-field>
           </ng-container>
-          <ng-container *ngSwitchCase="TypeKind.VARIANT">
+          <ng-container *ngSwitchCase="Metatype.VARIANT">
             <div style="width: 100%; display: flex; flex-direction: column;">
               <mat-form-field style="width: 100%;">
                 <mat-select placeholder="{{getAttributeRepresentation()}}"
@@ -186,7 +186,7 @@
           </ng-container>
         </ng-container>
       </ng-container>
-      <ng-template #koheseModel>
+      <ng-template #structure>
         <ng-container *ngIf="koheseObject[isVariantField ? 'value' :
           propertyDefinition.propertyName]">
           <ng-container *ngIf="isLocalTypeAttribute() else

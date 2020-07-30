@@ -144,7 +144,7 @@
   "methods": [],
   "localTypes": {
     "PropertyType": {
-      "typeKind": "Kohese Model",
+      "metatype": "Structure",
       "name": "PropertyType",
       "base": null,
       "idInjection": true,
@@ -188,7 +188,7 @@
       "methods": []
     },
     "RelationType": {
-      "typeKind": "Kohese Model",
+      "metatype": "Structure",
       "name": "RelationType",
       "base": null,
       "idInjection": true,

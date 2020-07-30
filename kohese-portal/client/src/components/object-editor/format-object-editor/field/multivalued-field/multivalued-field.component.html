@@ -19,8 +19,8 @@
       </h3>
       <ng-container *ngIf="(((propertyDefinition.kind === '') ||
         (propertyDefinition.kind === 'proxy-selector')) &&
-        isLocalTypeAttribute() && (getLocalTypeDataModel().typeKind ===
-        TypeKind.KOHESE_MODEL))">
+        isLocalTypeAttribute() && (getLocalTypeDataModel().metatype ===
+        Metatype.STRUCTURE))">
         <button mat-icon-button matTooltip="Expand all elements"
           style="margin-left: auto;" [disabled]="!koheseObject[isVariantField ?
           'value' : propertyDefinition.propertyName]?.length"
@@ -49,7 +49,7 @@
         propertyName].push(addValue()))" [ngStyle]="{ 'margin-left':
         ((((propertyDefinition.kind === '') || (propertyDefinition.kind ===
         'proxy-selector')) && isLocalTypeAttribute() &&
-        (getLocalTypeDataModel().typeKind === TypeKind.KOHESE_MODEL)) ? '' :
+        (getLocalTypeDataModel().metatype === Metatype.STRUCTURE)) ? '' :
         'auto') }">
         <mat-icon class="fa fa-plus"></mat-icon>
       </button>
@@ -173,8 +173,8 @@
                   <ng-container *ngIf="isLocalTypeAttribute() else
                     globalTypeAttribute">
                     <ng-container [ngSwitch]="getLocalTypeDataModel().
-                      typeKind">
-                      <ng-container *ngSwitchCase="TypeKind.KOHESE_MODEL">
+                      metatype">
+                      <ng-container *ngSwitchCase="Metatype.STRUCTURE">
                         <mat-expansion-panel
                           #multivaluedAttributeExpansionPanel style="width:
                           100%;">
@@ -203,7 +203,7 @@
                           </ng-template>
                         </mat-expansion-panel>
                       </ng-container>
-                      <ng-container *ngSwitchCase="TypeKind.ENUMERATION">
+                      <ng-container *ngSwitchCase="Metatype.ENUMERATION">
                         <mat-form-field style="width: 100%;">
                           <mat-select [(ngModel)]="koheseObject[isVariantField
                             ? 'value' : propertyDefinition.propertyName][j]"
@@ -219,7 +219,7 @@
                           </mat-select>
                         </mat-form-field>
                       </ng-container>
-                      <ng-container *ngSwitchCase="TypeKind.VARIANT">
+                      <ng-container *ngSwitchCase="Metatype.VARIANT">
                         <div style="width: 100%; display: flex; flex-direction:
                           column;">
                           <mat-form-field style="width: 100%;">
@@ -294,8 +294,8 @@
                 </ng-container>
                 <ng-container *ngIf="isLocalTypeAttribute() else
                   globalTypeAttribute">
-                  <ng-container *ngIf="(getLocalTypeDataModel().typeKind ===
-                    TypeKind.KOHESE_MODEL) && !koheseObject[isVariantField ?
+                  <ng-container *ngIf="(getLocalTypeDataModel().metatype ===
+                    Metatype.STRUCTURE) && !koheseObject[isVariantField ?
                     'value' : propertyDefinition.propertyName][j]">
                     <button mat-icon-button matTooltip="Set a value for {{
                       propertyDefinition.propertyName}}"

@@ -15,7 +15,7 @@ import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition
 import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { TypeKind } from '../../../../../common/src/Type.interface';
+import { Metatype } from '../../../../../common/src/Type.interface';
 import { KoheseDataModel } from '../../../../../common/src/KoheseModel.interface';
 import { EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 
@@ -169,8 +169,8 @@ export class ViewModelEditorComponent {
     return FormatDefinitionType;
   }
   
-  get TypeKind() {
-    return TypeKind;
+  get Metatype() {
+    return Metatype;
   }
   
   get Object() {

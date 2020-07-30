@@ -7,7 +7,7 @@ import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { KoheseDataModel, KoheseViewModel } from '../../../../../../common/src/KoheseModel.interface';
 import { PropertyDefinition } from '../../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
-import { Type, TypeKind } from '../../../../../../common/src/Type.interface';
+import { Type, Metatype } from '../../../../../../common/src/Type.interface';
 import { TreeComponent } from '../../../../components/tree/tree.component';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
@@ -35,7 +35,7 @@ export class Field {
   @Input('dataModel')
   set dataModel(dataModel: KoheseDataModel) {
     this._dataModel = dataModel;
-    this._isVariantField = (this._dataModel.typeKind === TypeKind.VARIANT);
+    this._isVariantField = (this._dataModel.metatype === Metatype.VARIANT);
   }
 
   protected _viewModel: KoheseViewModel;
@@ -87,8 +87,8 @@ export class Field {
     return Array;
   }
 
-  get TypeKind() {
-    return TypeKind;
+  get Metatype() {
+    return Metatype;
   }
 
   get itemRepository() {
@@ -338,9 +338,9 @@ export class Field {
           let classLocalTypesEntry: any = (this._enclosingDataModel ? this.
             _enclosingDataModel : this._dataModel)['classLocalTypes'][type];
           let localTypeDataModel: any = classLocalTypesEntry.definition;
-          if (localTypeDataModel.typeKind === TypeKind.ENUMERATION) {
+          if (localTypeDataModel.metatype === Metatype.ENUMERATION) {
             return null;
-          } else if (localTypeDataModel.typeKind === TypeKind.VARIANT) {
+          } else if (localTypeDataModel.metatype === Metatype.VARIANT) {
             return {
               discriminant: Object.keys(localTypeDataModel.properties)[0],
               value: null
@@ -364,11 +364,11 @@ export class Field {
                   _enclosingDataModel ? this._enclosingDataModel : this.
                   _dataModel)['classLocalTypes'][localTypeAttributeTypeName];
                 if (classLocalTypesEntry) {
-                  if (classLocalTypesEntry.definition.typeKind === TypeKind.
+                  if (classLocalTypesEntry.definition.metatype === Metatype.
                     ENUMERATION) {
                     localTypeInstance[attributeName] = null;
-                  } else if (classLocalTypesEntry.definition.typeKind ===
-                    TypeKind.VARIANT) {
+                  } else if (classLocalTypesEntry.definition.metatype ===
+                    Metatype.VARIANT) {
                     localTypeInstance[attributeName] = {
                       discriminant: Object.keys(classLocalTypesEntry.
                         definition.properties)[0],

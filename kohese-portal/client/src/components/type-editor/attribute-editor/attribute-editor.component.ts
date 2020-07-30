@@ -6,7 +6,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { Dialog } from '../../dialog/Dialog.interface';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
-import { TypeKind } from '../../../../../common/src/Type.interface';
+import { Metatype } from '../../../../../common/src/Type.interface';
 import { Attribute,
   ContainmentReferenceSpecification } from '../../../../../common/src/Attribute.interface';
 
@@ -258,7 +258,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     } else {
       if (this._contextualGlobalType.classLocalTypes[dataModelType] && this.
         _contextualGlobalType.classLocalTypes[dataModelType].definition.
-        typeKind === TypeKind.ENUMERATION) {
+        metatype === Metatype.ENUMERATION) {
         return ['Dropdown'];
       } else {
         return ['Reference'];

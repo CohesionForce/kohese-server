@@ -13,7 +13,7 @@ import { RepoStates,
 import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
 import { MockItemCache } from './MockItemCache';
 import { ItemCache } from '../../../common/src/item-cache';
-import { Type, TypeKind } from '../../../common/src/Type.interface';
+import { Type, Metatype } from '../../../common/src/Type.interface';
 import { KoheseDataModel,
   KoheseViewModel } from '../../../common/src/KoheseModel.interface';
 import { Attribute } from '../../../common/src/Attribute.interface';
@@ -313,7 +313,7 @@ export class MockItemRepository {
           multivaluedVariantAttribute;
 
         dataModel.localTypes['Local Type'] = ({
-          typeKind: TypeKind.KOHESE_MODEL,
+          metatype: Metatype.STRUCTURE,
           id: 'Local Type',
           name: 'Local Type',
           base: '',
@@ -351,7 +351,7 @@ export class MockItemRepository {
         } as KoheseDataModel);
 
         dataModel.localTypes['Enumeration'] = {
-          typeKind: TypeKind.ENUMERATION,
+          metatype: Metatype.ENUMERATION,
           id: 'Enumeration',
           name: 'Enumeration',
           values: [{
@@ -364,7 +364,7 @@ export class MockItemRepository {
         } as Enumeration;
 
         dataModel.localTypes['Variant'] = {
-          typeKind: TypeKind.VARIANT,
+          metatype: Metatype.VARIANT,
           id: 'Variant',
           name: 'Variant',
           base: null,
@@ -786,7 +786,7 @@ export class MockItemRepository {
           multivaluedVariantAttributePropertyDefinition);
         
         viewModel.localTypes['Local Type'] = ({
-          typeKind: TypeKind.KOHESE_MODEL,
+          metatype: Metatype.STRUCTURE,
           id: 'view-localtype',
           name: 'view-localtype',
           modelName: 'Local Type',
@@ -886,14 +886,14 @@ export class MockItemRepository {
         } as KoheseViewModel);
 
         viewModel.localTypes['Enumeration'] = {
-          typeKind: TypeKind.ENUMERATION,
+          metatype: Metatype.ENUMERATION,
           id: 'Enumeration',
           name: 'Enumeration',
           values: ['Enumeration Value 1', 'Enumeration Value 2']
         } as Type;//Enumeration;
 
         viewModel.localTypes['Variant'] = ({
-          typeKind: TypeKind.KOHESE_MODEL,
+          metatype: Metatype.STRUCTURE,
           id: 'view-variant',
           name: 'view-variant',
           modelName: 'Variant',
@@ -1174,10 +1174,10 @@ export class MockItemRepository {
     string {
     let value: any;
     if (index == null) {
-      value = koheseObject[(dataModel.typeKind === TypeKind.VARIANT) ? 'value'
+      value = koheseObject[(dataModel.metatype === Metatype.VARIANT) ? 'value'
         : attributeName];
     } else {
-      value = koheseObject[(dataModel.typeKind === TypeKind.VARIANT) ? 'value'
+      value = koheseObject[(dataModel.metatype === Metatype.VARIANT) ? 'value'
         : attributeName][index];
     }
 

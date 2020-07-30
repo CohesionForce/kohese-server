@@ -197,14 +197,14 @@
         <mat-icon class="fa fa-plus"></mat-icon>
       </button>
       <mat-menu #addLocalTypeMenu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item (click)="addLocalType(TypeKind.KOHESE_MODEL)">
-          Kohese Model
+        <button mat-menu-item (click)="addLocalType(Metatype.STRUCTURE)">
+          {{Metatype.STRUCTURE}}
         </button>
-        <button mat-menu-item (click)="addLocalType(TypeKind.ENUMERATION)">
-          Enumeration
+        <button mat-menu-item (click)="addLocalType(Metatype.ENUMERATION)">
+          {{Metatype.ENUMERATION}}
         </button>
-        <button mat-menu-item (click)="addLocalType(TypeKind.VARIANT)">
-          Variant
+        <button mat-menu-item (click)="addLocalType(Metatype.VARIANT)">
+          {{Metatype.VARIANT}}
         </button>
       </mat-menu>
     </span>
@@ -221,8 +221,8 @@
             </button>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
-            <ng-container [ngSwitch]="localType.typeKind">
-              <ng-container *ngSwitchCase="TypeKind.KOHESE_MODEL">
+            <ng-container [ngSwitch]="localType.metatype">
+              <ng-container *ngSwitchCase="Metatype.STRUCTURE">
                 <!--
                   The use of hasUnsavedChanges below is bad but preferred over
                   changing API.
@@ -233,7 +233,7 @@
                   [enclosingType]="dataModel">
                 </data-model-editor>
               </ng-container>
-              <ng-container *ngSwitchCase="TypeKind.ENUMERATION">
+              <ng-container *ngSwitchCase="Metatype.ENUMERATION">
                 <div style="width: 100%; display: flex; flex-direction: row;">
                   <button mat-icon-button [disabled]="!editable"
                     style="margin-left: auto;" (click)="addEnumerationValue(
@@ -267,7 +267,7 @@
                   </div>
                 </ng-container>
               </ng-container>
-              <ng-container *ngSwitchCase="TypeKind.VARIANT">
+              <ng-container *ngSwitchCase="Metatype.VARIANT">
                 <!--
                   The use of hasUnsavedChanges below is bad but preferred over
                   changing API.
