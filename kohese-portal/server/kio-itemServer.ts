@@ -763,6 +763,9 @@ function KIOItemServer(socket){
             request.parameters.pathBase, mediaDirectoryPath);
         } else {
           replacement = matchedSubstring;
+
+          // TODO: Determine if there is an https change required
+
           if (embeddedImageCaptureGroup) {
             replacement = await embedImage(matchedSubstring,
               embeddedImageCaptureGroup, request.parameters.pathBase,

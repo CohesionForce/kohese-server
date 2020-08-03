@@ -7,7 +7,9 @@ export class SocketService {
   public socket: SocketIOClient.Socket;
 
   constructor() {
-    this.socket = SocketIoClient();
+    this.socket = SocketIoClient({
+      rejectUnauthorized: false
+    });
   }
 
   connect(): void {

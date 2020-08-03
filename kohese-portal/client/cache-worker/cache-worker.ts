@@ -65,7 +65,9 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     switch (request.type) {
       case 'connect':
         if (!socket) {
-          socket = SocketIoClient();
+          socket = SocketIoClient({
+            rejectUnauthorized: false
+          });
           socket.on('connect_error', () => {
             console.log('*** Worker socket connection error');
             postToAllPorts('connectionError', {});

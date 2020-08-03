@@ -4,6 +4,8 @@
  *  usage: node tests/stressTest.js <itemId> <numberOfReqs> <delayInMS>
  */
 
+  // TODO: Determine if there is an https change required
+
 const http = require('http');
 
 var itemId;

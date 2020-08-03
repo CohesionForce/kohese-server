@@ -4,7 +4,7 @@
  *  usage: node tests/kio-stressTest.js <itemId> <numberOfReqs> <delayInMS>
  */
 
-const socket = require('socket.io-client')('http://localhost:3000');
+const socket = require('socket.io-client')('https://localhost:3000');
 
 var itemId;
 var numOfRequests;
