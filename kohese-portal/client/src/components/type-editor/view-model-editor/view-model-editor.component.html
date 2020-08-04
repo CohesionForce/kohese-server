@@ -259,7 +259,7 @@
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <ng-container [ngSwitch]="localType.metatype">
-            <ng-container *ngSwitchCase="TypeKind.KOHESE_MODEL">
+            <ng-container *ngSwitchCase="Metatype.STRUCTURE">
               <!-- The use of hasUnsavedChanges below is bad but preferred over
               changing API. -->
               <view-model-editor [viewModel]="localType"
@@ -268,7 +268,7 @@
                 localTypes[localType.name]">
               </view-model-editor>
             </ng-container>
-            <ng-container *ngSwitchCase="TypeKind.ENUMERATION">
+            <ng-container *ngSwitchCase="Metatype.ENUMERATION">
               <ng-container *ngFor="let value of localType.values; let j =
                 index; trackBy: getEnumerationValueIdentifier">
                 <mat-form-field style="width: 100%;">
@@ -277,7 +277,7 @@
                 </mat-form-field>
               </ng-container>
             </ng-container>
-            <ng-container *ngSwitchCase="TypeKind.VARIANT">
+            <ng-container *ngSwitchCase="Metatype.VARIANT">
               <!-- The use of hasUnsavedChanges below is bad but preferred over
               changing API. -->
               <view-model-editor [viewModel]="localType"
