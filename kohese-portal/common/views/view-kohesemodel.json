@@ -8,6 +8,7 @@
   "viewProperties": {},
   "localTypes": {
     "PropertyType": {
+      "metatype": "Structure",
       "name": "PropertyType",
       "modelName": "PropertyType",
       "icon": "",
@@ -133,6 +134,7 @@
       "tableDefinitions": {}
     },
     "RelationType": {
+      "metatype": "Structure",
       "name": "RelationType",
       "modelName": "RelationType",
       "icon": "",

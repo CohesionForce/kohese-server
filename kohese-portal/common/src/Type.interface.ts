@@ -1,10 +1,10 @@
 export interface Type {
-  typeKind: TypeKind;
+  metatype: Metatype;
   id: string;
   name: string;
   localTypes?: { [localTypeName: string]: Type };
 }
 
-export enum TypeKind {
-  KOHESE_MODEL = 'Kohese Model', ENUMERATION = 'Enumeration'
+export enum Metatype {
+  STRUCTURE = 'Structure', ENUMERATION = 'Enumeration', VARIANT = 'Variant'
 }

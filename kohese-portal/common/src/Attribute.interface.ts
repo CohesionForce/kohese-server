@@ -5,6 +5,8 @@ export interface Attribute {
   required: boolean;
   relation?: ContainmentReferenceSpecification |
     NonContainmentReferenceSpecification;
+  id?: boolean;
+  properties?: any;
 }
 
 export interface ContainmentReferenceSpecification {

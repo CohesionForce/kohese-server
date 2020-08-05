@@ -13,7 +13,7 @@ import { RepoStates,
 import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
 import { MockItemCache } from './MockItemCache';
 import { ItemCache } from '../../../common/src/item-cache';
-import { Type, TypeKind } from '../../../common/src/Type.interface';
+import { Type, Metatype } from '../../../common/src/Type.interface';
 import { KoheseDataModel,
   KoheseViewModel } from '../../../common/src/KoheseModel.interface';
 import { Attribute } from '../../../common/src/Attribute.interface';
@@ -21,6 +21,7 @@ import { FormatDefinition,
   FormatDefinitionType } from '../../../common/src/FormatDefinition.interface';
 import { FormatContainerKind } from '../../../common/src/FormatContainer.interface';
 import { PropertyDefinition } from '../../../common/src/PropertyDefinition.interface';
+import { Enumeration } from '../../../common/src/Enumeration.interface';
 
 export class MockItemRepository {
   static modelDefinitions = ModelDefinitions();
@@ -52,6 +53,183 @@ export class MockItemRepository {
       let dataModel: KoheseDataModel = JSON.parse(JSON.stringify(
         MockItemRepository.modelDefinitions.model[modelName]));
       if (dataModel.name === 'KoheseModel') {
+        let booleanAttribute: Attribute = {
+          name: 'booleanAttribute',
+          type: 'boolean',
+          required: false,
+          default: false
+        };
+        dataModel.properties[booleanAttribute.name] = booleanAttribute;
+
+        let multivaluedBooleanAttribute: Attribute = {
+          name: 'multivaluedBooleanAttribute',
+          type: ['boolean'],
+          required: false,
+          default: []
+        };
+        dataModel.properties[multivaluedBooleanAttribute.name] =
+          multivaluedBooleanAttribute;
+        
+        let numberAttribute: Attribute = {
+          name: 'numberAttribute',
+          type: 'number',
+          required: false,
+          default: 0
+        };
+        dataModel.properties[numberAttribute.name] = numberAttribute;
+
+        let multivaluedNumberAttribute: Attribute = {
+          name: 'multivaluedNumberAttribute',
+          type: ['number'],
+          required: false,
+          default: []
+        };
+        dataModel.properties[multivaluedNumberAttribute.name] =
+          multivaluedNumberAttribute;
+
+        let timeAttribute: Attribute = {
+          name: 'timeAttribute',
+          type: 'timestamp',
+          required: false,
+          default: null //new Date().getTime()
+        };
+        dataModel.properties[timeAttribute.name] = timeAttribute;
+
+        let multivaluedTimeAttribute: Attribute = {
+          name: 'multivaluedTimeAttribute',
+          type: ['timestamp'],
+          required: false,
+          default: []
+        };
+        dataModel.properties[multivaluedTimeAttribute.name] =
+          multivaluedTimeAttribute;
+
+        let stateMachineDefinition: any = {
+          state: {
+            First: {
+              name: 'First',
+              description: ''
+            },
+            Second: {
+              name: 'Second',
+              description: ''
+            },
+            Third: {
+              name: 'Third',
+              description: ''
+            }
+          },
+          transition: {
+            FirstToSecond: {
+              source: 'First',
+              target: 'Second'
+            },
+            SecondToThird: {
+              source: 'Second',
+              target: 'Third'
+            },
+            FirstToThird: {
+              source: 'First',
+              target: 'Third'
+            }
+          }
+        };
+        let stateAttribute: Attribute = {
+          name: 'stateAttribute',
+          type: 'StateMachine',
+          required: false,
+          default: 'First',
+          properties: stateMachineDefinition
+        };
+        dataModel.properties[stateAttribute.name] = stateAttribute;
+
+        let multivaluedStateAttribute: Attribute = {
+          name: 'multivaluedStateAttribute',
+          type: ['StateMachine'],
+          required: false,
+          default: ['First', 'First'],
+          properties: stateMachineDefinition
+        };
+        dataModel.properties[multivaluedStateAttribute.name] =
+          multivaluedStateAttribute;
+        
+        let usernameAttribute: Attribute = {
+          name: 'usernameAttribute',
+          type: 'string',
+          required: false,
+          default: 'admin',
+          relation: {
+            kind: 'KoheseUser',
+            foreignKey: 'username'
+          }
+        };
+        dataModel.properties[usernameAttribute.name] = usernameAttribute;
+
+        let multivaluedUsernameAttribute: Attribute = {
+          name: 'multivaluedUsernameAttribute',
+          type: ['string'],
+          required: false,
+          default: [],
+          relation: {
+            kind: 'KoheseUser',
+            foreignKey: 'username'
+          }
+        };
+        dataModel.properties[multivaluedUsernameAttribute.name] =
+          multivaluedUsernameAttribute;
+
+        let stringAttribute: Attribute = {
+          name: 'stringAttribute',
+          type: 'string',
+          required: false,
+          default: ''
+        };
+        dataModel.properties[stringAttribute.name] = stringAttribute;
+
+        let multivaluedStringAttribute: Attribute = {
+          name: 'multivaluedStringAttribute',
+          type: ['string'],
+          required: false,
+          default: []
+        };
+        dataModel.properties[multivaluedStringAttribute.name] =
+          multivaluedStringAttribute;
+
+        let maskedStringAttribute: Attribute = {
+          name: 'maskedStringAttribute',
+          type: 'string',
+          required: false,
+          default: ''
+        };
+        dataModel.properties[maskedStringAttribute.name] =
+          maskedStringAttribute;
+
+        let multivaluedMaskedStringAttribute: Attribute = {
+          name: 'multivaluedMaskedStringAttribute',
+          type: ['string'],
+          required: false,
+          default: []
+        };
+        dataModel.properties[multivaluedMaskedStringAttribute.name] =
+          multivaluedMaskedStringAttribute;
+
+        let markdownAttribute: Attribute = {
+          name: 'markdownAttribute',
+          type: 'string',
+          required: false,
+          default: ''
+        };
+        dataModel.properties[markdownAttribute.name] = markdownAttribute;
+
+        let multivaluedMarkdownAttribute: Attribute = {
+          name: 'multivaluedMarkdownAttribute',
+          type: ['string'],
+          required: false,
+          default: []
+        };
+        dataModel.properties[multivaluedMarkdownAttribute.name] =
+          multivaluedMarkdownAttribute;
+
         let globalTypeAttribute: Attribute = {
           name: 'globalTypeAttribute',
           type: 'KoheseModel',
@@ -62,7 +240,7 @@ export class MockItemRepository {
             foreignKey: 'id'
           }
         };
-        dataModel.properties['globalTypeAttribute'] = globalTypeAttribute;
+        dataModel.properties[globalTypeAttribute.name] = globalTypeAttribute;
 
         let multivaluedGlobalTypeAttribute: Attribute = {
           name: 'multivaluedGlobalTypeAttribute',
@@ -74,7 +252,7 @@ export class MockItemRepository {
             foreignKey: 'id'
           }
         };
-        dataModel.properties['multivaluedGlobalTypeAttribute'] =
+        dataModel.properties[multivaluedGlobalTypeAttribute.name] =
           multivaluedGlobalTypeAttribute;
 
         let localTypeAttribute: Attribute = {
@@ -84,7 +262,7 @@ export class MockItemRepository {
           default: null,
           relation: { contained: true }
         };
-        dataModel.properties['localTypeAttribute'] = localTypeAttribute;
+        dataModel.properties[localTypeAttribute.name] = localTypeAttribute;
 
         let multivaluedLocalTypeAttribute: Attribute = {
           name: 'multivaluedLocalTypeAttribute',
@@ -93,7 +271,7 @@ export class MockItemRepository {
           default: null,
           relation: { contained: true }
         };
-        dataModel.properties['multivaluedLocalTypeAttribute'] =
+        dataModel.properties[multivaluedLocalTypeAttribute.name] =
           multivaluedLocalTypeAttribute;
 
         let enumerationAttribute: Attribute = {
@@ -103,7 +281,7 @@ export class MockItemRepository {
           default: null,
           relation: { contained: true }
         };
-        dataModel.properties['enumerationAttribute'] = enumerationAttribute;
+        dataModel.properties[enumerationAttribute.name] = enumerationAttribute;
 
         let multivaluedEnumerationAttribute: Attribute = {
           name: 'multivaluedEnumerationAttribute',
@@ -112,31 +290,68 @@ export class MockItemRepository {
           default: null,
           relation: { contained: true }
         };
-        dataModel.properties['multivaluedEnumerationAttribute'] =
+        dataModel.properties[multivaluedEnumerationAttribute.name] =
           multivaluedEnumerationAttribute;
+        
+        let variantAttribute: Attribute = {
+          name: 'variantAttribute',
+          type: 'Variant',
+          required: false,
+          default: null,
+          relation: { contained: true }
+        };
+        dataModel.properties[variantAttribute.name] = variantAttribute;
+
+        let multivaluedVariantAttribute: Attribute = {
+          name: 'multivaluedVariantAttribute',
+          type: ['Variant'],
+          required: false,
+          default: null,
+          relation: { contained: true }
+        };
+        dataModel.properties[multivaluedVariantAttribute.name] =
+          multivaluedVariantAttribute;
 
         dataModel.localTypes['Local Type'] = ({
-          typeKind: TypeKind.KOHESE_MODEL,
+          metatype: Metatype.STRUCTURE,
           id: 'Local Type',
           name: 'Local Type',
           base: '',
           idInjection: true,
           properties: {
+            booleanAttribute: booleanAttribute,
+            multivaluedBooleanAttribute: multivaluedBooleanAttribute,
+            numberAttribute: numberAttribute,
+            multivaluedNumberAttribute: multivaluedNumberAttribute,
+            timeAttribute: timeAttribute,
+            multivaluedTimeAttribute: multivaluedTimeAttribute,
+            stateAttribute: stateAttribute,
+            multivaluedStateAttribute: multivaluedStateAttribute,
+            usernameAttribute: usernameAttribute,
+            multivaluedUsernameAttribute: multivaluedUsernameAttribute,
+            stringAttribute: stringAttribute,
+            multivaluedStringAttribute: multivaluedStringAttribute,
+            maskedStringAttribute: maskedStringAttribute,
+            multivaluedMaskedStringAttribute: multivaluedMaskedStringAttribute,
+            markdownAttribute: markdownAttribute,
+            multivaluedMarkdownAttribute: multivaluedMarkdownAttribute,
             globalTypeAttribute: globalTypeAttribute,
             multivaluedGlobalTypeAttribute: multivaluedGlobalTypeAttribute,
             localTypeAttribute: localTypeAttribute,
             multivaluedLocalTypeAttribute: multivaluedLocalTypeAttribute,
             enumerationAttribute: enumerationAttribute,
-            multivaluedEnumerationAttribute: multivaluedEnumerationAttribute
+            multivaluedEnumerationAttribute: multivaluedEnumerationAttribute,
+            variantAttribute: variantAttribute,
+            multivaluedVariantAttribute: multivaluedVariantAttribute
           },
           validations: [],
           relations: {},
           acls: [],
           methods: []
-        } as Type);
+        } as KoheseDataModel);
 
         dataModel.localTypes['Enumeration'] = {
-          typeKind: TypeKind.ENUMERATION,
+          metatype: Metatype.ENUMERATION,
           id: 'Enumeration',
           name: 'Enumeration',
           values: [{
@@ -146,18 +361,90 @@ export class MockItemRepository {
             name: 'EnumerationValue2',
             description: ''
           }]
-        } as Type;
+        } as Enumeration;
 
-        dataModel['globalTypeAttribute'] = {
+        dataModel.localTypes['Variant'] = {
+          metatype: Metatype.VARIANT,
+          id: 'Variant',
+          name: 'Variant',
+          base: null,
+          idInjection: true,
+          properties: {
+            booleanAttribute: booleanAttribute,
+            multivaluedBooleanAttribute: multivaluedBooleanAttribute,
+            numberAttribute: numberAttribute,
+            multivaluedNumberAttribute: multivaluedNumberAttribute,
+            timeAttribute: timeAttribute,
+            multivaluedTimeAttribute: multivaluedTimeAttribute,
+            stateAttribute: stateAttribute,
+            multivaluedStateAttribute: multivaluedStateAttribute,
+            usernameAttribute: usernameAttribute,
+            multivaluedUsernameAttribute: multivaluedUsernameAttribute,
+            stringAttribute: stringAttribute,
+            multivaluedStringAttribute: multivaluedStringAttribute,
+            maskedStringAttribute: maskedStringAttribute,
+            multivaluedMaskedStringAttribute: multivaluedMaskedStringAttribute,
+            markdownAttribute: markdownAttribute,
+            multivaluedMarkdownAttribute: multivaluedMarkdownAttribute,
+            globalTypeAttribute: globalTypeAttribute,
+            multivaluedGlobalTypeAttribute: multivaluedGlobalTypeAttribute,
+            localTypeAttribute: localTypeAttribute,
+            multivaluedLocalTypeAttribute: multivaluedLocalTypeAttribute,
+            enumerationAttribute: enumerationAttribute,
+            multivaluedEnumerationAttribute: multivaluedEnumerationAttribute,
+            variantAttribute: variantAttribute,
+            multivaluedVariantAttribute: multivaluedVariantAttribute
+          },
+          validations: [],
+          relations: {},
+          acls: [],
+          methods: []
+        } as KoheseDataModel;
+
+        dataModel[booleanAttribute.name] = true;
+        dataModel[multivaluedBooleanAttribute.name] = [true, false];
+        dataModel[numberAttribute.name] = 3;
+        dataModel[multivaluedNumberAttribute.name] = [3, 1];
+        dataModel[timeAttribute.name] = 86400000;
+        dataModel[multivaluedTimeAttribute.name] = [0, 86400000];
+        dataModel[stateAttribute.name] = 'First';
+        dataModel[multivaluedStateAttribute.name] = ['First', 'Second'];
+        dataModel[usernameAttribute.name] = 'admin';
+        dataModel[multivaluedUsernameAttribute.name] = ['admin', 'admin'];
+        dataModel[stringAttribute.name] = 'String';
+        dataModel[multivaluedStringAttribute.name] = ['String1', 'String2'];
+        dataModel[maskedStringAttribute.name] = 'MaskedString';
+        dataModel[multivaluedMaskedStringAttribute.name] = ['MaskedString1',
+          'MaskedString2'];
+        dataModel[markdownAttribute.name] = '**Markdown**';
+        dataModel[multivaluedMarkdownAttribute.name] = ['**Markdown1**',
+          '_Markdown2_'];
+        dataModel[globalTypeAttribute.name] = {
           id: 'KoheseModel'
         };
-        dataModel['multivaluedGlobalTypeAttribute'] = [{
+        dataModel[multivaluedGlobalTypeAttribute.name] = [{
           id: 'KoheseModel'
         }, {
           id: 'KoheseModel'
         }];
 
         let localTypeInstance: any = {
+          booleanAttribute: true,
+          multivaluedBooleanAttribute: [true, false],
+          numberAttribute: 3,
+          multivaluedNumberAttribute: [3, 1],
+          timeAttribute: 86400000,
+          multivaluedTimeAttribute: [0, 86400000],
+          stateAttribute: 'First',
+          multivaluedStateAttribute: ['First', 'Second'],
+          usernameAttribute: 'admin',
+          multivaluedUsernameAttribute: ['admin', 'admin'],
+          stringAttribute: 'String',
+          multivaluedStringAttribute: ['String1', 'String2'],
+          maskedStringAttribute: 'MaskedString',
+          multivaluedMaskedStringAttribute: ['MaskedString1', 'MaskedString2'],
+          markdownAttribute: '**Markdown**',
+          multivaluedMarkdownAttribute: ['**Markdown1**', '_Markdown2_'],
           globalTypeAttribute: {
             id: 'KoheseModel'
           },
@@ -172,27 +459,57 @@ export class MockItemRepository {
           multivaluedEnumerationAttribute: [
             'EnumerationValue1',
             'EnumerationValue2'
-          ]
+          ],
+          variantAttribute: {
+            discriminant: 'globalTypeAttribute',
+            value: {
+              id: 'KoheseModel'
+            }
+          },
+          multivaluedVariantAttribute: [{
+            discriminant: 'globalTypeAttribute',
+            value: {
+              id: 'KoheseModel'
+            }
+          }, {
+            discriminant: 'multivaluedEnumerationAttribute',
+            value: ['EnumerationValue1', 'EnumerationValue2']
+          }]
         };
         
-        localTypeInstance['localTypeAttribute'] = JSON.parse(JSON.stringify(
+        localTypeInstance[localTypeAttribute.name] = JSON.parse(JSON.stringify(
           localTypeInstance));
-        localTypeInstance['multivaluedLocalTypeAttribute'].push(JSON.parse(
+        localTypeInstance[multivaluedLocalTypeAttribute.name].push(JSON.parse(
           JSON.stringify(localTypeInstance)));
-        localTypeInstance['multivaluedLocalTypeAttribute'].push(JSON.parse(
+        localTypeInstance[multivaluedLocalTypeAttribute.name].push(JSON.parse(
           JSON.stringify(localTypeInstance)));
 
-        dataModel['localTypeAttribute'] = JSON.parse(JSON.stringify(
+        dataModel[localTypeAttribute.name] = JSON.parse(JSON.stringify(
           localTypeInstance));
-        dataModel['multivaluedLocalTypeAttribute'] = [
+        dataModel[multivaluedLocalTypeAttribute.name] = [
           JSON.parse(JSON.stringify(localTypeInstance)),
           JSON.parse(JSON.stringify(localTypeInstance))
         ];
-        dataModel['enumerationAttribute'] = 'EnumerationValue1';
-        dataModel['multivaluedEnumerationAttribute'] = [
+        dataModel[enumerationAttribute.name] = 'EnumerationValue1';
+        dataModel[multivaluedEnumerationAttribute.name] = [
           'EnumerationValue1',
           'EnumerationValue2'
         ];
+        dataModel[variantAttribute.name] = {
+          discriminant: 'globalTypeAttribute',
+          value: {
+            id: 'KoheseModel'
+          }
+        };
+        dataModel[multivaluedVariantAttribute.name] = [{
+          discriminant: 'globalTypeAttribute',
+          value: {
+            id: 'KoheseModel'
+          }
+        }, {
+          discriminant: 'multivaluedEnumerationAttribute',
+          value: ['EnumerationValue1', 'EnumerationValue2']
+        }];
       }
 
       new KoheseModel(dataModel);
@@ -207,6 +524,179 @@ export class MockItemRepository {
           viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
         let propertyDefinitions: Array<PropertyDefinition> = formatDefinition.
           containers[0].contents;
+        let booleanAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'booleanAttribute',
+          customLabel: 'Boolean Attribute',
+          labelOrientation: 'Top',
+          kind: 'boolean',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(booleanAttributePropertyDefinition);
+
+        let multivaluedBooleanAttributePropertyDefinition: PropertyDefinition =
+          {
+          propertyName: 'multivaluedBooleanAttribute',
+          customLabel: 'Multivalued Boolean Attribute',
+          labelOrientation: 'Top',
+          kind: 'boolean',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedBooleanAttributePropertyDefinition);
+
+        let numberAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'numberAttribute',
+          customLabel: 'Number Attribute',
+          labelOrientation: 'Top',
+          kind: 'number',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(numberAttributePropertyDefinition);
+
+        let multivaluedNumberAttributePropertyDefinition: PropertyDefinition =
+          {
+          propertyName: 'multivaluedNumberAttribute',
+          customLabel: 'Multivalued Number Attribute',
+          labelOrientation: 'Top',
+          kind: 'number',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedNumberAttributePropertyDefinition);
+
+        let timeAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'timeAttribute',
+          customLabel: 'Time Attribute',
+          labelOrientation: 'Top',
+          kind: 'date',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(timeAttributePropertyDefinition);
+
+        let multivaluedTimeAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'multivaluedTimeAttribute',
+          customLabel: 'Multivalued Time Attribute',
+          labelOrientation: 'Top',
+          kind: 'date',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedTimeAttributePropertyDefinition);
+
+        let stateAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'stateAttribute',
+          customLabel: 'State Attribute',
+          labelOrientation: 'Top',
+          kind: 'state-editor',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(stateAttributePropertyDefinition);
+
+        let multivaluedStateAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'multivaluedStateAttribute',
+          customLabel: 'Multivalued State Attribute',
+          labelOrientation: 'Top',
+          kind: 'state-editor',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(multivaluedStateAttributePropertyDefinition);
+
+        let usernameAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'usernameAttribute',
+          customLabel: 'Username Attribute',
+          labelOrientation: 'Top',
+          kind: 'user-selector',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(usernameAttributePropertyDefinition);
+
+        let multivaluedUsernameAttributePropertyDefinition:
+          PropertyDefinition = {
+          propertyName: 'multivaluedUsernameAttribute',
+          customLabel: 'Multivalued Username Attribute',
+          labelOrientation: 'Top',
+          kind: 'user-selector',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedUsernameAttributePropertyDefinition);
+
+        let stringAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'stringAttribute',
+          customLabel: 'String Attribute',
+          labelOrientation: 'Top',
+          kind: 'text',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(stringAttributePropertyDefinition);
+
+        let multivaluedStringAttributePropertyDefinition: PropertyDefinition =
+          {
+          propertyName: 'multivaluedStringAttribute',
+          customLabel: 'Multivalued String Attribute',
+          labelOrientation: 'Top',
+          kind: 'text',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedStringAttributePropertyDefinition);
+
+        let maskedStringAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'maskedStringAttribute',
+          customLabel: 'Masked String Attribute',
+          labelOrientation: 'Top',
+          kind: 'maskedString',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(maskedStringAttributePropertyDefinition);
+
+        let multivaluedMaskedStringAttributePropertyDefinition:
+          PropertyDefinition = {
+          propertyName: 'multivaluedMaskedStringAttribute',
+          customLabel: 'Multivalued Masked String Attribute',
+          labelOrientation: 'Top',
+          kind: 'maskedString',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedMaskedStringAttributePropertyDefinition);
+
+        let markdownAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'markdownAttribute',
+          customLabel: 'Markdown Attribute',
+          labelOrientation: 'Top',
+          kind: 'markdown',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(markdownAttributePropertyDefinition);
+
+        let multivaluedMarkdownAttributePropertyDefinition:
+          PropertyDefinition = {
+          propertyName: 'multivaluedMarkdownAttribute',
+          customLabel: 'Multivalued Markdown Attribute',
+          labelOrientation: 'Top',
+          kind: 'markdown',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedMarkdownAttributePropertyDefinition);
+
         let globalTypeAttibutePropertyDefinition: PropertyDefinition = {
           propertyName: 'globalTypeAttribute',
           customLabel: 'Global Type Attribute',
@@ -272,9 +762,31 @@ export class MockItemRepository {
         };
         propertyDefinitions.push(
           multivaluedEnumerationAttributePropertyDefinition);
+        
+        let variantAttributePropertyDefinition: PropertyDefinition = {
+          propertyName: 'variantAttribute',
+          customLabel: 'Variant Attribute',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(variantAttributePropertyDefinition);
 
+        let multivaluedVariantAttributePropertyDefinition:
+          PropertyDefinition = {
+          propertyName: 'multivaluedVariantAttribute',
+          customLabel: 'Multivalued Variant Attribute',
+          labelOrientation: 'Top',
+          kind: '',
+          visible: true,
+          editable: true
+        };
+        propertyDefinitions.push(
+          multivaluedVariantAttributePropertyDefinition);
+        
         viewModel.localTypes['Local Type'] = ({
-          typeKind: TypeKind.KOHESE_MODEL,
+          metatype: Metatype.STRUCTURE,
           id: 'view-localtype',
           name: 'view-localtype',
           modelName: 'Local Type',
@@ -292,30 +804,76 @@ export class MockItemRepository {
               containers: [{
                 kind: FormatContainerKind.VERTICAL,
                 contents: [
+                  booleanAttributePropertyDefinition,
+                  multivaluedBooleanAttributePropertyDefinition,
+                  numberAttributePropertyDefinition,
+                  multivaluedNumberAttributePropertyDefinition,
+                  timeAttributePropertyDefinition,
+                  multivaluedTimeAttributePropertyDefinition,
+                  stateAttributePropertyDefinition,
+                  multivaluedStateAttributePropertyDefinition,
+                  usernameAttributePropertyDefinition,
+                  multivaluedUsernameAttributePropertyDefinition,
+                  stringAttributePropertyDefinition,
+                  multivaluedStringAttributePropertyDefinition,
+                  maskedStringAttributePropertyDefinition,
+                  multivaluedMaskedStringAttributePropertyDefinition,
+                  markdownAttributePropertyDefinition,
+                  multivaluedMarkdownAttributePropertyDefinition,
                   globalTypeAttibutePropertyDefinition,
                   multivaluedGlobalTypeAttributePropertyDefinition,
                   localTypeAttributePropertyDefinition,
                   multivaluedLocalTypeAttributePropertyDefinition,
                   enumerationAttributePropertyDefinition,
-                  multivaluedEnumerationAttributePropertyDefinition
+                  multivaluedEnumerationAttributePropertyDefinition,
+                  variantAttributePropertyDefinition,
+                  multivaluedVariantAttributePropertyDefinition
                 ]
               }]
+            },
+            '497ce790-d0d7-11ea-83b0-4f5b7c4a9272': {
+              id: '497ce790-d0d7-11ea-83b0-4f5b7c4a9272',
+              name: 'Document Format Definition',
+              header: {
+                kind: FormatContainerKind.HEADER,
+                contents: []
+              },
+              containers: []
             }
           },
           defaultFormatKey: {
-            default: '0d8f76a0-b631-11ea-94f5-ad77c3385785'
+            default: '0d8f76a0-b631-11ea-94f5-ad77c3385785',
+            document: '497ce790-d0d7-11ea-83b0-4f5b7c4a9272'
           },
           tableDefinitions: {
             '502ae8c0-b71f-11ea-bdf1-99cdd4c272d8': {
               id: '502ae8c0-b71f-11ea-bdf1-99cdd4c272d8',
               name: 'Local Type Table Definition',
               columns: [
+                'booleanAttribute',
+                'multivaluedBooleanAttribute',
+                'numberAttribute',
+                'multivaluedNumberAttribute',
+                'timeAttribute',
+                'multivaluedTimeAttribute',
+                'stateAttribute',
+                'multivaluedStateAttribute',
+                'usernameAttribute',
+                'multivaluedUsernameAttribute',
+                'stringAttribute',
+                'multivaluedStringAttribute',
+                'maskedStringAttribute',
+                'multivaluedMaskedStringAttribute',
+                'markdownAttribute',
+                'multivaluedMarkdownAttribute',
                 'globalTypeAttribute',
                 'multivaluedGlobalTypeAttribute',
                 'localTypeAttribute',
                 'multivaluedLocalTypeAttribute',
                 'enumerationAttribute',
-                'multivaluedEnumerationAttribute'
+                'multivaluedEnumerationAttribute',
+                'variantAttribute',
+                'multivaluedVariantAttribute'
               ],
               expandedFormat: {
                 column1: [],
@@ -325,14 +883,114 @@ export class MockItemRepository {
               }
             }
           }
-        } as Type);
+        } as KoheseViewModel);
 
         viewModel.localTypes['Enumeration'] = {
-          typeKind: TypeKind.ENUMERATION,
+          metatype: Metatype.ENUMERATION,
           id: 'Enumeration',
           name: 'Enumeration',
           values: ['Enumeration Value 1', 'Enumeration Value 2']
-        } as Type;
+        } as Type;//Enumeration;
+
+        viewModel.localTypes['Variant'] = ({
+          metatype: Metatype.STRUCTURE,
+          id: 'view-variant',
+          name: 'view-variant',
+          modelName: 'Variant',
+          icon: '',
+          color: '#000000',
+          viewProperties: {},
+          formatDefinitions: {
+            '064ad380-d0d5-11ea-83b0-4f5b7c4a9272': {
+              id: '064ad380-d0d5-11ea-83b0-4f5b7c4a9272',
+              name: 'Default Format Definition',
+              header: {
+                kind: FormatContainerKind.HEADER,
+                contents: []
+              },
+              containers: [{
+                kind: FormatContainerKind.VERTICAL,
+                contents: [
+                  booleanAttributePropertyDefinition,
+                  multivaluedBooleanAttributePropertyDefinition,
+                  numberAttributePropertyDefinition,
+                  multivaluedNumberAttributePropertyDefinition,
+                  timeAttributePropertyDefinition,
+                  multivaluedTimeAttributePropertyDefinition,
+                  stateAttributePropertyDefinition,
+                  multivaluedStateAttributePropertyDefinition,
+                  usernameAttributePropertyDefinition,
+                  multivaluedUsernameAttributePropertyDefinition,
+                  stringAttributePropertyDefinition,
+                  multivaluedStringAttributePropertyDefinition,
+                  maskedStringAttributePropertyDefinition,
+                  multivaluedMaskedStringAttributePropertyDefinition,
+                  markdownAttributePropertyDefinition,
+                  multivaluedMarkdownAttributePropertyDefinition,
+                  globalTypeAttibutePropertyDefinition,
+                  multivaluedGlobalTypeAttributePropertyDefinition,
+                  localTypeAttributePropertyDefinition,
+                  multivaluedLocalTypeAttributePropertyDefinition,
+                  enumerationAttributePropertyDefinition,
+                  multivaluedEnumerationAttributePropertyDefinition,
+                  variantAttributePropertyDefinition,
+                  multivaluedVariantAttributePropertyDefinition
+                ]
+              }]
+            },
+            'a6254d70-d0d7-11ea-83b0-4f5b7c4a9272': {
+              id: 'a6254d70-d0d7-11ea-83b0-4f5b7c4a9272',
+              name: 'Document Format Definition',
+              header: {
+                kind: FormatContainerKind.HEADER,
+                contents: []
+              },
+              containers: []
+            }
+          },
+          defaultFormatKey: {
+            default: '064ad380-d0d5-11ea-83b0-4f5b7c4a9272',
+            document: 'a6254d70-d0d7-11ea-83b0-4f5b7c4a9272'
+          },
+          tableDefinitions: {
+            '3a5b87f0-d0d5-11ea-83b0-4f5b7c4a9272': {
+              id: '3a5b87f0-d0d5-11ea-83b0-4f5b7c4a9272',
+              name: 'Local Type Table Definition',
+              columns: [
+                'booleanAttribute',
+                'multivaluedBooleanAttribute',
+                'numberAttribute',
+                'multivaluedNumberAttribute',
+                'timeAttribute',
+                'multivaluedTimeAttribute',
+                'stateAttribute',
+                'multivaluedStateAttribute',
+                'usernameAttribute',
+                'multivaluedUsernameAttribute',
+                'stringAttribute',
+                'multivaluedStringAttribute',
+                'maskedStringAttribute',
+                'multivaluedMaskedStringAttribute',
+                'markdownAttribute',
+                'multivaluedMarkdownAttribute',
+                'globalTypeAttribute',
+                'multivaluedGlobalTypeAttribute',
+                'localTypeAttribute',
+                'multivaluedLocalTypeAttribute',
+                'enumerationAttribute',
+                'multivaluedEnumerationAttribute',
+                'variantAttribute',
+                'multivaluedVariantAttribute'
+              ],
+              expandedFormat: {
+                column1: [],
+                column2: [],
+                column3: [],
+                column4: []
+              }
+            }
+          }
+        } as KoheseViewModel);
 
         formatDefinition.containers.push({
           kind: FormatContainerKind.HORIZONTAL,
@@ -359,12 +1017,30 @@ export class MockItemRepository {
           id: '975f0030-b7e9-11ea-ac23-8b3d84d820e2',
           name: 'Kohese Model Table Definition',
           columns: [
+            'booleanAttribute',
+            'multivaluedBooleanAttribute',
+            'numberAttribute',
+            'multivaluedNumberAttribute',
+            'timeAttribute',
+            'multivaluedTimeAttribute',
+            'stateAttribute',
+            'multivaluedStateAttribute',
+            'usernameAttribute',
+            'multivaluedUsernameAttribute',
+            'stringAttribute',
+            'multivaluedStringAttribute',
+            'maskedStringAttribute',
+            'multivaluedMaskedStringAttribute',
+            'markdownAttribute',
+            'multivaluedMarkdownAttribute',
             'globalTypeAttribute',
             'multivaluedGlobalTypeAttribute',
             'localTypeAttribute',
             'multivaluedLocalTypeAttribute',
             'enumerationAttribute',
-            'multivaluedEnumerationAttribute'
+            'multivaluedEnumerationAttribute',
+            'variantAttribute',
+            'multivaluedVariantAttribute'
           ],
           expandedFormat: {
             column1: [],
@@ -373,6 +1049,25 @@ export class MockItemRepository {
             column4: []
           }
         };
+
+        viewModel.formatDefinitions['0322b120-d0d8-11ea-83b0-4f5b7c4a9272'] = {
+          id: '0322b120-d0d8-11ea-83b0-4f5b7c4a9272',
+          name: 'Document Format Definition',
+          header: {
+            kind: FormatContainerKind.HEADER,
+            contents: [{
+              propertyName: 'name',
+              customLabel: 'Name',
+              labelOrientation: 'Top',
+              kind: 'text',
+              visible: true,
+              editable: true
+            }]
+          },
+          containers: []
+        };
+        viewModel.defaultFormatKey[FormatDefinitionType.DOCUMENT] =
+          '0322b120-d0d8-11ea-83b0-4f5b7c4a9272';
       }
 
       new ItemProxy('KoheseView', viewModel);
@@ -477,7 +1172,22 @@ export class MockItemRepository {
     index: number, enclosingType: KoheseDataModel, dataModel: KoheseDataModel,
     viewModel: KoheseViewModel, formatDefinitionType: FormatDefinitionType):
     string {
-    return String(koheseObject[attributeName]);
+    let value: any;
+    if (index == null) {
+      value = koheseObject[(dataModel.metatype === Metatype.VARIANT) ? 'value'
+        : attributeName];
+    } else {
+      value = koheseObject[(dataModel.metatype === Metatype.VARIANT) ? 'value'
+        : attributeName][index];
+    }
+
+    if ((dataModel['classProperties'][attributeName].definition.relation) &&
+      (value.id != null)) {
+      return TreeConfiguration.getWorkingTree().getProxyFor(value.id).item.
+        name;
+    }
+
+    return String(value);
   }
 
   async setTreeConfig() {

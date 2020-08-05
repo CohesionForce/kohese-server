@@ -37,6 +37,7 @@
   },
   "localTypes": {
     "FlowOfEvents": {
+      "metatype": "Structure",
       "name": "FlowOfEvents",
       "modelName": "FlowOfEvents",
       "icon": "",

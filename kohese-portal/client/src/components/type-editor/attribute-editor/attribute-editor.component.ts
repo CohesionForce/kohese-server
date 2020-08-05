@@ -6,7 +6,9 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { Dialog } from '../../dialog/Dialog.interface';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
-import { TypeKind } from '../../../../../common/src/Type.interface';
+import { Metatype } from '../../../../../common/src/Type.interface';
+import { Attribute,
+  ContainmentReferenceSpecification } from '../../../../../common/src/Attribute.interface';
 
 @Component({
   selector: 'attribute-editor',
@@ -15,17 +17,17 @@ import { TypeKind } from '../../../../../common/src/Type.interface';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AttributeEditorComponent implements OnInit, Dialog {
-  private _attribute: any = {
+  private _attribute: Attribute = {
     name: '',
     type: 'boolean',
     required: false,
-    id: false
+    default: false
   };
   get attribute() {
     return this._attribute;
   }
   @Input('attribute')
-  set attribute(attribute: any) {
+  set attribute(attribute: Attribute) {
     this._attribute = attribute;
   }
   
@@ -170,7 +172,8 @@ export class AttributeEditorComponent implements OnInit, Dialog {
           contained: true
         };
       } else {
-        if (!this._attribute.relation || this._attribute.relation.contained) {
+        if (!this._attribute.relation || (this._attribute.relation as
+          ContainmentReferenceSpecification).contained) {
           this._attribute.relation = {
             kind: 'Item',
             foreignKey: 'id'
@@ -255,7 +258,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     } else {
       if (this._contextualGlobalType.classLocalTypes[dataModelType] && this.
         _contextualGlobalType.classLocalTypes[dataModelType].definition.
-        typeKind === TypeKind.ENUMERATION) {
+        metatype === Metatype.ENUMERATION) {
         return ['Dropdown'];
       } else {
         return ['Reference'];

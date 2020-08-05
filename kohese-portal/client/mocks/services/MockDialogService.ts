@@ -37,9 +37,9 @@ export class MockDialogService {
         return dialogRefPlaceholder;
       },
       'afterClosed': () => {
-        if ('ProxySelectorDialogComponent' === componentReference.name) {
-          return observableOf(TreeConfiguration.getWorkingTree().
-            getRootProxy());
+        if ('TreeComponent' === componentReference.name) {
+          return observableOf([TreeConfiguration.getWorkingTree().
+            getRootProxy()]);
         }
       }
     };
