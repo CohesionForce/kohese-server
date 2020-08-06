@@ -21,7 +21,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     name: '',
     type: 'boolean',
     required: false,
-    default: false
+    default: null
   };
   get attribute() {
     return this._attribute;
