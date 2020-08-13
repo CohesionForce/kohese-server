@@ -99,7 +99,7 @@
     },
     "resolutionActions": {
       "type": [
-        "Action"
+        "Item"
       ],
       "relation": {
         "kind": "Item",
