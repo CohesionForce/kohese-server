@@ -2,6 +2,9 @@
   "id": "view-domain",
   "name": "Domain",
   "parentId": "view-item",
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "createdBy": "gmckune",
   "createdOn": 1586302904733,
   "modifiedBy": "gmckune",

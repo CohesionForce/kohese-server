@@ -2,6 +2,9 @@
   "id": "view-issue",
   "name": "Issue View Model",
   "parentId": "view-observation",
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "modelName": "Issue",
   "icon": "fa fa-exclamation-circle",
   "color": "#ff0000",

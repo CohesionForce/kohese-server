@@ -81,6 +81,11 @@ export class ToggleAction extends Action {
   }
 }
 
+export enum TreeComponentConfiguration {
+  GET_CHILDREN, HAS_CHILDREN, GET_TEXT, GET_ICON, MAY_SELECT,
+    ELEMENT_SELECTION_HANDLER
+}
+
 @Component({
   selector: 'tree',
   templateUrl: './tree.component.html',
@@ -181,7 +186,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  private _allowMultiselect: boolean = this._data['allowMultiselect'];
+  private _allowMultiselect: boolean = false;
   get allowMultiselect() {
     return this._allowMultiselect;
   }

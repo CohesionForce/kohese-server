@@ -2,6 +2,9 @@
   "id": "view-kohesemodel",
   "name": "KoheseModel View Model",
   "parentId": "view-item",
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "modelName": "KoheseModel",
   "icon": "fa fa-sitemap",
   "color": "#000000",
@@ -359,6 +362,14 @@
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
+            },
+            {
+              "propertyName": "namespace",
+              "customLabel": "Namespace",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": true
             },
             {
               "propertyName": "base",

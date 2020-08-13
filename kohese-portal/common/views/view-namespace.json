@@ -1,18 +1,18 @@
 {
-  "id": "view-category",
-  "name": "Category View Model",
+  "id": "view-namespace",
+  "name": "Namespace View Model",
   "parentId": "view-item",
   "namespace": {
     "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
   },
-  "modelName": "Category",
+  "modelName": "Namespace",
   "icon": "",
   "color": "#000000",
   "localTypes": {},
   "viewProperties": {},
   "formatDefinitions": {
-    "7b2069a0-5d75-11ea-9932-bfa37f83df2f": {
-      "id": "7b2069a0-5d75-11ea-9932-bfa37f83df2f",
+    "0f4e5a00-d293-11ea-ab22-8724512ce3f8": {
+      "id": "0f4e5a00-d293-11ea-ab22-8724512ce3f8",
       "name": "Default Format Definition",
       "header": {
         "kind": "header",
@@ -158,36 +158,12 @@
               "kind": "proxy-selector",
               "visible": true,
               "editable": false
-            }
-          ]
-        }
-      ]
-    },
-    "dce35040-15da-11ea-97d2-3bae97d5d967": {
-      "id": "dce35040-15da-11ea-97d2-3bae97d5d967",
-      "name": "Format Definition",
-      "header": {
-        "kind": "header",
-        "contents": [
-          {
-            "propertyName": "name",
-            "customLabel": "Name",
-            "labelOrientation": "Top",
-            "kind": "text",
-            "visible": true,
-            "editable": true
-          }
-        ]
-      },
-      "containers": [
-        {
-          "kind": "list",
-          "contents": [
+            },
             {
-              "propertyName": "description",
-              "customLabel": "Description",
+              "propertyName": "alias",
+              "customLabel": "Alias",
               "labelOrientation": "Top",
-              "kind": "markdown",
+              "kind": "text",
               "visible": true,
               "editable": true
             }
@@ -197,8 +173,7 @@
     }
   },
   "defaultFormatKey": {
-    "default": "7b2069a0-5d75-11ea-9932-bfa37f83df2f",
-    "document": "dce35040-15da-11ea-97d2-3bae97d5d967"
+    "default": "0f4e5a00-d293-11ea-ab22-8724512ce3f8"
   },
   "tableDefinitions": {},
   "itemIds": []

@@ -20,6 +20,7 @@ import { TableModule } from '../../table/table.module';
 import { MultivaluedFieldComponent } from './field/multivalued-field/multivalued-field.component';
 import { SinglevaluedFieldComponent } from './field/singlevalued-field/singlevalued-field.component';
 import { FormatObjectEditorComponent } from './format-object-editor.component';
+import { TreeViewModule } from '../../tree/tree.module';
 
 describe('FormatObjectEditorComponent', () => {
   let component: FormatObjectEditorComponent;
@@ -45,7 +46,8 @@ describe('FormatObjectEditorComponent', () => {
         MatDialogModule,
         MarkdownModule,
         TableModule,
-        MarkdownEditorModule
+        MarkdownEditorModule,
+        TreeViewModule
       ],
       providers: [
         MarkdownService,

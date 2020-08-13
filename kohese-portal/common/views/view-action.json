@@ -2,6 +2,9 @@
   "id": "view-action",
   "name": "Action View Model",
   "parentId": "view-decision",
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "modelName": "Action",
   "icon": "fa fa-paper-plane",
   "color": "#00008b",

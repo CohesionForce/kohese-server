@@ -6,5 +6,6 @@ export interface Type {
 }
 
 export enum Metatype {
-  STRUCTURE = 'Structure', ENUMERATION = 'Enumeration', VARIANT = 'Variant'
+  STRUCTURE = 'Structure', ENUMERATION = 'Enumeration', VARIANT = 'Variant',
+    NAMESPACE = 'Namespace'
 }

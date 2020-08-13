@@ -115,7 +115,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         'Descendants', 'Do you also want to remove all descendants of ' +
         (object as ItemProxy).item.name + '?', '', 'No', (value: any) => {
         return true;
-      }, ['Yes', 'No']);
+      }, { Yes: 'Yes', No: 'No' });
       if (result) {
         if (object === this.rootSubject.getValue()) {
           this.rootSubject.next(this.getParent(object));

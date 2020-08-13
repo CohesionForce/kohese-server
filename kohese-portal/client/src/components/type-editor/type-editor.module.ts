@@ -13,6 +13,7 @@ import { StateMachineEditorModule } from '../state-machine-editor/state-machine-
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 import { AngularSplitModule } from 'angular-split';
+import { TreeViewModule } from '../tree/tree.module';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { AngularSplitModule } from 'angular-split';
     AngularSplitModule,
     StateMachineEditorModule,
     FormatModule,
-    ObjectEditorModule
+    ObjectEditorModule,
+    TreeViewModule
   ]
 })
 export class TypeEditorModule {

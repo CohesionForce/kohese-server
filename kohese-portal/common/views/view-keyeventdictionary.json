@@ -6,6 +6,9 @@
   "createdOn": 1572491164827,
   "modifiedBy": "gmckune",
   "modifiedOn": 1586376069127,
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "modelName": "KeyEventDictionary",
   "icon": "fa fa-th-list",
   "color": "#000000",

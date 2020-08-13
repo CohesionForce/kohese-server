@@ -1,7 +1,10 @@
 {
   "id": "Item",
   "name": "Item",
-  "parentId": "Model-Definitions",
+  "parentId": "750c7c00-d658-11ea-80c8-3b7d496d4ca3",
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "base": "PersistedModel",
   "isMetaModel": true,
   "idInjection": true,

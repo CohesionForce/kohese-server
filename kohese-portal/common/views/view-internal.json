@@ -2,6 +2,9 @@
   "id": "view-internal",
   "name": "Internal View Model",
   "parentId": "view-item",
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "modelName": "Internal",
   "icon": "fa fa-gears",
   "color": "#000000",

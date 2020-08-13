@@ -12,6 +12,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { PipesModule } from '../../pipes/pipes.module';
+import { TreeViewModule } from '../tree/tree.module';
 
 describe('Component: Type Editor', ()=>{
   let typeEditorComponent: TypeEditorComponent;
@@ -20,11 +21,13 @@ describe('Component: Type Editor', ()=>{
   beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [TypeEditorComponent],
-      imports : [CommonModule,
-         MaterialModule,
-         BrowserAnimationsModule,
-         PipesModule
-         ],
+      imports: [
+        CommonModule,
+        MaterialModule,
+        BrowserAnimationsModule,
+        PipesModule,
+        TreeViewModule
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         DynamicTypesService,

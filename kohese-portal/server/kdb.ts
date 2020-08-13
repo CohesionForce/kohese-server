@@ -35,6 +35,9 @@ let commonViewFiles = 'common/views/';
 function loadKoheseModelsAndViews() {
   console.log('::: Load Kohese Models');
 
+  loadModelInstances('Namespace', koheseKDBDirPath + path.sep + 'Namespace',
+    true);
+
   let repoModelFileDir = koheseKDBDirPath + '/KoheseModel';
   kdbFS.createDirIfMissing(repoModelFileDir);
   loadModelInstances('KoheseModel', commonModelFiles, false);

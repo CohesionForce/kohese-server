@@ -160,10 +160,14 @@ export class StateMachineEditorComponent implements OnInit {
     if (propertyId) {
       let propertyName: string = propertyId.charAt(0).toUpperCase() +
         propertyId.slice(1);
+      let options: { [optionName: string]: string } = {};
+      for (let j: number = 0; j < this._stateIds.length; j++) {
+        options[this._stateIds[j]] = this._stateIds[j];
+      }
       
       let value: any = await this._dialogService.openDropdownDialog('Edit ' +
         propertyName, '', propertyName, this._stateMachine.transition[
-        transitionId][propertyId], undefined, this._stateIds);
+        transitionId][propertyId], undefined, options);
       if (value) {
         this._stateMachine.transition[transitionId][propertyId] = value;
         

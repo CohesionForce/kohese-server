@@ -6,6 +6,9 @@
   "createdOn": 1572491164821,
   "modifiedBy": "gmckune",
   "modifiedOn": 1572491746960,
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "base": "Decision",
   "idInjection": true,
   "properties": {

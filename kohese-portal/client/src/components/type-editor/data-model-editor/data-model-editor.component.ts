@@ -209,6 +209,32 @@ export class DataModelEditorComponent {
     this._editable = false;
     this._changeDetectorRef.markForCheck();
   }
+
+  public areNamespaceReferencesEqual(option: { id: string}, selection:
+    { id: string }): boolean {
+    if ((option == null) && (selection == null)) {
+      return true;
+    } else {
+      if ((option != null) && (selection != null)) {
+        return (option.id === selection.id);
+      } else {
+        return false;
+      }
+    }
+  }
+
+  public getNamespaces(): Array<any> {
+    let namespaces: Array<any> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if (itemProxy.kind === 'Namespace') {
+        namespaces.push(itemProxy.item);
+      }
+    }, undefined);
+
+    return namespaces;
+  }
   
   public async parentTypeSelected(parentType: any): Promise<void> {
     let viewModelProxy: ItemProxy;

@@ -8,6 +8,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import {  TreeComponentConfiguration } from '../../tree/tree.component';
 
 @Component({
   selector: 'format-object-editor',
@@ -46,11 +47,6 @@ export class FormatObjectEditorComponent implements OnInit {
   set formatDefinitionType(formatDefinitionType: FormatDefinitionType) {
     this._formatDefinitionType = formatDefinitionType;
     this._changeDetectorRef.markForCheck();
-  }
-  
-  private _types: Array<any> = [];
-  get types() {
-    return this._types;
   }
   
   private _selectedType: any;
@@ -148,33 +144,6 @@ export class FormatObjectEditorComponent implements OnInit {
   set type(type: any) {
     this._type = type;
     this.selectedType = this._type;
-    
-    this._types.length = 0;
-    if (this._allowKindChange) {
-      this._itemRepository.getTreeConfig().getValue().config.getRootProxy().
-        visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
-        if (itemProxy.kind === 'KoheseModel') {
-          if (this._allowKindNarrowingOnly) {
-            let modelItemProxy: any = itemProxy;
-            while (modelItemProxy) {
-              if (modelItemProxy.item === this._type) {
-                this._types.push(itemProxy.item);
-                break;
-              }
-              
-              modelItemProxy = this._itemRepository.getTreeConfig().getValue().
-                config.getProxyFor(modelItemProxy.item.base);
-            }
-          } else {
-            this._types.push(itemProxy.item);
-          }
-        }
-      }, undefined);
-    
-      this._types.sort((oneType: any, anotherType: any) => {
-        return oneType.name.localeCompare(anotherType.name);
-      });
-    }
   }
   
   private _viewModel: any;
@@ -199,11 +168,15 @@ export class FormatObjectEditorComponent implements OnInit {
     return FormatContainerKind;
   }
 
+  get TreeComponentConfiguration() {
+    return TreeComponentConfiguration;
+  }
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef:
-    MatDialogRef<FormatObjectEditorComponent>, private _itemRepository:
-    ItemRepository) {
+    MatDialogRef<FormatObjectEditorComponent>,
+    private _itemRepository: ItemRepository) {
   }
   
   public ngOnInit(): void {
@@ -223,6 +196,64 @@ export class FormatObjectEditorComponent implements OnInit {
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
+  }
+
+  public getTreeComponentConfiguration(treeComponentConfiguration:
+    TreeComponentConfiguration): Function {
+    let treeConfiguration: TreeConfiguration = this._itemRepository.
+      getTreeConfig().getValue().config;
+    switch (treeComponentConfiguration) {
+      case TreeComponentConfiguration.GET_CHILDREN:
+        return (element: any) => {
+          return treeConfiguration.getProxyFor(element.id).children.map(
+            (itemProxy: ItemProxy) => {
+            return itemProxy.item;
+          });
+        };
+      case TreeComponentConfiguration.HAS_CHILDREN:
+        return (element: any) => {
+          return (treeConfiguration.getProxyFor(element.id).children.length >
+            0);
+        };
+      case TreeComponentConfiguration.GET_TEXT:
+        return (element: any) => {
+          return element.name;
+        };
+      case TreeComponentConfiguration.GET_ICON:
+        return (element: any) => {
+          return this._itemRepository.getTreeConfig().getValue().config.
+            getProxyFor('view-' + treeConfiguration.getProxyFor(element.id).
+            kind.toLowerCase()).item.icon;
+        };
+      case TreeComponentConfiguration.MAY_SELECT:
+        return (element: any) => {
+          if (treeConfiguration.getProxyFor(element.id).kind === 'Namespace') {
+            return false;
+          }
+
+          if (!this._allowKindNarrowingOnly) {
+            return true;
+          }
+          
+          let modelItemProxy: any = treeConfiguration.getProxyFor(element.
+            id);
+          while (modelItemProxy) {
+            if (modelItemProxy.item === this._type) {
+              return true;
+            }
+            
+            modelItemProxy = this._itemRepository.getTreeConfig().getValue().
+              config.getProxyFor(modelItemProxy.item.base);
+          }
+
+          return false;
+        };
+      case TreeComponentConfiguration.ELEMENT_SELECTION_HANDLER:
+        return (element: any) => {
+          this.selectedType = element;
+          this._changeDetectorRef.markForCheck();
+        };
+    }
   }
   
   public getReverseReferenceTableHeaderContent(formatContainer:

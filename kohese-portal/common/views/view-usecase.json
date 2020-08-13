@@ -6,6 +6,9 @@
   "createdOn": 1570033169859,
   "modifiedBy": "gmckune",
   "modifiedOn": 1593445614266,
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "modelName": "UseCase",
   "icon": "fa fa-lemon-o",
   "color": "#000000",

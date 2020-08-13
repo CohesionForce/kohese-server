@@ -2,6 +2,9 @@
   "id": "view-project",
   "name": "Project View Model",
   "parentId": "view-item",
+  "namespace": {
+    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+  },
   "modelName": "Project",
   "icon": "fa fa-pie-chart",
   "color": "#800080",

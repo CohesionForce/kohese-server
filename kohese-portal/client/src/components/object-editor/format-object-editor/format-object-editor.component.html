@@ -8,16 +8,23 @@
     </markdown>
   </ng-container>
   <ng-template #enabled>
-    <ng-container *ngIf="(allowKindChange && (types.length > 1))">
-      <mat-form-field style="width: 100%;">
-        <mat-select placeholder="Kind" [(ngModel)]="selectedType">
-          <ng-container *ngFor="let typeOption of types">
-            <mat-option [value]="typeOption">
-              {{typeOption.name}}
-            </mat-option>
-          </ng-container>
-        </mat-select>
-      </mat-form-field>
+    <ng-container *ngIf="allowKindChange">
+      <div style="height: 300px;">
+        <tree [root]="itemRepository.getTreeConfig().getValue().config.
+          getProxyFor('Model-Definitions').item"
+          [getChildren]="getTreeComponentConfiguration(
+          TreeComponentConfiguration.GET_CHILDREN)"
+          [hasChildren]="getTreeComponentConfiguration(
+          TreeComponentConfiguration.HAS_CHILDREN)"
+          [getText]="getTreeComponentConfiguration(TreeComponentConfiguration.
+          GET_TEXT)" [getIcon]="getTreeComponentConfiguration(
+          TreeComponentConfiguration.GET_ICON)" [selection]="[selectedType]"
+          [maySelect]="getTreeComponentConfiguration(TreeComponentConfiguration.
+          MAY_SELECT)"
+          [elementSelectionHandler]="getTreeComponentConfiguration(
+          TreeComponentConfiguration.ELEMENT_SELECTION_HANDLER)">
+        </tree>
+      </div>
     </ng-container>
     <ng-container *ngFor="let container of formatDefinition.containers">
       <ng-container *ngIf="(container.kind === FormatContainerKind.

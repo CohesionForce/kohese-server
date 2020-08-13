@@ -1,20 +1,20 @@
 {
-  "id": "Analysis",
-  "name": "Analysis",
-  "parentId": "750c7c00-d658-11ea-80c8-3b7d496d4ca3",
-  "base": "PersistedModel",
+  "id": "Namespace",
+  "name": "Namespace",
+  "parentId": "Item",
   "namespace": {
     "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
   },
+  "base": "Item",
+  "isMetaModel": true,
   "idInjection": true,
   "invertItemOrder": true,
   "properties": {
-    "id": {
+    "alias": {
+      "name": "alias",
       "type": "string",
-      "required": true
-    },
-    "raw": {
-      "type": "object"
+      "required": false,
+      "default": ""
     }
   },
   "validations": [],
