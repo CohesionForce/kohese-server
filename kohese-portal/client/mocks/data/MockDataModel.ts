@@ -274,6 +274,9 @@ export function ModelDefinitions() {
         "id": "Action",
         "name": "Action",
         "parentId": "Decision",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Decision",
         "idInjection": true,
         "invertItemOrder": true,
@@ -462,6 +465,9 @@ export function ModelDefinitions() {
         "createdOn": 1586302647375,
         "modifiedBy": "gmckune",
         "modifiedOn": 1586372358125,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Decision",
         "idInjection": true,
         "properties": {},
@@ -474,8 +480,11 @@ export function ModelDefinitions() {
       "Analysis": {
         "id": "Analysis",
         "name": "Analysis",
-        "parentId": "Model-Definitions",
+        "parentId": "750c7c00-d658-11ea-80c8-3b7d496d4ca3",
         "base": "PersistedModel",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "idInjection": true,
         "invertItemOrder": true,
         "properties": {
@@ -497,6 +506,9 @@ export function ModelDefinitions() {
         "id": "Category",
         "name": "Category",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "invertItemOrder": true,
@@ -511,6 +523,9 @@ export function ModelDefinitions() {
         "id": "Decision",
         "name": "Decision",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "invertItemOrder": true,
@@ -596,32 +611,50 @@ export function ModelDefinitions() {
                   "guard": {}
                 }
               }
-            }
+            },
+            "name": "decisionState"
           },
           "approvedBy": {
-            "type": "string"
+            "type": "string",
+            "name": "approvedBy"
           },
           "approvedOn": {
-            "type": "timestamp"
+            "type": "timestamp",
+            "name": "approvedOn"
           },
           "rationale": {
-            "type": "string"
+            "type": "string",
+            "name": "rationale"
           },
           "alternatives": {
             "type": [
               "object"
-            ]
+            ],
+            "name": "alternatives"
           },
           "costImpact": {
-            "type": "object"
+            "type": "object",
+            "name": "costImpact"
           },
           "scheduleImpact": {
-            "type": "object"
+            "type": "object",
+            "name": "scheduleImpact"
           },
           "otherImpacts": {
             "type": [
               "object"
-            ]
+            ],
+            "name": "otherImpacts"
+          },
+          "supportedDecisions": {
+            "name": "supportedDecisions",
+            "type": [
+              "Decision"
+            ],
+            "relation": {
+              "kind": "Item",
+              "foreignKey": "id"
+            }
           }
         },
         "validations": [],
@@ -634,6 +667,9 @@ export function ModelDefinitions() {
         "id": "DocumentConfiguration",
         "name": "DocumentConfiguration",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "invertItemOrder": true,
@@ -663,6 +699,9 @@ export function ModelDefinitions() {
         "createdOn": 1586302904721,
         "modifiedBy": "gmckune",
         "modifiedOn": 1586375436637,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Decision",
         "idInjection": true,
         "properties": {},
@@ -676,6 +715,9 @@ export function ModelDefinitions() {
         "id": "Internal-Lost",
         "name": "Internal-Lost",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": false,
         "isMetaModel": true,
@@ -693,6 +735,9 @@ export function ModelDefinitions() {
         "name": "Internal",
         "parentId": "Item",
         "base": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "idInjection": false,
         "isMetaModel": true,
         "isInternal": true,
@@ -708,6 +753,9 @@ export function ModelDefinitions() {
         "id": "Issue",
         "name": "Issue",
         "parentId": "Observation",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Observation",
         "idInjection": true,
         "invertItemOrder": true,
@@ -830,7 +878,10 @@ export function ModelDefinitions() {
       "Item": {
         "id": "Item",
         "name": "Item",
-        "parentId": "Model-Definitions",
+        "parentId": "750c7c00-d658-11ea-80c8-3b7d496d4ca3",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "PersistedModel",
         "isMetaModel": true,
         "idInjection": true,
@@ -964,6 +1015,9 @@ export function ModelDefinitions() {
         "createdOn": 1566607211922,
         "modifiedBy": "gmckune",
         "modifiedOn": 1586900797128,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Decision",
         "idInjection": true,
         "properties": {
@@ -1002,6 +1056,9 @@ export function ModelDefinitions() {
         "createdOn": 1572491164821,
         "modifiedBy": "gmckune",
         "modifiedOn": 1572491746960,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Decision",
         "idInjection": true,
         "properties": {
@@ -1026,11 +1083,24 @@ export function ModelDefinitions() {
         "id": "KoheseModel",
         "name": "KoheseModel",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "isMetaModel": true,
         "idInjection": false,
         "invertItemOrder": false,
         "properties": {
+          "namespace": {
+            "name": "namespace",
+            "type": "Namespace",
+            "required": true,
+            "default": null,
+            "relation": {
+              "kind": "Item",
+              "foreignKey": "id"
+            }
+          },
           "base": {
             "type": "string",
             "required": true,
@@ -1170,6 +1240,7 @@ export function ModelDefinitions() {
         "methods": [],
         "localTypes": {
           "PropertyType": {
+            "metatype": "Structure",
             "name": "PropertyType",
             "base": null,
             "idInjection": true,
@@ -1213,6 +1284,7 @@ export function ModelDefinitions() {
             "methods": []
           },
           "RelationType": {
+            "metatype": "Structure",
             "name": "RelationType",
             "base": null,
             "idInjection": true,
@@ -1249,6 +1321,9 @@ export function ModelDefinitions() {
         "id": "KoheseUser",
         "name": "KoheseUser",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "isMetaModel": true,
@@ -1280,10 +1355,23 @@ export function ModelDefinitions() {
         "id": "KoheseView",
         "name": "KoheseView",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "invertItemOrder": false,
         "properties": {
+          "namespace": {
+            "name": "namespace",
+            "type": "Namespace",
+            "required": true,
+            "default": null,
+            "relation": {
+              "kind": "Item",
+              "foreignKey": "id"
+            }
+          },
           "modelName": {
             "type": "string",
             "required": true,
@@ -1336,10 +1424,38 @@ export function ModelDefinitions() {
         "methods": [],
         "localTypes": {}
       },
+      "Namespace": {
+        "id": "Namespace",
+        "name": "Namespace",
+        "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
+        "base": "Item",
+        "isMetaModel": true,
+        "idInjection": true,
+        "invertItemOrder": true,
+        "properties": {
+          "alias": {
+            "name": "alias",
+            "type": "string",
+            "required": false,
+            "default": ""
+          }
+        },
+        "validations": [],
+        "relations": {},
+        "acls": [],
+        "methods": [],
+        "localTypes": {}
+      },
       "Observation": {
         "id": "Observation",
         "name": "Observation",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "invertItemOrder": true,
@@ -1377,6 +1493,9 @@ export function ModelDefinitions() {
         "id": "Project",
         "name": "Project",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "invertItemOrder": false,
@@ -1398,6 +1517,9 @@ export function ModelDefinitions() {
         "id": "ReportDefinition",
         "name": "ReportDefinition",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": false,
         "invertItemOrder": false,
@@ -1424,6 +1546,9 @@ export function ModelDefinitions() {
         "id": "Repository",
         "name": "Repository",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "invertItemOrder": true,
@@ -1447,6 +1572,9 @@ export function ModelDefinitions() {
         "id": "Task",
         "name": "Task",
         "parentId": "Item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Item",
         "idInjection": true,
         "invertItemOrder": true,
@@ -1628,6 +1756,16 @@ export function ModelDefinitions() {
           "actualHoursEffort": {
             "type": "number",
             "name": "actualHoursEffort"
+          },
+          "supportedDecisions": {
+            "name": "supportedDecisions",
+            "type": [
+              "Decision"
+            ],
+            "relation": {
+              "kind": "Item",
+              "foreignKey": "id"
+            }
           }
         },
         "validations": [],
@@ -1644,7 +1782,10 @@ export function ModelDefinitions() {
         "createdBy": "gmckune",
         "createdOn": 1570033169840,
         "modifiedBy": "gmckune",
-        "modifiedOn": 1587074473129,
+        "modifiedOn": 1593445545790,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "base": "Decision",
         "idInjection": true,
         "properties": {
@@ -1684,6 +1825,7 @@ export function ModelDefinitions() {
         "methods": [],
         "localTypes": {
           "FlowOfEvents": {
+            "metatype": "Structure",
             "name": "FlowOfEvents",
             "base": "Item",
             "idInjection": true,
@@ -1727,6 +1869,16 @@ export function ModelDefinitions() {
                   "kind": "Item",
                   "foreignKey": "id"
                 }
+              },
+              "OnStep": {
+                "name": "OnStep",
+                "type": "KeyEvent",
+                "required": false,
+                "id": false,
+                "relation": {
+                  "kind": "Item",
+                  "foreignKey": "id"
+                }
               }
             },
             "validations": [],
@@ -1742,6 +1894,9 @@ export function ModelDefinitions() {
         "id": "view-action",
         "name": "Action View Model",
         "parentId": "view-decision",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Action",
         "icon": "fa fa-paper-plane",
         "color": "#00008b",
@@ -2354,6 +2509,9 @@ export function ModelDefinitions() {
         "createdOn": 1586302647398,
         "modifiedBy": "gmckune",
         "modifiedOn": 1586373219340,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Actor",
         "icon": "fa fa-male",
         "color": "#000000",
@@ -2591,6 +2749,9 @@ export function ModelDefinitions() {
         "id": "view-analysis",
         "name": "Analysis View Model",
         "parentId": "View-Model-Definitions",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Analysis",
         "icon": "",
         "color": "#000000",
@@ -2641,6 +2802,9 @@ export function ModelDefinitions() {
         "id": "view-category",
         "name": "Category View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Category",
         "icon": "",
         "color": "#000000",
@@ -2843,10 +3007,12 @@ export function ModelDefinitions() {
         "id": "view-decision",
         "name": "Decision View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Decision",
         "icon": "fa fa-gavel",
         "color": "#add8e6",
-        "localTypes": {},
         "viewProperties": {
           "decisionState": {
             "inputType": {
@@ -2861,7 +3027,8 @@ export function ModelDefinitions() {
             },
             "required": true,
             "default": "Proposed",
-            "displayName": "DecisionState"
+            "displayName": "DecisionState",
+            "name": "decisionState"
           },
           "approvedBy": {
             "inputType": {
@@ -2870,7 +3037,8 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "approvedBy"
+            "displayName": "approvedBy",
+            "name": "approvedBy"
           },
           "approvedOn": {
             "inputType": {
@@ -2879,7 +3047,8 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "approvedOn"
+            "displayName": "approvedOn",
+            "name": "approvedOn"
           },
           "rationale": {
             "inputType": {
@@ -2890,7 +3059,8 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "rationale"
+            "displayName": "rationale",
+            "name": "rationale"
           },
           "alternatives": {
             "inputType": {
@@ -2901,9 +3071,19 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "alternatives"
+            "displayName": "alternatives",
+            "name": "alternatives"
+          },
+          "supportedDecisions": {
+            "name": "supportedDecisions",
+            "displayName": "Supported Decisions",
+            "inputType": {
+              "type": "",
+              "options": {}
+            }
           }
         },
+        "localTypes": {},
         "formatDefinitions": {
           "7aa458a0-5d71-11ea-8553-c51caee8a5fd": {
             "id": "7aa458a0-5d71-11ea-8553-c51caee8a5fd",
@@ -3108,6 +3288,14 @@ export function ModelDefinitions() {
                     "visible": true,
                     "kind": "",
                     "editable": true
+                  },
+                  {
+                    "propertyName": "supportedDecisions",
+                    "customLabel": "Supported Decisions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": true
                   }
                 ]
               },
@@ -3163,13 +3351,15 @@ export function ModelDefinitions() {
           "default": "7aa458a0-5d71-11ea-8553-c51caee8a5fd",
           "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
         },
-        "tableDefinitions": {},
-        "itemIds": []
+        "tableDefinitions": {}
       },
       "DocumentConfiguration View Model": {
         "id": "view-documentconfiguration",
         "name": "DocumentConfiguration View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "DocumentConfiguration",
         "icon": "fa fa-file",
         "color": "#ffa500",
@@ -3355,6 +3545,9 @@ export function ModelDefinitions() {
         "id": "view-domain",
         "name": "Domain",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "createdBy": "gmckune",
         "createdOn": 1586302904733,
         "modifiedBy": "gmckune",
@@ -3596,6 +3789,9 @@ export function ModelDefinitions() {
         "id": "view-internal-lost",
         "name": "Internal-Lost View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Internal-Lost",
         "icon": "fa fa-question",
         "color": "#000000",
@@ -3843,6 +4039,9 @@ export function ModelDefinitions() {
         "id": "view-internal",
         "name": "Internal View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Internal",
         "icon": "fa fa-gears",
         "color": "#000000",
@@ -4093,6 +4292,9 @@ export function ModelDefinitions() {
         "id": "view-issue",
         "name": "Issue View Model",
         "parentId": "view-observation",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Issue",
         "icon": "fa fa-exclamation-circle",
         "color": "#ff0000",
@@ -4457,6 +4659,9 @@ export function ModelDefinitions() {
         "id": "view-item",
         "name": "Item View Model",
         "parentId": "View-Model-Definitions",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Item",
         "icon": "fa fa-sticky-note",
         "color": "#565656",
@@ -4777,6 +4982,9 @@ export function ModelDefinitions() {
         "createdOn": 1566607211956,
         "modifiedBy": "gmckune",
         "modifiedOn": 1591737865749,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "KeyEvent",
         "icon": "fa fa-key",
         "color": "#000000",
@@ -5190,6 +5398,9 @@ export function ModelDefinitions() {
         "createdOn": 1572491164827,
         "modifiedBy": "gmckune",
         "modifiedOn": 1586376069127,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "KeyEventDictionary",
         "icon": "fa fa-th-list",
         "color": "#000000",
@@ -5500,12 +5711,16 @@ export function ModelDefinitions() {
         "id": "view-kohesemodel",
         "name": "KoheseModel View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "KoheseModel",
         "icon": "fa fa-sitemap",
         "color": "#000000",
         "viewProperties": {},
         "localTypes": {
           "PropertyType": {
+            "metatype": "Structure",
             "name": "PropertyType",
             "modelName": "PropertyType",
             "icon": "",
@@ -5631,6 +5846,7 @@ export function ModelDefinitions() {
             "tableDefinitions": {}
           },
           "RelationType": {
+            "metatype": "Structure",
             "name": "RelationType",
             "modelName": "RelationType",
             "icon": "",
@@ -5857,6 +6073,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "namespace",
+                    "customLabel": "Namespace",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": true
+                  },
+                  {
                     "propertyName": "base",
                     "customLabel": "Base",
                     "labelOrientation": "Top",
@@ -6047,6 +6271,9 @@ export function ModelDefinitions() {
         "id": "view-koheseuser",
         "name": "KoheseUser View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "KoheseUser",
         "icon": "fa fa-user",
         "color": "#000000",
@@ -6301,6 +6528,9 @@ export function ModelDefinitions() {
         "id": "view-koheseview",
         "name": "KoheseView View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "KoheseView",
         "icon": "fa fa-desktop",
         "color": "#000000",
@@ -6455,6 +6685,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "namespace",
+                    "customLabel": "Namespace",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "modelName",
                     "customLabel": "Model Name",
                     "labelOrientation": "Top",
@@ -6537,10 +6775,193 @@ export function ModelDefinitions() {
         },
         "tableDefinitions": {}
       },
+      "Namespace View Model": {
+        "id": "view-namespace",
+        "name": "Namespace View Model",
+        "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
+        "modelName": "Namespace",
+        "icon": "",
+        "color": "#000000",
+        "localTypes": {},
+        "viewProperties": {},
+        "formatDefinitions": {
+          "0f4e5a00-d293-11ea-ab22-8724512ce3f8": {
+            "id": "0f4e5a00-d293-11ea-ab22-8724512ce3f8",
+            "name": "Default Format Definition",
+            "header": {
+              "kind": "header",
+              "contents": [
+                {
+                  "propertyName": "name",
+                  "customLabel": "Name",
+                  "labelOrientation": "Top",
+                  "visible": true,
+                  "kind": "text",
+                  "editable": true
+                }
+              ]
+            },
+            "containers": [
+              {
+                "kind": "list",
+                "contents": [
+                  {
+                    "propertyName": "kind",
+                    "customLabel": "Kind",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "status",
+                    "customLabel": "Status",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "id",
+                    "customLabel": "ID",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "description",
+                    "customLabel": "Description",
+                    "labelOrientation": "Top",
+                    "kind": "markdown",
+                    "visible": true,
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "tags",
+                    "customLabel": "Tags",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "parentId",
+                    "customLabel": "Parent",
+                    "labelOrientation": "Top",
+                    "kind": "proxy-selector",
+                    "visible": true,
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "createdBy",
+                    "customLabel": "Created By",
+                    "labelOrientation": "Top",
+                    "kind": "user-selector",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "createdOn",
+                    "customLabel": "Created On",
+                    "labelOrientation": "Top",
+                    "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "modifiedBy",
+                    "customLabel": "Modified By",
+                    "labelOrientation": "Top",
+                    "kind": "user-selector",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "modifiedOn",
+                    "customLabel": "Modified On",
+                    "labelOrientation": "Top",
+                    "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "loadPending",
+                    "customLabel": "loadPending",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "hasValidationError",
+                    "customLabel": "hasValidationError",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "$dirtyFields",
+                    "customLabel": "$dirtyFields",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "__deletedProperty",
+                    "customLabel": "__deletedProperty",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "itemIds",
+                    "customLabel": "itemIds",
+                    "labelOrientation": "Top",
+                    "kind": "string",
+                    "visible": false,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "children",
+                    "customLabel": "Children",
+                    "labelOrientation": "Top",
+                    "kind": "proxy-selector",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "alias",
+                    "customLabel": "Alias",
+                    "labelOrientation": "Top",
+                    "kind": "text",
+                    "visible": true,
+                    "editable": true
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "defaultFormatKey": {
+          "default": "0f4e5a00-d293-11ea-ab22-8724512ce3f8"
+        },
+        "tableDefinitions": {},
+        "itemIds": []
+      },
       "Observation View Model": {
         "id": "view-observation",
         "name": "Observation View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Observation",
         "icon": "fa fa-comment",
         "color": "#bcc00a",
@@ -6821,6 +7242,9 @@ export function ModelDefinitions() {
         "id": "view-project",
         "name": "Project View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Project",
         "icon": "fa fa-pie-chart",
         "color": "#800080",
@@ -7045,6 +7469,9 @@ export function ModelDefinitions() {
         "id": "view-reportdefinition",
         "name": "ReportDefinition View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "ReportDefinition",
         "icon": "",
         "color": "#000000",
@@ -7263,6 +7690,9 @@ export function ModelDefinitions() {
         "id": "view-repository",
         "name": "Repository View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Repository",
         "icon": "fa fa-database",
         "color": "#660000",
@@ -7481,6 +7911,9 @@ export function ModelDefinitions() {
         "id": "view-task",
         "name": "Task View Model",
         "parentId": "view-item",
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "Task",
         "icon": "fa fa-tasks",
         "color": "#008000",
@@ -7600,6 +8033,14 @@ export function ModelDefinitions() {
             "default": null,
             "displayName": "predecessors",
             "name": "predecessors"
+          },
+          "supportedDecisions": {
+            "name": "supportedDecisions",
+            "displayName": "Supported Decisions",
+            "inputType": {
+              "type": "",
+              "options": {}
+            }
           }
         },
         "localTypes": {},
@@ -7823,6 +8264,14 @@ export function ModelDefinitions() {
                     "visible": true,
                     "kind": "number",
                     "editable": true
+                  },
+                  {
+                    "propertyName": "supportedDecisions",
+                    "customLabel": "Supported Decisions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
+                    "editable": true
                   }
                 ]
               },
@@ -7997,7 +8446,10 @@ export function ModelDefinitions() {
         "createdBy": "gmckune",
         "createdOn": 1570033169859,
         "modifiedBy": "gmckune",
-        "modifiedOn": 1591742618536,
+        "modifiedOn": 1593445614266,
+        "namespace": {
+          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+        },
         "modelName": "UseCase",
         "icon": "fa fa-lemon-o",
         "color": "#000000",
@@ -8029,6 +8481,7 @@ export function ModelDefinitions() {
         },
         "localTypes": {
           "FlowOfEvents": {
+            "metatype": "Structure",
             "name": "FlowOfEvents",
             "modelName": "FlowOfEvents",
             "icon": "",
@@ -8073,6 +8526,14 @@ export function ModelDefinitions() {
                   "type": "",
                   "options": {}
                 }
+              },
+              "OnStep": {
+                "name": "OnStep",
+                "displayName": "On Step",
+                "inputType": {
+                  "type": "",
+                  "options": {}
+                }
               }
             },
             "formatDefinitions": {
@@ -8108,6 +8569,14 @@ export function ModelDefinitions() {
                         "customLabel": "Preconditions",
                         "labelOrientation": "Top",
                         "kind": "text",
+                        "visible": true,
+                        "editable": true
+                      },
+                      {
+                        "propertyName": "OnStep",
+                        "customLabel": "On Step",
+                        "labelOrientation": "Top",
+                        "kind": "",
                         "visible": true,
                         "editable": true
                       },
@@ -8165,6 +8634,15 @@ export function ModelDefinitions() {
                         "customLabel": "Preconditions",
                         "labelOrientation": "Top",
                         "kind": "text",
+                        "tableDefinition": "",
+                        "visible": true,
+                        "editable": true
+                      },
+                      {
+                        "propertyName": "OnStep",
+                        "customLabel": "OnStep",
+                        "labelOrientation": "Top",
+                        "kind": "",
                         "tableDefinition": "",
                         "visible": true,
                         "editable": true

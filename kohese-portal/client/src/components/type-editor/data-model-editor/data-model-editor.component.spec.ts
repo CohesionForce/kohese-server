@@ -1,27 +1,22 @@
-import { TestBed, ComponentFixture, fakeAsync,
-  tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCheckboxModule, MatDialogRef, MatExpansionModule, MatIconModule,
+  MatInputModule, MatMenuModule, MatSelectModule,
+  MatTableModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatMenuModule, MatIconModule, MatInputModule, MatSelectModule,
-  MatTableModule, MatCheckboxModule, MatExpansionModule,
-  MatDialogRef } from '@angular/material';
 import { of as observableOf } from 'rxjs';
 
-import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
-import { ComponentDialogComponent } from '../../dialog/component-dialog/component-dialog.component';
-import { DataModelEditorComponent } from './data-model-editor.component';
-import { Type, Metatype } from '../../../../../common/src/Type.interface';
-import { KoheseDataModel } from '../../../../../common/src/KoheseModel.interface';
 import { Enumeration,
   EnumerationValue } from '../../../../../common/src/Enumeration.interface';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
-import { FormatContainer,
-  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
-import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
+import { KoheseDataModel } from '../../../../../common/src/KoheseModel.interface';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { Metatype, Type } from '../../../../../common/src/Type.interface';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { ComponentDialogComponent } from '../../dialog/component-dialog/component-dialog.component';
+import { DataModelEditorComponent } from './data-model-editor.component';
 
 describe('DataModelEditorComponent', () => {
   let component: DataModelEditorComponent;
@@ -144,6 +139,20 @@ describe('DataModelEditorComponent', () => {
   //   examineFormatDefinitions(subtypeViewModel);
   // }));
 
+  it('determines if two Namespace references are equal', () => {
+    expect(component.areNamespaceReferencesEqual(null, null)).toBe(true);
+    expect(component.areNamespaceReferencesEqual({ id: '' }, null)).toBe(
+      false);
+    expect(component.areNamespaceReferencesEqual({ id: '' }, { id: '' })).toBe(
+      true);
+  });
+
+  it('retrieves all Namespaces', () => {
+    expect(component.getNamespaces()).toEqual([TreeConfiguration.
+      getWorkingTree().getProxyFor('750c7c00-d658-11ea-80c8-3b7d496d4ca3').
+      item]);
+  });
+  
   it('adds an EnumerationValue', async () => {
     let enumeration: Enumeration = {
       metatype: Metatype.ENUMERATION,

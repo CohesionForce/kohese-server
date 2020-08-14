@@ -71,8 +71,14 @@ export class TypeEditorComponent {
             this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
               'Model-Definitions').visitTree({ includeOrigin: false },
               (itemProxy: ItemProxy) => {
-              if (itemProxy.kind !== 'Namespace') {
-                names.push(itemProxy.item.name);
+              if (metatype === Metatype.STRUCTURE) {
+                if (itemProxy.kind !== 'Namespace') {
+                  names.push(itemProxy.item.name);
+                }
+              } else {
+                if (itemProxy.kind === 'Namespace') {
+                  names.push(itemProxy.item.name);
+                }
               }
             }, undefined);
             return ((input !== '') && (names.indexOf(input) === -1));
@@ -101,6 +107,7 @@ export class TypeEditorComponent {
     }], { data: {} }).updateSize('70%', '40%').afterClosed().toPromise();
     
     if (inputs) {
+      let itemProxy: ItemProxy;
       if (metatype === Metatype.STRUCTURE) {
         let viewModel: any = {
           name: inputs[0],
@@ -183,9 +190,11 @@ export class TypeEditorComponent {
         
         this._dynamicTypesService.buildKoheseType(
           itemProxys[0] as KoheseModel);
+        
+        itemProxy = itemProxys[0];
       } else {
         // Metatype.NAMESPACE
-        this._itemRepository.upsertItem('Namespace', {
+        itemProxy = await this._itemRepository.upsertItem('Namespace', {
           name: inputs[0],
           parentId: inputs[1].id
         });
@@ -193,7 +202,7 @@ export class TypeEditorComponent {
 
       this._typeTree.update(true);
       this._typeTree.selection[0] = this._itemRepository.getTreeConfig().
-        getValue().config.getProxyFor(inputs[0]);
+        getValue().config.getProxyFor(itemProxy.item.id);
       
       this._changeDetectorRef.markForCheck();
     }

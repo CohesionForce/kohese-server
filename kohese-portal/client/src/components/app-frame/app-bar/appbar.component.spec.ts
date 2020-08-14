@@ -1,5 +1,4 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
@@ -27,13 +26,13 @@ describe('Component: App Bar', ()=>{
   beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [AppBarComponent],
-      imports : [CommonModule,
-         MaterialModule,
-         BrowserAnimationsModule,
-         FormsModule,
-         ReactiveFormsModule
-         ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      imports: [
+        CommonModule,
+        MaterialModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        ReactiveFormsModule
+      ],
       providers: [
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: CurrentUserService, useClass: MockCurrentUserService},

@@ -39,10 +39,9 @@ describe('Component: Type Editor', ()=>{
     typeEditorFixture = TestBed.createComponent(TypeEditorComponent);
     typeEditorComponent = typeEditorFixture.componentInstance;
     typeEditorFixture.detectChanges();
-    
-  })
+  });
 
   it('instantiates the Type Editor component', ()=>{
     expect(typeEditorComponent).toBeTruthy(); 
-  })
-})
+  });
+});

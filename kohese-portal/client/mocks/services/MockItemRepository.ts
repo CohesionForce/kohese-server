@@ -48,6 +48,13 @@ export class MockItemRepository {
   mockFullSync () {
     TreeConfiguration.getWorkingTree().reset();
 
+    new ItemProxy('Namespace', {
+      alias: 'Global',
+      id: '750c7c00-d658-11ea-80c8-3b7d496d4ca3',
+      name: 'Global Namespace',
+      parentId: 'Model-Definitions'
+    });
+
     for(let modelName in MockItemRepository.modelDefinitions.model) {
       console.log('::: Loading ' + modelName);
       let dataModel: KoheseDataModel = JSON.parse(JSON.stringify(
@@ -1083,6 +1090,13 @@ export class MockItemRepository {
       let viewProxy = working.getProxyFor(viewId);
       modelProxy.type = new KoheseType(modelProxy, viewProxy);
     }
+
+    new ItemProxy('KoheseUser', {
+      id: 'AdminKoheseUser',
+      name: 'admin',
+      username: 'admin',
+      password: 'password'
+    });
 
     let numberOfItemsToAdd: number = 7;
     for (let j: number = 0; j < numberOfItemsToAdd; j++) {
