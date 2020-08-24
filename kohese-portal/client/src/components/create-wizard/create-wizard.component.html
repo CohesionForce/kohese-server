@@ -7,7 +7,7 @@
             [type]="(proxyPlaceholderStream | async).model.item"
             [object]="(proxyPlaceholderStream | async).item"
             [formatDefinitionType]="FormatDefinitionType.DEFAULT"
-            [allowKindChange]="true">
+            [allowKindChange]="true" [allowKindNarrowingOnly]="false">
           </format-object-editor>
         </mat-card-content>
         <mat-card-actions style="display: flex; flex-direction: row;">

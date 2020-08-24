@@ -6,6 +6,7 @@
     "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
   },
   "base": "Item",
+  "isMetaModel": true,
   "idInjection": true,
   "invertItemOrder": false,
   "properties": {

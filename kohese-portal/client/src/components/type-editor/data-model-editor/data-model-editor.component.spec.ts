@@ -146,12 +146,6 @@ describe('DataModelEditorComponent', () => {
     expect(component.areNamespaceReferencesEqual({ id: '' }, { id: '' })).toBe(
       true);
   });
-
-  it('retrieves all Namespaces', () => {
-    expect(component.getNamespaces()).toEqual([TreeConfiguration.
-      getWorkingTree().getProxyFor('750c7c00-d658-11ea-80c8-3b7d496d4ca3').
-      item]);
-  });
   
   it('adds an EnumerationValue', async () => {
     let enumeration: Enumeration = {

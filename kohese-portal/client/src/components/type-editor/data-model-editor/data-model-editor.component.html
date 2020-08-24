@@ -20,16 +20,10 @@
     </ng-template>
   </ng-container>
 </div>
-<mat-form-field style="width: 100%;">
-  <mat-select placeholder="Namespace" [(ngModel)]="dataModel.namespace"
-    [compareWith]="areNamespaceReferencesEqual" [disabled]="!editable">
-    <ng-container *ngFor="let namespace of getNamespaces()">
-      <mat-option [value]="{ id: namespace.id }">
-        {{namespace.name}}
-      </mat-option>
-    </ng-container>
-  </mat-select>
-</mat-form-field>
+<label>
+  Namespace: {{itemRepository.getTreeConfig().getValue().config.getProxyFor(
+    dataModel.namespace.id).item.name}}
+</label>
 <mat-form-field style="width: 100%;">
   <input matInput type="text" placeholder="Name" [ngModel]="dataModel.name"
     (ngModelChange)="dataModel.name = $event; modifiedEventEmitter.emit()"

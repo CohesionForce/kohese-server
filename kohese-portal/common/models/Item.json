@@ -1,7 +1,7 @@
 {
   "id": "Item",
   "name": "Item",
-  "parentId": "750c7c00-d658-11ea-80c8-3b7d496d4ca3",
+  "parentId": "Model-Definitions",
   "namespace": {
     "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
   },

@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   Optional, Inject, OnInit, Output, EventEmitter, ViewChild,
   AfterViewInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { Dialog } from '../dialog/Dialog.interface';
 
 class ElementMapValue {
   get parent() {
@@ -92,7 +93,7 @@ export enum TreeComponentConfiguration {
   styleUrls: ['./tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeComponent implements OnInit, AfterViewInit {
+export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   private _elementMap: Map<any, ElementMapValue> =
     new Map<any, ElementMapValue>();
   get elementMap() {
@@ -314,6 +315,15 @@ export class TreeComponent implements OnInit, AfterViewInit {
     if (this._selection.length > 0) {
       this.scrollElementIntoView(this._selection[0]);
     }
+  }
+
+  /**
+   * @see Dialog.interface.ts
+   * 
+   * @param accept
+   */
+  public close(accept: boolean): any {
+    return (accept ? this._selection : undefined);
   }
   
   public scrollElementIntoView(element: any): void {

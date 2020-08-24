@@ -35,6 +35,11 @@ export class DynamicComponentDirective {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComponentDialogComponent implements OnInit, AfterViewInit {
+  private _title: string;
+  get title() {
+    return this._title;
+  }
+  
   private _configurationInstanceMap: Map<ComponentDialogConfiguration, any> =
     new Map<ComponentDialogConfiguration, any>();
   get configurationInstanceMap() {
@@ -70,6 +75,8 @@ export class ComponentDialogComponent implements OnInit, AfterViewInit {
   }
   
   public ngOnInit(): void {
+    this._title = this._matDialogData['title'];
+
     let componentDialogConfigurations: Array<ComponentDialogConfiguration> =
       (<Array<ComponentDialogConfiguration>> this._matDialogData[
       'componentDialogConfigurations']);

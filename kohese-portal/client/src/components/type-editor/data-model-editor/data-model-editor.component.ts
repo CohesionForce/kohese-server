@@ -210,6 +210,12 @@ export class DataModelEditorComponent {
     this._changeDetectorRef.markForCheck();
   }
 
+  /**
+   * Determines if two references are refer to the same Item
+   * 
+   * @param option
+   * @param selection 
+   */
   public areNamespaceReferencesEqual(option: { id: string}, selection:
     { id: string }): boolean {
     if ((option == null) && (selection == null)) {
@@ -221,19 +227,6 @@ export class DataModelEditorComponent {
         return false;
       }
     }
-  }
-
-  public getNamespaces(): Array<any> {
-    let namespaces: Array<any> = [];
-    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
-      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
-      ItemProxy) => {
-      if (itemProxy.kind === 'Namespace') {
-        namespaces.push(itemProxy.item);
-      }
-    }, undefined);
-
-    return namespaces;
   }
   
   public async parentTypeSelected(parentType: any): Promise<void> {

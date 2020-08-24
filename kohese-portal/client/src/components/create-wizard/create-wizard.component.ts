@@ -70,15 +70,17 @@ export class CreateWizardComponent extends NavigatableComponent
     let timestamp: number = Date.now();
     let username: string = this._sessionService.user.name;
     let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
-      'Item');
+      'Action');
     let proxyPlaceholder: any = {
-      kind: 'Item',
+      kind: 'Action',
       item: {
         parentId: this._parentId,
         createdOn: timestamp,
         createdBy: username,
         modifiedOn: timestamp,
-        modifiedBy: username
+        modifiedBy: username,
+        decisionState: 'Proposed',
+        actionState: 'Proposed'
       },
       model: modelProxy
     };

@@ -1159,8 +1159,10 @@ export class MockItemRepository {
 
   }
 
-  deleteItem() {
-
+  public deleteItem(itemProxy: ItemProxy, deleteDescendants: boolean):
+    Promise<any> {
+    itemProxy.deleteItem(deleteDescendants);
+    return Promise.resolve();
   }
 
   public upsertItem(kind: string, item: any): Promise<ItemProxy> {

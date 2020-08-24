@@ -8,7 +8,6 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import {  TreeComponentConfiguration } from '../../tree/tree.component';
 
 @Component({
   selector: 'format-object-editor',
@@ -47,6 +46,15 @@ export class FormatObjectEditorComponent implements OnInit {
   set formatDefinitionType(formatDefinitionType: FormatDefinitionType) {
     this._formatDefinitionType = formatDefinitionType;
     this._changeDetectorRef.markForCheck();
+  }
+
+  private _selectedNamespace: any;
+  get selectedNamespace() {
+    return this._selectedNamespace;
+  }
+  set selectedNamespace(selectedNamespace: any) {
+    this._selectedNamespace = selectedNamespace;
+    this.selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
   }
   
   private _selectedType: any;
@@ -143,6 +151,10 @@ export class FormatObjectEditorComponent implements OnInit {
   @Input('type')
   set type(type: any) {
     this._type = type;
+    if (this._allowKindChange && !this._enclosingType) {
+      this._selectedNamespace = this._itemRepository.getTreeConfig().
+        getValue().config.getProxyFor(this._type.namespace.id).item;
+    }
     this.selectedType = this._type;
   }
   
@@ -168,15 +180,11 @@ export class FormatObjectEditorComponent implements OnInit {
     return FormatContainerKind;
   }
 
-  get TreeComponentConfiguration() {
-    return TreeComponentConfiguration;
-  }
-
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef:
-    MatDialogRef<FormatObjectEditorComponent>,
-    private _itemRepository: ItemRepository) {
+    MatDialogRef<FormatObjectEditorComponent>, private _itemRepository:
+    ItemRepository) {
   }
   
   public ngOnInit(): void {
@@ -198,62 +206,61 @@ export class FormatObjectEditorComponent implements OnInit {
       this) && this._data;
   }
 
-  public getTreeComponentConfiguration(treeComponentConfiguration:
-    TreeComponentConfiguration): Function {
-    let treeConfiguration: TreeConfiguration = this._itemRepository.
-      getTreeConfig().getValue().config;
-    switch (treeComponentConfiguration) {
-      case TreeComponentConfiguration.GET_CHILDREN:
-        return (element: any) => {
-          return treeConfiguration.getProxyFor(element.id).children.map(
-            (itemProxy: ItemProxy) => {
-            return itemProxy.item;
-          });
-        };
-      case TreeComponentConfiguration.HAS_CHILDREN:
-        return (element: any) => {
-          return (treeConfiguration.getProxyFor(element.id).children.length >
-            0);
-        };
-      case TreeComponentConfiguration.GET_TEXT:
-        return (element: any) => {
-          return element.name;
-        };
-      case TreeComponentConfiguration.GET_ICON:
-        return (element: any) => {
-          return this._itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + treeConfiguration.getProxyFor(element.id).
-            kind.toLowerCase()).item.icon;
-        };
-      case TreeComponentConfiguration.MAY_SELECT:
-        return (element: any) => {
-          if (treeConfiguration.getProxyFor(element.id).kind === 'Namespace') {
-            return false;
-          }
+  /**
+   * Returns an Array containing all Namespaces that contain at least one type
+   */
+  public getNamespaces(): Array<any> {
+    let namespaces: Array<any> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if ((itemProxy.kind === 'Namespace') && (this.getNamespaceTypes(
+        itemProxy.item).length > 0)) {
+        namespaces.push(itemProxy.item);
+      }
+    }, undefined);
 
-          if (!this._allowKindNarrowingOnly) {
-            return true;
-          }
-          
-          let modelItemProxy: any = treeConfiguration.getProxyFor(element.
-            id);
+    namespaces.sort((oneNamespace: any, anotherNamespace: any) => {
+      return oneNamespace.name.localeCompare(anotherNamespace.name);
+    });
+
+    return namespaces;
+  }
+
+  /**
+   * Returns an Array containing all types in the given Namespace
+   * 
+   * @param namespace
+   */
+  public getNamespaceTypes(namespace: any): Array<any> {
+    let types: Array<any> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseModel') && !itemProxy.item.isMetaModel &&
+        (itemProxy.item.namespace.id === namespace.id)) {
+        if (this._allowKindNarrowingOnly) {
+          let modelItemProxy: any = itemProxy;
           while (modelItemProxy) {
             if (modelItemProxy.item === this._type) {
-              return true;
+              types.push(itemProxy.item);
+              break;
             }
             
             modelItemProxy = this._itemRepository.getTreeConfig().getValue().
               config.getProxyFor(modelItemProxy.item.base);
           }
+        } else {
+          types.push(itemProxy.item);
+        }
+      }
+    }, undefined);
 
-          return false;
-        };
-      case TreeComponentConfiguration.ELEMENT_SELECTION_HANDLER:
-        return (element: any) => {
-          this.selectedType = element;
-          this._changeDetectorRef.markForCheck();
-        };
-    }
+    types.sort((oneType: any, anotherType: any) => {
+      return oneType.name.localeCompare(anotherType.name);
+    });
+
+    return types;
   }
   
   public getReverseReferenceTableHeaderContent(formatContainer:

@@ -1,19 +1,23 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
-  ViewChild } from '@angular/core';
-import * as Uuid from 'uuid/v1';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy,
+  OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import * as Uuid from 'uuid';
 
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { DialogService } from '../../services/dialog/dialog.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
   FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
-import { InputDialogKind, InputDialogComponent } from '../dialog/input-dialog/input-dialog.component';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
-import { TreeComponent, TreeComponentConfiguration } from '../tree/tree.component';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { Metatype } from '../../../../common/src/Type.interface';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { ItemRepository,
+  TreeConfigInfo } from '../../services/item-repository/item-repository.service';
+import { InputDialogComponent,
+  InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
+import { NamespaceEditorComponent } from '../object-editor/namespace-editor/namespace-editor.component';
 
 @Component({
   selector: 'type-editor',
@@ -21,12 +25,25 @@ import { Metatype } from '../../../../common/src/Type.interface';
   styleUrls: ['./type-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TypeEditorComponent {
-  @ViewChild('typeTree')
-  private _typeTree: TreeComponent;
-  get typeTree() {
-    return this._typeTree;
+export class TypeEditorComponent implements OnInit, OnDestroy {
+  private _selectedNamespace: any;
+  get selectedNamespace() {
+    return this._selectedNamespace;
   }
+  set selectedNamespace(selectedNamespace: any) {
+    this._selectedNamespace = selectedNamespace;
+    this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
+  }
+
+  private _selectedType: any;
+  get selectedType() {
+    return this._selectedType;
+  }
+  set selectedType(selectedType: any) {
+    this._selectedType = selectedType;
+  }
+
+  private _treeConfigSubscription: Subscription;
 
   get itemRepository() {
     return this._itemRepository;
@@ -40,45 +57,115 @@ export class TypeEditorComponent {
     return FormatDefinitionType;
   }
 
-  get TreeComponentConfiguration() {
-    return TreeComponentConfiguration;
-  }
-
   public constructor(private _dynamicTypesService: DynamicTypesService,
     private dialogService: DialogService, private _itemRepository:
     ItemRepository, private _changeDetectorRef: ChangeDetectorRef) {
   }
 
-  public async add(metatype: Metatype): Promise<void> {
+  public ngOnInit(): void {
+    this._treeConfigSubscription = this._itemRepository.getTreeConfig().
+      subscribe((treeConfigInfo: TreeConfigInfo) => {
+      if (treeConfigInfo) {
+        this._selectedNamespace = treeConfigInfo.config.getProxyFor(
+          '750c7c00-d658-11ea-80c8-3b7d496d4ca3').item;
+        this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[
+          0];
+      }
+    });
+  }
+
+  public ngOnDestroy(): void {
+    this._treeConfigSubscription.unsubscribe();
+  }
+
+  /**
+   * Returns an Array containing all Namespaces that contain at least one type
+   */
+  public getNamespaces(): Array<any> {
+    let namespaces: Array<any> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if ((itemProxy.kind === 'Namespace') && (this.getNamespaceTypes(
+        itemProxy.item).length > 0)) {
+        namespaces.push(itemProxy.item);
+      }
+    }, undefined);
+
+    namespaces.sort((oneNamespace: any, anotherNamespace: any) => {
+      return oneNamespace.name.localeCompare(anotherNamespace.name);
+    });
+
+    return namespaces;
+  }
+
+  public async openNamespaceEditor(): Promise<void> {
+    await this.dialogService.openComponentsDialog([{
+      component: NamespaceEditorComponent,
+      matDialogData: {
+        selectedNamespace: this._selectedNamespace
+      }
+    }], {
+      data: {
+        title: 'Namespaces',
+        buttonLabels: {
+          acceptLabel: null,
+          cancelLabel: 'Close'
+        }
+      }
+    }).updateSize('90%', '90%').afterClosed().toPromise();
+  }
+
+  /**
+   * Returns an Array containing the types in the given Namespace
+   * 
+   * @param namespace
+   */
+  public getNamespaceTypes(namespace: any): Array<any> {
+    let types: Array<any> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.namespace.id
+        === namespace.id)) {
+        types.push(itemProxy.item);
+      }
+    }, undefined);
+
+    types.sort((oneType: any, anotherType: any) => {
+      return oneType.name.localeCompare(anotherType.name);
+    });
+
+    return types;
+  }
+
+  /**
+   * Allows the addition of a Structure
+   */
+  public async add(): Promise<void> {
     let namespaceOptions: { [name: string]: any } = {};
     this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
       ItemProxy) => {
       if (itemProxy.kind === 'Namespace') {
-        namespaceOptions[itemProxy.item.name] = { id: itemProxy.item.id };
+        namespaceOptions[itemProxy.item.name] = itemProxy.item;
       }
     }, undefined);
     let inputs: Array<any> = await this.dialogService.openComponentsDialog([{
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: {
-          title: 'Add ' + metatype,
+          title: 'Add ' + Metatype.STRUCTURE,
           text: '',
           fieldName: 'Name',
-          value: metatype,
+          value: Metatype.STRUCTURE,
           validate: (input: any) => {
             let names: Array<string> = [];
             this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
               'Model-Definitions').visitTree({ includeOrigin: false },
               (itemProxy: ItemProxy) => {
-              if (metatype === Metatype.STRUCTURE) {
-                if (itemProxy.kind !== 'Namespace') {
-                  names.push(itemProxy.item.name);
-                }
-              } else {
-                if (itemProxy.kind === 'Namespace') {
-                  names.push(itemProxy.item.name);
-                }
+              if (itemProxy.kind !== 'Namespace') {
+                names.push(itemProxy.item.name);
               }
             }, undefined);
             return ((input !== '') && (names.indexOf(input) === -1));
@@ -93,11 +180,9 @@ export class TypeEditorComponent {
           title: 'Select Namespace',
           text: '',
           fieldName: 'Namespace',
-          value: ((this._typeTree.selection[0].kind === 'Namespace') ?
-            Object.values(namespaceOptions).find((reference:
-            { id: string }) => {
-            return (this._typeTree.selection[0].item.id === reference.id);
-          }) : Object.values(namespaceOptions)[0]),
+          value: Object.values(namespaceOptions).find((namespace: any) => {
+            return (this._selectedNamespace.id === namespace.id);
+          }),
           validate: (input: any) => {
             return true;
           },
@@ -107,103 +192,91 @@ export class TypeEditorComponent {
     }], { data: {} }).updateSize('70%', '40%').afterClosed().toPromise();
     
     if (inputs) {
-      let itemProxy: ItemProxy;
-      if (metatype === Metatype.STRUCTURE) {
-        let viewModel: any = {
-          name: inputs[0],
-          namespace: inputs[1],
-          modelName: inputs[0],
-          parentId: 'view-item',
-          icon: '',
-          color: '#000000',
-          localTypes: {},
-          viewProperties: {},
-          formatDefinitions: {},
-          defaultFormatKey: {},
-          tableDefinitions: {}
-        };
-        let formatDefinitionId: string = (<any> Uuid).default();
-        let defaultFormatDefinition: FormatDefinition = {
-          id: formatDefinitionId,
-          name: 'Default Format Definition',
-          header: {
-            kind: FormatContainerKind.HEADER,
-            contents: [{
-              propertyName: 'name',
-              customLabel: 'Name',
-              labelOrientation: 'Top',
-              kind: 'text',
-              visible: true,
-              editable: true
-            }]
-          },
-          containers: [{
-            kind: FormatContainerKind.VERTICAL,
-            contents: [
-            ]
+      let viewModel: any = {
+        name: inputs[0],
+        namespace: { id: inputs[1].id },
+        modelName: inputs[0],
+        parentId: 'view-item',
+        icon: '',
+        color: '#000000',
+        localTypes: {},
+        viewProperties: {},
+        formatDefinitions: {},
+        defaultFormatKey: {},
+        tableDefinitions: {}
+      };
+      let formatDefinitionId: string = Uuid.v1();
+      let defaultFormatDefinition: FormatDefinition = {
+        id: formatDefinitionId,
+        name: 'Default Format Definition',
+        header: {
+          kind: FormatContainerKind.HEADER,
+          contents: [{
+            propertyName: 'name',
+            customLabel: 'Name',
+            labelOrientation: 'Top',
+            kind: 'text',
+            visible: true,
+            editable: true
           }]
-        };
-        
-        let itemKoheseView: any = this._itemRepository.getTreeConfig().
-          getValue().config.getProxyFor('view-item').item;
-        let itemDefaultFormatDefinition: FormatDefinition = itemKoheseView.
-          formatDefinitions[itemKoheseView.defaultFormatKey[
-          FormatDefinitionType.DEFAULT]];
-        let attributeEntries: Array<any> = defaultFormatDefinition.containers[
-          0].contents;
-        for (let j: number = 0; j < itemDefaultFormatDefinition.containers[0].
-          contents.length; j++) {
-          attributeEntries.push(JSON.parse(JSON.stringify(
-            itemDefaultFormatDefinition.containers[0].contents[j])));
-        }
-        if (this.areStateAttributesGrouped(itemDefaultFormatDefinition)) {
-          defaultFormatDefinition.containers.splice(1, 0, {
-            kind: FormatContainerKind.VERTICAL,
-            contents: []
-          });
-          for (let j: number = 0; j < itemDefaultFormatDefinition.containers[1].
-            contents.length; j++) {
-            defaultFormatDefinition.containers[1].contents.push(JSON.parse(JSON.
-              stringify(itemDefaultFormatDefinition.containers[1].contents[j])));
-          }
-        }
-        
-        viewModel.formatDefinitions[formatDefinitionId] =
-          defaultFormatDefinition;
-        viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
-          formatDefinitionId;
-        
-        let itemProxys: Array<ItemProxy> = await Promise.all([this.
-          _itemRepository.upsertItem('KoheseModel', {
-          name: inputs[0],
-          parentId: 'Item',
-          namespace: inputs[1],
-          base: 'Item',
-          idInjection: true,
-          properties: {},
-          validations: [],
-          relations: {},
-          acls: [],
-          methods: [],
-          localTypes: {}
-        }), this._itemRepository.upsertItem('KoheseView', viewModel)]);
-        
-        this._dynamicTypesService.buildKoheseType(
-          itemProxys[0] as KoheseModel);
-        
-        itemProxy = itemProxys[0];
-      } else {
-        // Metatype.NAMESPACE
-        itemProxy = await this._itemRepository.upsertItem('Namespace', {
-          name: inputs[0],
-          parentId: inputs[1].id
-        });
-      }
-
-      this._typeTree.update(true);
-      this._typeTree.selection[0] = this._itemRepository.getTreeConfig().
-        getValue().config.getProxyFor(itemProxy.item.id);
+        },
+        containers: [{
+          kind: FormatContainerKind.VERTICAL,
+          contents: [
+          ]
+        }]
+      };
       
+      let itemKoheseView: any = this._itemRepository.getTreeConfig().
+        getValue().config.getProxyFor('view-item').item;
+      let itemDefaultFormatDefinition: FormatDefinition = itemKoheseView.
+        formatDefinitions[itemKoheseView.defaultFormatKey[
+        FormatDefinitionType.DEFAULT]];
+      let attributeEntries: Array<any> = defaultFormatDefinition.containers[
+        0].contents;
+      for (let j: number = 0; j < itemDefaultFormatDefinition.containers[0].
+        contents.length; j++) {
+        attributeEntries.push(JSON.parse(JSON.stringify(
+          itemDefaultFormatDefinition.containers[0].contents[j])));
+      }
+      if (this.areStateAttributesGrouped(itemDefaultFormatDefinition)) {
+        defaultFormatDefinition.containers.splice(1, 0, {
+          kind: FormatContainerKind.VERTICAL,
+          contents: []
+        });
+        for (let j: number = 0; j < itemDefaultFormatDefinition.containers[1].
+          contents.length; j++) {
+          defaultFormatDefinition.containers[1].contents.push(JSON.parse(JSON.
+            stringify(itemDefaultFormatDefinition.containers[1].contents[j])));
+        }
+      }
+      
+      viewModel.formatDefinitions[formatDefinitionId] =
+        defaultFormatDefinition;
+      viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
+        formatDefinitionId;
+      
+      let itemProxys: Array<ItemProxy> = await Promise.all([this.
+        _itemRepository.upsertItem('KoheseModel', {
+        name: inputs[0],
+        parentId: 'Item',
+        namespace: { id: inputs[1].id },
+        base: 'Item',
+        idInjection: true,
+        properties: {},
+        validations: [],
+        relations: {},
+        acls: [],
+        methods: [],
+        localTypes: {}
+      }), this._itemRepository.upsertItem('KoheseView', viewModel)]);
+      
+      this._dynamicTypesService.buildKoheseType(
+        itemProxys[0] as KoheseModel);
+      
+      this._selectedNamespace = inputs[1];
+      this._selectedType = itemProxys[0].item;
+
       this._changeDetectorRef.markForCheck();
     }
   }
@@ -234,9 +307,14 @@ export class TypeEditorComponent {
     return false;
   }
 
+  /**
+   * Upon confirmation, removes the selected Structure from the system
+   * 
+   * @returns A Promise that resolves to nothing
+   */
   public async delete(): Promise<void> {
-    let selectedTypeItemProxy: ItemProxy = this._typeTree.selection[
-      0] as ItemProxy;
+    let selectedTypeItemProxy: ItemProxy = this._itemRepository.
+      getTreeConfig().getValue().config.getProxyFor(this._selectedType.id);
       let choiceValue: any = await this.dialogService.openYesNoDialog('Delete ' +
       selectedTypeItemProxy.item.name, 'Are you sure that you want to ' +
       'delete ' + selectedTypeItemProxy.item.name + '?');
@@ -251,40 +329,17 @@ export class TypeEditorComponent {
           name);
       }
 
-      this._typeTree.update(true);
+      let types: Array<any> = this.getNamespaceTypes(this._selectedNamespace);
+      if (types.length > 0) {
+        this._selectedType = types[0];
+      } else {
+        let treeConfiguration: TreeConfiguration = this._itemRepository.getTreeConfig().
+          getValue().config;
+        this._selectedNamespace = treeConfiguration.getProxyFor(
+          '750c7c00-d658-11ea-80c8-3b7d496d4ca3').item;
+        this._selectedType = treeConfiguration.getProxyFor('Item').item;
+      }
       this._changeDetectorRef.markForCheck();
-    }
-  }
-
-  public async save(kindName: string, item: any): Promise<void> {
-    await this._itemRepository.upsertItem(kindName, item);
-  }
-
-  public getTreeComponentConfiguration(treeComponentConfiguration:
-    TreeComponentConfiguration): Function {
-    switch (treeComponentConfiguration) {
-      case TreeComponentConfiguration.GET_CHILDREN:
-        return (element: any) => {
-          return (element as ItemProxy).children;
-        };
-      case TreeComponentConfiguration.HAS_CHILDREN:
-        return (element: any) => {
-          return ((element as ItemProxy).children.length > 0);
-        };
-      case TreeComponentConfiguration.GET_TEXT:
-        return (element: any) => {
-          return (element as ItemProxy).item.name;
-        };
-      case TreeComponentConfiguration.GET_ICON:
-        return (element: any) => {
-          return this._itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).item.
-            icon;
-        };
-      case TreeComponentConfiguration.ELEMENT_SELECTION_HANDLER:
-        return (element: any) => {
-          this._changeDetectorRef.markForCheck();
-        };
     }
   }
 }
