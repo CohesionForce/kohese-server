@@ -68,8 +68,9 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           socket = SocketIoClient({
             rejectUnauthorized: false
           });
-          socket.on('connect_error', () => {
+          socket.on('connect_error', (err) => {
             console.log('*** Worker socket connection error');
+            console.log(JSON.stringify(err, null, '  '));
             postToAllPorts('connectionError', {});
           });
           socket.on('reconnect', async () => {
@@ -460,8 +461,7 @@ function registerKoheseIOListeners() {
   // Register the listeners for the Item kinds that are being tracked
   socket.on('Item/create', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
-    buildOrUpdateProxy(notification.item, notification.kind, notification.
-      status);
+    buildOrUpdateProxy(notification.item, notification.kind, notification.status);
   });
 
   socket.on('Item/update', (notification) => {

@@ -102,7 +102,7 @@ export class ImportComponent implements OnInit {
   get getText() {
     return this._getText;
   }
-  
+
   private _getIcon: (element: any) => string = (element: any) => {
     return this._itemRepository.getTreeConfig().getValue().config.
       getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
@@ -147,10 +147,11 @@ export class ImportComponent implements OnInit {
 
     this._changeDetectorRef.markForCheck();
   }
-
+  //TODO throw error
   public async retrieveUrlContent(url: string): Promise<void> {
-    if (!/^https?:\/\//.test(url)) {
-      url = 'http://' + url;
+    if (!/^https:\/\//.test(url)) {
+      console.log('::: Import Component: ERR: Missing Protocol http or https');
+      throw('ERR: Throw error here: ' + url);
     }
     let contentObject: any = await this._itemRepository.getUrlContent(url);
     let file: File = new File([contentObject.content], url, {

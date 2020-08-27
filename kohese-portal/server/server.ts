@@ -50,8 +50,8 @@ if (require.main === module) {
       // Establish HTTPS Server
       var fs = require('fs');
       var options = {
-        key: fs.readFileSync('./cert/server.key'),
-        cert: fs.readFileSync('./cert/server.crt')
+        key: fs.readFileSync('./cert/serverkey.pem'),
+        cert: fs.readFileSync('./cert/servercert.pem')
       };
 
 

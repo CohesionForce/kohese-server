@@ -1,4 +1,9 @@
-openssl genrsa -out server.key 2048
-openssl rsa -in server.key -out server.key
-openssl req -sha256 -new -key server.key -out server.csr -subj '/CN=localhost'
-openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt
+openssl req -x509 -config openssl-ca.cnf -newkey rsa:4096 -sha512 -nodes -out cacert.pem -outform PEM
+openssl x509 -in cacert.pem -text -noout
+openssl x509 -purpose -in cacert.pem -inform PEM
+openssl req -config openssl-server.cnf -newkey rsa:4096 -sha512 -nodes -out servercert.csr -outform PEM
+openssl req -text -noout -verify -in servercert.csr
+touch index.txt
+echo '01' > serial.txt
+openssl ca -config openssl-ca.cnf -policy signing_policy -extensions signing_req -out servercert.pem -infiles servercert.csr
+openssl x509 -in servercert.pem -text -noout

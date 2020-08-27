@@ -1,0 +1,10 @@
+:: Original Certificate with invalid subjectAltName and no Certificate Authority signing it
+openssl genrsa -out server.key 2048
+openssl rsa -in server.key -out server.key
+openssl req -sha256 -new -key server.key -out server.csr -subj "/C=US/ST=Alabama/L=Huntsville/O=CohesionForce/OU=Org/CN=localhost/SN=localhost"
+openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt
+cat server.crt server.key > server.pem
+
+
+:: Alternative certificate that has a valid subjectAltName field
+openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout server.key -out server.crt -subj "/CN=CohesionForce" -addext "subjectAltName=DNS:CohesionForce,IP:10.0.0.1"
