@@ -6,15 +6,7 @@ var https = require('https');
 
 const KohesePort = 3010;
 
-function redirectToHTTPS(req, res, next) {
-  if (req.secure) {
-    return next();
-  }
-  console.log('!!! Redirecting to https: ' + req.url);
-  res.redirect(301, 'https://' + req.hostname + ':' + KohesePort + req.url);
-}
-
-var app = module.exports = express().use(redirectToHTTPS);
+var app = module.exports = express();
 
 global['app'] = app;
 

@@ -1,3 +1,7 @@
-server.csr
-server.crt
-server.key
+openssl-ca.cnf
+openssl-server.cnf
+cacert.pem
+cakey.pem
+servercert.csr
+servercert.pem
+serverkey.pem

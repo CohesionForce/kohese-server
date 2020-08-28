@@ -43,8 +43,8 @@ nsComment            = "OpenSSL Generated Certificate"
 
 DNS.1  = Kohese
 DNS.2  = CohesionForce
-DNS.3  = CryptoSecurity
-DNS.4  = localhost
+DNS.3  = localhost
+DNS.4  = example.com
 
 # IPv4 localhost
 IP.1     = 127.0.0.1

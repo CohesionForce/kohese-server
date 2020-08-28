@@ -147,11 +147,10 @@ export class ImportComponent implements OnInit {
 
     this._changeDetectorRef.markForCheck();
   }
-  //TODO throw error
   public async retrieveUrlContent(url: string): Promise<void> {
     if (!/^https:\/\//.test(url)) {
-      console.log('::: Import Component: ERR: Missing Protocol http or https');
-      throw('ERR: Throw error here: ' + url);
+      console.log('::: Import Component: ERR: Missing Protocol https');
+      throw('ERR: missing_https_protocol_at: ' + url);
     }
     let contentObject: any = await this._itemRepository.getUrlContent(url);
     let file: File = new File([contentObject.content], url, {

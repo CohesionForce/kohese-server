@@ -764,8 +764,6 @@ function KIOItemServer(socket){
         } else {
           replacement = matchedSubstring;
 
-          // TODO: Determine if there is an https change required
-
           if (embeddedImageCaptureGroup) {
             replacement = await embedImage(matchedSubstring,
               embeddedImageCaptureGroup, request.parameters.pathBase,
@@ -855,7 +853,7 @@ function KIOItemServer(socket){
       if (extensionBeginningIndex !== -1) {
         title = title.substring(0, extensionBeginningIndex);
       }
-      
+
       let pandocProcess: any = child.spawn('pandoc', ['-f', 'commonmark',
         '-t', 'html', '-s', '-M', 'title=' + title], undefined);
       pandocProcess.stdin.write(request.content);
@@ -873,7 +871,7 @@ function KIOItemServer(socket){
           sendResponse(undefined);
         });
       });
-      
+
       let reportPath: string = Path.resolve(_REPORTS_DIRECTORY_PATH, request.
         reportName);
       if ((request.format === 'application/vnd.oasis.opendocument.' +
@@ -896,7 +894,7 @@ function KIOItemServer(socket){
             sendResponse(undefined);
           });
         });
-        
+
         if (request.format === 'application/vnd.openxmlformats-' +
           'officedocument.wordprocessingml.document') {
           let intermediateFilePath: string = reportPath;
@@ -914,7 +912,7 @@ function KIOItemServer(socket){
               });
             });
           }
-          
+
           let sofficeProcess: any = child.spawn('soffice', ['--headless',
             '--convert-to', 'docx', '--outdir', _REPORTS_DIRECTORY_PATH,
             intermediateFilePath], undefined);
@@ -939,7 +937,7 @@ function KIOItemServer(socket){
               } else {
                 convertedFilePath = intermediateFilePath + '.docx';
               }
-              
+
               if (convertedFilePath === reportPath) {
                 sendResponse();
               } else {

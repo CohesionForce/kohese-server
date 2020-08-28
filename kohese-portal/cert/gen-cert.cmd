@@ -7,3 +7,4 @@ touch index.txt
 echo '01' > serial.txt
 openssl ca -config openssl-ca.cnf -policy signing_policy -extensions signing_req -out servercert.pem -infiles servercert.csr
 openssl x509 -in servercert.pem -text -noout
+rm -rf 01.pem index.txt index.txt.attr index.txt.old serial.txt serial.txt.old
