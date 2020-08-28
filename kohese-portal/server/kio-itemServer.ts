@@ -389,33 +389,29 @@ function KIOItemServer(socket){
         // Send deltas to client
         console.log('--- KDB Does Not Match: Delta response will be sent');
 
-        var thmCompare = TreeHashMap.compare(request.repoTreeHashes, repoTreeHashes);
         let thmDiff = TreeHashMap.diff(request.repoTreeHashes, repoTreeHashes);
-        // console.log('$$$ Diff Summary');
-        // console.log(thmDiff.summary);
-        // kdbFS.storeJSONDoc('./u.requestTHM.json', request.repoTreeHashes);
-        // kdbFS.storeJSONDoc('./u.serverTHM.json', repoTreeHashes);
-        // kdbFS.storeJSONDoc('./u.newDiff.json', thmDiff);
-        // kdbFS.storeJSONDoc('./u.oldDiff.json', thmCompare);
 
         response = {
             repoTreeHashes: repoTreeHashes,
             addItems: [],
             changeItems: [],
-            deleteItems: thmCompare.deletedItems
+            deleteItems: []
         };
 
-        thmCompare.addedItems.forEach((itemId) => {
+        for (let itemId in thmDiff.summary.itemAdded) {
           var proxy = ItemProxy.getWorkingTree().getProxyFor(itemId);
           response.addItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
-//          console.log(proxy.item);
-        });
+        }
 
-        thmCompare.changedItems.forEach((itemId) => {
+        for (let itemId in thmDiff.summary.contentChanged) {
           var proxy = ItemProxy.getWorkingTree().getProxyFor(itemId);
           response.changeItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
-//          console.log(proxy.item);
-        });
+        }
+
+        for (let itemId in thmDiff.summary.itemDeleted){
+          response.deleteItems.push(itemId);
+        }
+
       }
 
     } else {
