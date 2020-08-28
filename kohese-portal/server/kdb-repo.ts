@@ -400,45 +400,52 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static async getStatus (repositoryId, callback){
+  private static pendingGetStatus = {};
+  static async getStatus (repositoryId) : Promise<any> {
     //This code gets working directory changes similar to git status
-    repoList[repositoryId].getStatusExt().then(function(statuses) {
+    var repoStatus = [];
 
-      var repoStatus = [];
+    let statuses;
 
-      statuses.forEach(function(file) {
+    if (!this.pendingGetStatus[repositoryId]) {
+      this.pendingGetStatus[repositoryId] = repoList[repositoryId].getStatusExt();
+    }
+    statuses = await this.pendingGetStatus[repositoryId];
 
-        let path = file.path();
+    statuses.forEach(function(file) {
 
-        let itemId = undefined;
+      let path = file.path();
 
-        if (path.endsWith('.json')) {
-          itemId = Path.basename(path, '.json');
+      let itemId = undefined;
+
+      if (path.endsWith('.json')) {
+        itemId = Path.basename(path, '.json');
+        if (!UUID_REGEX.test(itemId)) {
+          itemId = Path.basename(Path.dirname(path));
           if (!UUID_REGEX.test(itemId)) {
-            itemId = Path.basename(Path.dirname(path));
-            if (!UUID_REGEX.test(itemId)) {
-              // Not an itemId, so reset to undefined
-              itemId = undefined;
-            }
+            // Not an itemId, so reset to undefined
+            itemId = undefined;
           }
         }
+      }
 
-        let fileStatus = {
-          itemId: itemId,
-          path: path,
-          status: file.status()
-        };
+      let fileStatus = {
+        itemId: itemId,
+        path: path,
+        status: file.status()
+      };
 
-        if (!itemId){
-          delete fileStatus.itemId;
-        }
+      if (!itemId){
+        delete fileStatus.itemId;
+      }
 
-        repoStatus.push(fileStatus);
+      repoStatus.push(fileStatus);
 
-      });
-
-      callback(repoStatus);
     });
+
+    delete this.pendingGetStatus[repositoryId];
+
+    return repoStatus;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -480,11 +487,11 @@ export class KDBRepo {
               }
             }
           }
-          
+
           break;
       }
     }
-      
+
     return relatedCommits;
     }
 
@@ -494,7 +501,7 @@ export class KDBRepo {
   static async walkHistoryForRepoFile(gitRepo, relativeFilePath, callback){
 
     var relatedCommits = KDBRepo.collectHistory(gitRepo, relativeFilePath);
-    
+
     var historyResponse = {
         file: relativeFilePath,
         history: []
@@ -510,11 +517,11 @@ export class KDBRepo {
           // TODO: Add path/OID
         });
     }
-    
+
     historyResponse.history.sort(function (c1, c2) {
       return c2.date - c1.date;
     });
-      
+
     callback(historyResponse);
   }
 }
