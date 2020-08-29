@@ -344,11 +344,11 @@ export class ItemRepository {
       let secondItemUpdateResponse = await this.sendMessageToWorker(
         'getItemUpdates', { refresh: true, treeHashes: workingTree.getAllTreeHashes() }, true);
 
-        let afterLoading = Date.now();
-        console.log('^^^ Time to perform second sync: ' + (afterLoading - afterGetStatus) / 1000);
-        console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
+      let afterLoading = Date.now();
+      console.log('^^^ Time to perform second sync: ' + (afterLoading - afterGetStatus) / 1000);
+      console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
 
-        let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
+      let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
 
       if (syncIsComplete){
         this.logService.log(this.logEvents.kdbSynced);
@@ -360,16 +360,15 @@ export class ItemRepository {
 
         let updatedTreeHashes = workingTree.getAllTreeHashes();
 
-        let compareRTH = TreeHashMap.compare(updatedTreeHashes, secondItemUpdateResponse.data.repoTreeHashes);
+        let diffRTH = TreeHashMap.diff(updatedTreeHashes, secondItemUpdateResponse.data.repoTreeHashes);
 
-        syncIsComplete = compareRTH.match
+        syncIsComplete = diffRTH.match
 
         if (!syncIsComplete) {
           // Provide additional logging information for failure to sync
-          this.logService.log(this.logEvents.repoSyncFailed, {comparison : compareRTH});
+          this.logService.log(this.logEvents.repoSyncFailed, {diff : diffRTH});
 
-          for (let idx in compareRTH.changedItems) {
-            let itemId = compareRTH.changedItems[idx];
+          for (let itemId in diffRTH.summary.contentChanged) {
             let changedProxy = workingTree.getProxyFor(itemId);
             this.logService.log(this.logEvents.failedProxySync, {
               id : itemId,
@@ -1018,7 +1017,7 @@ export class ItemRepository {
                               attributeTypeDataModel, attributeTypeViewModel,
                               formatDefinitionType) + '</li>');
                           }
-                          
+
                           body += '</ul>';
                         } else {
                           body += this.getStringRepresentation(reference,
