@@ -791,6 +791,7 @@ function KIOItemServer(socket){
             request.parameters.pathBase, mediaDirectoryPath);
         } else {
           replacement = matchedSubstring;
+
           if (embeddedImageCaptureGroup) {
             replacement = await embedImage(matchedSubstring,
               embeddedImageCaptureGroup, request.parameters.pathBase,

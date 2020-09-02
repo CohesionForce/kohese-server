@@ -3,11 +3,11 @@ var kio : any = {};
 
 kio.sessions = {};
 
-function Server(httpServer, options){
+function Server(httpsServer, options){
 
   if (!kio.server){
     console.log('::: Starting KIO Server');
-    kio.server =  require('socket.io')(httpServer, options);
+    kio.server =  require('socket.io')(httpsServer, options);
   } else {
     // Server has already been created
     console.log('!!! Attempted to start KIO Server again');
