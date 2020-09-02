@@ -169,7 +169,22 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         });
         break;
       case 'getStatus':
-        const statusCount = await getStatus();
+        let rootProxy = _workingTree.getRootProxy();
+        let statusCount = 0;
+        rootProxy.visitTree(null,(proxy: ItemProxy) => {
+          let statusArray = proxy.vcStatus.statusArray;
+          if (statusArray.length){
+            port.postMessage({
+              message: 'updateItemStatus',
+              data: {
+                itemId: proxy.item.id,
+                status: statusArray
+              }
+            });
+            statusCount++;
+          }
+        });
+
         port.postMessage({
           id: request.id,
           data: {statusCount: statusCount}
@@ -536,13 +551,6 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 
   if (proxy && itemStatus) {
     proxy.updateVCStatus(itemStatus);
-
-    // TODO: All change notifications need to be sent from ItemProxy
-
-    TreeConfiguration.getWorkingTree().getChangeSubject().next({
-      type: 'update',
-      proxy: proxy
-    });
   }
 
   postToAllPorts('updateItemStatus', { itemId: itemId, status: itemStatus });

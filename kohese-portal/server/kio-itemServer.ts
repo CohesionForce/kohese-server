@@ -58,6 +58,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
         kdb.storeModelInstance(change.proxy, change.type === 'create')
         .then(function (status) {
           let proxy : ItemProxy = change.proxy;
+          proxy.updateVCStatus(status, false);
           let createNotification = {
               type: change.type,
               kind: change.kind,
@@ -90,6 +91,35 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
       }
   }
 
+});
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+let retrieveVCStatus = KDBRepo.getStatus('ROOT');
+retrieveVCStatus.then((status) => {
+  console.log('::: Processing repo status');
+  var idStatusArray = [];
+  let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
+  for (var j = 0; j < status.length; j++) {
+    let statusRecord = status[j];
+
+    if (statusRecord.itemId){
+      idStatusArray.push({
+        id: statusRecord.itemId,
+        status: statusRecord.status
+      });
+
+      // Create lost item to represent the item if it does not exist
+      let proxy = workingTree.getProxyFor(statusRecord.itemId);
+      if (!proxy) {
+        // TODO: Need to evaluate and remove the creation of missing proxies from this location
+        proxy = ItemProxy.createMissingProxy('Item','id', statusRecord.itemId, workingTree);
+      }
+      proxy.updateVCStatus(statusRecord.status, false);
+    }
+  }
+  console.log('::: Status length (Initial):' + idStatusArray.length);
 });
 
 //////////////////////////////////////////////////////////////////////////
@@ -438,29 +468,23 @@ function KIOItemServer(socket){
     console.log('::: session %s: Getting status for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId, socket.id);
     let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
 
-    let status = await KDBRepo.getStatus(request.repoId);
+    let status = await retrieveVCStatus; //await KDBRepo.getStatus(request.repoId);
     if (status) {
       var idStatusArray = [];
-      for (var j = 0; j < status.length; j++) {
-        let statusRecord = status[j];
 
-        if (statusRecord.itemId){
+      let rootProxy = workingTree.getRootProxy();
+      rootProxy.visitTree(null,(proxy: ItemProxy) => {
+        let statusArray = proxy.vcStatus.statusArray;
+        if (statusArray.length){
           idStatusArray.push({
-            id: statusRecord.itemId,
-            status: statusRecord.status
+            id: proxy.item.id,
+            status: statusArray
           });
-
-          // Create lost item to represent the item if it does not exist
-          let proxy = workingTree.getProxyFor(statusRecord.itemId);
-          if (!proxy) {
-            // TODO: Need to evaluate and remove the creation of missing proxies from this location
-            proxy = ItemProxy.createMissingProxy('Item','id', statusRecord.itemId, workingTree);
-          }
         }
-      }
+      });
 
-      console.log('::: Current status');
-      console.log(JSON.stringify(idStatusArray, null, '  '));
+      // console.log('::: Current status');
+      // console.log(JSON.stringify(idStatusArray, null, '  '));
       let responseTransmitTime = Date.now();
 
       sendResponse(idStatusArray);
@@ -1508,6 +1532,7 @@ function updateStatus(proxies) {
         repositoryInformation.relativeFilePath);
     promises.push(promise.then((status) => {
       statusMap[proxies[i].item.id] = status;
+      proxies[i].updateVCStatus(status, false);
     }));
   }
 
