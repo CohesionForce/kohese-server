@@ -55,11 +55,37 @@ export class MockItemRepository {
       parentId: 'Model-Definitions'
     });
 
+    new ItemProxy('Namespace', {
+      alias: 'SubGlobal',
+      id: 'b32b6e10-ed3c-11ea-8737-9f31b413a913',
+      name: 'Sub-Global Namespace',
+      parentId: '750c7c00-d658-11ea-80c8-3b7d496d4ca3'
+    });
+
+    new ItemProxy('Namespace', {
+      alias: 'SubSubGlobal',
+      id: '03741da0-ed41-11ea-8737-9f31b413a913',
+      name: 'Sub-Sub-Global Namespace',
+      parentId: 'b32b6e10-ed3c-11ea-8737-9f31b413a913'
+    });
+
+    new ItemProxy('Namespace', {
+      alias: 'EmptySubGlobal',
+      id: 'cab8f1b0-edf5-11ea-8737-9f31b413a913',
+      name: 'Empty Sub-Global Namespace',
+      parentId: '750c7c00-d658-11ea-80c8-3b7d496d4ca3'
+    })
+
     for(let modelName in MockItemRepository.modelDefinitions.model) {
       console.log('::: Loading ' + modelName);
       let dataModel: KoheseDataModel = JSON.parse(JSON.stringify(
         MockItemRepository.modelDefinitions.model[modelName]));
-      if (dataModel.name === 'KoheseModel') {
+      
+      if (dataModel.name === 'Category') {
+        dataModel.namespace.id = 'b32b6e10-ed3c-11ea-8737-9f31b413a913';
+      } else if (dataModel.name === 'Project') {
+        dataModel.namespace.id = '03741da0-ed41-11ea-8737-9f31b413a913';
+      } else if (dataModel.name === 'KoheseModel') {
         let booleanAttribute: Attribute = {
           name: 'booleanAttribute',
           type: 'boolean',
@@ -526,7 +552,12 @@ export class MockItemRepository {
       console.log('::: Loading ' + viewName);
       let viewModel: KoheseViewModel = JSON.parse(JSON.stringify(
         MockItemRepository.modelDefinitions.view[viewName]));
-      if (viewModel.modelName === 'KoheseModel') {
+      
+      if (viewModel.modelName === 'Category') {
+        viewModel.namespace.id = 'b32b6e10-ed3c-11ea-8737-9f31b413a913';
+      } else if (viewModel.modelName === 'Project') {
+        viewModel.namespace.id = '03741da0-ed41-11ea-8737-9f31b413a913';
+      } else if (viewModel.modelName === 'KoheseModel') {
         let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
           viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
         let propertyDefinitions: Array<PropertyDefinition> = formatDefinition.
@@ -1096,6 +1127,16 @@ export class MockItemRepository {
       name: 'admin',
       username: 'admin',
       password: 'password'
+    });
+
+    new ItemProxy('Observation', {
+      id: 'ObservationInstance',
+      name: 'ObservationInstance',
+      observedBy: 'admin',
+      observedOn: 5000001,
+      context: [{
+        id: 'KoheseModel'
+      }]
     });
 
     let numberOfItemsToAdd: number = 7;

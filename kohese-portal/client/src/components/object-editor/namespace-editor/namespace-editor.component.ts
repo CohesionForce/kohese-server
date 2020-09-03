@@ -42,7 +42,7 @@ export class NamespaceEditorComponent implements Dialog {
    * @see Dialog.interface.ts
    */
   public isValid(): boolean {
-    return ((this._selectedNamespace.name != null) && (this.getNamespaces(
+    return ((this._selectedNamespace.name !== '') && (this.getNamespaces(
       true).map((namespace: any) => {
       return namespace.name;
     }).indexOf(this._selectedNamespace.name) === -1));

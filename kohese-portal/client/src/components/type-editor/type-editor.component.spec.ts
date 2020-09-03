@@ -49,6 +49,17 @@ describe('Component: Type Editor', ()=>{
     expect(typeEditorComponent).toBeTruthy(); 
   });
 
+  it('retrieves all Namespaces that contain at least one type', () => {
+    expect(typeEditorComponent.getNamespaces().length).toBe(3);
+  });
+
+  it('retrieves all types in a given Namespace', () => {
+    expect(typeEditorComponent.getNamespaceTypes(TreeConfiguration.
+      getWorkingTree().getProxyFor('b32b6e10-ed3c-11ea-8737-9f31b413a913').
+      item)).toEqual([TreeConfiguration.getWorkingTree().getProxyFor(
+      'Category').item]);
+  });
+
   it('adds Structures', async () => {
     let openComponentsDialogSpy: jasmine.Spy = spyOn(TestBed.get(
       DialogService), 'openComponentsDialog');

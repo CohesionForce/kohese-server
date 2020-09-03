@@ -77,4 +77,31 @@ describe('FormatObjectEditorComponent', () => {
       'multivaluedGlobalTypeAttribute'][0].id).item, 'globalTypeAttribute')).
       toBe('[object Object]');
   });
+
+  it('retrieves all Namespaces that contain at least one type', () => {
+    component.allowKindNarrowingOnly = false;
+    expect(component.getNamespaces().length).toBe(3);
+    component.allowKindNarrowingOnly = true;
+    component.type = TreeConfiguration.getWorkingTree().getProxyFor(
+      'Observation').item;
+    component.object = TreeConfiguration.getWorkingTree().getProxyFor(
+      'ObservationInstance').item;
+    expect(component.getNamespaces().length).toBe(1);
+  });
+
+  it('retrieves all types in a given Namespace', () => {
+    component.allowKindNarrowingOnly = false;
+    expect(component.getNamespaceTypes(TreeConfiguration.getWorkingTree().
+      getProxyFor('b32b6e10-ed3c-11ea-8737-9f31b413a913').item)).toEqual([
+      TreeConfiguration.getWorkingTree().getProxyFor('Category').item]);
+    component.allowKindNarrowingOnly = true;
+    component.type = TreeConfiguration.getWorkingTree().getProxyFor(
+      'Observation').item;
+    component.object = TreeConfiguration.getWorkingTree().getProxyFor(
+      'ObservationInstance').item;
+    expect(component.getNamespaceTypes(TreeConfiguration.getWorkingTree().
+      getProxyFor('750c7c00-d658-11ea-80c8-3b7d496d4ca3').item)).toEqual([
+      TreeConfiguration.getWorkingTree().getProxyFor('Issue').item,
+      TreeConfiguration.getWorkingTree().getProxyFor('Observation').item]);
+  });
 });

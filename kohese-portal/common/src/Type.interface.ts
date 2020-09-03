@@ -1,5 +1,6 @@
 export interface Type {
   metatype: Metatype;
+  namespace?: { id: string };
   id: string;
   name: string;
   localTypes?: { [localTypeName: string]: Type };

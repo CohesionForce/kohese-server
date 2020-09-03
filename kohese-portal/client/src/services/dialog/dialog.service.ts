@@ -74,8 +74,8 @@ export class DialogService {
     defaultValue: any, validate: (value: any) => boolean, options:
     { [optionName: string]: any}):
     Promise<any> {
-    if (options.indexOf(defaultValue) === -1) {
-      defaultValue = options[0];
+    if (defaultValue == null) {
+      defaultValue = Object.values(options)[0];
     }
     
     let dropdownDialogConfiguration: DropdownDialogConfiguration = {
