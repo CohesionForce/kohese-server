@@ -144,6 +144,8 @@ export class NamespaceEditorComponent implements Dialog {
       for (let j: number = 0 ; j < namespaceItemProxysToRemove.length; j++) {
         this._itemRepository.deleteItem(namespaceItemProxysToRemove[j], false);
       }
+
+      this._changeDetectorRef.markForCheck();
     }
   }
 
@@ -153,7 +155,7 @@ export class NamespaceEditorComponent implements Dialog {
   public async addSubcomponent(): Promise<void> {
     let treeConfiguration: TreeConfiguration = this._itemRepository.
       getTreeConfig().getValue().config;
-    let selection: Array<any> = await this._dialogService.openComponentsDialog(
+    let results: Array<any> = await this._dialogService.openComponentsDialog(
       [{
       component: TreeComponent,
       matDialogData: {
@@ -171,10 +173,12 @@ export class NamespaceEditorComponent implements Dialog {
           return treeConfiguration.getProxyFor('view-' +
             (element as ItemProxy).kind.toLowerCase()).item.icon;
         },
-        allowMultiselect: true
+        allowMultiselect: true,
+        showSelections: true
       }
     }], { data: {} }).updateSize('80%', '80%').afterClosed().toPromise();
-    if (selection) {
+    if (results) {
+      let selection: Array<any> = results[0];
       for (let j: number = 0; j < selection.length; j++) {
         if (selection[j].kind === 'Namespace') {
           selection[j].item.parentId = this._selectedNamespace.id;
@@ -182,6 +186,8 @@ export class NamespaceEditorComponent implements Dialog {
           selection[j].item.namespace.id = this._selectedNamespace.id;
         }
       }
+
+      this._changeDetectorRef.markForCheck();
     }
   }
 

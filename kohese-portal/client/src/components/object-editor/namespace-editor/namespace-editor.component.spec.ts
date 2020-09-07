@@ -119,7 +119,7 @@ describe('NamespaceEditorComponent', () => {
         return matDialogRefPlaceholder;
       },
       afterClosed: () => {
-        return of([namespaceItemProxy]);
+        return of([[namespaceItemProxy]]);
       }
     };
     spyOn(TestBed.get(DialogService), 'openComponentsDialog').and.returnValue(
@@ -131,7 +131,7 @@ describe('NamespaceEditorComponent', () => {
     let dataModelItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('Project');
     matDialogRefPlaceholder.afterClosed = () => {
-      return of([dataModelItemProxy]);
+      return of([[dataModelItemProxy]]);
     };
     await component.addSubcomponent();
     expect(dataModelItemProxy.item.namespace.id).toBe(component.

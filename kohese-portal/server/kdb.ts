@@ -459,6 +459,25 @@ function loadModelInstances (kind, modelDirPath, inRepo) {
     if(inRepo){
       proxy.repoPath = itemPath;
     }
+
+    migrate(proxy, kind);
+  }
+}
+
+function migrate(itemProxy: ItemProxy, typeName: string): void {
+  let migrated: boolean = false;
+  if (typeName === 'KoheseModel') {
+    if (itemProxy.item.namespace == null) {
+      itemProxy.item.namespace = {
+        id: '750c7c00-d658-11ea-80c8-3b7d496d4ca3'
+      };
+
+      migrated = true;
+    }
+  }
+  
+  if (migrated) {
+    storeModelInstance(itemProxy, false);
   }
 }
 
