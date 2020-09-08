@@ -465,7 +465,12 @@ function KIOItemServer(socket){
 
     let requestTime = Date.now();
     var repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
-    console.log('::: session %s: Getting status for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId, socket.id);
+    var username = 'Unknown';
+    if (socket.koheseUser){
+      username = socket.koheseUser.username;
+    }
+
+    console.log('::: session %s: Received getStatus for %s for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId, socket.id, username);
     let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
 
     let status = await retrieveVCStatus; //await KDBRepo.getStatus(request.repoId);
