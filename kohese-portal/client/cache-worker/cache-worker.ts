@@ -173,24 +173,23 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         break;
       case 'getStatus':
         let rootProxy = _workingTree.getRootProxy();
-        let statusCount = 0;
+        var idStatusArray = [];
         rootProxy.visitTree(null,(proxy: ItemProxy) => {
           let statusArray = proxy.vcStatus.statusArray;
           if (statusArray.length){
-            port.postMessage({
-              message: 'updateItemStatus',
-              data: {
-                itemId: proxy.item.id,
-                status: statusArray
-              }
+            idStatusArray.push({
+              id: proxy.item.id,
+              status: statusArray
             });
-            statusCount++;
           }
         });
 
         port.postMessage({
           id: request.id,
-          data: {statusCount: statusCount}
+          data: {
+            statusCount: idStatusArray.length,
+            idStatusArray: idStatusArray
+          }
         });
 
         break;
@@ -747,6 +746,7 @@ async function populateCache(): Promise<any> {
         console.log(JSON.stringify(missingCacheData, null, '  '));
         await fetchMissingCacheInformation(missingCacheData);
         missingCacheData = await _cache.analysis.reevaluateMissingData();
+        // TODO: Need to compare and exit if missing data can not be found
       }
 
       console.log('$$$ Getting tree roots');
@@ -760,6 +760,7 @@ async function populateCache(): Promise<any> {
         console.log(JSON.stringify(missingTreeRootData, null, '  '));
         await fetchMissingCacheInformation(missingTreeRootData);
         missingTreeRootData = await _cache.analysis.reevaluateMissingData();
+        // TODO: Need to compare and exit if missing data can not be found
       }
 
       let workingWorkspace = await _cache.getWorkspace('Working');
