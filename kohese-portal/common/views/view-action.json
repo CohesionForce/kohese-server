@@ -336,6 +336,14 @@
               "editable": true
             },
             {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": true
+            },
+            {
               "propertyName": "predecessors",
               "customLabel": "predecessors",
               "labelOrientation": "Top",
