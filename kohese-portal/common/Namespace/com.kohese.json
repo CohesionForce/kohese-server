@@ -1,0 +1,10 @@
+{
+  "alias": "Global",
+  "id": "com.kohese",
+  "name": "Global Namespace",
+  "parentId": "Model-Definitions",
+  "createdBy": "admin",
+  "createdOn": 1596548578622,
+  "modifiedBy": "admin",
+  "modifiedOn": 1596548599744
+}

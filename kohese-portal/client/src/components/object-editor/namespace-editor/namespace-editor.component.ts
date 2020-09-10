@@ -15,7 +15,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 })
 export class NamespaceEditorComponent implements Dialog {
   private _globalNamespace: any = this._itemRepository.getTreeConfig().
-    getValue().config.getProxyFor('750c7c00-d658-11ea-80c8-3b7d496d4ca3').item;
+    getValue().config.getProxyFor('com.kohese').item;
   get globalNamespace() {
     return this._globalNamespace;
   }

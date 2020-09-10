@@ -50,7 +50,7 @@ export class MockItemRepository {
 
     new ItemProxy('Namespace', {
       alias: 'Global',
-      id: '750c7c00-d658-11ea-80c8-3b7d496d4ca3',
+      id: 'com.kohese',
       name: 'Global Namespace',
       parentId: 'Model-Definitions'
     });
@@ -59,7 +59,7 @@ export class MockItemRepository {
       alias: 'SubGlobal',
       id: 'b32b6e10-ed3c-11ea-8737-9f31b413a913',
       name: 'Sub-Global Namespace',
-      parentId: '750c7c00-d658-11ea-80c8-3b7d496d4ca3'
+      parentId: 'com.kohese'
     });
 
     new ItemProxy('Namespace', {
@@ -73,7 +73,7 @@ export class MockItemRepository {
       alias: 'EmptySubGlobal',
       id: 'cab8f1b0-edf5-11ea-8737-9f31b413a913',
       name: 'Empty Sub-Global Namespace',
-      parentId: '750c7c00-d658-11ea-80c8-3b7d496d4ca3'
+      parentId: 'com.kohese'
     })
 
     for(let modelName in MockItemRepository.modelDefinitions.model) {

@@ -67,7 +67,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       subscribe((treeConfigInfo: TreeConfigInfo) => {
       if (treeConfigInfo) {
         this._selectedNamespace = treeConfigInfo.config.getProxyFor(
-          '750c7c00-d658-11ea-80c8-3b7d496d4ca3').item;
+          'com.kohese').item;
         this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[
           0];
       }
@@ -336,7 +336,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         let treeConfiguration: TreeConfiguration = this._itemRepository.getTreeConfig().
           getValue().config;
         this._selectedNamespace = treeConfiguration.getProxyFor(
-          '750c7c00-d658-11ea-80c8-3b7d496d4ca3').item;
+          'com.kohese').item;
         this._selectedType = treeConfiguration.getProxyFor('Item').item;
       }
       this._changeDetectorRef.markForCheck();

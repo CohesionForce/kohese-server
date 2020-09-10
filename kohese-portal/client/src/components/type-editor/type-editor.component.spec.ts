@@ -69,7 +69,7 @@ describe('Component: Type Editor', ()=>{
       },
       afterClosed: () => {
         return of(['Structure',
-          { id: '750c7c00-d658-11ea-80c8-3b7d496d4ca3' }]);
+          { id: 'com.kohese' }]);
       }
     } as MatDialogRef<ComponentDialogComponent>;
     openComponentsDialogSpy.and.returnValue(matDialogRefPlaceholder);
@@ -78,7 +78,7 @@ describe('Component: Type Editor', ()=>{
       getWorkingTree().getProxyFor('Structure');
     expect(metatypeInstanceItemProxy).toBeDefined();
     expect(metatypeInstanceItemProxy.item.namespace.id).toBe(
-      '750c7c00-d658-11ea-80c8-3b7d496d4ca3');
+      'com.kohese');
   });
 
   it('removes Structures', async () => {

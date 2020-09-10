@@ -35,6 +35,8 @@ let commonViewFiles = 'common/views/';
 function loadKoheseModelsAndViews() {
   console.log('::: Load Kohese Models');
 
+  kdbFS.createDirIfMissing(koheseKDBDirPath + path.sep + 'Namespace');
+  loadModelInstances('Namespace', 'common' + path.sep + 'Namespace', false);
   loadModelInstances('Namespace', koheseKDBDirPath + path.sep + 'Namespace',
     true);
 
@@ -469,7 +471,7 @@ function migrate(itemProxy: ItemProxy, typeName: string): void {
   if (typeName === 'KoheseModel') {
     if (itemProxy.item.namespace == null) {
       itemProxy.item.namespace = {
-        id: '750c7c00-d658-11ea-80c8-3b7d496d4ca3'
+        id: 'com.kohese'
       };
 
       migrated = true;

@@ -275,7 +275,7 @@ export function ModelDefinitions() {
         "name": "Action",
         "parentId": "Decision",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Decision",
         "idInjection": true,
@@ -466,7 +466,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1586372358125,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Decision",
         "idInjection": true,
@@ -480,10 +480,10 @@ export function ModelDefinitions() {
       "Analysis": {
         "id": "Analysis",
         "name": "Analysis",
-        "parentId": "750c7c00-d658-11ea-80c8-3b7d496d4ca3",
+        "parentId": "com.kohese",
         "base": "PersistedModel",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "idInjection": true,
         "invertItemOrder": true,
@@ -507,7 +507,7 @@ export function ModelDefinitions() {
         "name": "Category",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -524,7 +524,7 @@ export function ModelDefinitions() {
         "name": "Decision",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -668,7 +668,7 @@ export function ModelDefinitions() {
         "name": "DocumentConfiguration",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -700,7 +700,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1586375436637,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Decision",
         "idInjection": true,
@@ -716,7 +716,7 @@ export function ModelDefinitions() {
         "name": "Internal-Lost",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": false,
@@ -736,7 +736,7 @@ export function ModelDefinitions() {
         "parentId": "Item",
         "base": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "idInjection": false,
         "isMetaModel": true,
@@ -754,7 +754,7 @@ export function ModelDefinitions() {
         "name": "Issue",
         "parentId": "Observation",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Observation",
         "idInjection": true,
@@ -878,9 +878,9 @@ export function ModelDefinitions() {
       "Item": {
         "id": "Item",
         "name": "Item",
-        "parentId": "750c7c00-d658-11ea-80c8-3b7d496d4ca3",
+        "parentId": "com.kohese",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "PersistedModel",
         "isMetaModel": true,
@@ -1016,7 +1016,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1586900797128,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Decision",
         "idInjection": true,
@@ -1057,7 +1057,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1572491746960,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Decision",
         "idInjection": true,
@@ -1084,7 +1084,7 @@ export function ModelDefinitions() {
         "name": "KoheseModel",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "isMetaModel": true,
@@ -1322,7 +1322,7 @@ export function ModelDefinitions() {
         "name": "KoheseUser",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -1356,7 +1356,7 @@ export function ModelDefinitions() {
         "name": "KoheseView",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -1429,7 +1429,7 @@ export function ModelDefinitions() {
         "name": "Namespace",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "isMetaModel": true,
@@ -1454,7 +1454,7 @@ export function ModelDefinitions() {
         "name": "Observation",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -1494,7 +1494,7 @@ export function ModelDefinitions() {
         "name": "Project",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -1518,7 +1518,7 @@ export function ModelDefinitions() {
         "name": "ReportDefinition",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": false,
@@ -1547,7 +1547,7 @@ export function ModelDefinitions() {
         "name": "Repository",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -1573,7 +1573,7 @@ export function ModelDefinitions() {
         "name": "Task",
         "parentId": "Item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": true,
@@ -1784,7 +1784,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1593445545790,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "base": "Decision",
         "idInjection": true,
@@ -1895,7 +1895,7 @@ export function ModelDefinitions() {
         "name": "Action View Model",
         "parentId": "view-decision",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Action",
         "icon": "fa fa-paper-plane",
@@ -2510,7 +2510,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1586373219340,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Actor",
         "icon": "fa fa-male",
@@ -2750,7 +2750,7 @@ export function ModelDefinitions() {
         "name": "Analysis View Model",
         "parentId": "View-Model-Definitions",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Analysis",
         "icon": "",
@@ -2803,7 +2803,7 @@ export function ModelDefinitions() {
         "name": "Category View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Category",
         "icon": "",
@@ -3008,7 +3008,7 @@ export function ModelDefinitions() {
         "name": "Decision View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Decision",
         "icon": "fa fa-gavel",
@@ -3358,7 +3358,7 @@ export function ModelDefinitions() {
         "name": "DocumentConfiguration View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "DocumentConfiguration",
         "icon": "fa fa-file",
@@ -3546,7 +3546,7 @@ export function ModelDefinitions() {
         "name": "Domain",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "createdBy": "gmckune",
         "createdOn": 1586302904733,
@@ -3790,7 +3790,7 @@ export function ModelDefinitions() {
         "name": "Internal-Lost View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Internal-Lost",
         "icon": "fa fa-question",
@@ -4040,7 +4040,7 @@ export function ModelDefinitions() {
         "name": "Internal View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Internal",
         "icon": "fa fa-gears",
@@ -4293,7 +4293,7 @@ export function ModelDefinitions() {
         "name": "Issue View Model",
         "parentId": "view-observation",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Issue",
         "icon": "fa fa-exclamation-circle",
@@ -4660,7 +4660,7 @@ export function ModelDefinitions() {
         "name": "Item View Model",
         "parentId": "View-Model-Definitions",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Item",
         "icon": "fa fa-sticky-note",
@@ -4983,7 +4983,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1591737865749,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "KeyEvent",
         "icon": "fa fa-key",
@@ -5399,7 +5399,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1586376069127,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "KeyEventDictionary",
         "icon": "fa fa-th-list",
@@ -5712,7 +5712,7 @@ export function ModelDefinitions() {
         "name": "KoheseModel View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "KoheseModel",
         "icon": "fa fa-sitemap",
@@ -6272,7 +6272,7 @@ export function ModelDefinitions() {
         "name": "KoheseUser View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "KoheseUser",
         "icon": "fa fa-user",
@@ -6529,7 +6529,7 @@ export function ModelDefinitions() {
         "name": "KoheseView View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "KoheseView",
         "icon": "fa fa-desktop",
@@ -6780,7 +6780,7 @@ export function ModelDefinitions() {
         "name": "Namespace View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Namespace",
         "icon": "",
@@ -6960,7 +6960,7 @@ export function ModelDefinitions() {
         "name": "Observation View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Observation",
         "icon": "fa fa-comment",
@@ -7243,7 +7243,7 @@ export function ModelDefinitions() {
         "name": "Project View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Project",
         "icon": "fa fa-pie-chart",
@@ -7470,7 +7470,7 @@ export function ModelDefinitions() {
         "name": "ReportDefinition View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "ReportDefinition",
         "icon": "",
@@ -7691,7 +7691,7 @@ export function ModelDefinitions() {
         "name": "Repository View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Repository",
         "icon": "fa fa-database",
@@ -7912,7 +7912,7 @@ export function ModelDefinitions() {
         "name": "Task View Model",
         "parentId": "view-item",
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "Task",
         "icon": "fa fa-tasks",
@@ -8448,7 +8448,7 @@ export function ModelDefinitions() {
         "modifiedBy": "gmckune",
         "modifiedOn": 1593445614266,
         "namespace": {
-          "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+          "id": "com.kohese"
         },
         "modelName": "UseCase",
         "icon": "fa fa-lemon-o",

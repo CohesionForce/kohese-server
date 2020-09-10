@@ -7,7 +7,7 @@
   "modifiedBy": "gmckune",
   "modifiedOn": 1586375436637,
   "namespace": {
-    "id": "750c7c00-d658-11ea-80c8-3b7d496d4ca3"
+    "id": "com.kohese"
   },
   "base": "Decision",
   "idInjection": true,

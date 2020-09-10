@@ -100,7 +100,7 @@ describe('FormatObjectEditorComponent', () => {
     component.object = TreeConfiguration.getWorkingTree().getProxyFor(
       'ObservationInstance').item;
     expect(component.getNamespaceTypes(TreeConfiguration.getWorkingTree().
-      getProxyFor('750c7c00-d658-11ea-80c8-3b7d496d4ca3').item)).toEqual([
+      getProxyFor('com.kohese').item)).toEqual([
       TreeConfiguration.getWorkingTree().getProxyFor('Issue').item,
       TreeConfiguration.getWorkingTree().getProxyFor('Observation').item]);
   });
