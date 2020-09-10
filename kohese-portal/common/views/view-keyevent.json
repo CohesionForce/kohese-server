@@ -2,10 +2,6 @@
   "id": "view-keyevent",
   "name": "KeyEvent",
   "parentId": "view-decision",
-  "createdBy": "gmckune",
-  "createdOn": 1566607211956,
-  "modifiedBy": "gmckune",
-  "modifiedOn": 1591737865749,
   "modelName": "KeyEvent",
   "icon": "fa fa-key",
   "color": "#000000",
@@ -247,6 +243,14 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
               "editable": true
             },
             {
