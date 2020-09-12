@@ -335,7 +335,7 @@ export class ItemRepository {
       const statusResponse = await this.sendMessageToWorker(
         'getStatus', undefined, true);
       statusResponse.data.idStatusArray.forEach(element => {
-        this.updateItemStatus(element.id, element.itemStatus);
+        this.updateItemStatus(element.id, element.status);
       });
       console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
 
