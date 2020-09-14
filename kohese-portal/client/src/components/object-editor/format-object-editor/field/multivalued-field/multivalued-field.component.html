@@ -179,7 +179,9 @@
                           #multivaluedAttributeExpansionPanel style="width:
                           100%;">
                           <mat-expansion-panel-header>
-                            <mat-panel-title>
+                            <mat-panel-title style="white-space: nowrap;
+                              overflow: hidden; text-overflow: ellipsis;
+                              display: block;">
                               {{itemRepository.getStringRepresentation(
                                 koheseObject, propertyDefinition.propertyName,
                                 j, (enclosingDataModel ? enclosingDataModel :
