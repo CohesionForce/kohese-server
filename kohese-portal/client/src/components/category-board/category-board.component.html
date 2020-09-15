@@ -10,27 +10,22 @@
   </mat-form-field>
   <mat-form-field style="width: 40%; padding: 0px 3px 0px 3px;">
     <mat-select placeholder="Attribute" [(ngModel)]="selectedAttribute">
-      <ng-container *ngFor="let classPropertiesAttribute of Object.values(
-        selectedKind.classProperties)">
+      <ng-container *ngFor="let classPropertiesAttribute of Object.values(selectedKind.classProperties)">
         <mat-option [value]="classPropertiesAttribute.definition">
           {{classPropertiesAttribute.definition.name}}
         </mat-option>
       </ng-container>
     </mat-select>
   </mat-form-field>
-  <ng-container
-    *ngIf="isSelectedAttributeMultivaluedAndInstantaneouslyFinite()">
-    <div style="margin-left: auto; display: flex; flex-direction: column;
-      justify-content: center;">
+  <ng-container *ngIf="isSelectedAttributeMultivaluedAndInstantaneouslyFinite()">
+    <div style="margin-left: auto; display: flex; flex-direction: column; justify-content: center;">
       <mat-checkbox [(ngModel)]="shouldGroupElements">
         Group Elements
       </mat-checkbox>
     </div>
   </ng-container>
-  <button mat-icon-button matTooltip="Save the selected Project"
-    (click)="save()" [ngStyle]="{ 'margin-left':
-    (isSelectedAttributeMultivaluedAndInstantaneouslyFinite() ? '' :
-    'auto') }">
+  <button mat-icon-button matTooltip="Save the selected Project" (click)="save()" [ngStyle]="{ 'margin-left':
+    (isSelectedAttributeMultivaluedAndInstantaneouslyFinite() ? '' : 'auto') }">
     <mat-icon class="fa fa-save"></mat-icon>
   </button>
 </div>
@@ -44,59 +39,52 @@
       categoryItems.category)" style="height: 100%; width: 400px; min-width:
       400px; margin: 0px 7px 0px 7px; display: flex; flex-direction: column;">
       <div style="height: 50px;">
-        <h3 matTooltip="{{getCategoryHeading(categoryItems)}} ({{categoryItems.items.length}})" style="display:
-          flex; flex-direction: row;">
-          <span style="max-width: 90%; white-space: nowrap; overflow: hidden;
-            text-overflow: ellipsis;">
+        <h3 matTooltip="{{getCategoryHeading(categoryItems)}} ({{categoryItems.items.length}})"
+          style="display: flex; flex-direction: row;">
+          <span style="max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
             {{getCategoryHeading(categoryItems)}}
           </span>
           &nbsp;({{categoryItems.items.length}})
         </h3>
       </div>
-      <div style="height: calc(100% - 50px); overflow: auto; display: flex;
-        flex-direction: column;">
+      <div style="height: calc(100% - 50px); overflow: auto; display: flex; flex-direction: column;">
         <ng-container *ngFor="let item of categoryItems.items">
-          <mat-card draggable="{{mayDrag(item)}}" (dragstart)="$event.
-            dataTransfer.setData(item[selectedAttribute.name], item.id);
-            $event.dataTransfer.dropEffect = 'move'; changeDetectorRef.
-            detach()" (dragend)="changeDetectorRef.reattach();
-            changeDetectorRef.markForCheck()" [ngStyle]="{ 'background-color':
-            viewModel.color }" style="flex: 0 0 170px; color: whitesmoke;
-            margin-bottom: 3px;">
-            <mat-card-title style="display: flex; flex-direction: row;">
-              <h3 matTooltip="{{item.name}}" style="white-space: nowrap;
-                overflow: hidden; text-overflow: ellipsis;">
-                <mat-icon class="{{viewModel.icon}}">
-                </mat-icon>
+          <mat-expansion-panel style="width: 100%;
+            box-shadow: 0 3px 1px -2px rgba(0,0,0,.8), 0 2px 2px 0 rgba(0,0,0,.64), 0 1px 5px 0 rgba(0,0,0,.62);">
+            <mat-expansion-panel-header draggable="{{mayDrag(item)}}"
+              (dragstart)="$event.dataTransfer.setData(item[selectedAttribute.name], item.id);
+              $event.dataTransfer.dropEffect = 'move';
+              changeDetectorRef.detach();" (dragend)="changeDetectorRef.reattach();
+              changeDetectorRef.markForCheck();" [ngStyle]="{ 'background-color': viewModel.color }"
+              style="color: whitesmoke">
+              <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 68%;
+                display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <mat-icon class="{{viewModel.icon}}"></mat-icon>
                 {{item.name}}
-              </h3>
-              <ng-container *ngIf="itemRepository.getTreeConfig().getValue().
-                config.getProxyFor(item.id).dirty">
-                <!--
-                  Wrap the img below with a button to size and vertically align
-                  the image well.
-                -->
-                <button mat-icon-button [disabled]="true">
-                  <img src="assets/icons/versioncontrol/dirty.ico"/>
+              </mat-panel-title>
+              <mat-panel-description style="color: whitesmoke">
+                <ng-container *ngIf="itemRepository.getTreeConfig().getValue().config.getProxyFor(item.id).dirty">
+                  <!-- Wrapped the img below with a button to size and vertically align
+                    the image well. -->
+                  <button mat-icon-button [disabled]="true">
+                    <img src="assets/icons/versioncontrol/dirty.ico" />
+                  </button>
+                </ng-container>
+                <button mat-icon-button matTooltip="Display Item information" style="margin-left: auto;"
+                  (click)="displayInformation(item)">
+                  <mat-icon class="fa fa-search"></mat-icon>
                 </button>
-              </ng-container>
-              <button mat-icon-button matTooltip="Display Item information"
-                style="margin-left: auto;" (click)="displayInformation(
-                item)">
-                <mat-icon class="fa fa-search"></mat-icon>
-              </button>
-              <button mat-icon-button matTooltip="Navigate to this Item"
-                (click)="navigate(item)">
-                <mat-icon class="fa fa-arrow-right"></mat-icon>
-              </button>
-            </mat-card-title>
-            <mat-card-content style="background-color: white; color: black;">
+                <button mat-icon-button matTooltip="Navigate to this Item" (click)="navigate(item)">
+                  <mat-icon class="fa fa-arrow-right"></mat-icon>
+                </button>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <ng-template matExpansionPanelContent>
               <format-object-editor [type]="selectedKind" [object]="item"
-                [formatDefinitionType]="FormatDefinitionType.BOARD"
-                [disabled]="true">
+                [formatDefinitionType]="FormatDefinitionType.BOARD" [disabled]="true">
               </format-object-editor>
-            </mat-card-content>
-          </mat-card>
+            </ng-template>
+          </mat-expansion-panel>
         </ng-container>
       </div>
     </div>

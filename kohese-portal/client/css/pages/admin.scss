@@ -3,11 +3,11 @@
 .admin-screen {
   height: calc(100% - 90px);
   width: calc(100% - 65px);
-  
+
   .users-screen {
     height: calc(100% - 41px);
     width: 100%;
-    
+
     .session-container {
       height: 20%;
       width: calc(100% - 10px);
@@ -17,7 +17,7 @@
     .user-container {
       height: 80%;
       width: 100%;
-    
+
       #admin-user-list {
         float: left;
         height: 100%;
@@ -46,14 +46,18 @@
   height: calc(100% - 90px);
   width: calc(100% - 65px);
   overflow: auto;
-  
+
   .repository-panel {
     margin: 5px;
   }
-  
+
   .remote-container {
     height: 20%;
     overflow: auto;
     border: 1px solid black;
   }
+}
+
+::-webkit-scrollbar {
+  display: none;
 }

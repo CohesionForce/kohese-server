@@ -1,20 +1,22 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy,
+         ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { LensService,
-  ApplicationLens } from '../../services/lens-service/lens.service';
+import { LensService, ApplicationLens } from '../../services/lens-service/lens.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
+import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
+
+
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: [],
+  styleUrls: ['./admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminComponent implements OnInit, OnDestroy {
@@ -22,17 +24,17 @@ export class AdminComponent implements OnInit, OnDestroy {
   get lens() {
     return this._lens;
   }
-  
+
   private _koheseUserDataModel: any;
   get koheseUserDataModel() {
     return this._koheseUserDataModel;
   }
-  
+
   private _koheseUserViewModel: any;
   get koheseUserViewModel() {
     return this._koheseUserViewModel;
   }
-  
+
   private _sessionMap: any;
   get sessionMap() {
     return this._sessionMap;
@@ -40,27 +42,30 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   private _treeConfigurationSubscription: Subscription;
   private _lensSubscription: Subscription;
-  
+
   private _editableSet: Array<string> = [];
   get editableSet() {
     return this._editableSet;
   }
-  
+
   get sessionService() {
     return this._sessionService;
   }
-  
+
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
-  
+
   get ApplicationLens() {
     return ApplicationLens;
   }
-  
+
   get Object() {
     return Object;
   }
+
+  @ViewChildren(MatExpansionPanel)
+  private expansionPanels: QueryList<MatExpansionPanel>;
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _sessionService: SessionService, private _itemRepository:
@@ -80,7 +85,7 @@ export class AdminComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       }
     });
-    
+
     this._lensSubscription = this._lensService.getLensSubject().subscribe(
       (lens: ApplicationLens) => {
       this._lens = lens;
@@ -92,7 +97,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this._lensSubscription.unsubscribe();
     this._treeConfigurationSubscription.unsubscribe();
   }
-  
+
   public add(): void {
     let username: string = this._sessionService.user.name;
     let timestamp: number = Date.now();
@@ -120,7 +125,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public save(user: any): void {
     this._itemRepository.upsertItem(this._itemRepository.getTreeConfig().
       getValue().config.getProxyFor(user.id).kind, user).then(
@@ -129,14 +134,14 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
     this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
   }
-  
+
   public discardChanges(user: any): void {
     this._itemRepository.fetchItem(this._itemRepository.getTreeConfig().
       getValue().config.getProxyFor(user.id));
     this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public async remove(user: any): Promise<void> {
     let response: any = await this._dialogService.openYesNoDialog('Remove ' +
       user.name, 'Are you sure that you want to remove ' + user.name +
@@ -150,4 +155,23 @@ export class AdminComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  isModified(user: any): boolean {
+    return this._itemRepository.getTreeConfig().getValue().config.getProxyFor(user.id).dirty;
+  }
+
+  public expandAll(): void {
+    let expansionPanels: Array<MatExpansionPanel> = this.expansionPanels.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      expansionPanels[j].open();
+    }
+  }
+
+  public collapseAll(): void {
+    let expansionPanels: Array<MatExpansionPanel> = this.expansionPanels.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      expansionPanels[j].close();
+    }
+  }
+
 }

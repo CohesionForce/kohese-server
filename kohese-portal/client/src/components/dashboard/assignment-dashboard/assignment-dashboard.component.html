@@ -1,55 +1,67 @@
-<div style="height: 100%; display: flex; flex-direction: row;">
-  <div style="flex: 1 1 60%; overflow: auto;">
+<div style="height: 100%; display: flex; flex-direction: row; margin: 0.05em">
+  <div style="flex: 1 1 60%; overflow: auto; scroll-padding-block-start: 100%; color: whitesmoke">
+    <h4 style="height: 2.4em; padding-left: 0.3em; border-bottom: 2px solid rgba(0,0,0,.65);
+      background-color: white; color: rgba(0,0,0,.8); display: flex; flex-direction: row; align-items: center">
+      Assignments:
+      <button mat-icon-button matTooltip="Expand all differences" (click)="expandAll()" class="flex-right-align">
+        <mat-icon class="fa fa-chevron-down"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Collapse all differences" (click)="collapseAll()">
+        <mat-icon class="fa fa-chevron-up"></mat-icon>
+      </button>
+    </h4>
     <ng-container *ngFor="let assignment of sortedAssignmentList">
-      <mat-card [ngStyle]="{ 'background-color': (getViewModel(
-          assignment).color ? getViewModel(assignment).color : '#000000') }"
-          style="color: whitesmoke; margin-bottom: 3px;">
-        <mat-card-title style="display: flex; flex-direction: row;">
-          <h3>
-            <mat-icon class="{{getViewModel(assignment).icon}}">
-            </mat-icon>
-            {{assignment.item.name}}
+      <mat-expansion-panel style="width: 100%;
+        box-shadow: 0 3px 1px -2px rgba(0,0,0,.8), 0 2px 2px 0 rgba(0,0,0,.64), 0 1px 5px 0 rgba(0,0,0,.62);" #panel>
+        <mat-expansion-panel-header [ngStyle]="{ 'background-color': (getViewModel(assignment).color ?
+          getViewModel(assignment).color : '#000000') }">
+          <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 68%;
+            display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <mat-icon class="{{getViewModel(assignment).icon}}" style="margin-right: 3px;"></mat-icon>
+            {{ assignment.item[getHeader(assignment)] }}
+          </mat-panel-title>
+          <mat-panel-description style="color:whitesmoke">
             <ng-container *ngIf="assignment.dirty">
-              <img src="assets/icons/versioncontrol/dirty.ico"/>
+              <button mat-icon-button [disabled]="true" class="flex-right-align">
+                <img src="assets/icons/versioncontrol/dirty.ico" />
+              </button>
             </ng-container>
-          </h3>
-          <ng-container *ngIf="(editableSet.indexOf(assignment.item.id) === -1)
-            else editableBlock">
-            <button mat-icon-button matTooltip="Edit this Item"
-              class="flex-right-align" (click)="editableSet.push(assignment.item.
-              id)">
-              <mat-icon class="fa fa-edit"></mat-icon>
+            <ng-container *ngIf="(editableSet.indexOf(assignment.item.id) === -1) else editableBlock">
+              <button mat-icon-button matTooltip="Edit this Item"
+                [ngStyle]="{ 'margin-left': (assignment.dirty ? '' : 'auto') }"
+                (click)="$event.stopPropagation(); panel.open(); editableSet.push(assignment.item.id)">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+            </ng-container>
+            <ng-template #editableBlock>
+              <button mat-icon-button matTooltip="Save this Item"
+                [ngStyle]="{ 'margin-left': (assignment.dirty ? '' : 'auto') }"
+                (click)="$event.stopPropagation(); save(assignment)">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Discard unsaved changes to this Item"
+                (click)="$event.stopPropagation(); discardChanges(assignment)">
+                <mat-icon class="fa fa-times"></mat-icon>
+              </button>
+            </ng-template>
+            <button mat-icon-button matTooltip="Display Item information"
+              (click)="$event.stopPropagation(); displayInformation(assignment)">
+              <mat-icon class="fa fa-search"></mat-icon>
             </button>
-          </ng-container>
-          <ng-template #editableBlock>
-            <button mat-icon-button matTooltip="Save this Item"
-              class="flex-right-align" (click)="save(assignment)">
-              <mat-icon class="fa fa-save"></mat-icon>
+            <button mat-icon-button matTooltip="Navigate to this Item"
+              (click)="$event.stopPropagation(); navigate(assignment)">
+              <mat-icon class="fa fa-arrow-right"></mat-icon>
             </button>
-            <button mat-icon-button matTooltip="Discard unsaved changes to this
-              Item" (click)="discardChanges(assignment)">
-              <mat-icon class="fa fa-times"></mat-icon>
-            </button>
-          </ng-template>
-          <button mat-icon-button matTooltip="Display Item information"
-            (click)="displayInformation(assignment)">
-            <mat-icon class="fa fa-search"></mat-icon>
-          </button>
-          <button mat-icon-button matTooltip="Navigate to this Item"
-            (click)="navigate(assignment)">
-            <mat-icon class="fa fa-arrow-right"></mat-icon>
-          </button>
-        </mat-card-title>
-        <mat-card-content style="background-color: white; color: black;">
-          <format-object-editor [type]="assignment.model.item"
-            [object]="assignment.item"
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <format-object-editor [type]="assignment.model.item" [object]="assignment.item"
             [formatDefinitionType]="FormatDefinitionType.CARD"
             [disabled]="(editableSet.indexOf(assignment.item.id) === -1)">
           </format-object-editor>
-        </mat-card-content>
-      </mat-card>
+        </ng-template>
+      </mat-expansion-panel>
     </ng-container>
   </div>
-  <activity-feed [activityList]="assignmentList" style="flex: 1 1 40%;">
-  </activity-feed>
+  <activity-feed [activityList]="assignmentList" style="flex: 1 1 40%; padding-left: .5em"></activity-feed>
 </div>
