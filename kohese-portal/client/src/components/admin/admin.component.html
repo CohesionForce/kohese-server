@@ -31,7 +31,10 @@
         <mat-icon class="fa fa-plus"></mat-icon>
       </button>
     </h2>
-    <div style="height: calc(100% - 70px); overflow: auto;">
+    <!-- Height of 5.3em was chosen based on the minimum height for entire scroll bar to show. It is unclear
+         from where the extra space we are not taking to account is located. See comments on
+         assignment-dashboard.component.html or activity-feed.component.html for further explanation.  -->
+    <div style="height: calc(100% - 5.33em); overflow: auto;">
       <ng-container *ngFor="let user of sessionService.users">
         <mat-expansion-panel
           style="width: 100%;
