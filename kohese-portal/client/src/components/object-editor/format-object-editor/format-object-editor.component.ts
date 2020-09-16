@@ -237,8 +237,8 @@ export class FormatObjectEditorComponent implements OnInit {
     this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
       ItemProxy) => {
-      if ((itemProxy.kind === 'KoheseModel') && !itemProxy.item.isMetaModel &&
-        (itemProxy.item.namespace.id === namespace.id)) {
+      if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.namespace.id
+        === namespace.id)) {
         if (this._allowKindNarrowingOnly) {
           let modelItemProxy: any = itemProxy;
           while (modelItemProxy) {
