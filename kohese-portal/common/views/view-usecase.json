@@ -2,10 +2,6 @@
   "id": "view-usecase",
   "name": "UseCase",
   "parentId": "view-item",
-  "createdBy": "gmckune",
-  "createdOn": 1570033169859,
-  "modifiedBy": "gmckune",
-  "modifiedOn": 1593445614266,
   "namespace": {
     "id": "com.kohese"
   },
@@ -40,7 +36,6 @@
   },
   "localTypes": {
     "FlowOfEvents": {
-      "metatype": "Structure",
       "name": "FlowOfEvents",
       "modelName": "FlowOfEvents",
       "icon": "",
@@ -85,14 +80,6 @@
             "type": "",
             "options": {}
           }
-        },
-        "OnStep": {
-          "name": "OnStep",
-          "displayName": "On Step",
-          "inputType": {
-            "type": "",
-            "options": {}
-          }
         }
       },
       "formatDefinitions": {
@@ -128,14 +115,6 @@
                   "customLabel": "Preconditions",
                   "labelOrientation": "Top",
                   "kind": "text",
-                  "visible": true,
-                  "editable": true
-                },
-                {
-                  "propertyName": "OnStep",
-                  "customLabel": "On Step",
-                  "labelOrientation": "Top",
-                  "kind": "",
                   "visible": true,
                   "editable": true
                 },
@@ -193,15 +172,6 @@
                   "customLabel": "Preconditions",
                   "labelOrientation": "Top",
                   "kind": "text",
-                  "tableDefinition": "",
-                  "visible": true,
-                  "editable": true
-                },
-                {
-                  "propertyName": "OnStep",
-                  "customLabel": "OnStep",
-                  "labelOrientation": "Top",
-                  "kind": "",
                   "tableDefinition": "",
                   "visible": true,
                   "editable": true
@@ -439,6 +409,14 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
               "editable": true
             },
             {

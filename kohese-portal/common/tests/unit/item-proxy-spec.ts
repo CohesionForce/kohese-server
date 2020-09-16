@@ -1310,82 +1310,6 @@ it('Retrieve Delta Tree Hash Map', () => {
   newAAItem.parentId = 'AB';
   aa.updateItem(aa.kind, newAAItem);
 
-
-  var expectedDeltaMap = {
-    match: false,
-    addedItems: [ 'D' ],
-    changedItems: [ 'AA', 'C' ],
-    deletedItems: [ 'B' ],
-    childMismatch: {
-      'A': {
-        addedChildren: [],
-        deletedChildren: [
-          'AA'
-        ],
-        changedChildren: {
-          'AB': {
-            'from': '9eb9d8f149c52b7b171a55a1ad2cf19e6ebd5722',
-            'to': 'ddc3ea25293266ded6f267d7408bf37f6c19a3fe'
-          }
-        },
-        reorderedChildren: {
-          '0': {
-            'from': 'AA',
-            'to': 'AB'
-          },
-          '1': {
-            'from': 'AB',
-            'to': 'AC'
-          },
-          '2': {
-            'from': 'AC'
-          }
-        }
-      },
-      AB: {
-        addedChildren: ['AA'],
-        deletedChildren: [],
-        changedChildren: {},
-        reorderedChildren: {
-          0: {
-            from: 'ABA',
-            to: 'AA'
-          },
-          1: {
-            from: 'ABB',
-            to: 'ABA'
-          }
-        }
-      },
-      'NV-TOP': {
-        addedChildren: ['D'],
-        deletedChildren: ['B'],
-        changedChildren: {
-          A: {
-            from: 'a9385f1c99e1df0b5fac84cf27c3697a81bd677e',
-            to: '7f5c4f5a5de6ac07235090cc4854f5c9db2ac9e3'
-          },
-          C: {
-            from: 'ae18d558a36067d6fc77346a22b2ebd64a1c7e5e',
-            to: '51f07bc8e0eb82b241784709669f186aee2c3989'
-          }
-        },
-        reorderedChildren: { 1: { from: 'B', to: 'D' } }
-      },
-      ROOT: {
-        addedChildren: [],
-        deletedChildren: [],
-        changedChildren: {
-          'NV-TOP': {
-            from: 'f914e46f91190f7a8d48c9325bf78b5ebca8f8d8',
-            to: 'd556c2a797d86d518686a8f2395b7bf6fa888f9e'
-          }
-        },
-        reorderedChildren: {}
-      }
-    }
-  };
-
   let expectedDiffResult : TreeHashMapDifference = {
     'match': false,
     'summary': {
@@ -1682,7 +1606,6 @@ it('Retrieve Delta Tree Hash Map', () => {
 
   var treeHashMapAfter = ItemProxy.getWorkingTree().getAllTreeHashes();
 
-  var thmCompare : any = TreeHashMap.compare(treeHashMapBefore, treeHashMapAfter);
   let thmDiff = TreeHashMap.diff(treeHashMapBefore, treeHashMapAfter);
 
   // let kdbFS = require('../../../server/kdb-fs.js');
@@ -1691,10 +1614,8 @@ it('Retrieve Delta Tree Hash Map', () => {
 
   // Strip undefined fields to match previous implementation of Jasmine toEqual
   thmDiff = JSON.parse(JSON.stringify(thmDiff));
-  thmCompare = JSON.parse(JSON.stringify(thmCompare));
 
   expect(thmDiff).toEqual(expectedDiffResult);
-  expect(thmCompare).toEqual(expectedDeltaMap);
 });
 
 //////////////////////////////////////////////////////////////////////////
@@ -1808,11 +1729,11 @@ it('Recursive Delete', () => {
 
   subscription.unsubscribe();
 
-  let expectedChangeNotification = { 
-    update: [ 'A', 'AA', 'AAA', 'AAB', 'AB' ], 
-    delete: [ 'AAA', 'AAB', 'AA', 'AB', 'A' ] 
+  let expectedChangeNotification = {
+    update: [ 'A', 'AA', 'AAA', 'AAB', 'AB' ],
+    delete: [ 'AAA', 'AAB', 'AA', 'AB', 'A' ]
   };
-  
+
   expect(changeNotification).toEqual(expectedChangeNotification);
 });
 
@@ -1887,7 +1808,7 @@ it('Prevent Parent as Descendant', () => {
       id: 'A',
       name: 'A Item',
       parentId: 'AA'
-    });  
+    });
   } catch (err) {
     expect(err).toEqual({ error: 'Parent-Can-Not-Be-Descendant',
     childId: 'A',

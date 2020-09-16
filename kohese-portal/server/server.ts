@@ -2,6 +2,9 @@ process.title = "kohese-server";
 
 var express = require('express');
 var morgan = require('morgan');
+var https = require('https');
+
+const KohesePort = 3010;
 
 var app = module.exports = express();
 
@@ -16,7 +19,7 @@ if (require.main === module) {
   var baseRepoPath = 'kohese-kdb';
   for (var i = 2; i < process.argv.length; i++) {
     var arg = process.argv[i].split('=');
-    if((arg[0] === '-kdb') && (arg[1] !== '')) {
+    if ((arg[0] === '-kdb') && (arg[1] !== '')) {
       baseRepoPath = arg[1];
       break;
     }
@@ -36,9 +39,18 @@ if (require.main === module) {
       // eslint-disable-next-line no-unused-vars
       var enableAuth = require('./server-enableAuth');
 
+      // Establish HTTPS Server
+      var fs = require('fs');
+      var options = {
+        key: fs.readFileSync('./cert/serverkey.pem'),
+        cert: fs.readFileSync('./cert/servercert.pem')
+      };
+
+
+      let httpsServer = https.createServer(options, app);
+
       console.log('::: Starting Express Services');
-      const KohesePort = 3000;
-      var appServer = app.listen(KohesePort, () => {
+      var appServer = httpsServer.listen(KohesePort, () => {
         console.log('::: Kohese Server listening at port: ' + KohesePort);
       });
 
@@ -57,11 +69,11 @@ if (require.main === module) {
 
       // check to see if 'repl' was passed as an argument. If so, start the REPL service
       for (var i = 2; i < process.argv.length; i++) {
-          if(process.argv[i] === 'repl') {
-            // eslint-disable-next-line no-unused-vars
-            var koheseREPL = require('./kohese-repl');
-            break;
-          }
+        if (process.argv[i] === 'repl') {
+          // eslint-disable-next-line no-unused-vars
+          var koheseREPL = require('./kohese-repl');
+          break;
+        }
       }
     } catch (err) {
       console.log('*** Error while initializing server: ' + err);
@@ -71,5 +83,4 @@ if (require.main === module) {
     console.log('*** Error while initializing kdb: ' + err);
     console.log(err.stack)
   });
-
-  }
+}

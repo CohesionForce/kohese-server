@@ -1,9 +1,11 @@
 /**
- * 
+ *
  */
 
+
+ // TODO: Determine if there is an https change required
 var prompt = require('prompt');
-var http = require('http');
+var https = require('https');
 var fs = require('fs');
 
 var accessToken = 'Bearer ';
@@ -12,7 +14,7 @@ prompt.start();
 
 var filePrompt = {properties: {proceed: {
 	description: 'Proceed? (Y/N): ',
-	pattern: /^[YNyn]{1}$/, 
+	pattern: /^[YNyn]{1}$/,
 	message: 'Please enter Y or N',
 	required: true}}};
 
@@ -71,7 +73,7 @@ function  beginLogin() {
 				}
 		};
 
-		var loginRequest = http.request(options, loginCallback);
+		var loginRequest = https.request(options, loginCallback);
 		loginRequest.write(loginData);
 		loginRequest.end();
 

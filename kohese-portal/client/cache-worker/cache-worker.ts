@@ -65,9 +65,12 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     switch (request.type) {
       case 'connect':
         if (!socket) {
-          socket = SocketIoClient();
-          socket.on('connect_error', () => {
+          socket = SocketIoClient({
+            rejectUnauthorized: false
+          });
+          socket.on('connect_error', (err) => {
             console.log('*** Worker socket connection error');
+            console.log(JSON.stringify(err, null, '  '));
             postToAllPorts('connectionError', {});
           });
           socket.on('reconnect', async () => {
@@ -169,10 +172,24 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         });
         break;
       case 'getStatus':
-        const statusCount = await getStatus();
+        let rootProxy = _workingTree.getRootProxy();
+        var idStatusArray = [];
+        rootProxy.visitTree(null,(proxy: ItemProxy) => {
+          let statusArray = proxy.vcStatus.statusArray;
+          if (statusArray.length){
+            idStatusArray.push({
+              id: proxy.item.id,
+              status: statusArray
+            });
+          }
+        });
+
         port.postMessage({
           id: request.id,
-          data: {statusCount: statusCount}
+          data: {
+            statusCount: idStatusArray.length,
+            idStatusArray: idStatusArray
+          }
         });
 
         break;
@@ -458,8 +475,7 @@ function registerKoheseIOListeners() {
   // Register the listeners for the Item kinds that are being tracked
   socket.on('Item/create', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Created:  ' + notification.item.id);
-    buildOrUpdateProxy(notification.item, notification.kind, notification.
-      status);
+    buildOrUpdateProxy(notification.item, notification.kind, notification.status);
   });
 
   socket.on('Item/update', (notification) => {
@@ -536,13 +552,6 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 
   if (proxy && itemStatus) {
     proxy.updateVCStatus(itemStatus);
-
-    // TODO: All change notifications need to be sent from ItemProxy
-
-    TreeConfiguration.getWorkingTree().getChangeSubject().next({
-      type: 'update',
-      proxy: proxy
-    });
   }
 
   postToAllPorts('updateItemStatus', { itemId: itemId, status: itemStatus });
@@ -737,6 +746,7 @@ async function populateCache(): Promise<any> {
         console.log(JSON.stringify(missingCacheData, null, '  '));
         await fetchMissingCacheInformation(missingCacheData);
         missingCacheData = await _cache.analysis.reevaluateMissingData();
+        // TODO: Need to compare and exit if missing data can not be found
       }
 
       console.log('$$$ Getting tree roots');
@@ -750,6 +760,7 @@ async function populateCache(): Promise<any> {
         console.log(JSON.stringify(missingTreeRootData, null, '  '));
         await fetchMissingCacheInformation(missingTreeRootData);
         missingTreeRootData = await _cache.analysis.reevaluateMissingData();
+        // TODO: Need to compare and exit if missing data can not be found
       }
 
       let workingWorkspace = await _cache.getWorkspace('Working');

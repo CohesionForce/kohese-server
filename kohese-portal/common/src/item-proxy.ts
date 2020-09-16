@@ -2021,14 +2021,19 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  updateVCStatus (itemStatus : Array<string>) {
+  updateVCStatus (itemStatus : Array<string>, withNotification : boolean = true) {
 
-    this._vcStatus.updateStatus(itemStatus);
+    let currentStatus = this._vcStatus.statusArray;
 
-    TreeConfiguration.getWorkingTree().getChangeSubject().next({
-      type: 'update',
-      proxy: this
-    });
+    if (itemStatus !== currentStatus) {
+      this._vcStatus.updateStatus(itemStatus);
+      if (withNotification){
+        TreeConfiguration.getWorkingTree().getChangeSubject().next({
+          type: 'update',
+          proxy: this
+        });
+      }
+    }
 
   }
 
