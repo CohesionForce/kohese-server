@@ -115,8 +115,11 @@ export class StateSummaryDialogComponent implements OnInit {
 
   public getHeader(itemProxy: ItemProxy): string {
     let viewModel: any = this.getViewModel(itemProxy);
-    return viewModel.formatDefinitions[
-      viewModel.defaultFormatKey[FormatDefinitionType.CARD]].header.contents[0].propertyName;
+    let formatDefinitionId: string = viewModel.defaultFormatKey[FormatDefinitionType.CARD];
+    if(formatDefinitionId == null) {
+      formatDefinitionId = viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT];
+    }
+    return viewModel.formatDefinitions[formatDefinitionId].header.contents[0].propertyName;
   }
 
   public expandAll(): void {
