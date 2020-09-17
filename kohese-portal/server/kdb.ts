@@ -468,7 +468,7 @@ function loadModelInstances (kind, modelDirPath, inRepo) {
 
 function migrate(itemProxy: ItemProxy, typeName: string): void {
   let migrated: boolean = false;
-  if (typeName === 'KoheseModel') {
+  if ((typeName === 'KoheseModel') || (typeName === 'KoheseView')) {
     if (itemProxy.item.namespace == null) {
       itemProxy.item.namespace = {
         id: 'com.kohese'
