@@ -113,7 +113,6 @@ export class StateSummaryDialogComponent implements OnInit {
     this._navigationService.addTab('Explore', { id: itemProxy.item.id });
   }
 
-  //TODO: Handle case where a card is not present
   public getHeader(itemProxy: ItemProxy): string {
     let viewModel: any = this.getViewModel(itemProxy);
     return viewModel.formatDefinitions[

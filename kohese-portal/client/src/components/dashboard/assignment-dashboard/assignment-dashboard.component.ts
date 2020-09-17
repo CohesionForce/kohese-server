@@ -178,7 +178,6 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  //TODO: Handle case where a card is not present
   getHeader(itemProxy: ItemProxy): string {
     let viewModel: any = this.getViewModel(itemProxy);
     return viewModel.formatDefinitions[
