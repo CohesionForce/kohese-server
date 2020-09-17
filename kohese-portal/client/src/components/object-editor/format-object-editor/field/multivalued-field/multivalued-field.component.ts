@@ -25,6 +25,10 @@ export class MultivaluedFieldComponent extends Field {
   @ViewChildren('multivaluedAttributeExpansionPanel')
   private _multivaluedAttributeExpansionPanelQueryList:
     QueryList<MatExpansionPanel>;
+  
+  get changeDetectorRef() {
+    return this._changeDetectorRef;
+  }
     
   public constructor(changeDetectorRef: ChangeDetectorRef, itemRepository:
     ItemRepository, dialogService: DialogService, sessionService:
@@ -297,6 +301,53 @@ export class MultivaluedFieldComponent extends Field {
       
       this._changeDetectorRef.markForCheck();
     };
+  }
+
+  /**
+   * Determines whether a drop on this instance of MultivaluedFieldComponent
+   * should be allowed and responds accordingly
+   * 
+   * @param dragOverEvent The Event corresponding to the drag in question
+   */
+  public draggedOver(dragOverEvent: DragEvent): void {
+    if (dragOverEvent.dataTransfer.types.indexOf(
+      ('MultivaluedFieldComponent/' + (this._isVariantField ? this.
+      _koheseObject['discriminant'] : this._propertyDefinition.propertyName) +
+      '/Index').toLowerCase()) !== -1) {
+      dragOverEvent.preventDefault();
+
+      let htmlElement: HTMLElement =
+        (dragOverEvent.currentTarget as HTMLElement);
+      htmlElement.style['border-top'] = '';
+      htmlElement.style['border-bottom'] = '';
+      if ((dragOverEvent.offsetY / htmlElement.offsetHeight) < 0.5) {
+        htmlElement.style['border-top'] = 'dashed';
+      } else {
+        htmlElement.style['border-bottom'] = 'dashed';
+      }
+    }
+  }
+
+  /**
+   * Moves the value at the given ```sourceIndex``` to or immediately after
+   * the given ```targetIndex``` based on the given boolean
+   * 
+   * @param sourceIndex
+   * @param targetIndex
+   * @param moveBefore
+   */
+  public moveValue(sourceIndex: number, targetIndex: number, moveBefore:
+    boolean): void {
+    let value: any = this._koheseObject[this._isVariantField ? 'value' : this.
+      _propertyDefinition.propertyName].splice(sourceIndex, 1)[0];
+    targetIndex = ((sourceIndex <= targetIndex) ? (targetIndex - 1) :
+      targetIndex);
+    if (!moveBefore) {
+      targetIndex++;
+    }
+
+    this._koheseObject[this._isVariantField ? 'value' : this.
+      _propertyDefinition.propertyName].splice(targetIndex, 0, value);
   }
 
   /**

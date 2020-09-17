@@ -228,7 +228,7 @@ describe('MultivaluedFieldComponent', () => {
     let removeHandler: (elements: Array<any>) => void = component.
       getTableElementRemovalFunction();
     let references: Array<{ id: string }> = component.koheseObject[
-      'multivaluedGlobalTypeAttribute'];
+      'multivaluedGlobalTypeAttribute'].slice(0);
     let elements: Array<any> = references.map((reference: { id: string }) => {
       return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).item;
     });
@@ -249,6 +249,75 @@ describe('MultivaluedFieldComponent', () => {
     removeHandler([elements[1]]);
     expect(component.koheseObject['multivaluedLocalTypeAttribute'].indexOf(
       elements[1])).toBe(-1);
+  });
+
+  it('determines whether a drop on this instance of ' +
+    'MultivaluedFieldComponent should be allowed', () => {
+    let dataTransfer: DataTransfer = new DataTransfer();
+    dataTransfer.setData('MultivaluedFieldComponent/' + component.
+      propertyDefinition.propertyName + '/Index', '' + 0);
+    let dragOverEventPlaceholder: any = {
+      dataTransfer: dataTransfer,
+      currentTarget: document.createElement('div'),
+      preventDefault: () => {}
+    };
+    let preventDefaultSpy: jasmine.Spy = spyOn(dragOverEventPlaceholder,
+      'preventDefault');
+    component.draggedOver(dragOverEventPlaceholder);
+    expect(preventDefaultSpy).toHaveBeenCalled();
+
+    let dataModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
+      'KoheseModel').item;
+    component.koheseObject = dataModel['multivaluedVariantAttribute'][1];
+    component.dataModel = dataModel.localTypes['Variant'];
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[1].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return ((propertyDefinition.tableDefinition != null) &&
+        (propertyDefinition.propertyName ===
+        'multivaluedVariantAttribute'));
+    })[0];
+    dataTransfer.clearData();
+    dataTransfer.setData('MultivaluedFieldComponent/' + component.koheseObject[
+      'discriminant'] + '/Index', '' + 0);
+    preventDefaultSpy.calls.reset();
+    component.draggedOver(dragOverEventPlaceholder);
+    expect(preventDefaultSpy).toHaveBeenCalled();
+
+    dataTransfer.clearData();
+    preventDefaultSpy.calls.reset();
+    component.draggedOver(dragOverEventPlaceholder);
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+  });
+
+  it('moves values', () => {
+    let values: Array<any> = component.koheseObject[component.
+      propertyDefinition.propertyName].slice(0);
+    component.moveValue(2, 0, true);
+    expect(component.koheseObject[component.propertyDefinition.propertyName]).
+      toEqual([values[2], values[0], values[1]]);
+    
+    component.moveValue(2, 0, false);
+    expect(component.koheseObject[component.propertyDefinition.propertyName]).
+      toEqual([values[2], values[1], values[0]]);
+    
+    let dataModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
+      'KoheseModel').item;
+    component.koheseObject = dataModel['multivaluedVariantAttribute'][1];
+    values = component.koheseObject['value'].slice(0);
+    component.dataModel = dataModel.localTypes['Variant'];
+    component.propertyDefinition = component.viewModel.formatDefinitions[
+      component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
+      containers[1].contents.filter((propertyDefinition:
+      PropertyDefinition) => {
+      return ((propertyDefinition.tableDefinition != null) &&
+        (propertyDefinition.propertyName ===
+        'multivaluedVariantAttribute'));
+    })[0];
+    component.moveValue(2, 0, true);
+    expect(component.koheseObject['value']).toEqual([values[2], values[0],
+      values[1]]);
   });
 
   it('adds a value to a multivalued attribute', () => {
