@@ -1244,8 +1244,6 @@ export class ItemRepository {
               containers[0].kind !== FormatContainerKind.
               REVERSE_REFERENCE_TABLE) && (formatDefinition.containers[0].
               contents.length > 0)) {
-              let propertyDefinition: PropertyDefinition = formatDefinition.
-                containers[0].contents[0];
               if (classLocalTypes[type].definition.metatype === Metatype.
                 VARIANT) {
                 formatDefinitionId = viewModel.defaultFormatKey[
@@ -1289,14 +1287,22 @@ export class ItemRepository {
                   }
                 }
               } else {
-                return propertyDefinition.customLabel + ': ' + String(value[
-                  propertyDefinition.propertyName]);
+                let propertyDefinition: PropertyDefinition = formatDefinition.
+                  containers[0].contents[0];
+                return propertyDefinition.customLabel + ': ' + this.
+                  getStringRepresentation(value, propertyDefinition.
+                  propertyName, undefined, (enclosingType ? enclosingType :
+                  dataModel), classLocalTypes[type].definition, viewModel,
+                  formatDefinitionType);
               }
             }
           }
 
           let firstAttributeName: string = Object.keys(value)[0];
-          return firstAttributeName + ': ' + String(value[firstAttributeName]);
+          return firstAttributeName + ': ' + this.getStringRepresentation(
+            value, firstAttributeName, undefined, (enclosingType ?
+            enclosingType : dataModel), classLocalTypes[type].definition,
+            viewModel, formatDefinitionType);
         }
       } else {
         return this.currentTreeConfigSubject.getValue().config.getProxyFor(

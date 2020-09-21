@@ -193,11 +193,8 @@
             globalTypeAttribute">
             <mat-expansion-panel style="width: 100%;">
               <mat-expansion-panel-header>
-                <mat-panel-title>
-                  {{itemRepository.getStringRepresentation(koheseObject,
-                    propertyDefinition.propertyName, undefined,
-                    (enclosingDataModel ? enclosingDataModel : dataModel),
-                    dataModel, viewModel, formatDefinitionType)}}
+                <mat-panel-title style="white-space: nowrap; overflow: hidden;
+                  text-overflow: ellipsis; display: block;">
                 </mat-panel-title>
               </mat-expansion-panel-header>
               <ng-template matExpansionPanelContent>
