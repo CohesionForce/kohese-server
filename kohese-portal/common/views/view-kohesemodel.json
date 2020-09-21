@@ -316,6 +316,14 @@
               "editable": false
             },
             {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "loadPending",
               "customLabel": "loadPending",
               "labelOrientation": "Top",
@@ -376,14 +384,6 @@
               "customLabel": "Base",
               "labelOrientation": "Top",
               "kind": "text",
-              "visible": true,
-              "editable": false
-            },
-            {
-              "propertyName": "isMetaModel",
-              "customLabel": "Is Metamodel",
-              "labelOrientation": "Top",
-              "kind": "boolean",
               "visible": true,
               "editable": false
             },

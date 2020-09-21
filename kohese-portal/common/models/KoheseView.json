@@ -2,11 +2,11 @@
   "id": "KoheseView",
   "name": "KoheseView",
   "parentId": "Item",
+  "editable": false,
   "namespace": {
-    "id": "com.kohese"
+    "id": "com.kohese.metamodel"
   },
   "base": "Item",
-  "isMetaModel": true,
   "idInjection": true,
   "invertItemOrder": false,
   "properties": {

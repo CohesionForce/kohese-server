@@ -14,12 +14,6 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NamespaceEditorComponent implements Dialog {
-  private _globalNamespace: any = this._itemRepository.getTreeConfig().
-    getValue().config.getProxyFor('com.kohese').item;
-  get globalNamespace() {
-    return this._globalNamespace;
-  }
-
   private _selectedNamespace: any;
   get selectedNamespace() {
     return this._selectedNamespace;
@@ -63,8 +57,8 @@ export class NamespaceEditorComponent implements Dialog {
     let name: string = 'Namespace ' + this.getNamespaces(false).length;
     await this._itemRepository.upsertItem('Namespace', {
       name: name,
-      parentId: (this._selectedNamespace ? this._selectedNamespace.id : this.
-        _globalNamespace.id),
+      parentId: (this._selectedNamespace ? this._selectedNamespace.id :
+        'com.kohese'),
       alias: name
     });
   }
@@ -150,9 +144,13 @@ export class NamespaceEditorComponent implements Dialog {
   }
 
   /**
-   * Allows addition of Namespaces and types to the selected Namespace
+   * Allows addition of Namespaces and, if the given boolean is false, types to
+   * the selected Namespace
+   * 
+   * @param allowNamespaceAdditionOnly
    */
-  public async addSubcomponent(): Promise<void> {
+  public async addSubcomponent(allowNamespaceAdditionOnly: boolean):
+    Promise<void> {
     let treeConfiguration: TreeConfiguration = this._itemRepository.
       getTreeConfig().getValue().config;
     let results: Array<any> = await this._dialogService.openComponentsDialog(
@@ -161,10 +159,18 @@ export class NamespaceEditorComponent implements Dialog {
       matDialogData: {
         root: treeConfiguration.getProxyFor('Model-Definitions'),
         getChildren: (element: any) => {
-          return (element as ItemProxy).children;
+          return (element as ItemProxy).children.filter((itemProxy:
+            ItemProxy) => {
+            return (allowNamespaceAdditionOnly ? (itemProxy.kind ===
+              'Namespace') : true);
+          });
         },
         hasChildren: (element: any) => {
-          return ((element as ItemProxy).children.length > 0);
+          return ((element as ItemProxy).children.filter((itemProxy:
+            ItemProxy) => {
+            return (allowNamespaceAdditionOnly ? (itemProxy.kind ===
+              'Namespace') : true);
+          }).length > 0);
         },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;

@@ -98,7 +98,7 @@ describe('Component: Document View', ()=>{
     documentViewComponent.proxyStream = new BehaviorSubject(proxy);
     documentViewComponent.incrementalLoad = true;
     documentViewFixture.detectChanges();
-    expect(documentViewComponent.itemsLoaded).toBe(31);
+    expect(documentViewComponent.itemsLoaded).toBe(33);
   })
 
   afterEach(()=>{

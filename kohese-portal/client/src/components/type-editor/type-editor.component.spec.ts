@@ -50,7 +50,7 @@ describe('Component: Type Editor', ()=>{
   });
 
   it('retrieves all Namespaces that contain at least one type', () => {
-    expect(typeEditorComponent.getNamespaces().length).toBe(3);
+    expect(typeEditorComponent.getNamespaces().length).toBe(4);
   });
 
   it('retrieves all types in a given Namespace', () => {

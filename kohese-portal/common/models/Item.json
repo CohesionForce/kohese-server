@@ -2,11 +2,11 @@
   "id": "Item",
   "name": "Item",
   "parentId": "Model-Definitions",
+  "editable": false,
   "namespace": {
     "id": "com.kohese"
   },
   "base": "PersistedModel",
-  "isMetaModel": true,
   "idInjection": true,
   "invertItemOrder": true,
   "properties": {
@@ -59,6 +59,11 @@
     "modifiedOn": {
       "type": "timestamp",
       "name": "modifiedOn"
+    },
+    "editable": {
+      "name": "editable",
+      "type": "boolean",
+      "default": true
     },
     "loadPending": {
       "type": "boolean",

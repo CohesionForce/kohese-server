@@ -124,7 +124,7 @@ describe('NamespaceEditorComponent', () => {
     };
     spyOn(TestBed.get(DialogService), 'openComponentsDialog').and.returnValue(
       matDialogRefPlaceholder);
-    await component.addSubcomponent();
+    await component.addSubcomponent(true);
     expect(namespaceItemProxy.item.parentId).toBe(component.selectedNamespace.
       id);
 
@@ -133,7 +133,7 @@ describe('NamespaceEditorComponent', () => {
     matDialogRefPlaceholder.afterClosed = () => {
       return of([[dataModelItemProxy]]);
     };
-    await component.addSubcomponent();
+    await component.addSubcomponent(false);
     expect(dataModelItemProxy.item.namespace.id).toBe(component.
       selectedNamespace.id);
   });

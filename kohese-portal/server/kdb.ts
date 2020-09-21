@@ -471,7 +471,7 @@ function migrate(itemProxy: ItemProxy, typeName: string): void {
   if ((typeName === 'KoheseModel') || (typeName === 'KoheseView')) {
     if (itemProxy.item.namespace == null) {
       itemProxy.item.namespace = {
-        id: 'com.kohese'
+        id: 'com.kohese.userdefined'
       };
 
       migrated = true;

@@ -1,35 +1,36 @@
 <div [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 40px)' :
   '100%' }">
-  <div class="panel-heading " style="padding : 10px;">
-    <span>
-      {{itemProxy.kind}} Information: {{itemProxy.item.name}}
-    </span>
-    <span class="pull-right item-actions">
-      <ng-container *ngIf="itemProxy.item.parentId">
-        <i class="fa fa-level-up" (click)="navigate(itemProxy.item.parentId,
-          false)" title="Go to Parent">
-        </i>
-      </ng-container>
-      <ng-container *ngIf="editableStream.getValue() else notEditable">
-        <span class="fa fa-stack">
-          <i class="fa fa-lg fa-edit fa-stack-2x stacked-parent"
-            (click)="cancelEditing()" title="Cancel Edit">
-          </i>
-          <i class="fa fa-stack-1x fa-times stacked-child"
-            (click)="cancelEditing()" title="Cancel Edit">
-          </i>
-        </span>
-        <i class="fa fa-lg fa-save" (click)="upsertItem()"
-          title="Save">
-        </i>
-      </ng-container>
-      <ng-template #notEditable>
-        <i class="fa fa-lg fa-edit" (click)="editableStream.next(true)"
-          title="Edit">
-        </i>
-      </ng-template>
-      <i class="fa fa-lg fa-arrows-alt" title="Fullscreen"></i>
-    </span>
+  <div class="panel-heading" style="display: flex; flex-direction: row;
+    align-items: center;">
+    {{itemProxy.kind}} Information: {{itemProxy.item.name}}
+    <ng-container *ngIf="itemProxy.item.parentId">
+      <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
+        itemProxy.item.parentId, false)" style="margin-left: auto;">
+        <mat-icon class="fa fa-level-up"></mat-icon>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="editableStream.getValue() else notEditable">
+      <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
+        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
+        '') }">
+        <mat-icon class="fa fa-save"></mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Cancel edit"
+        (click)="cancelEditing()">
+        <mat-icon class="fa fa-times"></mat-icon>
+      </button>
+    </ng-container>
+    <ng-template #notEditable>
+      <button mat-icon-button matTooltip="Edit" [disabled]="(itemProxy.item.
+        editable === false)" (click)="editableStream.next(true)"
+        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
+        '') }">
+        <mat-icon class="fa fa-edit"></mat-icon>
+      </button>
+    </ng-template>
+    <button mat-icon-button matTooltip="Fullscreen">
+      <mat-icon class="fa fa-arrows-alt"></mat-icon>
+    </button>
   </div>
   <div style="height: calc(100% - 44px);">
     <!-- Nav tabs -->

@@ -480,7 +480,7 @@ export function ModelDefinitions() {
       "Analysis": {
         "id": "Analysis",
         "name": "Analysis",
-        "parentId": "com.kohese",
+        "parentId": "Model-Definitions",
         "base": "PersistedModel",
         "namespace": {
           "id": "com.kohese"
@@ -850,7 +850,7 @@ export function ModelDefinitions() {
           },
           "resolutionActions": {
             "type": [
-              "Action"
+              "Item"
             ],
             "relation": {
               "kind": "Item",
@@ -878,12 +878,12 @@ export function ModelDefinitions() {
       "Item": {
         "id": "Item",
         "name": "Item",
-        "parentId": "com.kohese",
+        "parentId": "Model-Definitions",
+        "editable": false,
         "namespace": {
           "id": "com.kohese"
         },
         "base": "PersistedModel",
-        "isMetaModel": true,
         "idInjection": true,
         "invertItemOrder": true,
         "properties": {
@@ -938,6 +938,11 @@ export function ModelDefinitions() {
           "modifiedOn": {
             "type": "timestamp",
             "name": "modifiedOn"
+          },
+          "editable": {
+            "name": "editable",
+            "type": "boolean",
+            "default": true
           },
           "loadPending": {
             "type": "boolean",
@@ -1083,11 +1088,11 @@ export function ModelDefinitions() {
         "id": "KoheseModel",
         "name": "KoheseModel",
         "parentId": "Item",
+        "editable": false,
         "namespace": {
-          "id": "com.kohese"
+          "id": "com.kohese.metamodel"
         },
         "base": "Item",
-        "isMetaModel": true,
         "idInjection": false,
         "invertItemOrder": false,
         "properties": {
@@ -1105,10 +1110,6 @@ export function ModelDefinitions() {
             "type": "string",
             "required": true,
             "name": "base"
-          },
-          "isMetaModel": {
-            "type": "boolean",
-            "name": "isMetaModel"
           },
           "isInternal": {
             "type": "boolean",
@@ -1321,12 +1322,12 @@ export function ModelDefinitions() {
         "id": "KoheseUser",
         "name": "KoheseUser",
         "parentId": "Item",
+        "editable": false,
         "namespace": {
-          "id": "com.kohese"
+          "id": "com.kohese.metamodel"
         },
         "base": "Item",
         "idInjection": true,
-        "isMetaModel": true,
         "invertItemOrder": true,
         "properties": {
           "password": {
@@ -1355,8 +1356,9 @@ export function ModelDefinitions() {
         "id": "KoheseView",
         "name": "KoheseView",
         "parentId": "Item",
+        "editable": false,
         "namespace": {
-          "id": "com.kohese"
+          "id": "com.kohese.metamodel"
         },
         "base": "Item",
         "idInjection": true,
@@ -1428,11 +1430,11 @@ export function ModelDefinitions() {
         "id": "Namespace",
         "name": "Namespace",
         "parentId": "Item",
+        "editable": false,
         "namespace": {
-          "id": "com.kohese"
+          "id": "com.kohese.metamodel"
         },
         "base": "Item",
-        "isMetaModel": true,
         "idInjection": true,
         "invertItemOrder": true,
         "properties": {
@@ -2127,6 +2129,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -2228,6 +2238,14 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "supportedDecisions",
+                    "customLabel": "Supported Decisions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
                     "editable": true
                   },
                   {
@@ -2505,10 +2523,6 @@ export function ModelDefinitions() {
         "id": "view-actor",
         "name": "Actor",
         "parentId": "view-item",
-        "createdBy": "gmckune",
-        "createdOn": 1586302647398,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1586373219340,
         "namespace": {
           "id": "com.kohese"
         },
@@ -2619,6 +2633,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -2720,6 +2742,14 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "supportedDecisions",
+                    "customLabel": "Supported Decisions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
                     "editable": true
                   }
                 ]
@@ -2908,6 +2938,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -3182,6 +3220,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -3467,6 +3513,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -3548,10 +3602,6 @@ export function ModelDefinitions() {
         "namespace": {
           "id": "com.kohese"
         },
-        "createdBy": "gmckune",
-        "createdOn": 1586302904733,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1586375436725,
         "modelName": "Domain",
         "icon": "fa fa-book",
         "color": "#000000",
@@ -3659,6 +3709,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -3760,6 +3818,14 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "supportedDecisions",
+                    "customLabel": "Supported Decisions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
                     "editable": true
                   }
                 ]
@@ -3940,6 +4006,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -4194,6 +4268,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -4463,6 +4545,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -4825,6 +4915,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -4978,10 +5076,6 @@ export function ModelDefinitions() {
         "id": "view-keyevent",
         "name": "KeyEvent",
         "parentId": "view-decision",
-        "createdBy": "gmckune",
-        "createdOn": 1566607211956,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1591737865749,
         "namespace": {
           "id": "com.kohese"
         },
@@ -5125,6 +5219,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -5226,6 +5328,14 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "supportedDecisions",
+                    "customLabel": "Supported Decisions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
                     "editable": true
                   },
                   {
@@ -5394,10 +5504,6 @@ export function ModelDefinitions() {
         "id": "view-keyeventdictionary",
         "name": "KeyEventDictionary",
         "parentId": "view-item",
-        "createdBy": "gmckune",
-        "createdOn": 1572491164827,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1586376069127,
         "namespace": {
           "id": "com.kohese"
         },
@@ -5517,6 +5623,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -5618,6 +5732,14 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "supportedDecisions",
+                    "customLabel": "Supported Decisions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
                     "editable": true
                   },
                   {
@@ -6025,6 +6147,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -6085,14 +6215,6 @@ export function ModelDefinitions() {
                     "customLabel": "Base",
                     "labelOrientation": "Top",
                     "kind": "text",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "isMetaModel",
-                    "customLabel": "Is Metamodel",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -6409,6 +6531,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -6633,6 +6763,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -6889,6 +7027,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -7100,6 +7246,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -7366,6 +7520,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -7575,6 +7737,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -7796,6 +7966,14 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -8146,6 +8324,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -8443,10 +8629,6 @@ export function ModelDefinitions() {
         "id": "view-usecase",
         "name": "UseCase",
         "parentId": "view-item",
-        "createdBy": "gmckune",
-        "createdOn": 1570033169859,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1593445614266,
         "namespace": {
           "id": "com.kohese"
         },
@@ -8481,7 +8663,6 @@ export function ModelDefinitions() {
         },
         "localTypes": {
           "FlowOfEvents": {
-            "metatype": "Structure",
             "name": "FlowOfEvents",
             "modelName": "FlowOfEvents",
             "icon": "",
@@ -8526,14 +8707,6 @@ export function ModelDefinitions() {
                   "type": "",
                   "options": {}
                 }
-              },
-              "OnStep": {
-                "name": "OnStep",
-                "displayName": "On Step",
-                "inputType": {
-                  "type": "",
-                  "options": {}
-                }
               }
             },
             "formatDefinitions": {
@@ -8569,14 +8742,6 @@ export function ModelDefinitions() {
                         "customLabel": "Preconditions",
                         "labelOrientation": "Top",
                         "kind": "text",
-                        "visible": true,
-                        "editable": true
-                      },
-                      {
-                        "propertyName": "OnStep",
-                        "customLabel": "On Step",
-                        "labelOrientation": "Top",
-                        "kind": "",
                         "visible": true,
                         "editable": true
                       },
@@ -8634,15 +8799,6 @@ export function ModelDefinitions() {
                         "customLabel": "Preconditions",
                         "labelOrientation": "Top",
                         "kind": "text",
-                        "tableDefinition": "",
-                        "visible": true,
-                        "editable": true
-                      },
-                      {
-                        "propertyName": "OnStep",
-                        "customLabel": "OnStep",
-                        "labelOrientation": "Top",
-                        "kind": "",
                         "tableDefinition": "",
                         "visible": true,
                         "editable": true
@@ -8779,6 +8935,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "editable",
+                    "customLabel": "Editable",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "loadPending",
                     "customLabel": "loadPending",
                     "labelOrientation": "Top",
@@ -8880,6 +9044,14 @@ export function ModelDefinitions() {
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
+                    "editable": true
+                  },
+                  {
+                    "propertyName": "supportedDecisions",
+                    "customLabel": "Supported Decisions",
+                    "labelOrientation": "Top",
+                    "kind": "",
+                    "visible": true,
                     "editable": true
                   },
                   {

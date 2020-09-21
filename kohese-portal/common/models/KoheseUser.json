@@ -2,12 +2,12 @@
   "id": "KoheseUser",
   "name": "KoheseUser",
   "parentId": "Item",
+  "editable": false,
   "namespace": {
-    "id": "com.kohese"
+    "id": "com.kohese.metamodel"
   },
   "base": "Item",
   "idInjection": true,
-  "isMetaModel": true,
   "invertItemOrder": true,
   "properties": {
     "password": {

@@ -31,7 +31,7 @@
       <mat-icon class="fa fa-plus"></mat-icon>
     </button>
     <button mat-icon-button matTooltip="Delete Type" (click)="delete()"
-      [disabled]="selectedType.isMetaModel">
+      [disabled]="(selectedType.editable === false)">
       <mat-icon class="fa fa-trash"></mat-icon>
     </button>
   </div>

@@ -49,10 +49,26 @@ export class MockItemRepository {
     TreeConfiguration.getWorkingTree().reset();
 
     new ItemProxy('Namespace', {
-      alias: 'Global',
+      alias: 'Kohese',
       id: 'com.kohese',
-      name: 'Global Namespace',
-      parentId: 'Model-Definitions'
+      name: 'Kohese Namespace',
+      parentId: 'Model-Definitions',
+      editable: false
+    });
+
+    new ItemProxy('Namespace', {
+      "alias": "Metamodel",
+      "id": "com.kohese.metamodel",
+      "name": "Metamodel Namespace",
+      "parentId": "com.kohese",
+      "editable": false
+    });
+
+    new ItemProxy('Namespace', {
+      "alias": "UserTypes",
+      "id": "com.kohese.userdefined",
+      "name": "User Types Namespace",
+      "parentId": "com.kohese"
     });
 
     new ItemProxy('Namespace', {

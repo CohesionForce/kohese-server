@@ -2,7 +2,7 @@
   <ng-container *ngIf="!enclosingType">
     <ng-container *ngIf="!editable else editableBlock">
       <button mat-icon-button matTooltip="Edit structure settings for this kind"
-        class="flex-right-align" [disabled]="dataModel.isMetaModel"
+        class="flex-right-align" [disabled]="(dataModel.editable === false)"
         (click)="editable = true">
         <mat-icon class="fa fa-edit"></mat-icon>
       </button>

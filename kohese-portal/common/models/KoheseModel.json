@@ -2,11 +2,11 @@
   "id": "KoheseModel",
   "name": "KoheseModel",
   "parentId": "Item",
+  "editable": false,
   "namespace": {
-    "id": "com.kohese"
+    "id": "com.kohese.metamodel"
   },
   "base": "Item",
-  "isMetaModel": true,
   "idInjection": false,
   "invertItemOrder": false,
   "properties": {
@@ -24,10 +24,6 @@
       "type": "string",
       "required": true,
       "name": "base"
-    },
-    "isMetaModel": {
-      "type": "boolean",
-      "name": "isMetaModel"
     },
     "isInternal": {
       "type": "boolean",
