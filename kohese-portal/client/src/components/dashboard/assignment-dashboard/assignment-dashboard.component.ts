@@ -1,15 +1,16 @@
-import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
+         ViewChild, ViewChildren, QueryList } from '@angular/core';
 
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../details/details.component';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
+import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
 
 import { Observable, Subscription } from 'rxjs';
 
@@ -33,16 +34,18 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   assignmentTypeSub : Subscription;
 
   assignmentTypes = {};
-  
+  @ViewChildren(MatExpansionPanel)
+  private expansionPanels: QueryList<MatExpansionPanel>;
+
   private _editableSet: Array<string> = [];
   get editableSet() {
     return this._editableSet;
   }
-  
+
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
-  
+
   get TreeConfiguration() {
     return TreeConfiguration;
   }
@@ -71,12 +74,12 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     this.assignmentTypeSub.unsubscribe();
     this.assignmentListSub.unsubscribe();
   }
-  
+
   public getViewModel(itemProxy: ItemProxy): any {
     return TreeConfiguration.getWorkingTree().getProxyFor('view-' + itemProxy.
       kind.toLowerCase()).item;
   }
-  
+
   public save(itemProxy: ItemProxy): void {
     this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
       (returnedItemProxy: ItemProxy) => {
@@ -84,14 +87,14 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     });
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
   }
-  
+
   public async discardChanges(itemProxy: ItemProxy): Promise<void> {
     await this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
     this.changeRef.markForCheck();
   }
-  
+
   public displayInformation(itemProxy: ItemProxy): void {
     this._dialogService.openComponentDialog(DetailsComponent, {
       data: {
@@ -99,11 +102,11 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       }
     }).updateSize('90%', '90%');
   }
-  
+
   public navigate(itemProxy: ItemProxy): void {
     this.navigationService.addTab('Explore', { id: itemProxy.item.id });
   }
-  
+
   sortAssignments(sortStrategy : DashboardSelections, assignmentList : Array<ItemProxy>) {
     let sortedArray = [];
     switch (sortStrategy) {
@@ -161,7 +164,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       kindProxy = TreeConfiguration.getWorkingTree().getProxyFor(kindProxy.
         item.base);
     }
-    
+
     if (types.indexOf('Task') !== -1) {
       if (assignment.item.taskState === 'Completed') {
         return true;
@@ -174,4 +177,29 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     }
     return false;
   }
+
+
+  getHeader(itemProxy: ItemProxy): string {
+    let viewModel: any = this.getViewModel(itemProxy);
+    let formatDefinitionId: string = viewModel.defaultFormatKey[FormatDefinitionType.CARD];
+    if(formatDefinitionId == null) {
+      formatDefinitionId = viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT];
+    }
+    return viewModel.formatDefinitions[formatDefinitionId].header.contents[0].propertyName;
+  }
+
+  public expandAll(): void {
+    let expansionPanels: Array<MatExpansionPanel> = this.expansionPanels.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      expansionPanels[j].open();
+    }
+  }
+
+  public collapseAll(): void {
+    let expansionPanels: Array<MatExpansionPanel> = this.expansionPanels.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      expansionPanels[j].close();
+    }
+  }
+
 }

@@ -250,6 +250,7 @@ export class LevelCache extends ItemCache {
     for (let sublevelName of sublevelNames){
       let beforeSublevel = Date.now();
       console.log('::: Loading cache for sublevel: ' + sublevelName);
+      let elementsLoaded : number = 0;
       let sublevel = this.registrationMap.get(sublevelName).sublevel;
 
       let iterator: any = sublevel.iterator();
@@ -274,14 +275,15 @@ export class LevelCache extends ItemCache {
             });
           });
         });
+        elementsLoaded++;
       }
       let afterSublevel = Date.now();
-      console.log('::: Loaded cache for sublevel: ' + sublevelName + ' - ' + (afterSublevel-beforeSublevel)/1000);
+      console.log('::: Loaded cache for sublevel: ' + sublevelName + ' - ' + (afterSublevel-beforeSublevel)/1000 + ' - ' + elementsLoaded);
     }
 
     let afterLoadCache = Date.now();
 
-    console.log('$$$ Load time from Level Cache: ' + (afterLoadCache - beforeLoadCache)/1000);
+    console.log('^^^ Load time from Level Cache: ' + (afterLoadCache - beforeLoadCache)/1000);
   }
 
   //////////////////////////////////////////////////////////////////////////

@@ -1,15 +1,17 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
-  Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
+         ViewChild, ViewChildren, QueryList } from '@angular/core';
 
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { SessionService } from '../../../services/user/session.service';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { DetailsComponent } from '../details.component';
+import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
+
 
 // TODO: Change Component to use selectedOrdering instead of exporting enumeration with Ordering getter
 export enum JournalOrdering {
@@ -81,6 +83,9 @@ export class JournalComponent {
   get Object() {
     return Object;
   }
+
+  @ViewChildren(MatExpansionPanel)
+  private expansionPanels: QueryList<MatExpansionPanel>;
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository, private _dialogService:
@@ -212,5 +217,27 @@ export class JournalComponent {
 
   public navigate(itemProxy: ItemProxy): void {
     this._navigationService.addTab('Explore', { id: itemProxy.item.id });
+  }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: itemProxy
+      }
+    }).updateSize('70%', '70%');
+  }
+
+  public expandAll(): void {
+    let expansionPanels: Array<MatExpansionPanel> = this.expansionPanels.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      expansionPanels[j].open();
+    }
+  }
+
+  public collapseAll(): void {
+    let expansionPanels: Array<MatExpansionPanel> = this.expansionPanels.toArray();
+    for (let j: number = 0; j < expansionPanels.length; j++) {
+      expansionPanels[j].close();
+    }
   }
 }

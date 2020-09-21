@@ -1,66 +1,76 @@
 <div style="height: 70px; display: flex; flex-direction: row;">
   <mat-form-field style="width: 40%; padding: 0px 3px 0px 3px;">
     <mat-select placeholder="Ordering" [(ngModel)]="selectedOrdering">
-      <mat-option *ngFor="let ordering of Object.keys(Ordering)"
-        [value]="Ordering[ordering]">
+      <mat-option *ngFor="let ordering of Object.keys(Ordering)" [value]="Ordering[ordering]">
         {{Ordering[ordering]}}
       </mat-option>
     </mat-select>
   </mat-form-field>
   <mat-form-field style="width: 50%; padding: 0px 3px 0px 3px;">
-    <input matInput #filterInput type="text" placeholder="Filter"
-      (input)="filterChanged($event.target.value)"/>
+    <input matInput #filterInput type="text" placeholder="Filter" (input)="filterChanged($event.target.value)" />
   </mat-form-field>
-  <button mat-icon-button matTooltip="Add an entry" (click)="addEntry()"
-    style="margin-left: auto;">
+  <button mat-icon-button matTooltip="Expand all differences" (click)="expandAll()" class="flex-right-align">
+    <mat-icon class="fa fa-chevron-down"></mat-icon>
+  </button>
+  <button mat-icon-button matTooltip="Collapse all differences" (click)="collapseAll()">
+    <mat-icon class="fa fa-chevron-up"></mat-icon>
+  </button>
+  <button mat-icon-button matTooltip="Add an entry" (click)="addEntry()" style="margin-left: auto;">
     <mat-icon class="fa fa-plus"></mat-icon>
   </button>
 </div>
 <div style="height: calc(100% - 70px); overflow-y: auto;">
-  <ng-container *ngFor="let observationItemProxy of getObservations(
-    filterInput.value)">
-    <mat-card [ngStyle]="{ 'background-color': (getViewModel(
-      observationItemProxy.model.item.name).color ? getViewModel(
-      observationItemProxy.model.item.name).color : '#000000') }" style="color:
-      whitesmoke; margin-bottom: 3px;">
-      <mat-card-title style="display: flex; flex-direction: row;">
-        <h3>
-          <mat-icon class="{{getViewModel(observationItemProxy.model.item.
-            name).icon}}">
-          </mat-icon>
+  <ng-container *ngFor="let observationItemProxy of getObservations(filterInput.value)">
+    <mat-expansion-panel style="width:100%;
+      box-shadow: 0 3px 1px -2px rgba(0,0,0,.8), 0 2px 2px 0 rgba(0,0,0,.64), 0 1px 5px 0 rgba(0,0,0,.62);" #panel>
+      <mat-expansion-panel-header [ngStyle]="{ 'background-color': (getViewModel(
+          observationItemProxy.model.item.name).color ? getViewModel(
+          observationItemProxy.model.item.name).color : '#000000') }" style="color: whitesmoke;">
+        <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 100%;
+            display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <mat-icon class="{{getViewModel(observationItemProxy.model.item.name).icon}}"></mat-icon>
           {{observationItemProxy.item.name}}
-        </h3>
-        <ng-container *ngIf="(editableSet.indexOf(observationItemProxy.item.id)
-          === -1) else editableBlock">
-          <button mat-icon-button matTooltip="Edit this Item"
-            class="flex-right-align" (click)="editableSet.push(
-            observationItemProxy.item.id)">
-            <mat-icon class="fa fa-edit"></mat-icon>
+        </mat-panel-title>
+        <mat-panel-description style="color:whitesmoke; font-size: medium; align-items: center;">
+          <ng-container *ngIf="observationItemProxy.dirty">
+            <button mat-icon-button [disabled]="true" class="flex-right-align">
+              <img src="assets/icons/versioncontrol/dirty.ico" />
+            </button>
+          </ng-container>
+          <ng-container *ngIf="(editableSet.indexOf(observationItemProxy.item.id) === -1) else editableBlock">
+            <button mat-icon-button matTooltip="Edit this Item"
+              [ngStyle]="{ 'margin-left': (observationItemProxy.dirty ? '' : 'auto') }"
+              (click)="$event.stopPropagation(); panel.open(); editableSet.push(observationItemProxy.item.id)">
+              <mat-icon class="fa fa-edit"></mat-icon>
+            </button>
+          </ng-container>
+          <ng-template #editableBlock>
+            <button mat-icon-button matTooltip="Save this Item"
+              [ngStyle]="{ 'margin-left': (observationItemProxy.dirty ? '' : 'auto') }"
+              (click)="$event.stopPropagation(); save(observationItemProxy)">
+              <mat-icon class="fa fa-save"></mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Discard unsaved changes to this Item"
+              (click)="$event.stopPropagation(); discardChanges(observationItemProxy)">
+              <mat-icon class="fa fa-times"></mat-icon>
+            </button>
+          </ng-template>
+          <button mat-icon-button matTooltip="Display Item information"
+            (click)="$event.stopPropagation(); displayInformation(observationItemProxy)">
+            <mat-icon class="fa fa-search"></mat-icon>
           </button>
-        </ng-container>
-        <ng-template #editableBlock>
-          <button mat-icon-button matTooltip="Save this Item"
-            class="flex-right-align" (click)="save(observationItemProxy)">
-            <mat-icon class="fa fa-save"></mat-icon>
+          <button mat-icon-button matTooltip="Navigate to this Item"
+            (click)="$event.stopPropagation(); navigate(observationItemProxy)">
+            <mat-icon class="fa fa-arrow-right"></mat-icon>
           </button>
-          <button mat-icon-button matTooltip="Discard unsaved changes to this
-            Item" (click)="discardChanges(observationItemProxy)">
-            <mat-icon class="fa fa-times"></mat-icon>
-          </button>
-        </ng-template>
-        <button mat-icon-button matTooltip="Navigate to this Item"
-          (click)="navigate(observationItemProxy)">
-          <mat-icon class="fa fa-arrow-right"></mat-icon>
-        </button>
-      </mat-card-title>
-      <mat-card-content style="background-color: white; color: black;">
-        <format-object-editor [type]="observationItemProxy.model.item"
-          [object]="observationItemProxy.item"
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <ng-template matExpansionPanelContent>
+        <format-object-editor [type]="observationItemProxy.model.item" [object]="observationItemProxy.item"
           [formatDefinitionType]="FormatDefinitionType.JOURNAL"
-          [disabled]="(editableSet.indexOf(observationItemProxy.item.id) ===
-          -1)">
+          [disabled]="(editableSet.indexOf(observationItemProxy.item.id) === -1)">
         </format-object-editor>
-      </mat-card-content>
-    </mat-card>
+      </ng-template>
+    </mat-expansion-panel>
   </ng-container>
 </div>

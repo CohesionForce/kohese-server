@@ -266,6 +266,10 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   get matDialogRef() {
     return this._matDialogRef;
   }
+
+  get changeDetectorRef() {
+    return this._changeDetectorRef;
+  }
   
   get Array() {
     return Array;
@@ -585,5 +589,25 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this._elementSelected(element);
       this._elementSelectedEventEmitter.emit(element);
     }
+  }
+
+  /**
+   * Moves the selected element at the given ```sourceIndex``` to or
+   * immediately after the given ```targetIndex``` based on the given boolean
+   * 
+   * @param sourceIndex
+   * @param targetIndex
+   * @param moveBefore
+   */
+  public moveElement(sourceIndex: number, targetIndex: number, moveBefore:
+    boolean): void {
+    let element: any = this._selection.splice(sourceIndex, 1)[0];
+    targetIndex = ((sourceIndex <= targetIndex) ? (targetIndex - 1) :
+      targetIndex);
+    if (!moveBefore) {
+      targetIndex++;
+    }
+
+    this._selection.splice(targetIndex, 0, element);
   }
 }

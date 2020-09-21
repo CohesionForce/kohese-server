@@ -2,8 +2,10 @@ console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
 import * as LevelJs from 'level-js';
+import * as _ from 'underscore';
 
 import { ItemProxy } from '../../common/src/item-proxy';
+import { TreeHashMap } from '../../common/src/tree-hash';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
 import { LevelCache } from '../../common/src/level-cache';
@@ -150,25 +152,50 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         break;
       case 'getItemUpdates':
         let updatesPromise = _itemUpdatesPromise;
-        if (!_itemUpdatesPromise || request.data.refresh) {
-          console.log('^^^ Request refresh of itemUpdates');
-          let treeHashes: any = request.data.treeHashes;
-          if (!treeHashes) {
-            treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
+        // Wait for any pending update to complete
+        await updatesPromise;
+
+        // Check for differences
+        let response : any = {};
+
+        let cwTreeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
+        let tabTreeHashes: any = request.data.treeHashes;
+
+        if(!_.isEqual(tabTreeHashes, cwTreeHashes)){
+          console.log('--- KDB Does Not Match: Delta response required');
+
+          let thmDiff = TreeHashMap.diff(tabTreeHashes, cwTreeHashes);
+
+          response = {
+              repoTreeHashes: cwTreeHashes,
+              addItems: [],
+              changeItems: [],
+              deleteItems: []
+          };
+
+          for (let itemId in thmDiff.summary.itemAdded) {
+            var proxy = _workingTree.getProxyFor(itemId);
+            response.addItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
           }
 
-          updatesPromise = updateWorking(treeHashes);
-          if (!request.data.refresh){
-            console.log('^^^ Updating _itemUpdatesPromise');
-            _itemUpdatesPromise = updatesPromise;
+          for (let itemId in thmDiff.summary.contentChanged) {
+            var proxy = _workingTree.getProxyFor(itemId);
+            response.changeItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
           }
+
+          for (let itemId in thmDiff.summary.itemDeleted){
+            response.deleteItems.push(itemId);
+          }
+
+        } else {
+          console.log('--- KDB Matches: No changes required');
+          response.kdbMatches = true;
         }
 
-        const itemUpdates = await updatesPromise;
 
         port.postMessage({
           id: request.id,
-          data: itemUpdates
+          data: response
         });
         break;
       case 'getStatus':
@@ -459,6 +486,7 @@ async function getStatus() : Promise<number> {
     socket.emit('Item/getStatus', {
       repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
     }, (response: Array<any>) => {
+      console.log('::: Processing status response');
       for (let j: number = 0; j < response.length; j++) {
         updateItemStatus(response[j].id, response[j].status);
       }
@@ -499,6 +527,7 @@ function registerKoheseIOListeners() {
   });
 
   socket.on('VersionControl/statusUpdated', (statusMap: any) => {
+    console.log('^^^ Status update received: ' + Object.keys(statusMap).length)
     for (var itemId in statusMap) {
       updateItemStatus(itemId, statusMap[itemId]);
     }
@@ -550,11 +579,15 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 
   let proxy: ItemProxy = _workingTree.getProxyFor(itemId);
 
-  if (proxy && itemStatus) {
-    proxy.updateVCStatus(itemStatus);
-  }
+  let currentStatus = proxy.vcStatus.statusArray;
+  if (currentStatus !== itemStatus) {
+    // Process status that have changed
+    if (proxy && itemStatus) {
+      proxy.updateVCStatus(itemStatus);
+    }
 
-  postToAllPorts('updateItemStatus', { itemId: itemId, status: itemStatus });
+    postToAllPorts('updateItemStatus', { itemId: itemId, status: itemStatus });
+  }
 
 }
 
