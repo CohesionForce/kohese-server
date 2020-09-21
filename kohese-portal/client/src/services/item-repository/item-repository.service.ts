@@ -335,7 +335,7 @@ export class ItemRepository {
       const statusResponse = await this.sendMessageToWorker(
         'getStatus', undefined, true);
       statusResponse.data.idStatusArray.forEach(element => {
-        this.updateItemStatus(element.id, element.itemStatus);
+        this.updateItemStatus(element.id, element.status);
       });
       console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
 
@@ -854,7 +854,7 @@ export class ItemRepository {
     }, undefined);
 
     if (headingLevel > -1) {
-      if (headingLevel === 0) {
+      if ((headingLevel === 0) && (formatDefinitionType === FormatDefinitionType.DOCUMENT)) {
         representation += '<div style="font-size: xxx-large;">';
       } else {
         for (let j: number = 0; j < headingLevel; j++) {
@@ -876,7 +876,7 @@ export class ItemRepository {
 	    }
 	  }
 
-	  if (headingLevel === 0) {
+	  if ((headingLevel === 0) && (formatDefinitionType === FormatDefinitionType.DOCUMENT)) {
 	    representation += '</div>\n\n';
 	  }
 

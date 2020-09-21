@@ -1,7 +1,10 @@
-<h4 style="height: 32px; background-color: navy; color: white;">
+<h4 style="height: 2.4em; padding-left: 0.3em; border-bottom: 2px solid rgba(0,0,0,.65);
+  background-color: white; color: rgba(0,0,0,.8); display: flex; flex-direction: row; align-items: center">
   Activity Feed:
 </h4>
-<div style="overflow: auto; height: calc(100% - 40px);">
+<!-- heigh calc is chosen to take into account the 1.33em from the "Assignments" h4 height
+     and the margin-bottom/margin-block-end  -->
+<div style="overflow: auto; height: calc(100% - 4.23em);">
   <ng-container *ngFor="let activity of activityList">
     <div class="activity-row" (click)="openProxyDetails(activity)">
       <b>{{activity.item.name}} </b>

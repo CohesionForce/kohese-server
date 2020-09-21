@@ -393,6 +393,9 @@ export class MockItemRepository {
           }, {
             name: 'EnumerationValue2',
             description: ''
+          }, {
+            name: 'EnumerationValue3',
+            description: ''
           }]
         } as Enumeration;
 
@@ -459,6 +462,8 @@ export class MockItemRepository {
           id: 'KoheseModel'
         }, {
           id: 'KoheseModel'
+        }, {
+          id: 'KoheseModel'
         }];
 
         let localTypeInstance: any = {
@@ -485,13 +490,16 @@ export class MockItemRepository {
             id: 'KoheseModel'
           }, {
             id: 'KoheseModel'
+          }, {
+            id: 'KoheseModel'
           }],
           localTypeAttribute: null,
           multivaluedLocalTypeAttribute: [],
           enumerationAttribute: 'EnumerationValue1',
           multivaluedEnumerationAttribute: [
             'EnumerationValue1',
-            'EnumerationValue2'
+            'EnumerationValue2',
+            'EnumerationValue3'
           ],
           variantAttribute: {
             discriminant: 'globalTypeAttribute',
@@ -506,7 +514,11 @@ export class MockItemRepository {
             }
           }, {
             discriminant: 'multivaluedEnumerationAttribute',
-            value: ['EnumerationValue1', 'EnumerationValue2']
+            value: ['EnumerationValue1', 'EnumerationValue2',
+              'EnumerationValue3']
+          }, {
+            discriminant: 'booleanAttribute',
+            value: 'true'
           }]
         };
         
@@ -526,7 +538,8 @@ export class MockItemRepository {
         dataModel[enumerationAttribute.name] = 'EnumerationValue1';
         dataModel[multivaluedEnumerationAttribute.name] = [
           'EnumerationValue1',
-          'EnumerationValue2'
+          'EnumerationValue2',
+          'EnumerationValue3'
         ];
         dataModel[variantAttribute.name] = {
           discriminant: 'globalTypeAttribute',
@@ -542,6 +555,9 @@ export class MockItemRepository {
         }, {
           discriminant: 'multivaluedEnumerationAttribute',
           value: ['EnumerationValue1', 'EnumerationValue2']
+        }, {
+          discriminant: 'booleanAttribute',
+          value: 'true'
         }];
       }
 
@@ -927,7 +943,8 @@ export class MockItemRepository {
           metatype: Metatype.ENUMERATION,
           id: 'Enumeration',
           name: 'Enumeration',
-          values: ['Enumeration Value 1', 'Enumeration Value 2']
+          values: ['Enumeration Value 1', 'Enumeration Value 2',
+            'Enumeration Value 3']
         } as Type;//Enumeration;
 
         viewModel.localTypes['Variant'] = ({
