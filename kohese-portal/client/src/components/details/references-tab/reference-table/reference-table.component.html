@@ -22,7 +22,7 @@
       </ng-container>
       <ng-container matColumnDef="Nav">
         <mat-header-cell *matHeaderCellDef></mat-header-cell>
-        <mat-cell *matCellDef="let reference">
+        <mat-cell *matCellDef="let reference" style="display: flex; justify-content: flex-end;">
           <div class="hidden-buttons"> <!-- div and class for scss styling -->
             <button mat-icon-button matTooltip="Open Modal Viewer" (click)="displayInformation(reference)">
               <mat-icon class="fa fa-clone"></mat-icon>
