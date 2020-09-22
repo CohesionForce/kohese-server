@@ -2,21 +2,22 @@ import { Component, OnInit, OnDestroy, Input, EventEmitter, OnChanges, ChangeDet
 
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../../services/navigation/navigation.service';
-
 import { ItemProxy } from '../../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
+import { Subscription, BehaviorSubject, Observable } from 'rxjs';
 import { MatTableDataSource } from '@angular/material'
+import { DetailsComponent } from '../../../details/details.component';
 
 @Component({
-  selector : 'children-table',
-  templateUrl : './children-table.component.html',
+  selector: 'children-table',
+  templateUrl: './children-table.component.html',
+  styleUrls: ['./children-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChildrenTableComponent extends NavigatableComponent
-                                    implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy {
   @Input()
-  filterSubject : BehaviorSubject<string>;
+  filterSubject: BehaviorSubject<string>;
   private _editableStream: BehaviorSubject<boolean>;
   get editableStream() {
     return this._editableStream;
@@ -27,39 +28,45 @@ export class ChildrenTableComponent extends NavigatableComponent
   }
 
   /* Obvervables */
-  filteredItems : Array<ItemProxy>;
+  filteredItems: Array<ItemProxy>;
 
   @Input()
-  childrenStream : BehaviorSubject<Array<ItemProxy>>;
-  tableStream : MatTableDataSource<ItemProxy>;
+  childrenStream: BehaviorSubject<Array<ItemProxy>>;
+  tableStream: MatTableDataSource<ItemProxy>;
 
   /* Subscriptions */
-  filterSub : Subscription;
-  childrenStreamSub : Subscription;
+  filterSub: Subscription;
+  childrenStreamSub: Subscription;
 
   /* Data */
-  rowDef : Array<string>;
-  children : Array<ItemProxy>;
+  rowDef: Array<string>;
+  children: Array<ItemProxy>;
 
-  constructor (protected NavigationService : NavigationService,
-               private changeRef : ChangeDetectorRef) {
+  constructor(protected NavigationService: NavigationService,
+    private changeRef: ChangeDetectorRef,
+    private _dialogService: DialogService,
+    private _navigationService: NavigationService) {
     super(NavigationService);
   }
 
-  ngOnInit () {
+  get navigationService() {
+    return this._navigationService;
+  }
+
+  ngOnInit() {
     this.childrenStreamSub =
-      this.childrenStream.subscribe((newChildren : Array<ItemProxy>)=>{
-      this.children = newChildren;
-      this.tableStream = new MatTableDataSource<ItemProxy>(this.children)
-      this.changeRef.markForCheck();
-    });
-    this.rowDef = ['kind','name','assignedTo','state','description', 'childrenCount']
+      this.childrenStream.subscribe((newChildren: Array<ItemProxy>) => {
+        this.children = newChildren;
+        this.tableStream = new MatTableDataSource<ItemProxy>(this.children)
+        this.changeRef.markForCheck();
+      });
+    this.rowDef = ['kind', 'name', 'assignedTo', 'state', 'description', 'childrenCount', "Nav"]
     this.filterSub = this.filterSubject.subscribe((newFilter) => {
       this.tableStream.filter = newFilter.trim().toLowerCase();
     })
   }
 
-  ngOnDestroy () {
+  ngOnDestroy() {
     this.filterSub.unsubscribe();
     this.childrenStreamSub.unsubscribe();
   }
@@ -90,5 +97,12 @@ export class ChildrenTableComponent extends NavigatableComponent
       }
     }
   }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsComponent, {
+      data: { itemProxy: itemProxy }
+    }).updateSize('90%', '90%');
+  }
+
 }
 
