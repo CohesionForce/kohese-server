@@ -23,7 +23,7 @@ function Server(httpsServer, options){
         socket.koheseUser = decodeAuthToken(request.token);
         console.log('>>>> session %s is user %s', socket.id, socket.koheseUser.username);
         socket.emit('authenticated');
-        
+
         kio.sessions[socket.id] = {
           sessionId: socket.id,
           address: socket.handshake.address,
@@ -33,11 +33,13 @@ function Server(httpsServer, options){
         global['app'].emit('newSession', socket);
         socket.on('connectionAdded', (data: any, sendResponse:
           () => void) => {
+          console.log('::: session %s for user %s added tab %s', socket.id, socket.koheseUser.username, data.clientTabId);
           kio.sessions[data.id].numberOfConnections++;
         });
         socket.on('connectionRemoved', (data: any, sendResponse:
           () => void) => {
-          kio.sessions[data.id].numberOfConnections--;
+            console.log('::: session %s for user %s removed tab %s', socket.id, socket.koheseUser.username, data.clientTabId);
+            kio.sessions[data.id].numberOfConnections--;
         });
         socket.on('getSessionMap', (data: any, sendResponse: (data:
           any) => void) => {

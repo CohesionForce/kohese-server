@@ -143,6 +143,8 @@ export class ItemRepository {
 
     console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
     this._worker = new SharedWorker(cacheWorkerBundle);
+
+    // Set up the worker messaging
     this._worker.port.addEventListener('message', (messageEvent: any) => {
 
       let msg: any = messageEvent.data;
@@ -206,6 +208,12 @@ export class ItemRepository {
       }
     });
 
+    // Try to notify cacheWorker if the tab is closing
+    addEventListener( 'unload', () => {
+      this.sendMessageToWorker('tabIsClosing', undefined, false)
+    });
+
+    // Establish the Item Repository
     ItemCache.setItemCache(this._cache);
     this._worker.port.start();
 
