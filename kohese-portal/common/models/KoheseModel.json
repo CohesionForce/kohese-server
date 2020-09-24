@@ -8,6 +8,7 @@
   },
   "base": "Item",
   "idInjection": false,
+  "genericallyWritable": false,
   "invertItemOrder": false,
   "properties": {
     "namespace": {
@@ -24,6 +25,11 @@
       "type": "string",
       "required": true,
       "name": "base"
+    },
+    "genericallyWritable": {
+      "name": "genericallyWritable",
+      "type": "boolean",
+      "default": true
     },
     "isInternal": {
       "type": "boolean",
