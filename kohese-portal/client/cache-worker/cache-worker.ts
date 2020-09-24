@@ -457,24 +457,29 @@ async function sync(): Promise<void> {
   }
   console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadWorking) / 1000);
 
-  // TODO: Need to deal with loss of data on refresh
-  _itemUpdatesPromise = updateWorking(workingTree.getAllTreeHashes());
-  await _itemUpdatesPromise;
-  let afterGetAll = Date.now();
-  console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
+  if (workingTree.loading) {
+    // Previous sync is still in progress, provide a warning and let existing sync finish
+    console.log("!!! Sync: Attempt to sync while previous sync was interrupted");
+  } else {
 
-  // Perform an update of the cache
-  await workingTree.saveToCache();
+    // TODO: Need to deal with loss of data on refresh
+    _itemUpdatesPromise = updateWorking(workingTree.getAllTreeHashes());
+    await _itemUpdatesPromise;
+    let afterGetAll = Date.now();
+    console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
 
-  let afterSaveToCache = Date.now();
-  console.log('^^^ Time to save working to cache: ' + (afterSaveToCache - afterGetAll) / 1000);
+    // Perform an update of the cache
+    await workingTree.saveToCache();
 
-  // TODO: Need to handle refresh
-  await getStatus();
-  let afterGetStatus = Date.now();
-  console.log('^^^ Time to get status: ' + (afterGetStatus - afterSaveToCache) / 1000);
-  console.log('^^^ Total time to sync: ' + (afterGetStatus - beforeSync) / 1000);
+    let afterSaveToCache = Date.now();
+    console.log('^^^ Time to save working to cache: ' + (afterSaveToCache - afterGetAll) / 1000);
 
+    // TODO: Need to handle refresh
+    await getStatus();
+    let afterGetStatus = Date.now();
+    console.log('^^^ Time to get status: ' + (afterGetStatus - afterSaveToCache) / 1000);
+    console.log('^^^ Total time to sync: ' + (afterGetStatus - beforeSync) / 1000);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
