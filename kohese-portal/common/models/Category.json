@@ -2,6 +2,9 @@
   "id": "Category",
   "name": "Category",
   "parentId": "Item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": true,

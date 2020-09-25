@@ -2,6 +2,9 @@
   "id": "DocumentConfiguration",
   "name": "DocumentConfiguration",
   "parentId": "Item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": true,

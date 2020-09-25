@@ -72,7 +72,7 @@ export class CreateWizardComponent extends NavigatableComponent
     let modelProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       'Item');
     let proxyPlaceholder: any = {
-      kind: 'Item',
+      kind: 'Action',
       item: {
         parentId: this._parentId,
         createdOn: timestamp,

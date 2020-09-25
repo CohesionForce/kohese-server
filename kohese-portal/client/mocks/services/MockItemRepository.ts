@@ -48,11 +48,60 @@ export class MockItemRepository {
   mockFullSync () {
     TreeConfiguration.getWorkingTree().reset();
 
+    new ItemProxy('Namespace', {
+      alias: 'Kohese',
+      id: 'com.kohese',
+      name: 'Kohese Namespace',
+      parentId: 'Model-Definitions',
+      editable: false
+    });
+
+    new ItemProxy('Namespace', {
+      "alias": "Metamodel",
+      "id": "com.kohese.metamodel",
+      "name": "Metamodel Namespace",
+      "parentId": "com.kohese",
+      "editable": false
+    });
+
+    new ItemProxy('Namespace', {
+      "alias": "UserTypes",
+      "id": "com.kohese.userdefined",
+      "name": "User Types Namespace",
+      "parentId": "com.kohese"
+    });
+
+    new ItemProxy('Namespace', {
+      alias: 'SubGlobal',
+      id: 'b32b6e10-ed3c-11ea-8737-9f31b413a913',
+      name: 'Sub-Global Namespace',
+      parentId: 'com.kohese'
+    });
+
+    new ItemProxy('Namespace', {
+      alias: 'SubSubGlobal',
+      id: '03741da0-ed41-11ea-8737-9f31b413a913',
+      name: 'Sub-Sub-Global Namespace',
+      parentId: 'b32b6e10-ed3c-11ea-8737-9f31b413a913'
+    });
+
+    new ItemProxy('Namespace', {
+      alias: 'EmptySubGlobal',
+      id: 'cab8f1b0-edf5-11ea-8737-9f31b413a913',
+      name: 'Empty Sub-Global Namespace',
+      parentId: 'com.kohese'
+    })
+
     for(let modelName in MockItemRepository.modelDefinitions.model) {
       console.log('::: Loading ' + modelName);
       let dataModel: KoheseDataModel = JSON.parse(JSON.stringify(
         MockItemRepository.modelDefinitions.model[modelName]));
-      if (dataModel.name === 'KoheseModel') {
+      
+      if (dataModel.name === 'Category') {
+        dataModel.namespace.id = 'b32b6e10-ed3c-11ea-8737-9f31b413a913';
+      } else if (dataModel.name === 'Project') {
+        dataModel.namespace.id = '03741da0-ed41-11ea-8737-9f31b413a913';
+      } else if (dataModel.name === 'KoheseModel') {
         let booleanAttribute: Attribute = {
           name: 'booleanAttribute',
           type: 'boolean',
@@ -535,7 +584,12 @@ export class MockItemRepository {
       console.log('::: Loading ' + viewName);
       let viewModel: KoheseViewModel = JSON.parse(JSON.stringify(
         MockItemRepository.modelDefinitions.view[viewName]));
-      if (viewModel.modelName === 'KoheseModel') {
+      
+      if (viewModel.modelName === 'Category') {
+        viewModel.namespace.id = 'b32b6e10-ed3c-11ea-8737-9f31b413a913';
+      } else if (viewModel.modelName === 'Project') {
+        viewModel.namespace.id = '03741da0-ed41-11ea-8737-9f31b413a913';
+      } else if (viewModel.modelName === 'KoheseModel') {
         let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
           viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
         let propertyDefinitions: Array<PropertyDefinition> = formatDefinition.
@@ -1101,6 +1155,23 @@ export class MockItemRepository {
       modelProxy.type = new KoheseType(modelProxy, viewProxy);
     }
 
+    new ItemProxy('KoheseUser', {
+      id: 'AdminKoheseUser',
+      name: 'admin',
+      username: 'admin',
+      password: 'password'
+    });
+
+    new ItemProxy('Observation', {
+      id: 'ObservationInstance',
+      name: 'ObservationInstance',
+      observedBy: 'admin',
+      observedOn: 5000001,
+      context: [{
+        id: 'KoheseModel'
+      }]
+    });
+
     let numberOfItemsToAdd: number = 7;
     for (let j: number = 0; j < numberOfItemsToAdd; j++) {
       let item: any = MockItem();
@@ -1162,8 +1233,10 @@ export class MockItemRepository {
 
   }
 
-  deleteItem() {
-
+  public deleteItem(itemProxy: ItemProxy, deleteDescendants: boolean):
+    Promise<any> {
+    itemProxy.deleteItem(deleteDescendants);
+    return Promise.resolve();
   }
 
   public upsertItem(kind: string, item: any): Promise<ItemProxy> {

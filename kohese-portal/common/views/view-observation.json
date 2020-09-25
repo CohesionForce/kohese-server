@@ -2,6 +2,9 @@
   "id": "view-observation",
   "name": "Observation View Model",
   "parentId": "view-item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "Observation",
   "icon": "fa fa-comment",
   "color": "#bcc00a",
@@ -140,6 +143,14 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
               "visible": true,
               "editable": false
             },

@@ -2,6 +2,9 @@
   "id": "view-actor",
   "name": "Actor",
   "parentId": "view-item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "Actor",
   "icon": "fa fa-male",
   "color": "#000000",
@@ -105,6 +108,14 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
               "visible": true,
               "editable": false
             },

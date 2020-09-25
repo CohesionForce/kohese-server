@@ -2,6 +2,9 @@
   "id": "view-item",
   "name": "Item View Model",
   "parentId": "View-Model-Definitions",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "Item",
   "icon": "fa fa-sticky-note",
   "color": "#565656",
@@ -161,6 +164,14 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
               "visible": true,
               "editable": false
             },

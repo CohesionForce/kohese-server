@@ -2,19 +2,28 @@
   "id": "KoheseModel",
   "name": "KoheseModel",
   "parentId": "Item",
+  "editable": false,
+  "namespace": {
+    "id": "com.kohese.metamodel"
+  },
   "base": "Item",
-  "isMetaModel": true,
   "idInjection": false,
   "invertItemOrder": false,
   "properties": {
+    "namespace": {
+      "name": "namespace",
+      "type": "Namespace",
+      "required": true,
+      "default": null,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    },
     "base": {
       "type": "string",
       "required": true,
       "name": "base"
-    },
-    "isMetaModel": {
-      "type": "boolean",
-      "name": "isMetaModel"
     },
     "isInternal": {
       "type": "boolean",

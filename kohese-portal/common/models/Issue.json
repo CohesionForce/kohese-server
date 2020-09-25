@@ -2,6 +2,9 @@
   "id": "Issue",
   "name": "Issue",
   "parentId": "Observation",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Observation",
   "idInjection": true,
   "invertItemOrder": true,

@@ -2,10 +2,24 @@
   "id": "KoheseView",
   "name": "KoheseView",
   "parentId": "Item",
+  "editable": false,
+  "namespace": {
+    "id": "com.kohese.metamodel"
+  },
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": false,
   "properties": {
+    "namespace": {
+      "name": "namespace",
+      "type": "Namespace",
+      "required": true,
+      "default": null,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    },
     "modelName": {
       "type": "string",
       "required": true,

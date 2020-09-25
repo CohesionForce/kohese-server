@@ -2,6 +2,9 @@
   "id": "view-koheseview",
   "name": "KoheseView View Model",
   "parentId": "view-item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "KoheseView",
   "icon": "fa fa-desktop",
   "color": "#000000",
@@ -108,6 +111,14 @@
               "editable": false
             },
             {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "loadPending",
               "customLabel": "loadPending",
               "labelOrientation": "Top",
@@ -152,6 +163,14 @@
               "customLabel": "Children",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "namespace",
+              "customLabel": "Namespace",
+              "labelOrientation": "Top",
+              "kind": "",
               "visible": true,
               "editable": false
             },

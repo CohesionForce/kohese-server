@@ -3,6 +3,9 @@
   "name": "Internal",
   "parentId": "Item",
   "base": "Item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "idInjection": false,
   "isMetaModel": true,
   "isInternal": true,

@@ -35,6 +35,11 @@ let commonViewFiles = 'common/views/';
 function loadKoheseModelsAndViews() {
   console.log('::: Load Kohese Models');
 
+  kdbFS.createDirIfMissing(koheseKDBDirPath + path.sep + 'Namespace');
+  loadModelInstances('Namespace', 'common' + path.sep + 'Namespace', false);
+  loadModelInstances('Namespace', koheseKDBDirPath + path.sep + 'Namespace',
+    true);
+
   let repoModelFileDir = koheseKDBDirPath + '/KoheseModel';
   kdbFS.createDirIfMissing(repoModelFileDir);
   loadModelInstances('KoheseModel', commonModelFiles, false);
@@ -456,6 +461,25 @@ function loadModelInstances (kind, modelDirPath, inRepo) {
     if(inRepo){
       proxy.repoPath = itemPath;
     }
+
+    migrate(proxy, kind);
+  }
+}
+
+function migrate(itemProxy: ItemProxy, typeName: string): void {
+  let migrated: boolean = false;
+  if ((typeName === 'KoheseModel') || (typeName === 'KoheseView')) {
+    if (itemProxy.item.namespace == null) {
+      itemProxy.item.namespace = {
+        id: 'com.kohese.userdefined'
+      };
+
+      migrated = true;
+    }
+  }
+  
+  if (migrated) {
+    storeModelInstance(itemProxy, false);
   }
 }
 

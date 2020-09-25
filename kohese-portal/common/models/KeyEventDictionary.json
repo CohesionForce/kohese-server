@@ -6,6 +6,9 @@
   "createdOn": 1572491164821,
   "modifiedBy": "gmckune",
   "modifiedOn": 1572491746960,
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Decision",
   "idInjection": true,
   "properties": {

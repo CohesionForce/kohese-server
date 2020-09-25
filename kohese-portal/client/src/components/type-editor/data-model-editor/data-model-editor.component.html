@@ -2,7 +2,7 @@
   <ng-container *ngIf="!enclosingType">
     <ng-container *ngIf="!editable else editableBlock">
       <button mat-icon-button matTooltip="Edit structure settings for this kind"
-        class="flex-right-align" [disabled]="dataModel.isMetaModel"
+        class="flex-right-align" [disabled]="(dataModel.editable === false)"
         (click)="editable = true">
         <mat-icon class="fa fa-edit"></mat-icon>
       </button>
@@ -20,6 +20,10 @@
     </ng-template>
   </ng-container>
 </div>
+<label>
+  Namespace: {{itemRepository.getTreeConfig().getValue().config.getProxyFor(
+    dataModel.namespace.id).item.name}}
+</label>
 <mat-form-field style="width: 100%;">
   <input matInput type="text" placeholder="Name" [ngModel]="dataModel.name"
     (ngModelChange)="dataModel.name = $event; modifiedEventEmitter.emit()"

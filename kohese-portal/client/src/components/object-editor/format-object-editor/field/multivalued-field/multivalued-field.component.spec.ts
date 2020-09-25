@@ -20,6 +20,7 @@ import { TableModule } from '../../../../table/table.module';
 import { FormatObjectEditorComponent } from '../../format-object-editor.component';
 import { SinglevaluedFieldComponent } from '../singlevalued-field/singlevalued-field.component';
 import { MultivaluedFieldComponent } from './multivalued-field.component';
+import { TreeViewModule } from '../../../../tree/tree.module';
 
 describe('MultivaluedFieldComponent', () => {
   let component: MultivaluedFieldComponent;
@@ -43,7 +44,8 @@ describe('MultivaluedFieldComponent', () => {
         MatDialogModule,
         MarkdownModule,
         TableModule,
-        MarkdownEditorModule
+        MarkdownEditorModule,
+        TreeViewModule
       ],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },

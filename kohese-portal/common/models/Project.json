@@ -2,6 +2,9 @@
   "id": "Project",
   "name": "Project",
   "parentId": "Item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": false,

@@ -209,6 +209,25 @@ export class DataModelEditorComponent {
     this._editable = false;
     this._changeDetectorRef.markForCheck();
   }
+
+  /**
+   * Determines if two references are refer to the same Item
+   * 
+   * @param option
+   * @param selection 
+   */
+  public areNamespaceReferencesEqual(option: { id: string}, selection:
+    { id: string }): boolean {
+    if ((option == null) && (selection == null)) {
+      return true;
+    } else {
+      if ((option != null) && (selection != null)) {
+        return (option.id === selection.id);
+      } else {
+        return false;
+      }
+    }
+  }
   
   public async parentTypeSelected(parentType: any): Promise<void> {
     let viewModelProxy: ItemProxy;

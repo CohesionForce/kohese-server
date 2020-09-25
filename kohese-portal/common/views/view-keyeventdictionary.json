@@ -2,6 +2,9 @@
   "id": "view-keyeventdictionary",
   "name": "KeyEventDictionary",
   "parentId": "view-item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "KeyEventDictionary",
   "icon": "fa fa-th-list",
   "color": "#000000",
@@ -114,6 +117,14 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
               "visible": true,
               "editable": false
             },

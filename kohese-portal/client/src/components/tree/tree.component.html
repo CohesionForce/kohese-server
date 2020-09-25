@@ -62,7 +62,8 @@
           (input)="searchTextChanged($event.target.value)"/>
       </mat-form-field>
     </div>
-    <div #elementContainer style="height: calc(100% - 70px); width: 100%;">
+    <div #elementContainer style="height: calc(100% - 70px); width: 100%;
+      overflow-y: auto;">
       <ng-container *ngFor="let element of Array.from(elementMap.keys())">
         <ng-container *ngIf="shouldDisplay(element)">
           <div style="height: 40px; width: 100%; display: flex; flex-direction:

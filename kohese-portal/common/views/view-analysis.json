@@ -2,6 +2,9 @@
   "id": "view-analysis",
   "name": "Analysis View Model",
   "parentId": "View-Model-Definitions",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "Analysis",
   "icon": "",
   "color": "#000000",

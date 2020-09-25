@@ -1,0 +1,25 @@
+{
+  "id": "Namespace",
+  "name": "Namespace",
+  "parentId": "Item",
+  "editable": false,
+  "namespace": {
+    "id": "com.kohese.metamodel"
+  },
+  "base": "Item",
+  "idInjection": true,
+  "invertItemOrder": true,
+  "properties": {
+    "alias": {
+      "name": "alias",
+      "type": "string",
+      "required": false,
+      "default": ""
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": [],
+  "localTypes": {}
+}

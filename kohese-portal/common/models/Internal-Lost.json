@@ -2,6 +2,9 @@
   "id": "Internal-Lost",
   "name": "Internal-Lost",
   "parentId": "Item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Item",
   "idInjection": false,
   "isMetaModel": true,

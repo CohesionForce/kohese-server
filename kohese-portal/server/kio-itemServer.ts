@@ -175,9 +175,11 @@ function KIOItemServer(socket){
         responseTransmitTime: null
       },
       cache: {
+        Namespace: {},
         KoheseModel: {},
         KoheseView: {},
-        KoheseUser: {}}
+        KoheseUser: {}
+      }
     };
 
     let repoProxy;

@@ -1,60 +1,86 @@
-<div style="height: 100%; width: 100%;">
-  <div style="height: 7%; width: 100%;">
-    <mat-form-field class="pad" style="width: 25%;">
+<ng-container *ngIf="(itemRepository.getTreeConfig() | async) else
+  notInitialized">
+  <div style="height: 40px; width: 100%; display: flex; flex-direction: row;">
+    <div style="width: 40%; margin: 0px 3px 0px 3px;">
+      <mat-form-field style="width: calc(100% - 40px);">
+        <mat-select placeholder="Namespace" [(ngModel)]="selectedNamespace">
+          <ng-container *ngFor="let namespace of getNamespaces()">
+            <mat-option [value]="namespace">
+              {{namespace.name}}
+            </mat-option>
+          </ng-container>
+        </mat-select>
+      </mat-form-field>
+      <button mat-icon-button matTooltip="Edit Namespaces"
+        (click)="openNamespaceEditor()">
+        <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+      </button>
+    </div>
+    <mat-form-field style="width: 40%; margin: 0px 3px 0px 3px;">
       <mat-select placeholder="Type" [(ngModel)]="selectedType">
-        <mat-option *ngFor="let type of types"
-          matTooltip="{{type.dataModelItemProxy.item.description}}"
-          [value]="type">
-          <mat-icon class="{{type.viewModelItemProxy.item.icon}}">
-          </mat-icon>
-          {{type.dataModelItemProxy.item.name}}
-        </mat-option>
+        <ng-container *ngFor="let type of getNamespaceTypes(
+          selectedNamespace)">
+          <mat-option [value]="type">
+            {{type.name}}
+          </mat-option>
+        </ng-container>
       </mat-select>
     </mat-form-field>
-    <span class="pull-right">
-      <button mat-icon-button matTooltip="Add Type" (click)="add()">
-        <mat-icon class="fa fa-plus"></mat-icon>
-      </button>
-      <button mat-icon-button matTooltip="Delete Type" (click)="delete()"
-        [disabled]="(!selectedType || selectedType.dataModelItemProxy.item.
-        isMetaModel)">
-        <mat-icon class="fa fa-trash"></mat-icon>
-      </button>
-    </span>
+    <button mat-icon-button matTooltip="Add Type" [disabled]="!itemRepository.
+      getTreeConfig().getValue()" style="margin-left: auto;" (click)="add()">
+      <mat-icon class="fa fa-plus"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Delete Type" (click)="delete()"
+      [disabled]="(selectedType.editable === false)">
+      <mat-icon class="fa fa-trash"></mat-icon>
+    </button>
   </div>
-  <div style="height: 93%; width: 100%;">
-    <ng-container *ngIf="selectedType">
-      <mat-tab-group class="pad" style="height: 100%; width: 100%;">
-        <mat-tab>
-          <ng-template mat-tab-label>
-            Structure
-            <ng-container *ngIf="selectedType.dataModelItemProxy.dirty">
-              <img src="assets/icons/versioncontrol/dirty.ico"/>
-            </ng-container>
-          </ng-template>
-          <ng-template matTabContent>
-            <data-model-editor [dataModel]="selectedType.dataModelItemProxy.
-              item" [hasUnsavedChanges]="selectedType.dataModelItemProxy.dirty"
-              (modified)="selectedType.dataModelItemProxy.dirty = true">
-            </data-model-editor>
-          </ng-template>
-        </mat-tab>
-        <mat-tab>
-          <ng-template mat-tab-label>
-            Display
-            <ng-container *ngIf="selectedType.viewModelItemProxy.dirty">
-              <img src="assets/icons/versioncontrol/dirty.ico"/>
-            </ng-container>
-          </ng-template>
-          <ng-template matTabContent>
-            <view-model-editor [viewModel]="selectedType.viewModelItemProxy.
-              item" [hasUnsavedChanges]="selectedType.viewModelItemProxy.dirty"
-              (modified)="selectedType.viewModelItemProxy.dirty = true"
-              [dataModel]="selectedType.dataModelItemProxy.item">
-            </view-model-editor>
-          </ng-template>
-        </mat-tab>
-      </mat-tab-group>
-    </ng-container>
+  <div style="height: calc(100% - 40px);">
+    <mat-tab-group class="pad" style="height: 100%; width: 100%;">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Structure
+          <ng-container *ngIf="itemRepository.getTreeConfig().getValue().
+            config.getProxyFor(selectedType.id).dirty">
+            <img src="assets/icons/versioncontrol/dirty.ico"/>
+          </ng-container>
+        </ng-template>
+        <ng-template matTabContent>
+          <data-model-editor [dataModel]="selectedType"
+            [hasUnsavedChanges]="itemRepository.getTreeConfig().getValue().
+            config.getProxyFor(selectedType.id).dirty"
+            (modified)="itemRepository.getTreeConfig().getValue().config.
+            getProxyFor(selectedType.id).dirty = true">
+          </data-model-editor>
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Display
+          <ng-container *ngIf="itemRepository.getTreeConfig().getValue().
+            config.getProxyFor('view-' + selectedType.name.toLowerCase()).
+            dirty">
+            <img src="assets/icons/versioncontrol/dirty.ico"/>
+          </ng-container>
+        </ng-template>
+        <ng-template matTabContent>
+          <view-model-editor [viewModel]="itemRepository.getTreeConfig().
+            getValue().config.getProxyFor('view-' + selectedType.name.
+            toLowerCase()).item" [hasUnsavedChanges]="itemRepository.
+            getTreeConfig().getValue().config.getProxyFor('view-' +
+            selectedType.name.toLowerCase()).dirty" (modified)="itemRepository.
+            getTreeConfig().getValue().config.getProxyFor('view-' +
+            selectedType.name.toLowerCase()).dirty = true"
+            [dataModel]="selectedType">
+          </view-model-editor>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
   </div>
-</div>
+</ng-container>
+<ng-template #notInitialized>
+  <div style="height: 100%; width: 100%; display: flex; justify-content:
+    center; align-items: center;">
+    <mat-spinner mode="indeterminate"></mat-spinner>
+  </div>
+</ng-template>
