@@ -381,8 +381,6 @@ let _workingTree = TreeConfiguration.getWorkingTree();
   let checkConnections: () => void = () => {
     port.postMessage({message: 'verifyConnection', data: undefined});
 
-    console.log('::: Checking connection for tab: ' + clientId);
-
     let timeSinceLastConnectionVerification = Date.now() - lastTabResponseTime;
 
     if (timeSinceLastConnectionVerification < 20000) {
@@ -415,12 +413,14 @@ function tabConnected(clientId, port) {
 //
 //////////////////////////////////////////////////////////////////////////
 function tabDisconnected(clientId) {
-  console.log("::: Notifying server that tab is closing: " + clientId);
-  socket.emit('connectionRemoved', {
-    id: socket.id,
-    clientTabId: clientId
-  });
-  delete clientMap[clientId];
+  if (clientMap[clientId]){
+    console.log("::: Notifying server that tab is closing: " + clientId);
+    socket.emit('connectionRemoved', {
+      id: socket.id,
+      clientTabId: clientId
+    });
+    delete clientMap[clientId];
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
