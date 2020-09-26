@@ -23,6 +23,15 @@ let _fundamentalItemsPromise: Promise<any>;
 let _loadedCachePromise: Promise<any>;
 let _itemUpdatesPromise: Promise<any>;
 
+let _suppressWorkerRequestAnnouncement = {
+  verifyConnection: true
+};
+
+let _suppressWorkerEventAnnouncement = {
+  connectionVerification: true
+};
+
+
 let _lastClientId :number = 0;
 
 let _workingTree = TreeConfiguration.getWorkingTree();
@@ -64,7 +73,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     const request = event.data;
 
     const requestStartTime = Date.now();
-    console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
+    if (!_suppressWorkerEventAnnouncement[request.type])
+    {
+      console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
+    }
 
     // Determine which message handler to invoke
     switch (request.type) {
@@ -361,8 +373,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     }
 
     const requestFinishTime = Date.now();
-    console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
+    if (!_suppressWorkerEventAnnouncement) {
+      console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
       + ' - ' + (requestFinishTime - requestStartTime) / 1000 + 's');
+    }
   };
 
   //////////////////////////////////////////////////////////////////////////
