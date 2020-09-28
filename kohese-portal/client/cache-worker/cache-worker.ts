@@ -14,7 +14,6 @@ import { Workspace } from '../../common/src/kohese-commit';
 let socket: SocketIOClient.Socket;
 let clientMap = {};
 let _authRequest = {};
-let _connectionVerificationSet: Set<number> = new Set<number>();
 let kioListenersInitialized: boolean = false;
 
 let cacheInitialized: boolean = false;
@@ -23,6 +22,15 @@ let _connectionAuthenticatedPromise: Promise<any>;
 let _fundamentalItemsPromise: Promise<any>;
 let _loadedCachePromise: Promise<any>;
 let _itemUpdatesPromise: Promise<any>;
+
+let _suppressWorkerRequestAnnouncement = {
+  verifyConnection: true
+};
+
+let _suppressWorkerEventAnnouncement = {
+  connectionVerification: true
+};
+
 
 let _lastClientId :number = 0;
 
@@ -52,7 +60,11 @@ let _workingTree = TreeConfiguration.getWorkingTree();
   }
 
   const clientId = ++_lastClientId;
+  port.koheseClientTabId = clientId;
+  port.koheseAssumedTabClosedUnexpectedly = false;
+
   clientMap[clientId] = port;
+  let lastTabResponseTime = Date.now();
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -61,7 +73,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     const request = event.data;
 
     const requestStartTime = Date.now();
-    console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
+    if (!_suppressWorkerEventAnnouncement[request.type])
+    {
+      console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
+    }
 
     // Determine which message handler to invoke
     switch (request.type) {
@@ -79,6 +94,17 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             console.log('^^^ Socket reconnected');
             _connectionAuthenticatedPromise = authenticate(_authRequest);
             await _connectionAuthenticatedPromise;
+            for (let key in clientMap) {
+              // Provide notification of client tab ids to server
+              if (!port.koheseAssumedTabClosedUnexpectedly) {
+                socket.emit('connectionAdded', {
+                  id: socket.id,
+                  clientTabId: clientMap[key].koheseClientTabId
+                });
+              } else {
+                console.log('!!! Client list has a tab that is assumed closed: ' + port.koheseClientTabId);
+              }
+            }
 
             postToAllPorts('reconnected', {});
           });
@@ -89,9 +115,15 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }
 
         await _connectionAuthenticatedPromise;
-        socket.emit('connectionAdded', { id: socket.id });
+        tabConnected(clientId, port);
         port.postMessage({ id: request.id });
         break;
+
+      case 'tabIsClosing':
+        console.log('::: Client tab is closing: ' + clientId);
+        tabDisconnected(clientId);
+        break;
+
       case 'getFundamentalItems':
         if (!_fundamentalItemsPromise || request.data.refresh) {
           _fundamentalItemsPromise = synchronizeModels();
@@ -104,6 +136,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           data: fundamentalItems
         });
         break;
+
       case 'getCache':
         if (!_loadedCachePromise || request.data.refresh) {
           _loadedCachePromise = populateCache();
@@ -150,6 +183,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
         port.postMessage({ id: request.id });
         break;
+
       case 'getItemUpdates':
         let updatesPromise = _itemUpdatesPromise;
         // Wait for any pending update to complete
@@ -198,6 +232,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           data: response
         });
         break;
+
       case 'getStatus':
         let rootProxy = _workingTree.getRootProxy();
         var idStatusArray = [];
@@ -218,11 +253,19 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             idStatusArray: idStatusArray
           }
         });
+        break;
 
-        break;
       case 'connectionVerification':
-        _connectionVerificationSet.add(clientId);
+        lastTabResponseTime = Date.now();
+        if (port.koheseAssumedTabClosedUnexpectedly){
+          setTimeout(() => {
+            checkConnections();
+          }, 5000);
+          tabConnected(clientId, port);
+          port.koheseAssumedTabClosedUnexpectedly = false;
+        }
         break;
+
       case 'getSessionMap':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (sessionMap: any) => void, reject: () => void) => {
@@ -231,6 +274,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'getIcons':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (icons: Array<string>) => void, reject: () => void) => {
@@ -238,6 +282,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           resolve(icons);
         }); }) });
         break;
+
       case 'getUrlContent':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (contentObject: any) => void, reject: () => void) => {
@@ -247,6 +292,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           resolve(contentObject);
         }); }) });
         break;
+
       case 'convertToMarkdown':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (markdown: string) => void, reject: () => void) => {
@@ -258,6 +304,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           resolve(markdown);
         }); }) });
         break;
+
       case 'importMarkdown':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
@@ -268,6 +315,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'produceReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
@@ -278,6 +326,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'getReportMetaData':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (reportObjects: Array<any>) => void, reject:
@@ -287,6 +336,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'renameReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
@@ -296,6 +346,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'getReportPreview':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (reportPreview: string) => void, reject: () => void) => {
@@ -305,6 +356,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'removeReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
@@ -314,14 +366,17 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);
     }
 
     const requestFinishTime = Date.now();
-    console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
+    if (!_suppressWorkerEventAnnouncement) {
+      console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
       + ' - ' + (requestFinishTime - requestStartTime) / 1000 + 's');
+    }
   };
 
   //////////////////////////////////////////////////////////////////////////
@@ -334,28 +389,52 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
   port.start();
 
-  let connectionVerificationAttempts: number = 0;
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   let checkConnections: () => void = () => {
-    postToAllPorts('verifyConnection', undefined);
+    port.postMessage({message: 'verifyConnection', data: undefined});
 
-    // TODO: Need to update lost connection logic
+    let timeSinceLastConnectionVerification = Date.now() - lastTabResponseTime;
 
-    // if (3 === connectionVerificationAttempts) {
-    //   for (let id in clientMap) {
-    //     if (!_connectionVerificationSet.has(+id)) {
-    //       delete clientMap[id];
-    //       socket.emit('connectionRemoved', { id: socket.id });
-    //     }
-    //   }
-    //   _connectionVerificationSet.clear();
-    //   connectionVerificationAttempts = 0;
-    // }
-    // connectionVerificationAttempts++;
-    // setTimeout(() => {
-    //   checkConnections();
-    // }, 7000);
+    if (timeSinceLastConnectionVerification < 20000) {
+      setTimeout(() => {
+        checkConnections();
+      }, 5000);
+    } else {
+      console.log('*** Tab failed to respond to connection request, assuming it has closed unexpectedly: ' + clientId);
+      port.koheseAssumedTabClosedUnexpectedly = true;
+      tabDisconnected(clientId);
+    }
   };
+
   checkConnections();
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function tabConnected(clientId, port) {
+  console.log("::: Notifying server that tab has connected: " + clientId);
+  socket.emit('connectionAdded', {
+    id: socket.id,
+    clientTabId: clientId
+  });
+  clientMap[clientId] = port;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function tabDisconnected(clientId) {
+  if (clientMap[clientId]){
+    console.log("::: Notifying server that tab is closing: " + clientId);
+    socket.emit('connectionRemoved', {
+      id: socket.id,
+      clientTabId: clientId
+    });
+    delete clientMap[clientId];
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
