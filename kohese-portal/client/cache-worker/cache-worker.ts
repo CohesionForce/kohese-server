@@ -8,6 +8,7 @@ import { ItemProxy } from '../../common/src/item-proxy';
 import { TreeHashMap } from '../../common/src/tree-hash';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
+import { KoheseView } from '../../common/src/KoheseView';
 import { LevelCache } from '../../common/src/level-cache';
 import { Workspace } from '../../common/src/kohese-commit';
 
@@ -553,6 +554,8 @@ function buildOrUpdateProxy(item: any, kind: string, itemStatus: Array<string>, 
     } else {
       if (kind === 'KoheseModel') {
         proxy = new KoheseModel(item);
+      } else if (kind === 'KoheseView') {
+        proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
       } else {
         proxy = new ItemProxy(kind, item);
       }
@@ -643,6 +646,7 @@ function synchronizeModels(): Promise<any> {
       }
 
       processBulkUpdate(response);
+      KoheseModel.modelDefinitionLoadingComplete();
       resolve(response);
     });
   });
@@ -861,10 +865,6 @@ function processBulkUpdate(response: any): void {
     let kindList: any = response.cache[kind];
     for (let id in kindList) {
       buildOrUpdateProxy(JSON.parse(kindList[id]), kind, undefined);
-    }
-
-    if (kind === 'KoheseView') {
-      KoheseModel.modelDefinitionLoadingComplete();
     }
   }
 

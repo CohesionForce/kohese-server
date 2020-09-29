@@ -3,11 +3,13 @@ const StringReplaceAsync = require('string-replace-async');
 
 import { ItemProxy } from '../common/src/item-proxy';
 import { KoheseModel } from '../common/src/KoheseModel';
+import { KoheseView } from '../common/src/KoheseView';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
 import { ItemCache } from '../common/src/item-cache';
 import { KDBRepo } from './kdb-repo';
 import { KDBCache } from './kdb-cache';
+
 const MdToKohese = require('./md-to-kohese');
 
 var kio = require('./koheseIO');
@@ -556,6 +558,8 @@ function KIOItemServer(socket){
       } else {
         if (kind === 'KoheseModel') {
           proxy = new KoheseModel(item);
+        } else if (kind === 'KoheseView') {
+          proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
         } else {
           proxy = new ItemProxy(kind, item);
         }

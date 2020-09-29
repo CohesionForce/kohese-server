@@ -343,11 +343,21 @@ export class TreeConfiguration {
   //
   //////////////////////////////////////////////////////////////////////////
   getProxyFor(id) : ItemProxy {
+    let itemProxy: ItemProxy;
     // TODO Need to remove this returning of the ROOT when the string is empty
     if(id === '') {
-      return this.root;
+      itemProxy = this.root;
     }
-    return this.proxyMap[id];
+    itemProxy = this.proxyMap[id];
+
+    if ((itemProxy == null) && (this !== TreeConfiguration.getWorkingTree())) {
+      itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(id);
+      if ((itemProxy != null) && (itemProxy.kind !== 'KoheseModel')) {
+        itemProxy = undefined;
+      }
+    }
+
+    return itemProxy;
   }
 
   //////////////////////////////////////////////////////////////////////////

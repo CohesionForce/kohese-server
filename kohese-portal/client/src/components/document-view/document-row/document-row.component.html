@@ -32,10 +32,9 @@
       </ng-container>
       <ng-template #notEditable>
         <markdown [data]="itemRepository.getMarkdownRepresentation(docInfo.
-          proxy.item, undefined, docInfo.proxy.model.item, itemRepository.
-          getTreeConfig().getValue().config.getProxyFor('view-' + docInfo.
-          proxy.model.item.name.toLowerCase()).item, FormatDefinitionType.
-          DOCUMENT, docInfo.depth, false)">
+          proxy.item, undefined, docInfo.proxy.model.item, docInfo.
+          proxy.model.view.item, FormatDefinitionType.DOCUMENT, docInfo.depth,
+          false)">
         </markdown>
       </ng-template>
     </div>

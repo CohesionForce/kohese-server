@@ -2,12 +2,20 @@
 import { ItemProxy, KoheseModelInterface }  from './item-proxy';
 import { TreeConfiguration } from './tree-configuration';
 import * as  _ from 'underscore';
+import { KoheseView } from './KoheseView';
 
 
 let modelMap = {
 };
 
 export class KoheseModel extends ItemProxy implements KoheseModelInterface {
+  private _view: KoheseView;
+  get view() {
+    return this._view;
+  }
+  set view(koheseView: KoheseView) {
+    this._view = koheseView;
+  }
 
   static modelsDefined : boolean = false;
 
