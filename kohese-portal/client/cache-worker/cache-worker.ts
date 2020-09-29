@@ -19,6 +19,7 @@ let kioListenersInitialized: boolean = false;
 let cacheInitialized: boolean = false;
 let _cache: LevelCache;
 let _connectionAuthenticatedPromise: Promise<any>;
+let _userLockedOut : boolean = false;
 let _fundamentalItemsPromise: Promise<any>;
 let _loadedCachePromise: Promise<any>;
 let _itemUpdatesPromise: Promise<any>;
@@ -112,6 +113,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
           _authRequest = request.data;
           _connectionAuthenticatedPromise = authenticate(_authRequest);
+        }
+
+        if (_userLockedOut) {
+          port.postMessage({message:'userLockedOut'});
         }
 
         await _connectionAuthenticatedPromise;
@@ -458,6 +463,13 @@ async function authenticate(authRequest): Promise<void> {
 
       // Begin synchronization process
       sync();
+    });
+
+    socket.on('userLockedOut', async () => {
+      console.log ('^^^ Session user locked out');
+      socket.disconnect();
+      _userLockedOut = true;
+      postToAllPorts('userLockedOut', {});
     });
 
     console.log('^^^ Requesting authentication');
