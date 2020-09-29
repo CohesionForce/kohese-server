@@ -145,11 +145,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             let processItemProxy: (itemProxy: ItemProxy) => void = (itemProxy:
               ItemProxy) => {
               initialContent += this._itemRepository.getMarkdownRepresentation(
-                itemProxy.item, undefined, itemProxy.model.item, this.
-                _itemRepository.getTreeConfig().getValue().config.getProxyFor(
-                'view-' + itemProxy.kind.toLowerCase()).item,
-                FormatDefinitionType.DOCUMENT, itemProxy.getDepthFromAncestor(
-                object as ItemProxy), reportSpecifications.addLinks);
+                itemProxy.item, undefined, itemProxy.model.item, itemProxy.
+                model.view.item, FormatDefinitionType.DOCUMENT, itemProxy.
+                getDepthFromAncestor(object as ItemProxy),
+                reportSpecifications.addLinks);
             };
             
             if (reportSpecifications.includeDescendants) {

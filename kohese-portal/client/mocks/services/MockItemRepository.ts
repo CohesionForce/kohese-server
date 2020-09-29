@@ -8,6 +8,7 @@ import { MockDataModel, ModelDefinitions } from '../data/MockDataModel';
 import { ItemProxy } from '../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../common/src/KoheseModel';
+import { KoheseView } from '../../../common/src/KoheseView';
 import { RepoStates,
   TreeConfigType } from '../../src/services/item-repository/item-repository.service';
 import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
@@ -1141,7 +1142,7 @@ export class MockItemRepository {
           '0322b120-d0d8-11ea-83b0-4f5b7c4a9272';
       }
 
-      new ItemProxy('KoheseView', viewModel);
+      new KoheseView(viewModel, TreeConfiguration.getWorkingTree());
     }
 
     KoheseModel.modelDefinitionLoadingComplete();
