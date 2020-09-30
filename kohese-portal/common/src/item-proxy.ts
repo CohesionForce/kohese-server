@@ -561,7 +561,18 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   clearDirtyFlags() {
-    delete this.dirtyFields;
+    if (this.dirty) {
+      delete this.dirtyFields;
+      this.external_dirty = false;
+      this.treeConfig.changeSubject.next({
+        type: 'dirty',
+        kind: this.kind,
+        id: this._item.id,
+        dirty: this.dirty,
+        dirtyFields: this.dirtyFields,
+        proxy: this
+      });
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -2084,14 +2095,6 @@ export class ItemProxy {
     // Copy the withItem into the current proxy
     let modifications = this.copyAttributes(withItem);
     this.clearDirtyFlags();
-    this.treeConfig.changeSubject.next({
-      type: 'dirty',
-      kind: this.kind,
-      id: this._item.id,
-      dirty: false,
-      dirtyFields: {},
-      proxy: this
-    });
 
     // console.log('%%% Modifications');
     // console.log(modifications);
