@@ -34,6 +34,7 @@ import { KoheseDataModel,
 
 export enum RepoStates {
   DISCONNECTED,
+  USER_LOCKED_OUT,
   SYNCHRONIZING,
   SYNCHRONIZATION_FAILED,
   KOHESEMODELS_SYNCHRONIZED,
@@ -180,22 +181,37 @@ export class ItemRepository {
           );
 
           break;
+
+        case 'userLockedOut':
+
+          this.updateRepositorySyncState(
+            RepoStates.USER_LOCKED_OUT,
+            'User is locked out'
+          );
+
+          break;
+
         case 'verifyConnection':
           this.sendMessageToWorker('connectionVerification', undefined, false);
           break;
+
         case 'update':
           this.buildOrUpdateProxy(msg.data.item, msg.data.kind, msg.data.status);
           break;
+
         case 'updateItemStatus':
           this.updateItemStatus(msg.data.itemId, msg.data.status);
           break;
+
         case 'deletion':
           TreeConfiguration.getWorkingTree().getProxyFor(msg.data.id).deleteItem();
           break;
+
         case 'cachePiece':
           const cachePiece: any = msg.data;
           this.processCachePiece(cachePiece);
           break;
+
         default:
           console.log('*** Received unexpected message: ' + msg.message);
           console.log(messageEvent);

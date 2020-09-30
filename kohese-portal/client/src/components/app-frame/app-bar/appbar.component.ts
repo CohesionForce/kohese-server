@@ -61,6 +61,10 @@ export class AppBarComponent extends NavigatableComponent
           this._itemRepositoryState = status.state;
           this.syncStatusString = 'Disconnected';
           break;
+        case(RepoStates.USER_LOCKED_OUT):
+          this._itemRepositoryState = status.state;
+          this.syncStatusString = 'User Locked Out';
+          break;
         case(RepoStates.SYNCHRONIZATION_FAILED):
           this._itemRepositoryState = status.state;
           this.syncStatusString = 'Synchronization Failed';
