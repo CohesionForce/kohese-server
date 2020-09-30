@@ -3,22 +3,27 @@ import { KoheseModel } from './KoheseModel';
 import { TreeConfiguration } from './tree-configuration';
 
 export class KoheseView extends ItemProxy {
-  public constructor(koheseView: any, treeConfiguration: TreeConfiguration) {
+  public constructor(koheseView: any, treeConfig?: TreeConfiguration) {
+    if (!treeConfig) {
+      treeConfig = TreeConfiguration.getWorkingTree();
+    }
+
     if (koheseView.id == null) {
       koheseView.id = 'view-' + koheseView.name.toLowerCase();
     }
 
-    if (koheseView.parentId && (treeConfiguration.getProxyFor(koheseView.
+    if (koheseView.parentId && (treeConfig.getProxyFor(koheseView.
       parentId) == null)) {
       ItemProxy.createMissingProxy('KoheseView', 'id', koheseView.parentId,
-        treeConfiguration);
+        treeConfig);
     }
 
-    super('KoheseView', koheseView, treeConfiguration);
+    super('KoheseView', koheseView, treeConfig);
 
     this.internal = koheseView.isInternal;
 
-    (TreeConfiguration.getWorkingTree().getProxyFor(koheseView.
-      modelName) as KoheseModel).view = this;
+    // Associate view with the model
+    let modelProxy = KoheseModel.getModelProxyFor(koheseView.modelName);
+    modelProxy.view = this;
   }
 }

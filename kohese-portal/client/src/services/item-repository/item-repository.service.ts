@@ -463,7 +463,7 @@ export class ItemRepository {
         if (kind === 'KoheseModel') {
           proxy = new KoheseModel(item);
         } else if (kind === 'KoheseView') {
-          proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
+          proxy = new KoheseView(item);
         } else {
           proxy = new ItemProxy(kind, item);
         }
@@ -605,7 +605,7 @@ export class ItemRepository {
         if (addedItem.kind === 'KoheseModel') {
           iProxy = new KoheseModel(addedItem.item);
         } else if (addedItem.kind === 'KoheseView') {
-          new KoheseView(addedItem.item, TreeConfiguration.getWorkingTree());
+          new KoheseView(addedItem.item);
         } else {
           iProxy = new ItemProxy(addedItem.kind, addedItem.item);
         }
@@ -618,8 +618,7 @@ export class ItemRepository {
         if (changededItem.kind === 'KoheseModel') {
           iProxy = new KoheseModel(changededItem.item);
         } else if (changededItem.kind === 'KoheseView') {
-          new KoheseView(changededItem.item, TreeConfiguration.
-            getWorkingTree());
+          new KoheseView(changededItem.item);
         } else {
           iProxy = new ItemProxy(changededItem.kind, changededItem.item);
         }

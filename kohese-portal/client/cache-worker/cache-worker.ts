@@ -646,7 +646,7 @@ function buildOrUpdateProxy(item: any, kind: string, itemStatus: Array<string>, 
       if (kind === 'KoheseModel') {
         proxy = new KoheseModel(item);
       } else if (kind === 'KoheseView') {
-        proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
+        proxy = new KoheseView(item);
       } else {
         proxy = new ItemProxy(kind, item);
       }
