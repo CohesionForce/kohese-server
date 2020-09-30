@@ -52,6 +52,10 @@ You now should be looking at the certificates and authorities wizard.
   2. Import the certificate.
 ***END***
 
+7. After you've imported the certificate, you will be presented with a pop-up asking how you'd like to use it. You will be presented with 3 options including website and two others. Click website.
+
+You have now successfully imported the certificate to Chrome. If you have any errors, refer to the # Troubleshooting section of this documentation.
+
 # Certificate Validation Confirmation
 An easy way to find your certificate when multiple with the same name are present is by looking at the timestamp. Usually, the one you want was created last.
 
@@ -93,11 +97,11 @@ The last common issue seen is [ERR_SSL_VERSION_OR_CIPHER_MISMATCH]. This means t
   4. Follow the steps in  # Certificate Validation; Delete any previous versions of your certificate from Authorities.
 
 [ERR_CERT_AUTHORITY_INVALID]
-  1. Check rfc5280 and OpenSSL Documentation to make sure any changes made to the source is(are) valid.
+  1. Check RFC 5280 and OpenSSL Documentation to make sure any change(s) made to the source is(are) valid.
   2. If step one cannot be reasonably verified within that documentation, revert changes made to, and delete all files other than   [.gitignore], [gen-cert.cmd], [instructions.md], [openssl-ca.cnf], and [openssl-server.cnf].
 
 [ERR_SSL_VERSION_OR_CIPHER_MISMATCH]
-  1. One has used the wrong amount of bits to encrypt
-  2. Forgotten steps in the certificate formation process
+  1. The wrong amount of bits has been used to encrypt when executing [gen-cert.cmd]. make sure your rsa:xxxx bits on lines 1 and 4 match the [default_bits] field under the [req] topic in both [openssl-ca.cnf] and [openssl-server.cnf].
+  2. Necessary steps have been omitted during the certificate formation process. Make sure any changes made to [gen-cert.cmd] do not violate RFC 5280. You may compare the previous version of [gen-cert.cmd] to the new version with your changes for easy debugging, assuming any changes were made.
   3. Use of mismatched encryption algorithms that do not conform to the list of openSSL ciphers
-  4. This error is also used if the Broswer simply does not recognize the format, even if the certificate is formed correctly.
+  4. This error is also used if the Broswer simply does not recognize the format, even if the certificate is formed correctly. Examples include trying to validate a [.crt] file in authorities rather than a [.pem] file.

@@ -4,7 +4,7 @@ declare module SharedWorker {
   }
   export interface SharedWorker extends AbstractWorker {
       port: MessagePort;
-      onconnect: (messageEvent: MessageEvent) => void;
+      // onconnect: (messageEvent: MessageEvent) => void;
   }
 }
 declare var SharedWorker: {
