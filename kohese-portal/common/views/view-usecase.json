@@ -36,6 +36,7 @@
   },
   "localTypes": {
     "FlowOfEvents": {
+      "metatype": "Structure",
       "name": "FlowOfEvents",
       "modelName": "FlowOfEvents",
       "icon": "",
@@ -80,6 +81,14 @@
             "type": "",
             "options": {}
           }
+        },
+        "OnStep": {
+          "name": "OnStep",
+          "displayName": "On Step",
+          "inputType": {
+            "type": "",
+            "options": {}
+          }
         }
       },
       "formatDefinitions": {
@@ -115,6 +124,14 @@
                   "customLabel": "Preconditions",
                   "labelOrientation": "Top",
                   "kind": "text",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "OnStep",
+                  "customLabel": "On Step",
+                  "labelOrientation": "Top",
+                  "kind": "",
                   "visible": true,
                   "editable": true
                 },
@@ -172,6 +189,15 @@
                   "customLabel": "Preconditions",
                   "labelOrientation": "Top",
                   "kind": "text",
+                  "tableDefinition": "",
+                  "visible": true,
+                  "editable": true
+                },
+                {
+                  "propertyName": "OnStep",
+                  "customLabel": "On Step",
+                  "labelOrientation": "Top",
+                  "kind": "",
                   "tableDefinition": "",
                   "visible": true,
                   "editable": true

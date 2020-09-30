@@ -35,6 +35,7 @@ import { KoheseDataModel,
 
 export enum RepoStates {
   DISCONNECTED,
+  USER_LOCKED_OUT,
   SYNCHRONIZING,
   SYNCHRONIZATION_FAILED,
   KOHESEMODELS_SYNCHRONIZED,
@@ -144,6 +145,8 @@ export class ItemRepository {
 
     console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
     this._worker = new SharedWorker(cacheWorkerBundle);
+
+    // Set up the worker messaging
     this._worker.port.addEventListener('message', (messageEvent: any) => {
 
       let msg: any = messageEvent.data;
@@ -179,22 +182,37 @@ export class ItemRepository {
           );
 
           break;
+
+        case 'userLockedOut':
+
+          this.updateRepositorySyncState(
+            RepoStates.USER_LOCKED_OUT,
+            'User is locked out'
+          );
+
+          break;
+
         case 'verifyConnection':
           this.sendMessageToWorker('connectionVerification', undefined, false);
           break;
+
         case 'update':
           this.buildOrUpdateProxy(msg.data.item, msg.data.kind, msg.data.status);
           break;
+
         case 'updateItemStatus':
           this.updateItemStatus(msg.data.itemId, msg.data.status);
           break;
+
         case 'deletion':
           TreeConfiguration.getWorkingTree().getProxyFor(msg.data.id).deleteItem();
           break;
+
         case 'cachePiece':
           const cachePiece: any = msg.data;
           this.processCachePiece(cachePiece);
           break;
+
         default:
           console.log('*** Received unexpected message: ' + msg.message);
           console.log(messageEvent);
@@ -207,6 +225,12 @@ export class ItemRepository {
       }
     });
 
+    // Try to notify cacheWorker if the tab is closing
+    addEventListener( 'unload', () => {
+      this.sendMessageToWorker('tabIsClosing', undefined, false)
+    });
+
+    // Establish the Item Repository
     ItemCache.setItemCache(this._cache);
     this._worker.port.start();
 
@@ -1252,8 +1276,6 @@ export class ItemRepository {
               containers[0].kind !== FormatContainerKind.
               REVERSE_REFERENCE_TABLE) && (formatDefinition.containers[0].
               contents.length > 0)) {
-              let propertyDefinition: PropertyDefinition = formatDefinition.
-                containers[0].contents[0];
               if (classLocalTypes[type].definition.metatype === Metatype.
                 VARIANT) {
                 formatDefinitionId = viewModel.defaultFormatKey[
@@ -1297,14 +1319,22 @@ export class ItemRepository {
                   }
                 }
               } else {
-                return propertyDefinition.customLabel + ': ' + String(value[
-                  propertyDefinition.propertyName]);
+                let propertyDefinition: PropertyDefinition = formatDefinition.
+                  containers[0].contents[0];
+                return propertyDefinition.customLabel + ': ' + this.
+                  getStringRepresentation(value, propertyDefinition.
+                  propertyName, undefined, (enclosingType ? enclosingType :
+                  dataModel), classLocalTypes[type].definition, viewModel,
+                  formatDefinitionType);
               }
             }
           }
 
           let firstAttributeName: string = Object.keys(value)[0];
-          return firstAttributeName + ': ' + String(value[firstAttributeName]);
+          return firstAttributeName + ': ' + this.getStringRepresentation(
+            value, firstAttributeName, undefined, (enclosingType ?
+            enclosingType : dataModel), classLocalTypes[type].definition,
+            viewModel, formatDefinitionType);
         }
       } else {
         return this.currentTreeConfigSubject.getValue().config.getProxyFor(

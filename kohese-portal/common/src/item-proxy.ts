@@ -433,7 +433,6 @@ export class ItemProxy {
       proxy.relations = {
         references: {
           Item: {
-            parent: null,
             children: proxy.children
           }
         },

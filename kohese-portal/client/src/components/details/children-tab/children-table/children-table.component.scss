@@ -1,0 +1,14 @@
+// Highlights row when mouse hovers over it
+mat-row:hover {
+  background-color: lightgray;
+}
+
+// Buttons are initially hidden
+.hidden-buttons button {
+  visibility:hidden;
+}
+
+// Buttons become visible when mouse hovers over row
+mat-row:hover button{
+  visibility: visible;
+}
