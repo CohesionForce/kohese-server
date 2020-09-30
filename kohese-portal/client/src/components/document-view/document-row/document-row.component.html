@@ -12,8 +12,8 @@
         <button mat-icon-button class="fa fa-clipboard side-button" (click)="showProxyDetails(docInfo.proxy)"></button>
         <button mat-icon-button *ngIf="!row.editable"
           class="fa fa-edit side-button" [disabled]="((docInfo.proxy.item.
-          editable === false) || (docInfo.proxy.model.item.
-          genericallyWritable === false))" (click)="row.editable = true">
+          preventModification === true) || (docInfo.proxy.model.item.
+          restrictInstanceEditing === true))" (click)="row.editable = true">
         </button>
         <button mat-icon-button *ngIf="row.editable" class="fa fa-save side-button" (click)="upsertItem(docInfo.proxy, row, docInfo);"></button>
         <button mat-icon-button *ngIf="row.editable" class="fa fa-times

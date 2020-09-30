@@ -2,7 +2,7 @@
   "id": "Item",
   "name": "Item",
   "parentId": "Model-Definitions",
-  "editable": false,
+  "preventModification": true,
   "namespace": {
     "id": "com.kohese"
   },
@@ -44,6 +44,11 @@
       "type": "string",
       "name": "parentId"
     },
+    "preventModification": {
+      "name": "preventModification",
+      "type": "boolean",
+      "default": false
+    },
     "createdBy": {
       "type": "string",
       "name": "createdBy"
@@ -59,11 +64,6 @@
     "modifiedOn": {
       "type": "timestamp",
       "name": "modifiedOn"
-    },
-    "editable": {
-      "name": "editable",
-      "type": "boolean",
-      "default": true
     },
     "loadPending": {
       "type": "boolean",

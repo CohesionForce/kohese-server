@@ -238,7 +238,7 @@ export class FormatObjectEditorComponent implements OnInit {
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
       ItemProxy) => {
       if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.
-        genericallyWritable !== false) && (itemProxy.item.namespace.id
+        restrictInstanceEditing !== true) && (itemProxy.item.namespace.id
         === namespace.id)) {
         if (this._allowKindNarrowingOnly) {
           let modelItemProxy: any = itemProxy;
