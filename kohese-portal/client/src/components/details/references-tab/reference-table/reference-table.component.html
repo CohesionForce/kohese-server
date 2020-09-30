@@ -1,18 +1,6 @@
 <div *ngFor="let referenceInfo of referencesInfo">
   <div *ngIf="referenceInfo.relationName != 'children'">
     <h3 class="panel-heading">{{referenceInfo.relationName}} </h3>
-    <div #menuDiv style="visibility: hidden; position: fixed" [matMenuTriggerFor]="contextMenu"></div>
-    <mat-menu #contextMenu="matMenu">
-      <ng-template matMenuContent let-itemProxy="itemProxy">
-        <ng-container *ngFor="let menuItem of getMenuItems(itemProxy)">
-          <button mat-menu-item matTooltip="{{ menuItem.tooltip }}"
-            [disabled]="(menuItem.isEnabled != null) && !menuItem.isEnabled()" (click)="menuItem.execute()">
-            <mat-icon class="{{ menuItem.icon }}"></mat-icon>
-            {{ menuItem.action }}
-          </button>
-        </ng-container>
-      </ng-template>
-    </mat-menu>
     <mat-table *ngIf="referenceInfo" [dataSource]="referenceInfo.tableStream">
       <ng-container matColumnDef="kind">
         <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
@@ -22,12 +10,10 @@
         <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
         <mat-cell *matCellDef="let reference"> {{reference.item.name}}</mat-cell>
       </ng-container>
-
       <ng-container matColumnDef="state">
         <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
         <mat-cell *matCellDef="let reference">{{reference.state}}</mat-cell>
       </ng-container>
-
       <ng-container matColumnDef="description">
         <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
         <mat-cell *matCellDef="let reference"> {{reference.item.description | truncate : 30}}</mat-cell>
@@ -37,7 +23,7 @@
         <mat-cell *matCellDef="let reference" style="display: flex; justify-content: flex-end;">
           <div class="hidden-buttons">
             <!-- div and class for scss styling -->
-            <button mat-icon-button matTooltip="Open Modal Viewer" (click)="displayInformation(reference)">
+            <button mat-icon-button matTooltip="Open pop-up" (click)="displayInformation(reference)">
               <mat-icon class="fa fa-clone"></mat-icon>
             </button>
             <button mat-icon-button matTooltip="Navigate to Explorer"
@@ -52,7 +38,7 @@
         </mat-cell>
       </ng-container>
       <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
-      <mat-row *matRowDef="let proxy; columns: rowDef" (contextmenu)="onContextMenu($event, menuDiv, proxy)">
+      <mat-row *matRowDef="let proxy; columns: rowDef">
       </mat-row>
     </mat-table>
   </div>
