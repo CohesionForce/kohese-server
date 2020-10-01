@@ -22,22 +22,17 @@
       </span>
     </div>
     <div class="nav navbar-top-links navbar-right">
-      <ng-container *ngIf="((itemRepository.getTreeConfig().getValue()?.config
-        === TreeConfiguration.getWorkingTree()) && (modifiedItems.length >
-        0))">
+      <ng-container *ngIf="(modifiedProxies.length > 0)">
         <button mat-icon-button [matMenuTriggerFor]="modifiedItemsMenu">
           <img src="assets/icons/versioncontrol/dirty.ico"/>
         </button>
         <mat-menu #modifiedItemsMenu="matMenu" [overlapTrigger]="false">
-          <ng-container *ngFor="let modifiedItem of modifiedItems">
+          <ng-container *ngFor="let modifiedProxy of modifiedProxies">
             <button mat-menu-item (click)="navigate('Explore',
-              { id: modifiedItem.id })">
-              <mat-icon class="{{itemRepository.getTreeConfig().getValue().
-                config.getProxyFor('view-' + itemRepository.getTreeConfig().
-                getValue().config.getProxyFor(modifiedItem.id).kind.
-                toLowerCase()).item.icon}}">
+              { id: modifiedProxy.item.id })">
+              <mat-icon class="{{modifiedProxy.model.view.item.icon}}">
               </mat-icon>
-              {{modifiedItem.name}}
+              {{modifiedProxy.item.name}}
             </button>
           </ng-container>
         </mat-menu>

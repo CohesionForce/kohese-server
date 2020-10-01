@@ -31,9 +31,9 @@ export class AppBarComponent extends NavigatableComponent
   public readonly State: any = RepoStates;
   public syncStatusString: string;
 
-  private _modifiedItems: Array<any> = [];
-  get modifiedItems() {
-    return this._modifiedItems;
+  private _modifiedProxies: Array<ItemProxy> = [];
+  get modifiedProxies() {
+    return this._modifiedProxies;
   }
 
   public messageCount: number = 0;
@@ -110,17 +110,16 @@ export class AppBarComponent extends NavigatableComponent
         this._changeSubscription = treeConfigInfo.config.getChangeSubject().
           subscribe((notification: any) => {
           if (notification.type === 'dirty') {
-            let index: number = this._modifiedItems.indexOf(notification.proxy.
-              item);
+            let index: number = this._modifiedProxies.indexOf(notification.proxy);
             if (notification.dirty) {
               if (index === -1) {
                 // Add item to list since it has become dirty
-                this._modifiedItems.push(notification.proxy.item);
+                this._modifiedProxies.push(notification.proxy);
               }
             } else {
               if (index !== -1) {
                 // Remove item from the list since it is no longer dirty
-                this._modifiedItems.splice(index, 1);
+                this._modifiedProxies.splice(index, 1);
               }
             }
           }
