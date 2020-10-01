@@ -461,10 +461,6 @@ export function ModelDefinitions() {
         "id": "Actor",
         "name": "Actor",
         "parentId": "Decision",
-        "createdBy": "gmckune",
-        "createdOn": 1586302647375,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1586372358125,
         "namespace": {
           "id": "com.kohese"
         },
@@ -695,10 +691,6 @@ export function ModelDefinitions() {
         "id": "Domain",
         "name": "Domain",
         "parentId": "Decision",
-        "createdBy": "gmckune",
-        "createdOn": 1586302904721,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1586375436637,
         "namespace": {
           "id": "com.kohese"
         },
@@ -715,12 +707,13 @@ export function ModelDefinitions() {
         "id": "Internal-Lost",
         "name": "Internal-Lost",
         "parentId": "Item",
+        "editable": false,
         "namespace": {
           "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": false,
-        "isMetaModel": true,
+        "genericallyWritable": false,
         "isInternal": true,
         "invertItemOrder": false,
         "properties": {},
@@ -734,12 +727,13 @@ export function ModelDefinitions() {
         "id": "Internal",
         "name": "Internal",
         "parentId": "Item",
+        "editable": false,
         "base": "Item",
         "namespace": {
           "id": "com.kohese"
         },
         "idInjection": false,
-        "isMetaModel": true,
+        "genericallyWritable": false,
         "isInternal": true,
         "invertItemOrder": false,
         "properties": {},
@@ -879,7 +873,6 @@ export function ModelDefinitions() {
         "id": "Item",
         "name": "Item",
         "parentId": "Model-Definitions",
-        "editable": false,
         "namespace": {
           "id": "com.kohese"
         },
@@ -1016,10 +1009,6 @@ export function ModelDefinitions() {
         "name": "KeyEvent",
         "description": "This Kind allows for the definition of the attributes associated with a Key Event.",
         "parentId": "Decision",
-        "createdBy": "gmckune",
-        "createdOn": 1566607211922,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1586900797128,
         "namespace": {
           "id": "com.kohese"
         },
@@ -1057,10 +1046,6 @@ export function ModelDefinitions() {
         "id": "KeyEventDictionary",
         "name": "KeyEventDictionary",
         "parentId": "Decision",
-        "createdBy": "gmckune",
-        "createdOn": 1572491164821,
-        "modifiedBy": "gmckune",
-        "modifiedOn": 1572491746960,
         "namespace": {
           "id": "com.kohese"
         },
@@ -1094,6 +1079,7 @@ export function ModelDefinitions() {
         },
         "base": "Item",
         "idInjection": false,
+        "genericallyWritable": false,
         "invertItemOrder": false,
         "properties": {
           "namespace": {
@@ -1110,6 +1096,11 @@ export function ModelDefinitions() {
             "type": "string",
             "required": true,
             "name": "base"
+          },
+          "genericallyWritable": {
+            "name": "genericallyWritable",
+            "type": "boolean",
+            "default": true
           },
           "isInternal": {
             "type": "boolean",
@@ -1328,6 +1319,7 @@ export function ModelDefinitions() {
         },
         "base": "Item",
         "idInjection": true,
+        "genericallyWritable": false,
         "invertItemOrder": true,
         "properties": {
           "password": {
@@ -1362,6 +1354,7 @@ export function ModelDefinitions() {
         },
         "base": "Item",
         "idInjection": true,
+        "genericallyWritable": false,
         "invertItemOrder": false,
         "properties": {
           "namespace": {
@@ -1436,6 +1429,7 @@ export function ModelDefinitions() {
         },
         "base": "Item",
         "idInjection": true,
+        "genericallyWritable": false,
         "invertItemOrder": true,
         "properties": {
           "alias": {
@@ -6221,6 +6215,14 @@ export function ModelDefinitions() {
                   {
                     "propertyName": "isInternal",
                     "customLabel": "Is Internal",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
+                    "propertyName": "genericallyWritable",
+                    "customLabel": "Generically Writable",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": true,

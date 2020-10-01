@@ -8,6 +8,7 @@ import { ItemRepository, RepoStates,
 import { SessionService } from '../../../services/user/session.service';
 import { NotificationService } from '../../../services/notifications/notification.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
 @Component({
   selector: 'app-bar',
@@ -43,6 +44,10 @@ export class AppBarComponent extends NavigatableComponent
 
   get itemRepository() {
     return this._itemRepository;
+  }
+
+  get TreeConfiguration() {
+    return TreeConfiguration;
   }
 
   constructor(private sessionService: SessionService,

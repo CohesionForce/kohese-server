@@ -2,12 +2,13 @@
   "id": "Internal-Lost",
   "name": "Internal-Lost",
   "parentId": "Item",
+  "editable": false,
   "namespace": {
     "id": "com.kohese"
   },
   "base": "Item",
   "idInjection": false,
-  "isMetaModel": true,
+  "genericallyWritable": false,
   "isInternal": true,
   "invertItemOrder": false,
   "properties": {},

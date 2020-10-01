@@ -388,6 +388,14 @@
               "editable": false
             },
             {
+              "propertyName": "genericallyWritable",
+              "customLabel": "Generically Writable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "isInternal",
               "customLabel": "Is Internal",
               "labelOrientation": "Top",
