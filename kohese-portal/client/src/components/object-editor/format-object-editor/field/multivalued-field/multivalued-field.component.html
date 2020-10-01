@@ -93,8 +93,8 @@
                 <input matInput [matDatepicker]="matDatepicker"
                   [ngModel]="getDateString(koheseObject[isVariantField ?
                   'value' : propertyDefinition.propertyName][j])"
-                  (ngModelChange)="($event ? koheseObject[propertyDefinition.
-                  propertyName][j] = $event.getTime() : '')"
+                  (ngModelChange)="koheseObject[propertyDefinition.
+                  propertyName][j] = ($event ? $event.getTime() : null)"
                   [disabled]="!propertyDefinition.editable"/>
                 <mat-datepicker-toggle matSuffix [for]="matDatepicker">
                 </mat-datepicker-toggle>
