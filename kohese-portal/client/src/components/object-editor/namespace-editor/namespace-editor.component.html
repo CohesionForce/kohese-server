@@ -16,7 +16,7 @@
             ellipsis; text-align: left;">
             {{namespace.name}}
           </button>
-          <ng-container *ngIf="(namespace.editable !== false)">
+          <ng-container *ngIf="(namespace.preventModification !== true)">
             <button mat-icon-button matTooltip="Remove this Namespace"
               (click)="remove(namespace)" style="margin-left: auto;">
               <mat-icon class="fa fa-trash"></mat-icon>
@@ -40,7 +40,8 @@
           <input matInput type="text" placeholder="Name"
             [(ngModel)]="selectedNamespace.name" [required]="true"/>
         </mat-form-field>
-        <ng-container *ngIf="(selectedNamespace.editable !== false)">
+        <ng-container *ngIf="(selectedNamespace.preventModification !==
+          true)">
           <mat-form-field style="width: 100%;">
             <mat-select placeholder="Enclosing Namespace"
               [(ngModel)]="selectedNamespace.parentId">
@@ -68,7 +69,7 @@
             </h3>
             <button mat-icon-button style="margin-left: auto;" matTooltip="Add
               a subcomponent" (click)="addSubcomponent(selectedNamespace.
-              editable === false)">
+              preventModification === true)">
               <mat-icon class="fa fa-plus"></mat-icon>
             </button>
           </div>

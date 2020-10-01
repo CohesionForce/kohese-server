@@ -2,29 +2,32 @@
   "id": "KoheseUser",
   "name": "KoheseUser",
   "parentId": "Item",
-  "editable": false,
+  "preventModification": true,
+  "restrictInstanceEditing": true,
   "namespace": {
     "id": "com.kohese.metamodel"
   },
   "base": "Item",
-  "genericallyWritable": false,
   "idInjection": true,
   "invertItemOrder": true,
   "properties": {
     "password": {
       "type": "string",
       "required": true,
-      "hidden": true
+      "hidden": true,
+      "name": "password"
     },
     "email": {
       "type": "string",
-      "required": false
+      "required": false,
+      "name": "email"
     },
     "username": {
       "type": "string",
       "derived": true,
       "id": true,
-      "calculated": "name"
+      "calculated": "name",
+      "name": "username"
     }
   },
   "validations": [],

@@ -2,15 +2,20 @@
   "id": "KoheseModel",
   "name": "KoheseModel",
   "parentId": "Item",
-  "editable": false,
+  "preventModification": true,
+  "restrictInstanceEditing": true,
   "namespace": {
     "id": "com.kohese.metamodel"
   },
   "base": "Item",
   "idInjection": false,
-  "genericallyWritable": false,
   "invertItemOrder": false,
   "properties": {
+    "restrictInstanceEditing": {
+      "name": "restrictInstanceEditing",
+      "type": "boolean",
+      "default": false
+    },
     "namespace": {
       "name": "namespace",
       "type": "Namespace",
@@ -25,11 +30,6 @@
       "type": "string",
       "required": true,
       "name": "base"
-    },
-    "genericallyWritable": {
-      "name": "genericallyWritable",
-      "type": "boolean",
-      "default": true
     },
     "isInternal": {
       "type": "boolean",

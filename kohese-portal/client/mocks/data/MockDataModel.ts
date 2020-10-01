@@ -707,13 +707,13 @@ export function ModelDefinitions() {
         "id": "Internal-Lost",
         "name": "Internal-Lost",
         "parentId": "Item",
-        "editable": false,
+        "preventModification": true,
+        "restrictInstanceEditing": true,
         "namespace": {
           "id": "com.kohese"
         },
         "base": "Item",
         "idInjection": false,
-        "genericallyWritable": false,
         "isInternal": true,
         "invertItemOrder": false,
         "properties": {},
@@ -727,13 +727,13 @@ export function ModelDefinitions() {
         "id": "Internal",
         "name": "Internal",
         "parentId": "Item",
-        "editable": false,
+        "preventModification": true,
+        "restrictInstanceEditing": true,
         "base": "Item",
         "namespace": {
           "id": "com.kohese"
         },
         "idInjection": false,
-        "genericallyWritable": false,
         "isInternal": true,
         "invertItemOrder": false,
         "properties": {},
@@ -873,6 +873,7 @@ export function ModelDefinitions() {
         "id": "Item",
         "name": "Item",
         "parentId": "Model-Definitions",
+        "restrictInstanceEditing": true,
         "namespace": {
           "id": "com.kohese"
         },
@@ -916,6 +917,11 @@ export function ModelDefinitions() {
             "type": "string",
             "name": "parentId"
           },
+          "preventModification": {
+            "name": "preventModification",
+            "type": "boolean",
+            "default": false
+          },
           "createdBy": {
             "type": "string",
             "name": "createdBy"
@@ -931,11 +937,6 @@ export function ModelDefinitions() {
           "modifiedOn": {
             "type": "timestamp",
             "name": "modifiedOn"
-          },
-          "editable": {
-            "name": "editable",
-            "type": "boolean",
-            "default": true
           },
           "loadPending": {
             "type": "boolean",
@@ -1073,15 +1074,20 @@ export function ModelDefinitions() {
         "id": "KoheseModel",
         "name": "KoheseModel",
         "parentId": "Item",
-        "editable": false,
+        "preventModification": true,
+        "restrictInstanceEditing": true,
         "namespace": {
           "id": "com.kohese.metamodel"
         },
         "base": "Item",
         "idInjection": false,
-        "genericallyWritable": false,
         "invertItemOrder": false,
         "properties": {
+          "restrictInstanceEditing": {
+            "name": "restrictInstanceEditing",
+            "type": "boolean",
+            "default": false
+          },
           "namespace": {
             "name": "namespace",
             "type": "Namespace",
@@ -1096,11 +1102,6 @@ export function ModelDefinitions() {
             "type": "string",
             "required": true,
             "name": "base"
-          },
-          "genericallyWritable": {
-            "name": "genericallyWritable",
-            "type": "boolean",
-            "default": true
           },
           "isInternal": {
             "type": "boolean",
@@ -1313,13 +1314,13 @@ export function ModelDefinitions() {
         "id": "KoheseUser",
         "name": "KoheseUser",
         "parentId": "Item",
-        "editable": false,
+        "preventModification": true,
+        "restrictInstanceEditing": true,
         "namespace": {
           "id": "com.kohese.metamodel"
         },
         "base": "Item",
         "idInjection": true,
-        "genericallyWritable": false,
         "invertItemOrder": true,
         "properties": {
           "password": {
@@ -1348,13 +1349,13 @@ export function ModelDefinitions() {
         "id": "KoheseView",
         "name": "KoheseView",
         "parentId": "Item",
-        "editable": false,
+        "preventModification": true,
+        "restrictInstanceEditing": true,
         "namespace": {
           "id": "com.kohese.metamodel"
         },
         "base": "Item",
         "idInjection": true,
-        "genericallyWritable": false,
         "invertItemOrder": false,
         "properties": {
           "namespace": {
@@ -1423,13 +1424,13 @@ export function ModelDefinitions() {
         "id": "Namespace",
         "name": "Namespace",
         "parentId": "Item",
-        "editable": false,
+        "preventModification": true,
+        "restrictInstanceEditing": true,
         "namespace": {
           "id": "com.kohese.metamodel"
         },
         "base": "Item",
         "idInjection": true,
-        "genericallyWritable": false,
         "invertItemOrder": true,
         "properties": {
           "alias": {
@@ -2091,6 +2092,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -2119,14 +2128,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -2595,6 +2596,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -2623,14 +2632,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -2904,6 +2905,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -2932,14 +2941,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -3186,6 +3187,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -3214,14 +3223,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -3475,6 +3476,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -3503,14 +3512,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -3671,6 +3672,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -3699,14 +3708,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -3972,6 +3973,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -4000,14 +4009,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -4234,6 +4235,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -4262,14 +4271,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -4511,6 +4512,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -4539,14 +4548,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -4877,6 +4878,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -4905,14 +4914,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -5181,6 +5182,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -5209,14 +5218,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -5585,6 +5586,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -5613,14 +5622,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -6109,6 +6110,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -6137,14 +6146,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -6197,6 +6198,14 @@ export function ModelDefinitions() {
                     "editable": false
                   },
                   {
+                    "propertyName": "restrictInstanceEditing",
+                    "customLabel": "Restrict Instance Editing",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "namespace",
                     "customLabel": "Namespace",
                     "labelOrientation": "Top",
@@ -6215,14 +6224,6 @@ export function ModelDefinitions() {
                   {
                     "propertyName": "isInternal",
                     "customLabel": "Is Internal",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "genericallyWritable",
-                    "customLabel": "Generically Writable",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": true,
@@ -6501,6 +6502,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -6529,14 +6538,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -6737,6 +6738,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -6765,14 +6774,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -6997,6 +6998,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -7025,14 +7034,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -7220,6 +7221,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -7248,14 +7257,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -7490,6 +7491,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -7518,14 +7527,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -7711,6 +7712,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -7739,14 +7748,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -7940,6 +7941,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -7968,14 +7977,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -8294,6 +8295,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -8322,14 +8331,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },
@@ -8905,6 +8906,14 @@ export function ModelDefinitions() {
                     "editable": true
                   },
                   {
+                    "propertyName": "preventModification",
+                    "customLabel": "Prevent Modification",
+                    "labelOrientation": "Top",
+                    "kind": "boolean",
+                    "visible": true,
+                    "editable": false
+                  },
+                  {
                     "propertyName": "createdBy",
                     "customLabel": "Created By",
                     "labelOrientation": "Top",
@@ -8933,14 +8942,6 @@ export function ModelDefinitions() {
                     "customLabel": "Modified On",
                     "labelOrientation": "Top",
                     "kind": "date",
-                    "visible": true,
-                    "editable": false
-                  },
-                  {
-                    "propertyName": "editable",
-                    "customLabel": "Editable",
-                    "labelOrientation": "Top",
-                    "kind": "boolean",
                     "visible": true,
                     "editable": false
                   },

@@ -129,6 +129,14 @@
               "editable": true
             },
             {
+              "propertyName": "preventModification",
+              "customLabel": "Prevent Modification",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "createdBy",
               "customLabel": "Created By",
               "labelOrientation": "Top",
@@ -157,14 +165,6 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
-              "visible": true,
-              "editable": false
-            },
-            {
-              "propertyName": "editable",
-              "customLabel": "Editable",
-              "labelOrientation": "Top",
-              "kind": "boolean",
               "visible": true,
               "editable": false
             },

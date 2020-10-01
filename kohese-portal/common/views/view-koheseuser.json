@@ -2,13 +2,13 @@
   "id": "view-koheseuser",
   "name": "KoheseUser View Model",
   "parentId": "view-item",
+  "itemIds": [],
   "namespace": {
     "id": "com.kohese"
   },
   "modelName": "KoheseUser",
   "icon": "fa fa-user",
   "color": "#000000",
-  "localTypes": {},
   "viewProperties": {
     "password": {
       "inputType": {
@@ -17,7 +17,8 @@
           "isMultiLine": false
         }
       },
-      "displayName": "Password"
+      "displayName": "Password",
+      "name": "password"
     },
     "email": {
       "inputType": {
@@ -26,7 +27,8 @@
           "isMultiLine": false
         }
       },
-      "displayName": "E-Mail Address"
+      "displayName": "E-Mail Address",
+      "name": "email"
     },
     "username": {
       "inputType": {
@@ -35,9 +37,11 @@
           "isMultiLine": false
         }
       },
-      "displayName": "Username"
+      "displayName": "Username",
+      "name": "username"
     }
   },
+  "localTypes": {},
   "formatDefinitions": {
     "99cb2460-5d77-11ea-9d2a-81904e0f9ce1": {
       "id": "99cb2460-5d77-11ea-9d2a-81904e0f9ce1",
@@ -108,6 +112,14 @@
               "editable": true
             },
             {
+              "propertyName": "preventModification",
+              "customLabel": "Prevent Modification",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "createdBy",
               "customLabel": "Created By",
               "labelOrientation": "Top",
@@ -136,14 +148,6 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
-              "visible": true,
-              "editable": false
-            },
-            {
-              "propertyName": "editable",
-              "customLabel": "Editable",
-              "labelOrientation": "Top",
-              "kind": "boolean",
               "visible": true,
               "editable": false
             },
@@ -260,6 +264,5 @@
     "default": "99cb2460-5d77-11ea-9d2a-81904e0f9ce1",
     "document": "2f3dd260-15eb-11ea-97d2-3bae97d5d967"
   },
-  "tableDefinitions": {},
-  "itemIds": []
+  "tableDefinitions": {}
 }
