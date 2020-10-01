@@ -22,7 +22,7 @@ export interface KindInputDialogConfiguration extends
 }
 
 export interface DropdownDialogConfiguration extends InputDialogConfiguration {
-  options: Array<any>;
+  options: { [optionName: string]: any };
 }
 
 @Component({
@@ -44,6 +44,10 @@ export class InputDialogComponent implements Dialog {
   get InputDialogKind() {
     return InputDialogKind;
   }
+
+  get Object() {
+    return Object;
+  }
   
   public constructor(private _changeDetectorRef: ChangeDetectorRef) {
   }
@@ -59,5 +63,17 @@ export class InputDialogComponent implements Dialog {
   
   public close(accept: boolean): any {
     return (accept ? this._inputDialogConfiguration.value : undefined);
+  }
+
+  public areOptionsEqual(option: any, selection: any): boolean {
+    if ((option == null) && (selection == null)) {
+      return true;
+    } else {
+      if ((option != null) && (selection != null)) {
+        return (option === selection);
+      } else {
+        return false;
+      }
+    }
   }
 }

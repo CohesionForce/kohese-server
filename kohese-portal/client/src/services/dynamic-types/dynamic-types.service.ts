@@ -49,13 +49,15 @@ export class DynamicTypesService {
                 this.treeConfig = newConfig.config;
 
                 let modelProxy: ItemProxy = this.treeConfig.getProxyFor('Model-Definitions');
-                let typeProxies: Array<KoheseModel> = modelProxy.getDescendants().
-                  sort((first: KoheseModel, second: KoheseModel) => {
+                let typeProxies: Array<ItemProxy> = modelProxy.
+                  getDescendants().filter((itemProxy: ItemProxy) => {
+                  return (itemProxy.kind !== 'Namespace');
+                }).sort((first: ItemProxy, second: ItemProxy) => {
                     return ((first.item.name > second.item.name) ?
                       1 : ((first.item.name < second.item.name) ? -1 : 0));
                   });
                 for (let j: number = 0; j < typeProxies.length; j++) {
-                  this.buildKoheseType(typeProxies[j]);
+                  this.buildKoheseType(typeProxies[j] as KoheseModel);
                 }
 
                 if (this.repoStatusSubscription) {

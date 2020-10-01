@@ -8,6 +8,7 @@ import { MockDataModel, ModelDefinitions } from '../data/MockDataModel';
 import { ItemProxy } from '../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../common/src/KoheseModel';
+import { KoheseView } from '../../../common/src/KoheseView';
 import { RepoStates,
   TreeConfigType } from '../../src/services/item-repository/item-repository.service';
 import { KoheseType } from '../../src/classes/UDT/KoheseType.class';
@@ -40,7 +41,7 @@ export class MockItemRepository {
     MockItemRepository.singleton = this;
     if (!ItemCache.getItemCache()){
       let mockItemCache = new MockItemCache();
-      ItemCache.setItemCache(mockItemCache);  
+      ItemCache.setItemCache(mockItemCache);
     }
     this.mockFullSync();
   }
@@ -48,11 +49,60 @@ export class MockItemRepository {
   mockFullSync () {
     TreeConfiguration.getWorkingTree().reset();
 
+    new ItemProxy('Namespace', {
+      alias: 'Kohese',
+      id: 'com.kohese',
+      name: 'Kohese Namespace',
+      parentId: 'Model-Definitions',
+      editable: false
+    });
+
+    new ItemProxy('Namespace', {
+      "alias": "Metamodel",
+      "id": "com.kohese.metamodel",
+      "name": "Metamodel Namespace",
+      "parentId": "com.kohese",
+      "editable": false
+    });
+
+    new ItemProxy('Namespace', {
+      "alias": "UserTypes",
+      "id": "com.kohese.userdefined",
+      "name": "User Types Namespace",
+      "parentId": "com.kohese"
+    });
+
+    new ItemProxy('Namespace', {
+      alias: 'SubGlobal',
+      id: 'b32b6e10-ed3c-11ea-8737-9f31b413a913',
+      name: 'Sub-Global Namespace',
+      parentId: 'com.kohese'
+    });
+
+    new ItemProxy('Namespace', {
+      alias: 'SubSubGlobal',
+      id: '03741da0-ed41-11ea-8737-9f31b413a913',
+      name: 'Sub-Sub-Global Namespace',
+      parentId: 'b32b6e10-ed3c-11ea-8737-9f31b413a913'
+    });
+
+    new ItemProxy('Namespace', {
+      alias: 'EmptySubGlobal',
+      id: 'cab8f1b0-edf5-11ea-8737-9f31b413a913',
+      name: 'Empty Sub-Global Namespace',
+      parentId: 'com.kohese'
+    })
+
     for(let modelName in MockItemRepository.modelDefinitions.model) {
       console.log('::: Loading ' + modelName);
       let dataModel: KoheseDataModel = JSON.parse(JSON.stringify(
         MockItemRepository.modelDefinitions.model[modelName]));
-      if (dataModel.name === 'KoheseModel') {
+
+      if (dataModel.name === 'Category') {
+        dataModel.namespace.id = 'b32b6e10-ed3c-11ea-8737-9f31b413a913';
+      } else if (dataModel.name === 'Project') {
+        dataModel.namespace.id = '03741da0-ed41-11ea-8737-9f31b413a913';
+      } else if (dataModel.name === 'KoheseModel') {
         let booleanAttribute: Attribute = {
           name: 'booleanAttribute',
           type: 'boolean',
@@ -69,7 +119,7 @@ export class MockItemRepository {
         };
         dataModel.properties[multivaluedBooleanAttribute.name] =
           multivaluedBooleanAttribute;
-        
+
         let numberAttribute: Attribute = {
           name: 'numberAttribute',
           type: 'number',
@@ -152,7 +202,7 @@ export class MockItemRepository {
         };
         dataModel.properties[multivaluedStateAttribute.name] =
           multivaluedStateAttribute;
-        
+
         let usernameAttribute: Attribute = {
           name: 'usernameAttribute',
           type: 'string',
@@ -292,7 +342,7 @@ export class MockItemRepository {
         };
         dataModel.properties[multivaluedEnumerationAttribute.name] =
           multivaluedEnumerationAttribute;
-        
+
         let variantAttribute: Attribute = {
           name: 'variantAttribute',
           type: 'Variant',
@@ -360,6 +410,9 @@ export class MockItemRepository {
           }, {
             name: 'EnumerationValue2',
             description: ''
+          }, {
+            name: 'EnumerationValue3',
+            description: ''
           }]
         } as Enumeration;
 
@@ -426,6 +479,8 @@ export class MockItemRepository {
           id: 'KoheseModel'
         }, {
           id: 'KoheseModel'
+        }, {
+          id: 'KoheseModel'
         }];
 
         let localTypeInstance: any = {
@@ -452,13 +507,16 @@ export class MockItemRepository {
             id: 'KoheseModel'
           }, {
             id: 'KoheseModel'
+          }, {
+            id: 'KoheseModel'
           }],
           localTypeAttribute: null,
           multivaluedLocalTypeAttribute: [],
           enumerationAttribute: 'EnumerationValue1',
           multivaluedEnumerationAttribute: [
             'EnumerationValue1',
-            'EnumerationValue2'
+            'EnumerationValue2',
+            'EnumerationValue3'
           ],
           variantAttribute: {
             discriminant: 'globalTypeAttribute',
@@ -473,10 +531,14 @@ export class MockItemRepository {
             }
           }, {
             discriminant: 'multivaluedEnumerationAttribute',
-            value: ['EnumerationValue1', 'EnumerationValue2']
+            value: ['EnumerationValue1', 'EnumerationValue2',
+              'EnumerationValue3']
+          }, {
+            discriminant: 'booleanAttribute',
+            value: 'true'
           }]
         };
-        
+
         localTypeInstance[localTypeAttribute.name] = JSON.parse(JSON.stringify(
           localTypeInstance));
         localTypeInstance[multivaluedLocalTypeAttribute.name].push(JSON.parse(
@@ -493,7 +555,8 @@ export class MockItemRepository {
         dataModel[enumerationAttribute.name] = 'EnumerationValue1';
         dataModel[multivaluedEnumerationAttribute.name] = [
           'EnumerationValue1',
-          'EnumerationValue2'
+          'EnumerationValue2',
+          'EnumerationValue3'
         ];
         dataModel[variantAttribute.name] = {
           discriminant: 'globalTypeAttribute',
@@ -509,6 +572,9 @@ export class MockItemRepository {
         }, {
           discriminant: 'multivaluedEnumerationAttribute',
           value: ['EnumerationValue1', 'EnumerationValue2']
+        }, {
+          discriminant: 'booleanAttribute',
+          value: 'true'
         }];
       }
 
@@ -519,7 +585,12 @@ export class MockItemRepository {
       console.log('::: Loading ' + viewName);
       let viewModel: KoheseViewModel = JSON.parse(JSON.stringify(
         MockItemRepository.modelDefinitions.view[viewName]));
-      if (viewModel.modelName === 'KoheseModel') {
+
+      if (viewModel.modelName === 'Category') {
+        viewModel.namespace.id = 'b32b6e10-ed3c-11ea-8737-9f31b413a913';
+      } else if (viewModel.modelName === 'Project') {
+        viewModel.namespace.id = '03741da0-ed41-11ea-8737-9f31b413a913';
+      } else if (viewModel.modelName === 'KoheseModel') {
         let formatDefinition: FormatDefinition = viewModel.formatDefinitions[
           viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
         let propertyDefinitions: Array<PropertyDefinition> = formatDefinition.
@@ -718,7 +789,7 @@ export class MockItemRepository {
         };
         propertyDefinitions.push(
           multivaluedGlobalTypeAttributePropertyDefinition);
-        
+
         let localTypeAttributePropertyDefinition: PropertyDefinition = {
           propertyName: 'localTypeAttribute',
           customLabel: 'Local Type Attribute',
@@ -728,7 +799,7 @@ export class MockItemRepository {
           editable: true
         };
         propertyDefinitions.push(localTypeAttributePropertyDefinition);
-        
+
         let multivaluedLocalTypeAttributePropertyDefinition:
           PropertyDefinition = {
           propertyName: 'multivaluedLocalTypeAttribute',
@@ -750,7 +821,7 @@ export class MockItemRepository {
           editable: true
         };
         propertyDefinitions.push(enumerationAttributePropertyDefinition);
-        
+
         let multivaluedEnumerationAttributePropertyDefinition:
           PropertyDefinition = {
           propertyName: 'multivaluedEnumerationAttribute',
@@ -762,7 +833,7 @@ export class MockItemRepository {
         };
         propertyDefinitions.push(
           multivaluedEnumerationAttributePropertyDefinition);
-        
+
         let variantAttributePropertyDefinition: PropertyDefinition = {
           propertyName: 'variantAttribute',
           customLabel: 'Variant Attribute',
@@ -784,7 +855,7 @@ export class MockItemRepository {
         };
         propertyDefinitions.push(
           multivaluedVariantAttributePropertyDefinition);
-        
+
         viewModel.localTypes['Local Type'] = ({
           metatype: Metatype.STRUCTURE,
           id: 'view-localtype',
@@ -889,7 +960,8 @@ export class MockItemRepository {
           metatype: Metatype.ENUMERATION,
           id: 'Enumeration',
           name: 'Enumeration',
-          values: ['Enumeration Value 1', 'Enumeration Value 2']
+          values: ['Enumeration Value 1', 'Enumeration Value 2',
+            'Enumeration Value 3']
         } as Type;//Enumeration;
 
         viewModel.localTypes['Variant'] = ({
@@ -1070,7 +1142,7 @@ export class MockItemRepository {
           '0322b120-d0d8-11ea-83b0-4f5b7c4a9272';
       }
 
-      new ItemProxy('KoheseView', viewModel);
+      new KoheseView(viewModel);
     }
 
     KoheseModel.modelDefinitionLoadingComplete();
@@ -1083,6 +1155,23 @@ export class MockItemRepository {
       let viewProxy = working.getProxyFor(viewId);
       modelProxy.type = new KoheseType(modelProxy, viewProxy);
     }
+
+    new ItemProxy('KoheseUser', {
+      id: 'AdminKoheseUser',
+      name: 'admin',
+      username: 'admin',
+      password: 'password'
+    });
+
+    new ItemProxy('Observation', {
+      id: 'ObservationInstance',
+      name: 'ObservationInstance',
+      observedBy: 'admin',
+      observedOn: 5000001,
+      context: [{
+        id: 'KoheseModel'
+      }]
+    });
 
     let numberOfItemsToAdd: number = 7;
     for (let j: number = 0; j < numberOfItemsToAdd; j++) {
@@ -1145,8 +1234,10 @@ export class MockItemRepository {
 
   }
 
-  deleteItem() {
-
+  public deleteItem(itemProxy: ItemProxy, deleteDescendants: boolean):
+    Promise<any> {
+    itemProxy.deleteItem(deleteDescendants);
+    return Promise.resolve();
   }
 
   public upsertItem(kind: string, item: any): Promise<ItemProxy> {
@@ -1200,7 +1291,7 @@ export class MockItemRepository {
       configType: TreeConfigType.DEFAULT
     });
   }
-  
+
   public getSessionMap(): Promise<any> {
     return Promise.resolve({ 'socketId': {
       sessionId: 'socketId',

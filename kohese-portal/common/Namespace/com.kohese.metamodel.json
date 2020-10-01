@@ -1,0 +1,7 @@
+{
+  "alias": "Metamodel",
+  "id": "com.kohese.metamodel",
+  "name": "Metamodel Namespace",
+  "parentId": "com.kohese",
+  "editable": false
+}

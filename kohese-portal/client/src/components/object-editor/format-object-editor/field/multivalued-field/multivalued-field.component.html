@@ -58,7 +58,22 @@
       <ng-container *ngFor="let value of koheseObject[isVariantField ? 'value'
         : propertyDefinition.propertyName]; let j = index; trackBy:
         getMultivaluedAttributeValueIdentifier">
-        <div style="display: flex; flex-direction: row;">
+        <div draggable="true" (dragstart)="$event.dataTransfer.setData(
+          'MultivaluedFieldComponent/' + (isVariantField ? koheseObject[
+          'discriminant'] : propertyDefinition.propertyName)
+          + '/Index', j); $event.dataTransfer.dropEffect = 'move';
+          changeDetectorRef.detach(); changeDetectorRef.markForCheck()"
+          (dragover)="draggedOver($event)" (dragleave)="$event.currentTarget.
+          style['border-top'] = ''; $event.currentTarget.style[
+          'border-bottom'] = ''" (dragend)="changeDetectorRef.reattach();
+          changeDetectorRef.markForCheck()" (drop)="$event.preventDefault();
+          $event.currentTarget.style['border-top'] = ''; $event.currentTarget.
+          style['border-bottom'] = ''; moveValue($event.dataTransfer.
+          getData('MultivaluedFieldComponent/' + (isVariantField ?
+          koheseObject['discriminant'] : propertyDefinition.propertyName) +
+          '/Index'), j, ((($event.offsetY / $event.
+          currentTarget.offsetHeight) < 0.5) ? true : false))" style="display:
+          flex; flex-direction: row;">
           <ng-container [ngSwitch]="propertyDefinition.kind">
             <ng-container *ngSwitchCase="'boolean'">
               <mat-checkbox [(ngModel)]="koheseObject[isVariantField ? 'value'
@@ -179,12 +194,9 @@
                           #multivaluedAttributeExpansionPanel style="width:
                           100%;">
                           <mat-expansion-panel-header>
-                            <mat-panel-title>
-                              {{itemRepository.getStringRepresentation(
-                                koheseObject, propertyDefinition.propertyName,
-                                j, (enclosingDataModel ? enclosingDataModel :
-                                dataModel), dataModel, viewModel,
-                                formatDefinitionType)}}
+                            <mat-panel-title style="white-space: nowrap;
+                              overflow: hidden; text-overflow: ellipsis;
+                              display: block;">
                             </mat-panel-title>
                           </mat-expansion-panel-header>
                           <ng-template matExpansionPanelContent>

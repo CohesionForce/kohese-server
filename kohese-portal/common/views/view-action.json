@@ -2,6 +2,9 @@
   "id": "view-action",
   "name": "Action View Model",
   "parentId": "view-decision",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "Action",
   "icon": "fa fa-paper-plane",
   "color": "#00008b",
@@ -232,6 +235,14 @@
               "editable": false
             },
             {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "loadPending",
               "customLabel": "loadPending",
               "labelOrientation": "Top",
@@ -333,6 +344,14 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
               "editable": true
             },
             {

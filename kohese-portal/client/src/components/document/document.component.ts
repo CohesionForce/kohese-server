@@ -645,7 +645,11 @@ export class DocumentComponent implements OnInit, OnDestroy {
   public moveDocumentComponents(documentComponents: Array<DocumentComponent>):
     void {
     let selectedMoveLocation: string;
-    let locations: Array<string> = ['Before', 'After', 'Child'];
+    let locations: { [optionName: string]: any } = {
+      Before: 'Before',
+      After: 'After',
+      Child: 'Child'
+    };
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: this._documentConfiguration,
@@ -1058,7 +1062,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
   
   private async insert(insertionIdentifier: string): Promise<void> {
     if (insertionIdentifier) {
-      let insertionPositions: Array<string> = ['Before', 'After'];
+      let insertionPositions: { [optionName: string]: any } = {
+        Before: 'Before',
+        After: 'After'
+      };
       for (let j: number = 0; j < this._outlineTree.selection.length; j++) {
         let documentComponent: DocumentComponent = this._outlineTree.selection[
           j];

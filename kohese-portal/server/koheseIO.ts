@@ -1,5 +1,7 @@
 
 var kio : any = {};
+var kdbFS = require('./kdb-fs');
+const userLockoutFile = 'koheseUserLockout.json';
 
 kio.sessions = {};
 
@@ -22,27 +24,49 @@ function Server(httpsServer, options){
       socket.on('authenticate', function(request) {
         socket.koheseUser = decodeAuthToken(request.token);
         console.log('>>>> session %s is user %s', socket.id, socket.koheseUser.username);
-        socket.emit('authenticated');
-        
-        kio.sessions[socket.id] = {
-          sessionId: socket.id,
-          address: socket.handshake.address,
-          username: socket.koheseUser.username,
-          numberOfConnections: 0
-        };
-        global['app'].emit('newSession', socket);
-        socket.on('connectionAdded', (data: any, sendResponse:
-          () => void) => {
-          kio.sessions[data.id].numberOfConnections++;
-        });
-        socket.on('connectionRemoved', (data: any, sendResponse:
-          () => void) => {
-          kio.sessions[data.id].numberOfConnections--;
-        });
-        socket.on('getSessionMap', (data: any, sendResponse: (data:
-          any) => void) => {
-          sendResponse(kio.sessions);
-        });
+
+        let username = socket.koheseUser.username;
+        let userLockoutList;
+        let userIsLockedOut : boolean = false;
+        try {
+          userLockoutList = kdbFS.loadJSONDocIfItExists(userLockoutFile)
+          if (userLockoutList && userLockoutList.length){
+            console.log("::: Found User Lockout List: " + userLockoutList);
+            userIsLockedOut = userLockoutList.indexOf(username) > -1;
+          }
+        } catch (error) {
+          console.log('*** Error: ' + error);
+        }
+
+        if (userIsLockedOut) {
+          console.log('*** User is locked out: ' + username);
+          socket.emit('userLockedOut');
+        } else {
+
+          socket.emit('authenticated');
+
+          kio.sessions[socket.id] = {
+            sessionId: socket.id,
+            address: socket.handshake.address,
+            username: socket.koheseUser.username,
+            numberOfConnections: 0
+          };
+          global['app'].emit('newSession', socket);
+          socket.on('connectionAdded', (data: any, sendResponse:
+            () => void) => {
+            kio.sessions[data.id].numberOfConnections++;
+            console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
+          });
+          socket.on('connectionRemoved', (data: any, sendResponse:
+            () => void) => {
+              kio.sessions[data.id].numberOfConnections--;
+              console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
+          });
+          socket.on('getSessionMap', (data: any, sendResponse: (data:
+            any) => void) => {
+            sendResponse(kio.sessions);
+          });
+        }
       });
       socket.on('disconnect', function () {
         var username = 'Unknown';

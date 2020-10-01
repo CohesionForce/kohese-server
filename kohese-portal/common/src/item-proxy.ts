@@ -408,8 +408,6 @@ export class ItemProxy {
     if (!itemId){
       if ('KoheseModel' === kind) {
         forItem.id = forItem.name;
-      } else if ('KoheseView' === kind) {
-        forItem.id = 'view-' + forItem.name.toLowerCase();
       } else {
         forItem.id = uuidV1();
       }
@@ -435,7 +433,6 @@ export class ItemProxy {
       proxy.relations = {
         references: {
           Item: {
-            parent: null,
             children: proxy.children
           }
         },
@@ -561,7 +558,18 @@ export class ItemProxy {
   //
   //////////////////////////////////////////////////////////////////////////
   clearDirtyFlags() {
-    delete this.dirtyFields;
+    if (this.dirty) {
+      delete this.dirtyFields;
+      this.external_dirty = false;
+      this.treeConfig.changeSubject.next({
+        type: 'dirty',
+        kind: this.kind,
+        id: this._item.id,
+        dirty: this.dirty,
+        dirtyFields: this.dirtyFields,
+        proxy: this
+      });
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -2023,13 +2031,16 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   updateVCStatus (itemStatus : Array<string>, withNotification : boolean = true) {
 
-    this._vcStatus.updateStatus(itemStatus);
+    let currentStatus = this._vcStatus.statusArray;
 
-    if (withNotification){
-      TreeConfiguration.getWorkingTree().getChangeSubject().next({
-        type: 'update',
-        proxy: this
-      });
+    if (itemStatus !== currentStatus) {
+      this._vcStatus.updateStatus(itemStatus);
+      if (withNotification){
+        TreeConfiguration.getWorkingTree().getChangeSubject().next({
+          type: 'update',
+          proxy: this
+        });
+      }
     }
 
   }
@@ -2081,14 +2092,6 @@ export class ItemProxy {
     // Copy the withItem into the current proxy
     let modifications = this.copyAttributes(withItem);
     this.clearDirtyFlags();
-    this.treeConfig.changeSubject.next({
-      type: 'dirty',
-      kind: this.kind,
-      id: this._item.id,
-      dirty: false,
-      dirtyFields: {},
-      proxy: this
-    });
 
     // console.log('%%% Modifications');
     // console.log(modifications);

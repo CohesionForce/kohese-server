@@ -57,11 +57,12 @@
   <ng-template #dropdownDialogConfiguration>
     <mat-form-field style="width: 100%;">
       <mat-select placeholder="{{inputDialogConfiguration.fieldName}}"
-        [(ngModel)]="inputDialogConfiguration.value">
-        <ng-container *ngFor="let option of inputDialogConfiguration.
-          options">
-          <mat-option [value]="option">
-            {{option}}
+        [(ngModel)]="inputDialogConfiguration.value"
+        [compareWith]="areOptionsEqual">
+        <ng-container *ngFor="let optionName of Object.keys(
+          inputDialogConfiguration.options)">
+          <mat-option [value]="inputDialogConfiguration.options[optionName]">
+            {{optionName}}
           </mat-option>
         </ng-container>
       </mat-select>

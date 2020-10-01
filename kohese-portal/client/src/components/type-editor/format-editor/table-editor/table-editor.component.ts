@@ -91,17 +91,17 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   }
 
   public async addColumn(): Promise<void> {
-    let attributeNames: Array<string> = [];
+    let options: { [optionName: string]: string } = {};
     for (let j: number = 0; j < this._attributes.length; j++) {
       if (this._tableDefinition.columns.indexOf(this._attributes[j].name) ===
         -1) {
-        attributeNames.push(this._attributes[j].name);
+        options[this._attributes[j].name] = this._attributes[j].name;
       }
     }
     
     let newColumn: any = await this.dialogService.openDropdownDialog(
-      'Add Column', '', 'Attribute', attributeNames[0], undefined,
-      attributeNames);
+      'Add Column', '', 'Attribute', Object.keys(options)[0], undefined,
+      options);
     if (newColumn) {
       this._tableDefinition.columns.push(newColumn);
       this.changeDetectorRef.markForCheck();
@@ -118,12 +118,13 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   }
 
   public async addExpandedProperty(colNum: number): Promise<void> {
-    let attributeNames: Array<string> = this._attributes.map((attribute:
-      any) => {
-      return attribute.name;
-    });
+    let options: { [optionName: string]: string } = {};
+    for (let j: number = 0; j < this._attributes.length; j++) {
+      options[this._attributes[j].name] = this._attributes[j].name;
+    }
+
     let newProp: any = await this.dialogService.openDropdownDialog('Add ' +
-      'Column', '', 'Attribute', attributeNames[0], undefined, attributeNames);
+      'Column', '', 'Attribute', Object.keys(options)[0], undefined, options);
     if (newProp) {
       const columnName = 'column' + colNum;
       this._tableDefinition.expandedFormat[columnName].push(newProp);

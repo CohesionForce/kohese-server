@@ -1,6 +1,12 @@
+<ng-container *ngIf="(title != null)">
+  <h3 style="height: 40px;">
+    {{title}}
+  </h3>
+</ng-container>
 <ng-container *ngIf="(configurationInstanceMap.size > 1) else
   singleComponent">
-  <mat-horizontal-stepper [linear]="true" style="height: 100%;">
+  <mat-horizontal-stepper [linear]="true" [ngStyle]="{ 'height': ((title ==
+    null) ? '100%' : 'calc(100% - 50px)') }">
     <ng-template matStepperIcon="edit">
       <mat-icon class="fa fa-pencil mat-step-icon-content"></mat-icon>
     </ng-template>
@@ -63,7 +69,8 @@
 <ng-template #singleComponent>
   <ng-container *ngFor="let componentDialogConfiguration of Array.from(
     configurationInstanceMap.keys())">
-    <div style="height: calc(100% - 40px);">
+    <div [ngStyle]="{ 'height': ((title == null) ? 'calc(100% - 40px)' : 'calc(
+      100% - 90px)') }">
       <ng-template dynamic-component></ng-template>
     </div>
     <div style="height: 40px; width: 100%; display: flex; flex-direction:

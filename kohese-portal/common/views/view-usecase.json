@@ -2,10 +2,9 @@
   "id": "view-usecase",
   "name": "UseCase",
   "parentId": "view-item",
-  "createdBy": "gmckune",
-  "createdOn": 1570033169859,
-  "modifiedBy": "gmckune",
-  "modifiedOn": 1593445614266,
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "UseCase",
   "icon": "fa fa-lemon-o",
   "color": "#000000",
@@ -196,7 +195,7 @@
                 },
                 {
                   "propertyName": "OnStep",
-                  "customLabel": "OnStep",
+                  "customLabel": "On Step",
                   "labelOrientation": "Top",
                   "kind": "",
                   "tableDefinition": "",
@@ -335,6 +334,14 @@
               "editable": false
             },
             {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "loadPending",
               "customLabel": "loadPending",
               "labelOrientation": "Top",
@@ -436,6 +443,14 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
               "editable": true
             },
             {

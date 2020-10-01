@@ -2,10 +2,9 @@
   "id": "view-keyeventdictionary",
   "name": "KeyEventDictionary",
   "parentId": "view-item",
-  "createdBy": "gmckune",
-  "createdOn": 1572491164827,
-  "modifiedBy": "gmckune",
-  "modifiedOn": 1586376069127,
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "KeyEventDictionary",
   "icon": "fa fa-th-list",
   "color": "#000000",
@@ -122,6 +121,14 @@
               "editable": false
             },
             {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "loadPending",
               "customLabel": "loadPending",
               "labelOrientation": "Top",
@@ -223,6 +230,14 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
               "editable": true
             },
             {

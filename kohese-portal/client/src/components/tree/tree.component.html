@@ -62,7 +62,8 @@
           (input)="searchTextChanged($event.target.value)"/>
       </mat-form-field>
     </div>
-    <div #elementContainer style="height: calc(100% - 70px); width: 100%;">
+    <div #elementContainer style="height: calc(100% - 70px); width: 100%;
+      overflow-y: auto;">
       <ng-container *ngFor="let element of Array.from(elementMap.keys())">
         <ng-container *ngIf="shouldDisplay(element)">
           <div style="height: 40px; width: 100%; display: flex; flex-direction:
@@ -119,12 +120,28 @@
       </h3>
     </div>
     <div style="height: calc(100% - 50px); overflow-y: auto;">
-      <ng-container *ngFor="let selectionEntry of selection">
+      <ng-container *ngFor="let selectionEntry of selection; let j = index">
         <div style="display: flex; flex-direction: row;">
           <button mat-button matTooltip="{{elementMap.get(selectionEntry)?.
-            text}}" (click)="scrollElementIntoView(selectionEntry)"
-            style="white-space: nowrap; overflow: hidden; text-overflow:
-            ellipsis; width: 100%; text-align: left;">
+            text}}" draggable="true" (dragstart)="$event.dataTransfer.setData(
+            'TreeComponent/index', j); $event.dataTransfer.dropEffect = 'move';
+            changeDetectorRef.detach(); changeDetectorRef.markForCheck()"
+            (dragover)="$event.preventDefault(); $event.currentTarget.style[
+            'border-top'] = ''; $event.currentTarget.style['border-bottom'] =
+            ''; ((($event.offsetY / $event.currentTarget.offsetHeight) < 0.5) ?
+            $event.currentTarget.style['border-top'] = 'dashed' : $event.
+            currentTarget.style['border-bottom'] = 'dashed')"
+            (dragleave)="$event.currentTarget.style['border-top'] = ''; $event.
+            currentTarget.style['border-bottom'] = ''"
+            (dragend)="changeDetectorRef.reattach(); changeDetectorRef.
+            markForCheck()" (drop)="$event.preventDefault(); $event.
+            currentTarget.style['border-top'] = ''; $event.currentTarget.style[
+            'border-bottom'] = ''; moveElement($event.dataTransfer.getData(
+            'TreeComponent/index'), j, ((($event.offsetY / $event.
+            currentTarget.offsetHeight) < 0.5) ? true : false))"
+            (click)="scrollElementIntoView(selectionEntry)" style="white-space:
+            nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;
+            text-align: left;">
             <mat-icon class="{{elementMap.get(selectionEntry)?.icon}}">
             </mat-icon>
             {{elementMap.get(selectionEntry)?.text}}

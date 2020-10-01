@@ -2,6 +2,9 @@
   "id": "Repository",
   "name": "Repository",
   "parentId": "Item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Item",
   "idInjection": true,
   "invertItemOrder": true,

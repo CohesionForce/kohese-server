@@ -2,6 +2,9 @@
   "id": "ReportDefinition",
   "name": "ReportDefinition",
   "parentId": "Item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Item",
   "idInjection": false,
   "invertItemOrder": false,

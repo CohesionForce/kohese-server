@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   Optional, Inject, OnInit, Output, EventEmitter, ViewChild,
   AfterViewInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { Dialog } from '../dialog/Dialog.interface';
 
 class ElementMapValue {
   get parent() {
@@ -81,13 +82,18 @@ export class ToggleAction extends Action {
   }
 }
 
+export enum TreeComponentConfiguration {
+  GET_CHILDREN, HAS_CHILDREN, GET_TEXT, GET_ICON, MAY_SELECT,
+    ELEMENT_SELECTION_HANDLER
+}
+
 @Component({
   selector: 'tree',
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeComponent implements OnInit, AfterViewInit {
+export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   private _elementMap: Map<any, ElementMapValue> =
     new Map<any, ElementMapValue>();
   get elementMap() {
@@ -181,7 +187,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this._changeDetectorRef.markForCheck();
   }
   
-  private _allowMultiselect: boolean = this._data['allowMultiselect'];
+  private _allowMultiselect: boolean = false;
   get allowMultiselect() {
     return this._allowMultiselect;
   }
@@ -260,6 +266,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
   get matDialogRef() {
     return this._matDialogRef;
   }
+
+  get changeDetectorRef() {
+    return this._changeDetectorRef;
+  }
   
   get Array() {
     return Array;
@@ -309,6 +319,15 @@ export class TreeComponent implements OnInit, AfterViewInit {
     if (this._selection.length > 0) {
       this.scrollElementIntoView(this._selection[0]);
     }
+  }
+
+  /**
+   * @see Dialog.interface.ts
+   * 
+   * @param accept
+   */
+  public close(accept: boolean): any {
+    return (accept ? this._selection : undefined);
   }
   
   public scrollElementIntoView(element: any): void {
@@ -570,5 +589,25 @@ export class TreeComponent implements OnInit, AfterViewInit {
       this._elementSelected(element);
       this._elementSelectedEventEmitter.emit(element);
     }
+  }
+
+  /**
+   * Moves the selected element at the given ```sourceIndex``` to or
+   * immediately after the given ```targetIndex``` based on the given boolean
+   * 
+   * @param sourceIndex
+   * @param targetIndex
+   * @param moveBefore
+   */
+  public moveElement(sourceIndex: number, targetIndex: number, moveBefore:
+    boolean): void {
+    let element: any = this._selection.splice(sourceIndex, 1)[0];
+    targetIndex = ((sourceIndex <= targetIndex) ? (targetIndex - 1) :
+      targetIndex);
+    if (!moveBefore) {
+      targetIndex++;
+    }
+
+    this._selection.splice(targetIndex, 0, element);
   }
 }

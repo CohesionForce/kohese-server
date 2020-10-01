@@ -26,8 +26,9 @@ export class MockDialogService {
   
   public openDropdownDialog(title: string, text: string, label: string,
     defaultValue: string, validate: (value: any) => boolean, options:
-    Array<string>): Promise<any> {
-    return Promise.resolve(options[0]);
+    { [optionName: string]: any }): Promise<any> {
+    // 20200812 - Attempting to use Object.values below failed
+    return Promise.resolve(options[Object.keys(options)[0]]);
   }
 
   public openComponentDialog<T>(componentReference: ComponentType<T>, data:

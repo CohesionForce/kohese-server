@@ -2,12 +2,20 @@
 import { ItemProxy, KoheseModelInterface }  from './item-proxy';
 import { TreeConfiguration } from './tree-configuration';
 import * as  _ from 'underscore';
+import { KoheseView } from './KoheseView';
 
 
 let modelMap = {
 };
 
 export class KoheseModel extends ItemProxy implements KoheseModelInterface {
+  private _view: KoheseView;
+  get view() {
+    return this._view;
+  }
+  set view(koheseView: KoheseView) {
+    this._view = koheseView;
+  }
 
   static modelsDefined : boolean = false;
 
@@ -205,11 +213,11 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
   static modelDefinitionLoadingComplete() {
     // Create the key ordering for descendant models
     let rootModelProxy = ItemProxy.getWorkingTree().getProxyFor('Model-Definitions');
-    var models = rootModelProxy.getDescendants();
-
-    for(var index in models){
-      let modelProxy = models[index];
-      modelProxy.updateDerivedModelProperties();
+    let descendants: Array<ItemProxy> = rootModelProxy.getDescendants();
+    for (let j: number = 0; j < descendants.length; j++) {
+      if (descendants[j].kind === 'KoheseModel') {
+        (descendants[j] as KoheseModel).updateDerivedModelProperties();
+      }
     }
 
     TreeConfiguration.registerKoheseModelClass(KoheseModel);

@@ -2,6 +2,9 @@
   "id": "view-decision",
   "name": "Decision View Model",
   "parentId": "view-item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "Decision",
   "icon": "fa fa-gavel",
   "color": "#add8e6",
@@ -174,6 +177,14 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
               "visible": true,
               "editable": false
             },

@@ -2,25 +2,37 @@ console.log('$$$ Loading Cache Worker');
 
 import * as SocketIoClient from 'socket.io-client';
 import * as LevelJs from 'level-js';
+import * as _ from 'underscore';
 
 import { ItemProxy } from '../../common/src/item-proxy';
+import { TreeHashMap } from '../../common/src/tree-hash';
 import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { KoheseModel } from '../../common/src/KoheseModel';
+import { KoheseView } from '../../common/src/KoheseView';
 import { LevelCache } from '../../common/src/level-cache';
 import { Workspace } from '../../common/src/kohese-commit';
 
 let socket: SocketIOClient.Socket;
 let clientMap = {};
 let _authRequest = {};
-let _connectionVerificationSet: Set<number> = new Set<number>();
 let kioListenersInitialized: boolean = false;
 
 let cacheInitialized: boolean = false;
 let _cache: LevelCache;
 let _connectionAuthenticatedPromise: Promise<any>;
+let _userLockedOut : boolean = false;
 let _fundamentalItemsPromise: Promise<any>;
 let _loadedCachePromise: Promise<any>;
 let _itemUpdatesPromise: Promise<any>;
+
+let _suppressWorkerRequestAnnouncement = {
+  verifyConnection: true
+};
+
+let _suppressWorkerEventAnnouncement = {
+  connectionVerification: true
+};
+
 
 let _lastClientId :number = 0;
 
@@ -50,7 +62,11 @@ let _workingTree = TreeConfiguration.getWorkingTree();
   }
 
   const clientId = ++_lastClientId;
+  port.koheseClientTabId = clientId;
+  port.koheseAssumedTabClosedUnexpectedly = false;
+
   clientMap[clientId] = port;
+  let lastTabResponseTime = Date.now();
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -59,7 +75,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     const request = event.data;
 
     const requestStartTime = Date.now();
-    console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
+    if (!_suppressWorkerEventAnnouncement[request.type])
+    {
+      console.log('^^^ Received request ' + request.type + ' from tab ' + clientId);
+    }
 
     // Determine which message handler to invoke
     switch (request.type) {
@@ -77,6 +96,17 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             console.log('^^^ Socket reconnected');
             _connectionAuthenticatedPromise = authenticate(_authRequest);
             await _connectionAuthenticatedPromise;
+            for (let key in clientMap) {
+              // Provide notification of client tab ids to server
+              if (!port.koheseAssumedTabClosedUnexpectedly) {
+                socket.emit('connectionAdded', {
+                  id: socket.id,
+                  clientTabId: clientMap[key].koheseClientTabId
+                });
+              } else {
+                console.log('!!! Client list has a tab that is assumed closed: ' + port.koheseClientTabId);
+              }
+            }
 
             postToAllPorts('reconnected', {});
           });
@@ -86,10 +116,20 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           _connectionAuthenticatedPromise = authenticate(_authRequest);
         }
 
+        if (_userLockedOut) {
+          port.postMessage({message:'userLockedOut'});
+        }
+
         await _connectionAuthenticatedPromise;
-        socket.emit('connectionAdded', { id: socket.id });
+        tabConnected(clientId, port);
         port.postMessage({ id: request.id });
         break;
+
+      case 'tabIsClosing':
+        console.log('::: Client tab is closing: ' + clientId);
+        tabDisconnected(clientId);
+        break;
+
       case 'getFundamentalItems':
         if (!_fundamentalItemsPromise || request.data.refresh) {
           _fundamentalItemsPromise = synchronizeModels();
@@ -102,6 +142,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           data: fundamentalItems
         });
         break;
+
       case 'getCache':
         if (!_loadedCachePromise || request.data.refresh) {
           _loadedCachePromise = populateCache();
@@ -148,55 +189,89 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
         port.postMessage({ id: request.id });
         break;
+
       case 'getItemUpdates':
         let updatesPromise = _itemUpdatesPromise;
-        if (!_itemUpdatesPromise || request.data.refresh) {
-          console.log('^^^ Request refresh of itemUpdates');
-          let treeHashes: any = request.data.treeHashes;
-          if (!treeHashes) {
-            treeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
+        // Wait for any pending update to complete
+        await updatesPromise;
+
+        // Check for differences
+        let response : any = {};
+
+        let cwTreeHashes = TreeConfiguration.getWorkingTree().getAllTreeHashes();
+        let tabTreeHashes: any = request.data.treeHashes;
+
+        if(!_.isEqual(tabTreeHashes, cwTreeHashes)){
+          console.log('--- KDB Does Not Match: Delta response required');
+
+          let thmDiff = TreeHashMap.diff(tabTreeHashes, cwTreeHashes);
+
+          response = {
+              repoTreeHashes: cwTreeHashes,
+              addItems: [],
+              changeItems: [],
+              deleteItems: []
+          };
+
+          for (let itemId in thmDiff.summary.itemAdded) {
+            var proxy = _workingTree.getProxyFor(itemId);
+            response.addItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
           }
 
-          updatesPromise = updateWorking(treeHashes);
-          if (!request.data.refresh){
-            console.log('^^^ Updating _itemUpdatesPromise');
-            _itemUpdatesPromise = updatesPromise;
+          for (let itemId in thmDiff.summary.contentChanged) {
+            var proxy = _workingTree.getProxyFor(itemId);
+            response.changeItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
           }
+
+          for (let itemId in thmDiff.summary.itemDeleted){
+            response.deleteItems.push(itemId);
+          }
+
+        } else {
+          console.log('--- KDB Matches: No changes required');
+          response.kdbMatches = true;
         }
 
-        const itemUpdates = await updatesPromise;
 
         port.postMessage({
           id: request.id,
-          data: itemUpdates
+          data: response
         });
         break;
+
       case 'getStatus':
         let rootProxy = _workingTree.getRootProxy();
-        let statusCount = 0;
+        var idStatusArray = [];
         rootProxy.visitTree(null,(proxy: ItemProxy) => {
           let statusArray = proxy.vcStatus.statusArray;
           if (statusArray.length){
-            port.postMessage({
-              message: 'updateItemStatus',
-              data: {
-                itemId: proxy.item.id,
-                status: statusArray
-              }
+            idStatusArray.push({
+              id: proxy.item.id,
+              status: statusArray
             });
-            statusCount++;
           }
         });
 
         port.postMessage({
           id: request.id,
-          data: {statusCount: statusCount}
+          data: {
+            statusCount: idStatusArray.length,
+            idStatusArray: idStatusArray
+          }
         });
+        break;
 
-        break;
       case 'connectionVerification':
-        _connectionVerificationSet.add(clientId);
+        lastTabResponseTime = Date.now();
+        if (port.koheseAssumedTabClosedUnexpectedly){
+          setTimeout(() => {
+            checkConnections();
+          }, 5000);
+          tabConnected(clientId, port);
+          port.koheseAssumedTabClosedUnexpectedly = false;
+        }
         break;
+
       case 'getSessionMap':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (sessionMap: any) => void, reject: () => void) => {
@@ -205,6 +280,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'getIcons':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (icons: Array<string>) => void, reject: () => void) => {
@@ -212,6 +288,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           resolve(icons);
         }); }) });
         break;
+
       case 'getUrlContent':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (contentObject: any) => void, reject: () => void) => {
@@ -221,6 +298,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           resolve(contentObject);
         }); }) });
         break;
+
       case 'convertToMarkdown':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (markdown: string) => void, reject: () => void) => {
@@ -232,6 +310,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           resolve(markdown);
         }); }) });
         break;
+
       case 'importMarkdown':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
@@ -242,6 +321,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'produceReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
@@ -252,6 +332,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'getReportMetaData':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (reportObjects: Array<any>) => void, reject:
@@ -261,6 +342,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'renameReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
@@ -270,6 +352,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'getReportPreview':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (reportPreview: string) => void, reject: () => void) => {
@@ -279,6 +362,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       case 'removeReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject: () => void) => {
@@ -288,14 +372,17 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           });
         }) });
         break;
+
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);
     }
 
     const requestFinishTime = Date.now();
-    console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
+    if (!_suppressWorkerEventAnnouncement) {
+      console.log('^^^ Processing time for request ' + request.type + ' from tab ' + clientId
       + ' - ' + (requestFinishTime - requestStartTime) / 1000 + 's');
+    }
   };
 
   //////////////////////////////////////////////////////////////////////////
@@ -308,28 +395,52 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
   port.start();
 
-  let connectionVerificationAttempts: number = 0;
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   let checkConnections: () => void = () => {
-    postToAllPorts('verifyConnection', undefined);
+    port.postMessage({message: 'verifyConnection', data: undefined});
 
-    // TODO: Need to update lost connection logic
+    let timeSinceLastConnectionVerification = Date.now() - lastTabResponseTime;
 
-    // if (3 === connectionVerificationAttempts) {
-    //   for (let id in clientMap) {
-    //     if (!_connectionVerificationSet.has(+id)) {
-    //       delete clientMap[id];
-    //       socket.emit('connectionRemoved', { id: socket.id });
-    //     }
-    //   }
-    //   _connectionVerificationSet.clear();
-    //   connectionVerificationAttempts = 0;
-    // }
-    // connectionVerificationAttempts++;
-    // setTimeout(() => {
-    //   checkConnections();
-    // }, 7000);
+    if (timeSinceLastConnectionVerification < 20000) {
+      setTimeout(() => {
+        checkConnections();
+      }, 5000);
+    } else {
+      console.log('*** Tab failed to respond to connection request, assuming it has closed unexpectedly: ' + clientId);
+      port.koheseAssumedTabClosedUnexpectedly = true;
+      tabDisconnected(clientId);
+    }
   };
+
   checkConnections();
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function tabConnected(clientId, port) {
+  console.log("::: Notifying server that tab has connected: " + clientId);
+  socket.emit('connectionAdded', {
+    id: socket.id,
+    clientTabId: clientId
+  });
+  clientMap[clientId] = port;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function tabDisconnected(clientId) {
+  if (clientMap[clientId]){
+    console.log("::: Notifying server that tab is closing: " + clientId);
+    socket.emit('connectionRemoved', {
+      id: socket.id,
+      clientTabId: clientId
+    });
+    delete clientMap[clientId];
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -353,6 +464,13 @@ async function authenticate(authRequest): Promise<void> {
 
       // Begin synchronization process
       sync();
+    });
+
+    socket.on('userLockedOut', async () => {
+      console.log ('^^^ Session user locked out');
+      socket.disconnect();
+      _userLockedOut = true;
+      postToAllPorts('userLockedOut', {});
     });
 
     console.log('^^^ Requesting authentication');
@@ -431,24 +549,29 @@ async function sync(): Promise<void> {
   }
   console.log('^^^ Time to calc treehashes: ' + (afterCalcTreeHashes - afterLoadWorking) / 1000);
 
-  // TODO: Need to deal with loss of data on refresh
-  _itemUpdatesPromise = updateWorking(workingTree.getAllTreeHashes());
-  await _itemUpdatesPromise;
-  let afterGetAll = Date.now();
-  console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
+  if (workingTree.loading) {
+    // Previous sync is still in progress, provide a warning and let existing sync finish
+    console.log("!!! Sync: Attempt to sync while previous sync was interrupted");
+  } else {
 
-  // Perform an update of the cache
-  await workingTree.saveToCache();
+    // TODO: Need to deal with loss of data on refresh
+    _itemUpdatesPromise = updateWorking(workingTree.getAllTreeHashes());
+    await _itemUpdatesPromise;
+    let afterGetAll = Date.now();
+    console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
 
-  let afterSaveToCache = Date.now();
-  console.log('^^^ Time to save working to cache: ' + (afterSaveToCache - afterGetAll) / 1000);
+    // Perform an update of the cache
+    await workingTree.saveToCache();
 
-  // TODO: Need to handle refresh
-  await getStatus();
-  let afterGetStatus = Date.now();
-  console.log('^^^ Time to get status: ' + (afterGetStatus - afterSaveToCache) / 1000);
-  console.log('^^^ Total time to sync: ' + (afterGetStatus - beforeSync) / 1000);
+    let afterSaveToCache = Date.now();
+    console.log('^^^ Time to save working to cache: ' + (afterSaveToCache - afterGetAll) / 1000);
 
+    // TODO: Need to handle refresh
+    await getStatus();
+    let afterGetStatus = Date.now();
+    console.log('^^^ Time to get status: ' + (afterGetStatus - afterSaveToCache) / 1000);
+    console.log('^^^ Total time to sync: ' + (afterGetStatus - beforeSync) / 1000);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -460,6 +583,7 @@ async function getStatus() : Promise<number> {
     socket.emit('Item/getStatus', {
       repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
     }, (response: Array<any>) => {
+      console.log('::: Processing status response');
       for (let j: number = 0; j < response.length; j++) {
         updateItemStatus(response[j].id, response[j].status);
       }
@@ -500,6 +624,7 @@ function registerKoheseIOListeners() {
   });
 
   socket.on('VersionControl/statusUpdated', (statusMap: any) => {
+    console.log('^^^ Status update received: ' + Object.keys(statusMap).length)
     for (var itemId in statusMap) {
       updateItemStatus(itemId, statusMap[itemId]);
     }
@@ -520,6 +645,8 @@ function buildOrUpdateProxy(item: any, kind: string, itemStatus: Array<string>, 
     } else {
       if (kind === 'KoheseModel') {
         proxy = new KoheseModel(item);
+      } else if (kind === 'KoheseView') {
+        proxy = new KoheseView(item);
       } else {
         proxy = new ItemProxy(kind, item);
       }
@@ -551,11 +678,15 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 
   let proxy: ItemProxy = _workingTree.getProxyFor(itemId);
 
-  if (proxy && itemStatus) {
-    proxy.updateVCStatus(itemStatus);
-  }
+  let currentStatus = proxy.vcStatus.statusArray;
+  if (currentStatus !== itemStatus) {
+    // Process status that have changed
+    if (proxy && itemStatus) {
+      proxy.updateVCStatus(itemStatus);
+    }
 
-  postToAllPorts('updateItemStatus', { itemId: itemId, status: itemStatus });
+    postToAllPorts('updateItemStatus', { itemId: itemId, status: itemStatus });
+  }
 
 }
 
@@ -606,6 +737,7 @@ function synchronizeModels(): Promise<any> {
       }
 
       processBulkUpdate(response);
+      KoheseModel.modelDefinitionLoadingComplete();
       resolve(response);
     });
   });
@@ -747,6 +879,7 @@ async function populateCache(): Promise<any> {
         console.log(JSON.stringify(missingCacheData, null, '  '));
         await fetchMissingCacheInformation(missingCacheData);
         missingCacheData = await _cache.analysis.reevaluateMissingData();
+        // TODO: Need to compare and exit if missing data can not be found
       }
 
       console.log('$$$ Getting tree roots');
@@ -760,6 +893,7 @@ async function populateCache(): Promise<any> {
         console.log(JSON.stringify(missingTreeRootData, null, '  '));
         await fetchMissingCacheInformation(missingTreeRootData);
         missingTreeRootData = await _cache.analysis.reevaluateMissingData();
+        // TODO: Need to compare and exit if missing data can not be found
       }
 
       let workingWorkspace = await _cache.getWorkspace('Working');
@@ -822,10 +956,6 @@ function processBulkUpdate(response: any): void {
     let kindList: any = response.cache[kind];
     for (let id in kindList) {
       buildOrUpdateProxy(JSON.parse(kindList[id]), kind, undefined);
-    }
-
-    if (kind === 'KoheseView') {
-      KoheseModel.modelDefinitionLoadingComplete();
     }
   }
 

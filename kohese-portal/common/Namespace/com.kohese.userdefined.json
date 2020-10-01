@@ -1,0 +1,6 @@
+{
+  "alias": "UserTypes",
+  "id": "com.kohese.userdefined",
+  "name": "User Types Namespace",
+  "parentId": "com.kohese"
+}

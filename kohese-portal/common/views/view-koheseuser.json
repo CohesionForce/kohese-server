@@ -2,6 +2,9 @@
   "id": "view-koheseuser",
   "name": "KoheseUser View Model",
   "parentId": "view-item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "KoheseUser",
   "icon": "fa fa-user",
   "color": "#000000",
@@ -133,6 +136,14 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
               "visible": true,
               "editable": false
             },

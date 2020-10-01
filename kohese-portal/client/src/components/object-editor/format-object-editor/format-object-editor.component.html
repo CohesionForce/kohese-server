@@ -8,16 +8,28 @@
     </markdown>
   </ng-container>
   <ng-template #enabled>
-    <ng-container *ngIf="(allowKindChange && (types.length > 1))">
-      <mat-form-field style="width: 100%;">
-        <mat-select placeholder="Kind" [(ngModel)]="selectedType">
-          <ng-container *ngFor="let typeOption of types">
-            <mat-option [value]="typeOption">
-              {{typeOption.name}}
-            </mat-option>
-          </ng-container>
-        </mat-select>
-      </mat-form-field>
+    <ng-container *ngIf="allowKindChange">
+      <div style="display: flex; flex-direction: row;">
+        <mat-form-field style="width: 50%; margin: 0px 3px 0px 3px;">
+          <mat-select placeholder="Namespace" [(ngModel)]="selectedNamespace">
+            <ng-container *ngFor="let namespace of getNamespaces()">
+              <mat-option [value]="namespace">
+                {{namespace.name}}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width: 50%; margin: 0px 3px 0px 3px;">
+          <mat-select placeholder="Kind" [(ngModel)]="selectedType">
+            <ng-container *ngFor="let type of getNamespaceTypes(
+              selectedNamespace)">
+              <mat-option [value]="type">
+                {{type.name}}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </ng-container>
     <ng-container *ngFor="let container of formatDefinition.containers">
       <ng-container *ngIf="(container.kind === FormatContainerKind.

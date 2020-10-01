@@ -14,6 +14,7 @@ import { FormatDefinitionEditorComponent } from './format-definition-editor/form
 import { TableModule } from '../table/table.module';
 import { MultivaluedFieldComponent } from './format-object-editor/field/multivalued-field/multivalued-field.component';
 import { SinglevaluedFieldComponent } from './format-object-editor/field/singlevalued-field/singlevalued-field.component';
+import { NamespaceEditorComponent } from './namespace-editor/namespace-editor.component';
 
 @NgModule({
   declarations: [
@@ -21,11 +22,13 @@ import { SinglevaluedFieldComponent } from './format-object-editor/field/singlev
     FormatObjectEditorComponent,
     MultivaluedFieldComponent,
     SinglevaluedFieldComponent,
-    FormatDefinitionEditorComponent
+    FormatDefinitionEditorComponent,
+    NamespaceEditorComponent
   ],
   entryComponents: [
     FormatObjectEditorComponent,
-    DocumentConfigurationEditorComponent
+    DocumentConfigurationEditorComponent,
+    NamespaceEditorComponent
   ],
   imports: [
     CommonModule,

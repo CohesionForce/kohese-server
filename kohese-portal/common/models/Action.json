@@ -2,6 +2,9 @@
   "id": "Action",
   "name": "Action",
   "parentId": "Decision",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "base": "Decision",
   "idInjection": true,
   "invertItemOrder": true,

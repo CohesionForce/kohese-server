@@ -2,6 +2,9 @@
   "id": "view-documentconfiguration",
   "name": "DocumentConfiguration View Model",
   "parentId": "view-item",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "DocumentConfiguration",
   "icon": "fa fa-file",
   "color": "#ffa500",
@@ -105,6 +108,14 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
               "visible": true,
               "editable": false
             },

@@ -21,6 +21,7 @@ import { FormatObjectEditorComponent } from '../../format-object-editor.componen
 import { MultivaluedFieldComponent } from '../multivalued-field/multivalued-field.component';
 import { SinglevaluedFieldComponent } from './singlevalued-field.component';
 import { TableModule } from '../../../../../components/table/table.module';
+import { TreeViewModule } from '../../../../tree/tree.module';
 
 describe('SinglevaluedFieldComponent', () => {
   let component: SinglevaluedFieldComponent;
@@ -45,7 +46,8 @@ describe('SinglevaluedFieldComponent', () => {
         MatDialogModule,
         MarkdownModule,
         MarkdownEditorModule,
-        TableModule
+        TableModule,
+        TreeViewModule
       ],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },

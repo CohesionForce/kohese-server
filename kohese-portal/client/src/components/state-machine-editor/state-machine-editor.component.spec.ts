@@ -97,17 +97,15 @@ describe('Component: state-machine-editor', () => {
     expect(transition.target).toEqual('stateOne');
   }));
   
-  it('edits a transition', fakeAsync(() => {
-    component.editTransition('transition', '');
-    tick();
+  it('edits a transition', async () => {
+    await component.editTransition('transition', '');
     expect(component.stateMachine.transition['transition']).not.toBeDefined();
     expect(component.stateMachine.transition['Name']).toBeDefined();
     
-    component.editTransition('Name', 'target');
-    tick();
+    await component.editTransition('Name', 'target');
     expect(component.stateMachine.transition['Name'].target).toEqual(
       'stateOne');
-  }));
+  });
   
   it('deletes a transition', fakeAsync(() => {
     component.deleteTransition('transition');

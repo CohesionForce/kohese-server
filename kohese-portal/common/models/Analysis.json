@@ -3,6 +3,9 @@
   "name": "Analysis",
   "parentId": "Model-Definitions",
   "base": "PersistedModel",
+  "namespace": {
+    "id": "com.kohese"
+  },
   "idInjection": true,
   "invertItemOrder": true,
   "properties": {

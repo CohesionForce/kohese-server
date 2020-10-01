@@ -2,10 +2,9 @@
   "id": "view-domain",
   "name": "Domain",
   "parentId": "view-item",
-  "createdBy": "gmckune",
-  "createdOn": 1586302904733,
-  "modifiedBy": "gmckune",
-  "modifiedOn": 1586375436725,
+  "namespace": {
+    "id": "com.kohese"
+  },
   "modelName": "Domain",
   "icon": "fa fa-book",
   "color": "#000000",
@@ -113,6 +112,14 @@
               "editable": false
             },
             {
+              "propertyName": "editable",
+              "customLabel": "Editable",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "loadPending",
               "customLabel": "loadPending",
               "labelOrientation": "Top",
@@ -214,6 +221,14 @@
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
+              "editable": true
+            },
+            {
+              "propertyName": "supportedDecisions",
+              "customLabel": "Supported Decisions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
               "editable": true
             }
           ]

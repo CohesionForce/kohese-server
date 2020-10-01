@@ -1,24 +1,23 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy,
-  ChangeDetectorRef } from '@angular/core';
-import * as Uuid from 'uuid/v1';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy,
+  OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import * as Uuid from 'uuid';
 
-import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { DialogService } from '../../services/dialog/dialog.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatContainer,
   FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
-import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
+import { FormatDefinition,
+  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
-
-import { Subscription } from 'rxjs';
-
-interface Type {
-  dataModelItemProxy: ItemProxy;
-  viewModelItemProxy: ItemProxy;
-}
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+import { Metatype } from '../../../../common/src/Type.interface';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { ItemRepository,
+  TreeConfigInfo } from '../../services/item-repository/item-repository.service';
+import { InputDialogComponent,
+  InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
+import { NamespaceEditorComponent } from '../object-editor/namespace-editor/namespace-editor.component';
 
 @Component({
   selector: 'type-editor',
@@ -27,77 +26,176 @@ interface Type {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TypeEditorComponent implements OnInit, OnDestroy {
-  private _types: Array<Type> = [];
-  get types() {
-    return this._types;
+  private _selectedNamespace: any;
+  get selectedNamespace() {
+    return this._selectedNamespace;
   }
-  
-  private _selectedType: Type;
+  set selectedNamespace(selectedNamespace: any) {
+    this._selectedNamespace = selectedNamespace;
+    this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
+  }
+
+  private _selectedType: any;
   get selectedType() {
     return this._selectedType;
   }
-  set selectedType(selectedType: Type) {
+  set selectedType(selectedType: any) {
     this._selectedType = selectedType;
   }
 
-  private _treeConfigurationSubscription: Subscription;
+  private _treeConfigSubscription: Subscription;
+
+  get itemRepository() {
+    return this._itemRepository;
+  }
+
+  get Metatype() {
+    return Metatype;
+  }
+
+  get FormatDefinitionType() {
+    return FormatDefinitionType;
+  }
 
   public constructor(private _dynamicTypesService: DynamicTypesService,
-    private dialogService: DialogService, private itemRepository:
+    private dialogService: DialogService, private _itemRepository:
     ItemRepository, private _changeDetectorRef: ChangeDetectorRef) {
   }
 
   public ngOnInit(): void {
-    this._treeConfigurationSubscription = this.itemRepository.getTreeConfig().
-      subscribe((treeConfigurationObject: any) => {
-      if (treeConfigurationObject) {
-        treeConfigurationObject.config.getRootProxy().visitTree(
-          { includeOrigin: false }, (itemProxy: ItemProxy) => {
-          if (itemProxy.kind === 'KoheseModel') {
-            this._types.push({
-              dataModelItemProxy: itemProxy,
-              viewModelItemProxy: treeConfigurationObject.config.getProxyFor(
-                'view-' + itemProxy.item.name.toLowerCase())
-            });
-          }
-        }, undefined);
-        this._types.sort((oneType: Type, anotherType: Type) => {
-          return oneType.dataModelItemProxy.item.name.localeCompare(
-            anotherType.dataModelItemProxy.item.name);
-        });
-        
-        this._selectedType = this._types[0];
-        
-        this._changeDetectorRef.markForCheck();
+    this._treeConfigSubscription = this._itemRepository.getTreeConfig().
+      subscribe((treeConfigInfo: TreeConfigInfo) => {
+      if (treeConfigInfo) {
+        this._selectedNamespace = treeConfigInfo.config.getProxyFor(
+          'com.kohese').item;
+        this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[
+          0];
       }
     });
   }
 
   public ngOnDestroy(): void {
-    this._treeConfigurationSubscription.unsubscribe();
+    this._treeConfigSubscription.unsubscribe();
   }
 
+  /**
+   * Returns an Array containing all Namespaces that contain at least one type
+   */
+  public getNamespaces(): Array<any> {
+    let namespaces: Array<any> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if ((itemProxy.kind === 'Namespace') && (this.getNamespaceTypes(
+        itemProxy.item).length > 0)) {
+        namespaces.push(itemProxy.item);
+      }
+    }, undefined);
+
+    namespaces.sort((oneNamespace: any, anotherNamespace: any) => {
+      return oneNamespace.name.localeCompare(anotherNamespace.name);
+    });
+
+    return namespaces;
+  }
+
+  public async openNamespaceEditor(): Promise<void> {
+    await this.dialogService.openComponentsDialog([{
+      component: NamespaceEditorComponent,
+      matDialogData: {
+        selectedNamespace: this._selectedNamespace
+      }
+    }], {
+      data: {
+        title: 'Namespaces',
+        buttonLabels: {
+          acceptLabel: null,
+          cancelLabel: 'Close'
+        }
+      }
+    }).updateSize('90%', '90%').afterClosed().toPromise();
+  }
+
+  /**
+   * Returns an Array containing the types in the given Namespace
+   * 
+   * @param namespace
+   */
+  public getNamespaceTypes(namespace: any): Array<any> {
+    let types: Array<any> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.namespace.id
+        === namespace.id)) {
+        types.push(itemProxy.item);
+      }
+    }, undefined);
+
+    types.sort((oneType: any, anotherType: any) => {
+      return oneType.name.localeCompare(anotherType.name);
+    });
+
+    return types;
+  }
+
+  /**
+   * Allows the addition of a Structure
+   */
   public async add(): Promise<void> {
-    let name: any = await this.dialogService.openInputDialog('Add Type', '',
-      InputDialogKind.STRING, 'Name', '', undefined);
-    if (name) {
-      let dataModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
-        upsertItem('KoheseModel', {
-        name: name,
-        parentId: 'Item',
-        base: 'Item',
-        idInjection: true,
-        properties: {},
-        validations: [],
-        relations: {},
-        acls: [],
-        methods: [],
-        localTypes: {}
-      });
-      
+    let namespaceOptions: { [name: string]: any } = {};
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if (itemProxy.kind === 'Namespace') {
+        namespaceOptions[itemProxy.item.name] = itemProxy.item;
+      }
+    }, undefined);
+    let inputs: Array<any> = await this.dialogService.openComponentsDialog([{
+      component: InputDialogComponent,
+      matDialogData: {
+        inputDialogConfiguration: {
+          title: 'Add Type',
+          text: '',
+          fieldName: 'Name',
+          value: 'Type',
+          validate: (input: any) => {
+            let names: Array<string> = [];
+            this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+              'Model-Definitions').visitTree({ includeOrigin: false },
+              (itemProxy: ItemProxy) => {
+              if (itemProxy.kind !== 'Namespace') {
+                names.push(itemProxy.item.name);
+              }
+            }, undefined);
+            return ((input !== '') && (names.indexOf(input) === -1));
+          },
+          inputDialogKind: InputDialogKind.STRING
+        }
+      }
+    }, {
+      component: InputDialogComponent,
+      matDialogData: {
+        inputDialogConfiguration: {
+          title: 'Select Namespace',
+          text: '',
+          fieldName: 'Namespace',
+          value: Object.values(namespaceOptions).find((namespace: any) => {
+            return (this._selectedNamespace.id === namespace.id);
+          }),
+          validate: (input: any) => {
+            return true;
+          },
+          options: namespaceOptions
+        }
+      }
+    }], { data: {} }).updateSize('70%', '40%').afterClosed().toPromise();
+    
+    if (inputs) {
       let viewModel: any = {
-        name: name,
-        modelName: name,
+        name: inputs[0],
+        namespace: { id: inputs[1].id },
+        modelName: inputs[0],
         parentId: 'view-item',
         icon: '',
         color: '#000000',
@@ -107,7 +205,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         defaultFormatKey: {},
         tableDefinitions: {}
       };
-      let formatDefinitionId: string = (<any> Uuid).default();
+      let formatDefinitionId: string = Uuid.v1();
       let defaultFormatDefinition: FormatDefinition = {
         id: formatDefinitionId,
         name: 'Default Format Definition',
@@ -129,7 +227,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         }]
       };
       
-      let itemKoheseView: any = this.itemRepository.getTreeConfig().
+      let itemKoheseView: any = this._itemRepository.getTreeConfig().
         getValue().config.getProxyFor('view-item').item;
       let itemDefaultFormatDefinition: FormatDefinition = itemKoheseView.
         formatDefinitions[itemKoheseView.defaultFormatKey[
@@ -157,24 +255,29 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         defaultFormatDefinition;
       viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
         formatDefinitionId;
-      let viewModelProxyPromise: Promise<ItemProxy> = this.itemRepository.
-        upsertItem('KoheseView', viewModel);
       
-      Promise.all([dataModelProxyPromise, viewModelProxyPromise]).
-        then((proxies: Array<ItemProxy>) => {
-        this._types.push({
-          dataModelItemProxy: proxies[0],
-          viewModelItemProxy: proxies[1]
-        });
-        this._types.sort((oneType: Type, anotherType: Type) => {
-          return oneType.dataModelItemProxy.item.name.localeCompare(
-            anotherType.dataModelItemProxy.item.name);
-        });
-        
-        this._dynamicTypesService.buildKoheseType(proxies[0] as KoheseModel);
-        
-        this._changeDetectorRef.markForCheck();
-      });
+      let itemProxys: Array<ItemProxy> = await Promise.all([this.
+        _itemRepository.upsertItem('KoheseModel', {
+        name: inputs[0],
+        parentId: 'Item',
+        namespace: { id: inputs[1].id },
+        base: 'Item',
+        idInjection: true,
+        properties: {},
+        validations: [],
+        relations: {},
+        acls: [],
+        methods: [],
+        localTypes: {}
+      }), this._itemRepository.upsertItem('KoheseView', viewModel)]);
+      
+      this._dynamicTypesService.buildKoheseType(
+        itemProxys[0] as KoheseModel);
+      
+      this._selectedNamespace = inputs[1];
+      this._selectedType = itemProxys[0].item;
+
+      this._changeDetectorRef.markForCheck();
     }
   }
   
@@ -204,20 +307,38 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     return false;
   }
 
+  /**
+   * Upon confirmation, removes the selected Structure from the system
+   * 
+   * @returns A Promise that resolves to nothing
+   */
   public async delete(): Promise<void> {
-    let choiceValue: any = await this.dialogService.openYesNoDialog('Delete ' +
-      this._selectedType.dataModelItemProxy.item.name, 'Are you sure that ' +
-      'you want to delete ' + this._selectedType.dataModelItemProxy.item.name +
-      '?');
+    let selectedTypeItemProxy: ItemProxy = this._itemRepository.
+      getTreeConfig().getValue().config.getProxyFor(this._selectedType.id);
+      let choiceValue: any = await this.dialogService.openYesNoDialog('Delete ' +
+      selectedTypeItemProxy.item.name, 'Are you sure that you want to ' +
+      'delete ' + selectedTypeItemProxy.item.name + '?');
     if (choiceValue) {
-      this.itemRepository.deleteItem(this._selectedType.dataModelItemProxy,
-        false);
-      this.itemRepository.deleteItem(this._selectedType.viewModelItemProxy,
-        false);
-      this._types.splice(this._types.indexOf(this._selectedType), 1);
-      this._dynamicTypesService.removeKoheseType(this._selectedType.
-        dataModelItemProxy.item.name);
-      
+      this._itemRepository.deleteItem(selectedTypeItemProxy, false);
+
+      if (selectedTypeItemProxy.kind === 'KoheseModel') {
+        this._itemRepository.deleteItem(this._itemRepository.getTreeConfig().
+          getValue().config.getProxyFor('view-' + selectedTypeItemProxy.item.
+          name.toLowerCase()), false);
+        this._dynamicTypesService.removeKoheseType(selectedTypeItemProxy.item.
+          name);
+      }
+
+      let types: Array<any> = this.getNamespaceTypes(this._selectedNamespace);
+      if (types.length > 0) {
+        this._selectedType = types[0];
+      } else {
+        let treeConfiguration: TreeConfiguration = this._itemRepository.getTreeConfig().
+          getValue().config;
+        this._selectedNamespace = treeConfiguration.getProxyFor(
+          'com.kohese').item;
+        this._selectedType = treeConfiguration.getProxyFor('Item').item;
+      }
       this._changeDetectorRef.markForCheck();
     }
   }

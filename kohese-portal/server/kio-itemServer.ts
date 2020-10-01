@@ -3,11 +3,13 @@ const StringReplaceAsync = require('string-replace-async');
 
 import { ItemProxy } from '../common/src/item-proxy';
 import { KoheseModel } from '../common/src/KoheseModel';
+import { KoheseView } from '../common/src/KoheseView';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { TreeHashMap } from '../common/src/tree-hash';
 import { ItemCache } from '../common/src/item-cache';
 import { KDBRepo } from './kdb-repo';
 import { KDBCache } from './kdb-cache';
+
 const MdToKohese = require('./md-to-kohese');
 
 var kio = require('./koheseIO');
@@ -175,9 +177,11 @@ function KIOItemServer(socket){
         responseTransmitTime: null
       },
       cache: {
+        Namespace: {},
         KoheseModel: {},
         KoheseView: {},
-        KoheseUser: {}}
+        KoheseUser: {}
+      }
     };
 
     let repoProxy;
@@ -465,7 +469,12 @@ function KIOItemServer(socket){
 
     let requestTime = Date.now();
     var repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
-    console.log('::: session %s: Getting status for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId, socket.id);
+    var username = 'Unknown';
+    if (socket.koheseUser){
+      username = socket.koheseUser.username;
+    }
+
+    console.log('::: session %s: Received getStatus for %s for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId, socket.id, username);
     let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
 
     let status = await retrieveVCStatus; //await KDBRepo.getStatus(request.repoId);
@@ -551,6 +560,8 @@ function KIOItemServer(socket){
       } else {
         if (kind === 'KoheseModel') {
           proxy = new KoheseModel(item);
+        } else if (kind === 'KoheseView') {
+          proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
         } else {
           proxy = new ItemProxy(kind, item);
         }

@@ -1,31 +1,5 @@
 @import '../../app.component';
 
-.item-actions {
-
-  i {
-    border: 2px solid $secondaryColor + 200;
-    border-radius: 5px;
-    &:hover {
-      cursor: pointer;
-    }
-    padding: 3px 5px 3px 5px;
-    margin-right: 5px;
-  }
-
-  .fa-stack {
-    margin-right: 5px;
-    .stacked-child {
-      border: none;
-      padding: 0;
-      margin: 0;
-    }
-    .stacked-parent {
-      border: none;
-      margin: 0;
-    }
-  }
-}
-
 #details-tabs {
   height: 100%;
 

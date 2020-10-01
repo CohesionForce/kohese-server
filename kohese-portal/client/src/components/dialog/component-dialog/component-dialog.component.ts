@@ -35,6 +35,11 @@ export class DynamicComponentDirective {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComponentDialogComponent implements OnInit, AfterViewInit {
+  private _title: string;
+  get title() {
+    return this._title;
+  }
+  
   private _configurationInstanceMap: Map<ComponentDialogConfiguration, any> =
     new Map<ComponentDialogConfiguration, any>();
   get configurationInstanceMap() {
@@ -70,6 +75,8 @@ export class ComponentDialogComponent implements OnInit, AfterViewInit {
   }
   
   public ngOnInit(): void {
+    this._title = this._matDialogData['title'];
+
     let componentDialogConfigurations: Array<ComponentDialogConfiguration> =
       (<Array<ComponentDialogConfiguration>> this._matDialogData[
       'componentDialogConfigurations']);
@@ -93,8 +100,15 @@ export class ComponentDialogComponent implements OnInit, AfterViewInit {
         createComponent(this._componentFactoryResolver.resolveComponentFactory(
         componentDialogConfigurations[j].component)).instance;
       // Populate '@Input'-decorated attributes
+      // for (let attributeName in componentDialogConfigurations[j].
+      //   component['__prop__metadata__']) {
+      /*
+       * Due to Decorator information not being present at runtime when
+       * Ahead-Of-Time compilation has been performed, the above ```for```
+       * statement above has been replaced with the below ```for``` statement.
+       */ 
       for (let attributeName in componentDialogConfigurations[j].
-        component['__prop__metadata__']) {
+        matDialogData) {
         let value: any = componentDialogConfigurations[j].matDialogData[
           attributeName];
         if (value != null) {
