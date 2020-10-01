@@ -3,7 +3,7 @@
   <mat-menu #contextMenu="matMenu">
     <ng-template matMenuContent>
       <button mat-menu-item
-        [disabled]="row.editable || !docInfo.proxy.item.preventModification || !docInfo.proxy.model.item.restrictInstanceEditing"
+        [disabled]="row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing"
         (click)="row.editable = true">
         <mat-icon class="fa fa-edit"></mat-icon>
         Edit
