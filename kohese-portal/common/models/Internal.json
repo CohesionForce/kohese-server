@@ -2,12 +2,13 @@
   "id": "Internal",
   "name": "Internal",
   "parentId": "Item",
+  "editable": false,
   "base": "Item",
   "namespace": {
     "id": "com.kohese"
   },
   "idInjection": false,
-  "isMetaModel": true,
+  "genericallyWritable": false,
   "isInternal": true,
   "invertItemOrder": false,
   "properties": {},

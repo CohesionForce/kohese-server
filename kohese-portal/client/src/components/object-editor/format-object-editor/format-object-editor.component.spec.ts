@@ -80,7 +80,7 @@ describe('FormatObjectEditorComponent', () => {
 
   it('retrieves all Namespaces that contain at least one type', () => {
     component.allowKindNarrowingOnly = false;
-    expect(component.getNamespaces().length).toBe(4);
+    expect(component.getNamespaces().length).toBe(3);
     component.allowKindNarrowingOnly = true;
     component.type = TreeConfiguration.getWorkingTree().getProxyFor(
       'Observation').item;

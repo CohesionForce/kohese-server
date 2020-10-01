@@ -21,8 +21,9 @@
       </button>
     </ng-container>
     <ng-template #notEditable>
-      <button mat-icon-button matTooltip="Edit" [disabled]="(itemProxy.item.
-        editable === false)" (click)="editableStream.next(true)"
+      <button mat-icon-button matTooltip="Edit" [disabled]="((itemProxy.item.
+        editable === false) || (itemProxy.model.item.genericallyWritable
+        === false))" (click)="editableStream.next(true)"
         [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
         '') }">
         <mat-icon class="fa fa-edit"></mat-icon>

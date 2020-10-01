@@ -408,8 +408,6 @@ export class ItemProxy {
     if (!itemId){
       if ('KoheseModel' === kind) {
         forItem.id = forItem.name;
-      } else if ('KoheseView' === kind) {
-        forItem.id = 'view-' + forItem.name.toLowerCase();
       } else {
         forItem.id = uuidV1();
       }

@@ -26,19 +26,17 @@
         <button mat-icon-button [matMenuTriggerFor]="modifiedItemsMenu">
           <img src="assets/icons/versioncontrol/dirty.ico"/>
         </button>
+        <mat-menu #modifiedItemsMenu="matMenu" [overlapTrigger]="false">
+          <ng-container *ngFor="let modifiedProxy of modifiedProxies">
+            <button mat-menu-item (click)="navigate('Explore',
+              { id: modifiedProxy.item.id })">
+              <mat-icon class="{{modifiedProxy.model.view.item.icon}}">
+              </mat-icon>
+              {{modifiedProxy.item.name}}
+            </button>
+          </ng-container>
+        </mat-menu>
       </ng-container>
-      <mat-menu #modifiedItemsMenu="matMenu" [overlapTrigger]="false">
-        <ng-container *ngFor="let modifiedProxy of modifiedProxies">
-          <button mat-menu-item (click)="navigate('Explore',
-            { id: modifiedProxy.item.id })">
-            <mat-icon class="{{itemRepository.getTreeConfig().getValue().
-              config.getProxyFor('view-' + modifiedProxy.kind.
-              toLowerCase()).item.icon}}">
-            </mat-icon>
-            {{modifiedProxy.item.name}}
-          </button>
-        </ng-container>
-      </mat-menu>
       <button mat-button [matMenuTriggerFor]="notificationMenu">
         <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
           [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>

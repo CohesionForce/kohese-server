@@ -15,6 +15,7 @@ var jsonExt = /\.json$/;
 import { ItemProxy } from '../common/src/item-proxy';
 import { TreeConfiguration } from '../common/src/tree-configuration';
 import { KoheseModel } from '../common/src/KoheseModel';
+import { KoheseView } from '../common/src/KoheseView';
 import { KDBCache } from './kdb-cache';
 import { KDBRepo } from './kdb-repo';
 
@@ -453,6 +454,10 @@ function loadModelInstances (kind, modelDirPath, inRepo) {
     switch (kind){
       case 'KoheseModel':
         proxy = new KoheseModel(itemPayload);
+        break;
+      case 'KoheseView':
+        proxy = new KoheseView(itemPayload, TreeConfiguration.
+          getWorkingTree());
         break;
       default:
         proxy = new ItemProxy(kind, itemPayload);
