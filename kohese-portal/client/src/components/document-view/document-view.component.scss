@@ -5,6 +5,7 @@
 
 .body-container {
   height : calc(100% - 50px);
+  background-color: #aaaa;
 }
 
 .details-doc {
@@ -16,24 +17,15 @@
 }
 
 .document-row {
+  margin: 5px;
   padding-left : 10px;
-  border-bottom : 1px gray solid;
-  border-left : 1px black solid;
-  width: calc(100% - 100px);
+  padding-right: 10px;
+  width: 99%;
   display: inline-block;
-  background-color : whitesmoke;
-}
-
-.side-button {
-  padding-bottom : 10px;
+  background-color : #fff;
 }
 
 :host {
   height: 100%;
 }
-
-// .hovered-row {
-//   min-height: 200px;
-//   vertical-align: text-bottom;
-// }
 
