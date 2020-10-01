@@ -284,6 +284,14 @@
               "editable": true
             },
             {
+              "propertyName": "preventModification",
+              "customLabel": "Prevent Modification",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "createdBy",
               "customLabel": "Created By",
               "labelOrientation": "Top",
@@ -312,14 +320,6 @@
               "customLabel": "Modified On",
               "labelOrientation": "Top",
               "kind": "date",
-              "visible": true,
-              "editable": false
-            },
-            {
-              "propertyName": "editable",
-              "customLabel": "Editable",
-              "labelOrientation": "Top",
-              "kind": "boolean",
               "visible": true,
               "editable": false
             },
@@ -372,6 +372,14 @@
               "editable": false
             },
             {
+              "propertyName": "restrictInstanceEditing",
+              "customLabel": "Restrict Instance Editing",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "namespace",
               "customLabel": "Namespace",
               "labelOrientation": "Top",
@@ -384,14 +392,6 @@
               "customLabel": "Base",
               "labelOrientation": "Top",
               "kind": "text",
-              "visible": true,
-              "editable": false
-            },
-            {
-              "propertyName": "genericallyWritable",
-              "customLabel": "Generically Writable",
-              "labelOrientation": "Top",
-              "kind": "boolean",
               "visible": true,
               "editable": false
             },

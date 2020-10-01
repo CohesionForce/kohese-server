@@ -2,13 +2,13 @@
   "id": "Internal-Lost",
   "name": "Internal-Lost",
   "parentId": "Item",
-  "editable": false,
+  "preventModification": true,
+  "restrictInstanceEditing": true,
   "namespace": {
     "id": "com.kohese"
   },
   "base": "Item",
   "idInjection": false,
-  "genericallyWritable": false,
   "isInternal": true,
   "invertItemOrder": false,
   "properties": {},
