@@ -19,10 +19,10 @@
       <input matInput [matDatepicker]="matDatepicker" placeholder="{{
         getAttributeRepresentation()}}"
         [ngModel]="getDateString(koheseObject[isVariantField ? 'value' :
-        propertyDefinition.propertyName])" (ngModelChange)="($event ?
-        koheseObject[isVariantField ? 'value' : propertyDefinition.
-        propertyName] = $event.getTime() : '')"
-        [disabled]="!propertyDefinition.editable"/>
+        propertyDefinition.propertyName])" (ngModelChange)="koheseObject[
+        isVariantField ? 'value' : propertyDefinition.propertyName] = ($event ?
+        $event.getTime() : null)" [disabled]="!propertyDefinition.
+        editable"/>
       <mat-datepicker-toggle matSuffix [for]="matDatepicker">
       </mat-datepicker-toggle>
       <mat-datepicker #matDatepicker></mat-datepicker>
@@ -99,7 +99,11 @@
       <mat-select placeholder="{{getAttributeRepresentation()}}"
         [(ngModel)]="koheseObject[isVariantField ? 'value' :
         propertyDefinition.propertyName]" [disabled]="!propertyDefinition.
-        editable">
+        editable" [compareWith]="areUsernamesEqual">
+        <ng-container *ngIf="(dataModel.classProperties[propertyDefinition.
+          propertyName].definition.required !== true)">
+          <mat-option [value]="null"></mat-option>
+        </ng-container>
         <ng-container *ngFor="let user of sessionService.users">
           <mat-option [value]="user.name">
             {{user.name}}
