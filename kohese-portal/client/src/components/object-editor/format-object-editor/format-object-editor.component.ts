@@ -25,10 +25,10 @@ export class FormatObjectEditorComponent implements OnInit {
     if (!object) {
       object = {};
     }
-    
+
     this._object = object;
   }
-  
+
   private _enclosingType: any;
   get enclosingType() {
     return this._enclosingType;
@@ -37,7 +37,7 @@ export class FormatObjectEditorComponent implements OnInit {
   set enclosingType(enclosingType: any) {
     this._enclosingType = enclosingType;
   }
-  
+
   private _formatDefinitionType: FormatDefinitionType;
   get formatDefinitionType() {
     return this._formatDefinitionType;
@@ -56,14 +56,14 @@ export class FormatObjectEditorComponent implements OnInit {
     this._selectedNamespace = selectedNamespace;
     this.selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
   }
-  
+
   private _selectedType: any;
   get selectedType() {
     return this._selectedType;
   }
   set selectedType(selectedType: any) {
     this._selectedType = selectedType;
-    
+
     if (this._enclosingType) {
       this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor(
         'view-' + this._enclosingType.classLocalTypes[this._selectedType.name].
@@ -72,14 +72,14 @@ export class FormatObjectEditorComponent implements OnInit {
       this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
         this._selectedType.name.toLowerCase()).item;
     }
-    
+
     this._formatDefinition = this._viewModel.formatDefinitions[this._viewModel.
       defaultFormatKey[this._formatDefinitionType]];
     if (!this._formatDefinition) {
       this._formatDefinition = this._viewModel.formatDefinitions[this.
         _viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
     }
-    
+
     this._formatDefinition = JSON.parse(JSON.stringify(this.
       _formatDefinition));
     this._formatDefinition.containers.unshift({
@@ -105,7 +105,7 @@ export class FormatObjectEditorComponent implements OnInit {
         }
       }
     }
-    
+
     for (let attributeName in this._selectedType.classProperties) {
       if (this._object[attributeName] == null) {
         let defaultValue: any = this._selectedType.classProperties[
@@ -116,7 +116,7 @@ export class FormatObjectEditorComponent implements OnInit {
       }
     }
   }
-  
+
   private _isDisabled: boolean = false;
   get isDisabled() {
     return this._isDisabled;
@@ -125,7 +125,7 @@ export class FormatObjectEditorComponent implements OnInit {
   set isDisabled(isDisabled: boolean) {
     this._isDisabled = isDisabled;
   }
-  
+
   private _allowKindChange: boolean = false;
   get allowKindChange() {
     return this._allowKindChange;
@@ -134,7 +134,7 @@ export class FormatObjectEditorComponent implements OnInit {
   set allowKindChange(allowKindChange: boolean) {
     this._allowKindChange = allowKindChange;
   }
-  
+
   private _allowKindNarrowingOnly: boolean = true;
   get allowKindNarrowingOnly() {
     return this._allowKindNarrowingOnly;
@@ -143,7 +143,7 @@ export class FormatObjectEditorComponent implements OnInit {
   set allowKindNarrowingOnly(allowKindNarrowingOnly: boolean) {
     this._allowKindNarrowingOnly = allowKindNarrowingOnly;
   }
-  
+
   private _type: any;
   get type() {
     return this._type;
@@ -152,30 +152,29 @@ export class FormatObjectEditorComponent implements OnInit {
   set type(type: any) {
     this._type = type;
     if (this._allowKindChange && !this._enclosingType) {
-      this._selectedNamespace = this._itemRepository.getTreeConfig().
-        getValue().config.getProxyFor(this._type.namespace.id).item;
+      this._selectedNamespace = TreeConfiguration.getWorkingTree().getProxyFor(this._type.namespace.id).item;
     }
     this.selectedType = this._type;
   }
-  
+
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
   }
-  
+
   private _formatDefinition: FormatDefinition;
   get formatDefinition() {
     return this._formatDefinition;
   }
-  
+
   get itemRepository() {
     return this._itemRepository;
   }
-  
+
   get Array() {
     return Array;
   }
-  
+
   get FormatContainerKind() {
     return FormatContainerKind;
   }
@@ -186,7 +185,7 @@ export class FormatObjectEditorComponent implements OnInit {
     MatDialogRef<FormatObjectEditorComponent>, private _itemRepository:
     ItemRepository) {
   }
-  
+
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this.object = this._data['object'];
@@ -200,7 +199,7 @@ export class FormatObjectEditorComponent implements OnInit {
       this.type = this._data['type'];
     }
   }
-  
+
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
@@ -211,7 +210,7 @@ export class FormatObjectEditorComponent implements OnInit {
    */
   public getNamespaces(): Array<any> {
     let namespaces: Array<any> = [];
-    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+    TreeConfiguration.getWorkingTree().getProxyFor(
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
       ItemProxy) => {
       if ((itemProxy.kind === 'Namespace') && (this.getNamespaceTypes(
@@ -229,12 +228,12 @@ export class FormatObjectEditorComponent implements OnInit {
 
   /**
    * Returns an Array containing all types in the given Namespace
-   * 
+   *
    * @param namespace
    */
   public getNamespaceTypes(namespace: any): Array<any> {
     let types: Array<any> = [];
-    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+    TreeConfiguration.getWorkingTree().getProxyFor(
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
       ItemProxy) => {
       if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.
@@ -247,9 +246,8 @@ export class FormatObjectEditorComponent implements OnInit {
               types.push(itemProxy.item);
               break;
             }
-            
-            modelItemProxy = this._itemRepository.getTreeConfig().getValue().
-              config.getProxyFor(modelItemProxy.item.base);
+
+            modelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(modelItemProxy.item.base);
           }
         } else {
           types.push(itemProxy.item);
@@ -263,7 +261,7 @@ export class FormatObjectEditorComponent implements OnInit {
 
     return types;
   }
-  
+
   public getReverseReferenceTableHeaderContent(formatContainer:
     FormatContainer): string {
     return formatContainer.contents.map((propertyDefinition:
@@ -272,7 +270,7 @@ export class FormatObjectEditorComponent implements OnInit {
         propertyDefinition.propertyName.attribute;
     }).join(', ');
   }
-  
+
   public getReverseReferences(formatContainer: FormatContainer): Array<any> {
     let references: Array<any> = [];
     let reverseReferencesObject: any = TreeConfiguration.getWorkingTree().
@@ -287,10 +285,10 @@ export class FormatObjectEditorComponent implements OnInit {
         }));
       }
     }
-    
+
     return references;
   }
-  
+
   /**
    * Returns a function intended to be called by TableComponent to retrieve
    * text for the table cell indicated by the given row and column identifier
@@ -301,7 +299,7 @@ export class FormatObjectEditorComponent implements OnInit {
       return String(row[columnId]);
     };
   }
-  
+
   public isObjectValid(): boolean {
     for (let attributeName in this._selectedType.classProperties) {
       let attributeValue: any = this._object[attributeName];
@@ -310,20 +308,20 @@ export class FormatObjectEditorComponent implements OnInit {
         return false;
       }
     }
-    
+
     return true;
   }
-  
+
   public close(accept: boolean): any {
     let result: any = {
       type: this._selectedType,
       object: this._object
     };
-    
+
     if (this.isDialogInstance()) {
       this._matDialogRef.close(accept ? result : undefined);
     }
-    
+
     return result;
   }
 }
