@@ -1,12 +1,14 @@
-import { Component, OnInit, OnDestroy, Input, EventEmitter, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, EventEmitter, OnChanges,
+  ChangeDetectionStrategy, ChangeDetectorRef, ViewChild } from '@angular/core';
 
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { Subscription, BehaviorSubject, Observable } from 'rxjs';
-import { MatTableDataSource } from '@angular/material'
+import { MatMenuTrigger, MatTableDataSource } from '@angular/material'
 import { DetailsComponent } from '../../../details/details.component';
+import { ContextMenuComponent, MenuItem } from '../../../context-menu/context-menu.component';
 
 @Component({
   selector: 'children-table',
@@ -14,8 +16,7 @@ import { DetailsComponent } from '../../../details/details.component';
   styleUrls: ['./children-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChildrenTableComponent extends NavigatableComponent
-  implements OnInit, OnDestroy {
+export class ChildrenTableComponent extends NavigatableComponent implements OnInit, OnDestroy {
   @Input()
   filterSubject: BehaviorSubject<string>;
   private _editableStream: BehaviorSubject<boolean>;
@@ -26,13 +27,12 @@ export class ChildrenTableComponent extends NavigatableComponent
   set editableStream(editableStream: BehaviorSubject<boolean>) {
     this._editableStream = editableStream;
   }
-
-  /* Obvervables */
-  filteredItems: Array<ItemProxy>;
-
   @Input()
   childrenStream: BehaviorSubject<Array<ItemProxy>>;
   tableStream: MatTableDataSource<ItemProxy>;
+
+  /* Obvervables */
+  filteredItems: Array<ItemProxy>;
 
   /* Subscriptions */
   filterSub: Subscription;
@@ -42,15 +42,18 @@ export class ChildrenTableComponent extends NavigatableComponent
   rowDef: Array<string>;
   children: Array<ItemProxy>;
 
-  constructor(protected NavigationService: NavigationService,
-    private changeRef: ChangeDetectorRef,
-    private _dialogService: DialogService,
-    private _navigationService: NavigationService) {
-    super(NavigationService);
-  }
+  /*Context Menu */
+  contextMenuPosition = { x: '0px', y: '0px' };
 
   get navigationService() {
     return this._navigationService;
+  }
+
+  constructor(
+    private changeRef: ChangeDetectorRef,
+    private _dialogService: DialogService,
+    private _navigationService: NavigationService) {
+    super(_navigationService);
   }
 
   ngOnInit() {
@@ -102,6 +105,39 @@ export class ChildrenTableComponent extends NavigatableComponent
     this._dialogService.openComponentDialog(DetailsComponent, {
       data: { itemProxy: itemProxy }
     }).updateSize('90%', '90%');
+  }
+
+  onContextMenu(event: MouseEvent, contextMenuComponent: ContextMenuComponent) {
+    event.preventDefault();
+    contextMenuComponent.x = event.clientX + 'px';
+    contextMenuComponent.y = event.clientY + 'px';
+    contextMenuComponent.contextMenu.menu.focusFirstItem('mouse');
+    contextMenuComponent.contextMenu.openMenu();
+  }
+
+  public getMenuItems(itemProxy: ItemProxy): MenuItem[] {
+    return [{
+      action: 'Display Item',
+      icon: 'fa fa-clone',
+      execute: () => {
+        this._dialogService.openComponentDialog(DetailsComponent, {
+          data: { itemProxy: itemProxy }
+        }).updateSize('90%', '90%');
+      }
+    }, {
+      action: 'Navigate in Explorer',
+      icon: 'fa fa-arrow-right',
+      execute: () => {
+        console.log('Executed: Navigate in Explorer');
+        this._navigationService.navigate('Explore', { id: itemProxy.item.id });
+      },
+    }, {
+      action: 'Open in New Tab',
+      icon: 'fa fa-external-link',
+      execute: () => {
+        this._navigationService.addTab('Explore', { id: itemProxy.item.id });
+      }
+    }]
   }
 
 }
