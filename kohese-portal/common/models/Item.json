@@ -46,8 +46,7 @@
     },
     "preventModification": {
       "name": "preventModification",
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
     "createdBy": {
       "type": "string",
