@@ -1,51 +1,89 @@
 {
-  "id": "view-keyevent",
-  "name": "KeyEvent",
-  "parentId": "view-decision",
+  "id": "view-requirement",
+  "name": "Requirement",
+  "parentId": "view-item",
   "namespace": {
     "id": "com.kohese"
   },
-  "modelName": "KeyEvent",
-  "icon": "fa fa-key",
+  "modelName": "Requirement",
+  "icon": "fa fa-rocket",
   "color": "#000000",
   "viewProperties": {
-    "DetectionMechanism": {
-      "displayName": "DetectionMechanism",
+    "TestMethod": {
+      "name": "TestMethod",
+      "displayName": "TestMethod",
       "inputType": {
-        "type": "text",
+        "type": "",
         "options": {}
-      },
-      "name": "DetectionMechanism"
+      }
     },
-    "EventInputData": {
-      "displayName": "EventInputData",
+    "TestLevel": {
+      "name": "TestLevel",
+      "displayName": "TestLevel",
       "inputType": {
-        "type": "text",
+        "type": "",
         "options": {}
-      },
-      "name": "EventInputData"
+      }
     },
-    "Responses": {
-      "displayName": "Responses",
+    "BuildAllocation": {
+      "name": "BuildAllocation",
+      "displayName": "BuildAllocation",
       "inputType": {
-        "type": "text",
+        "type": "",
         "options": {}
-      },
-      "name": "Responses"
+      }
     },
-    "EventOutputData": {
-      "displayName": "EventOutputData",
+    "Safety": {
+      "name": "Safety",
+      "displayName": "Safety",
       "inputType": {
-        "type": "text",
+        "type": "boolean",
         "options": {}
-      },
-      "name": "EventOutputData"
+      }
+    },
+    "Security": {
+      "name": "Security",
+      "displayName": "Security",
+      "inputType": {
+        "type": "boolean",
+        "options": {}
+      }
+    },
+    "Privacy": {
+      "name": "Privacy",
+      "displayName": "Privacy",
+      "inputType": {
+        "type": "boolean",
+        "options": {}
+      }
     }
   },
-  "localTypes": {},
+  "localTypes": {
+    "TestMethodType": {
+      "metatype": "Enumeration",
+      "id": "view-testmethodtype",
+      "name": "TestMethodType",
+      "values": [
+        "Analysis",
+        "Demonstration",
+        "Inspection",
+        "Test"
+      ]
+    },
+    "TestLevelType": {
+      "metatype": "Enumeration",
+      "id": "view-testleveltype",
+      "name": "TestLevelType",
+      "values": [
+        "Unit",
+        "SI",
+        "System"
+      ]
+    }
+  },
   "formatDefinitions": {
-    "04b498d0-5d76-11ea-9d2a-81904e0f9ce1": {
-      "id": "04b498d0-5d76-11ea-9d2a-81904e0f9ce1",
+    "6e255540-ebe5-11ea-bb6a-2d27ba9b961c": {
+      "id": "6e255540-ebe5-11ea-bb6a-2d27ba9b961c",
       "name": "Default Format Definition",
       "header": {
         "kind": "header",
@@ -54,8 +92,8 @@
             "propertyName": "name",
             "customLabel": "Name",
             "labelOrientation": "Top",
-            "visible": true,
             "kind": "text",
+            "visible": true,
             "editable": true
           }
         ]
@@ -111,14 +149,6 @@
               "kind": "proxy-selector",
               "visible": true,
               "editable": true
-            },
-            {
-              "propertyName": "preventModification",
-              "customLabel": "Prevent Modification",
-              "labelOrientation": "Top",
-              "kind": "boolean",
-              "visible": true,
-              "editable": false
             },
             {
               "propertyName": "createdBy",
@@ -311,38 +341,6 @@
               "kind": "boolean",
               "visible": true,
               "editable": true
-            },
-            {
-              "propertyName": "DetectionMechanism",
-              "customLabel": "DetectionMechanism",
-              "labelOrientation": "Top",
-              "kind": "text",
-              "visible": true,
-              "editable": true
-            },
-            {
-              "propertyName": "EventInputData",
-              "customLabel": "EventInputData",
-              "labelOrientation": "Top",
-              "kind": "text",
-              "visible": true,
-              "editable": true
-            },
-            {
-              "propertyName": "Responses",
-              "customLabel": "Responses",
-              "labelOrientation": "Top",
-              "kind": "text",
-              "visible": true,
-              "editable": true
-            },
-            {
-              "propertyName": "EventOutputData",
-              "customLabel": "EventOutputData",
-              "labelOrientation": "Top",
-              "kind": "text",
-              "visible": true,
-              "editable": true
             }
           ]
         },
@@ -361,14 +359,15 @@
         }
       ]
     },
-    "89324a90-a7af-11e8-8662-71e48f0160fe": {
-      "name": "New definition",
+    "2732eb90-ebe8-11ea-bb6a-2d27ba9b961c": {
+      "id": "2732eb90-ebe8-11ea-bb6a-2d27ba9b961c",
+      "name": "NewFormatDefintion",
       "header": {
         "kind": "header",
         "contents": [
           {
             "propertyName": "name",
-            "customLabel": "Name",
+            "customLabel": "name",
             "labelOrientation": "Top",
             "kind": "text",
             "visible": true,
@@ -384,108 +383,86 @@
               "propertyName": "description",
               "customLabel": "Description",
               "labelOrientation": "Top",
-              "kind": "markdown",
-              "visible": true,
-              "editable": true
-            },
-            {
-              "propertyName": "name",
-              "customLabel": "name",
-              "labelOrientation": "Top",
               "kind": "text",
               "tableDefinition": "",
               "visible": true,
               "editable": true
             },
             {
-              "propertyName": "DetectionMechanism",
-              "customLabel": "DetectionMechanism",
+              "propertyName": "TestLevel",
+              "customLabel": "TestLevel",
               "labelOrientation": "Top",
-              "kind": "text",
+              "kind": "",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             },
             {
-              "propertyName": "EventInputData",
-              "customLabel": "EventInputData",
+              "propertyName": "TestMethod",
+              "customLabel": "TestMethod",
               "labelOrientation": "Top",
-              "kind": "text",
+              "kind": "",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             },
             {
-              "propertyName": "Responses",
-              "customLabel": "Responses",
+              "propertyName": "Safety",
+              "customLabel": "Safety",
               "labelOrientation": "Top",
-              "kind": "text",
+              "kind": "boolean",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             },
             {
-              "propertyName": "EventOutputData",
-              "customLabel": "EventOutputData",
+              "propertyName": "Security",
+              "customLabel": "Security",
               "labelOrientation": "Top",
-              "kind": "text",
+              "kind": "boolean",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "Privacy",
+              "customLabel": "Privacy",
+              "labelOrientation": "Top",
+              "kind": "boolean",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "BuildAllocation",
+              "customLabel": "BuildAllocation",
+              "labelOrientation": "Top",
+              "kind": "",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             }
           ]
         }
-      ],
-      "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+      ]
     }
   },
   "defaultFormatKey": {
-    "default": "04b498d0-5d76-11ea-9d2a-81904e0f9ce1",
-    "document": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    "default": "6e255540-ebe5-11ea-bb6a-2d27ba9b961c",
+    "document": "2732eb90-ebe8-11ea-bb6a-2d27ba9b961c"
   },
   "tableDefinitions": {
-    "b1090aa0-fb86-11e9-be56-311e0135452a": {
-      "id": "b1090aa0-fb86-11e9-be56-311e0135452a",
-      "name": "KeyEventInfo",
+    "e8a5bc90-ebe7-11ea-bb6a-2d27ba9b961c": {
+      "id": "e8a5bc90-ebe7-11ea-bb6a-2d27ba9b961c",
+      "name": "Trace Matrix",
       "columns": [
-        "name",
-        "DetectionMechanism",
-        "EventInputData",
-        "Responses",
-        "EventOutputData"
-      ],
-      "expandedFormat": {
-        "column1": [],
-        "column2": [],
-        "column3": [],
-        "column4": []
-      }
-    },
-    "5b7cf180-aa97-11ea-b459-333ae1bfee22": {
-      "id": "5b7cf180-aa97-11ea-b459-333ae1bfee22",
-      "name": "KeyEventTableForUseCases",
-      "columns": [
-        "name",
-        "DetectionMechanism",
-        "Responses"
-      ],
-      "expandedFormat": {
-        "column1": [],
-        "column2": [],
-        "column3": [],
-        "column4": []
-      }
-    },
-    "8b177e80-ed2f-11ea-9eb2-bf05b4e52f2b": {
-      "id": "8b177e80-ed2f-11ea-9eb2-bf05b4e52f2b",
-      "name": "KeyEventMatrix",
-      "columns": [
-        "name",
         "description",
-        "TestMethod",
         "TestLevel",
-        "TraceTo",
-        "TraceFrom",
-        "BuildAllocation",
+        "TestMethod",
         "Safety",
         "Security",
-        "Privacy"
+        "Privacy",
+        "BuildAllocation"
       ],
       "expandedFormat": {
         "column1": [],
