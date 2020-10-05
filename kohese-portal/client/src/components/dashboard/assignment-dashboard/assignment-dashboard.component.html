@@ -49,12 +49,24 @@
               </ng-template>
               <button mat-icon-button matTooltip="Display Item information"
                 (click)="$event.stopPropagation(); displayInformation(assignment)">
-                <mat-icon class="fa fa-search"></mat-icon>
+                <mat-icon class="fa fa-clone"></mat-icon>
               </button>
-              <button mat-icon-button matTooltip="Navigate to this Item"
-                (click)="$event.stopPropagation(); navigate(assignment)">
-                <mat-icon class="fa fa-arrow-right"></mat-icon>
+              <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
+                (click)="$event.stopPropagation();">
+                <mat-icon class="fa fa-bars"></mat-icon>
               </button>
+              <mat-menu #menu="matMenu" [overlapTrigger]="false">
+                <button mat-menu-item
+                  (click)="$event.stopPropagation(); navigationService.navigate('Explore', { id: assignment.item.id })">
+                  <mat-icon class="fa fa-arrow-right"></mat-icon>
+                  Navigate in Explorer
+                </button>
+                <button mat-menu-item
+                  (click)="$event.stopPropagation(); navigationService.addTab('Explore', { id: assignment.item.id })">
+                  <mat-icon class="fa fa-external-link"></mat-icon>
+                  Navigate in New Tab
+                </button>
+              </mat-menu>
             </mat-panel-description>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>

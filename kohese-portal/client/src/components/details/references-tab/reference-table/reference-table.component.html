@@ -24,14 +24,15 @@
         <mat-header-cell *matHeaderCellDef></mat-header-cell>
         <mat-cell *matCellDef="let reference" style="display: flex; justify-content: flex-end;">
           <div class="hidden-buttons"> <!-- div and class for scss styling -->
-            <button mat-icon-button matTooltip="Open Modal Viewer" (click)="displayInformation(reference)">
+            <button mat-icon-button matTooltip="Display Item Information"
+              (click)="displayInformation(reference)">
               <mat-icon class="fa fa-clone"></mat-icon>
             </button>
-            <button mat-icon-button matTooltip="Navigate to Explorer"
+            <button mat-icon-button matTooltip="Navigate in Explorer"
               (click)="navigationService.navigate('Explore', { id: reference.item.id })">
               <mat-icon class="fa fa-arrow-right"></mat-icon>
             </button>
-            <button mat-icon-button matTooltip="Navigate to New Tab"
+            <button mat-icon-button matTooltip="Navigate in New Tab"
               (click)="navigationService.addTab('Explore', { id: reference.item.id })">
               <mat-icon class="fa fa-external-link"></mat-icon>
             </button>

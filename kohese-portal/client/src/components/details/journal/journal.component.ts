@@ -84,6 +84,10 @@ export class JournalComponent {
     return Object;
   }
 
+  get navigationService() {
+    return this._navigationService;
+  }
+
   @ViewChildren(MatExpansionPanel)
   private expansionPanels: QueryList<MatExpansionPanel>;
 
@@ -213,10 +217,6 @@ export class JournalComponent {
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
     this._changeDetectorRef.markForCheck();
-  }
-
-  public navigate(itemProxy: ItemProxy): void {
-    this._navigationService.addTab('Explore', { id: itemProxy.item.id });
   }
 
   public displayInformation(itemProxy: ItemProxy): void {

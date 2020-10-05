@@ -61,6 +61,10 @@ export class StateSummaryDialogComponent implements OnInit {
     return TreeConfiguration;
   }
 
+  get navigationService() {
+    return this._navigationService;
+  }
+
   @ViewChildren(MatExpansionPanel)
   private expansionPanels: QueryList<MatExpansionPanel>;
 
@@ -76,9 +80,7 @@ export class StateSummaryDialogComponent implements OnInit {
     }
   }
 
-  ngOnInit() {
-
-  }
+  ngOnInit() { }
 
   toggleExpandRow(row) {
     console.log('Toggled Expand Row!', row);
@@ -107,10 +109,6 @@ export class StateSummaryDialogComponent implements OnInit {
         itemProxy: itemProxy
       }
     }).updateSize('70%', '70%');
-  }
-
-  public navigate(itemProxy: ItemProxy): void {
-    this._navigationService.addTab('Explore', { id: itemProxy.item.id });
   }
 
   public getHeader(itemProxy: ItemProxy): string {
