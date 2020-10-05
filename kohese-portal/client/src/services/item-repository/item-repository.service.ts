@@ -1202,7 +1202,11 @@ export class ItemRepository {
     type = (Array.isArray(type) ? type[0] : type);
 
     if (type === 'timestamp') {
-      return new Date(value).toLocaleDateString();
+      if (value == null) {
+        return String(value);
+      } else {
+        return new Date(value).toLocaleDateString();
+      }
     }
 
     let classLocalTypes: any = (enclosingType ? enclosingType : dataModel)[
