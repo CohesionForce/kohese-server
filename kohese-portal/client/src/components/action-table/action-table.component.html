@@ -1,97 +1,109 @@
 <mat-table *ngIf="tableStream" #actionTable [dataSource]="tableStream">
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-      <mat-cell *matCellDef="let action" 
-                (click)="navigate('Explore', {id:action.proxy.item.id})">
-        <ng-container *ngIf="action.proxy.model.type.viewModelProxy">
-          <span class="{{action.proxy.model.type.viewModelProxy.item.icon}}"
-            [ngStyle]="getRowIndent(action)">
-          </span>
-        </ng-container>
-        {{action.proxy.item.name}}
-      </mat-cell>
-    </ng-container>
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+    <mat-cell *matCellDef="let action">
+      <ng-container *ngIf="action.proxy.model.type.viewModelProxy">
+        <span class="{{action.proxy.model.type.viewModelProxy.item.icon}}" [ngStyle]="getRowIndent(action)">
+        </span>
+      </ng-container>
+      {{action.proxy.item.name}}
+    </mat-cell>
+  </ng-container>
 
-    <ng-container matColumnDef="predecessors">
-      <mat-header-cell *matHeaderCellDef> Predecessors</mat-header-cell>
-      <mat-cell *matCellDef="let action">
-        <ul *ngIf="action.proxy.relations.references[action.proxy.kind]">
-          <ng-container *ngIf="action.proxy.relations.references[action.proxy.
-            kind].predecessors">
-            <ng-container *ngIf="Array.isArray(action.proxy.relations.
-              references[action.proxy.kind].predecessors)">
-              <li *ngFor="let predecessor of action.proxy.relations.references[
-                action.proxy.kind].predecessors"> 
-                {{predecessor.item.name}}
-              </li>
-            </ng-container>
-            <ng-container *ngIf="!Array.isArray(action.proxy.relations.
-              references[action.proxy.kind].predecessors)">
-              <li>
-                {{action.proxy.relations.references[action.proxy.kind].
-                  predecessors.item.name}}
-              </li>
-            </ng-container>
+  <ng-container matColumnDef="predecessors">
+    <mat-header-cell *matHeaderCellDef> Predecessors</mat-header-cell>
+    <mat-cell *matCellDef="let action">
+      <ul *ngIf="action.proxy.relations.references[action.proxy.kind]">
+        <ng-container *ngIf="action.proxy.relations.references[action.proxy.kind].predecessors">
+          <ng-container *ngIf="Array.isArray(action.proxy.relations.references[action.proxy.kind].predecessors)">
+            <li *ngFor="let predecessor of action.proxy.relations.references[action.proxy.kind].predecessors">
+              {{predecessor.item.name}}
+            </li>
           </ng-container>
-        </ul>
-      </mat-cell>
-    </ng-container>
+          <ng-container *ngIf="!Array.isArray(action.proxy.relations.references[action.proxy.kind].predecessors)">
+            <li>
+              {{action.proxy.relations.references[action.proxy.kind].predecessors.item.name}}
+            </li>
+          </ng-container>
+        </ng-container>
+      </ul>
+    </mat-cell>
+  </ng-container>
 
-    <ng-container matColumnDef="assignedTo">
-        <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
-        <mat-cell *matCellDef="let action"> {{action.proxy.item.assignedTo}}</mat-cell>
-    </ng-container>
+  <ng-container matColumnDef="assignedTo">
+    <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
+    <mat-cell *matCellDef="let action"> {{action.proxy.item.assignedTo}}</mat-cell>
+  </ng-container>
 
-    <ng-container matColumnDef="state">
-        <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
-        <mat-cell *matCellDef="let action"> {{action.proxy.state}} </mat-cell>
-    </ng-container>
+  <ng-container matColumnDef="state">
+    <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
+    <mat-cell *matCellDef="let action"> {{action.proxy.state}} </mat-cell>
+  </ng-container>
 
-    <ng-container matColumnDef="estimatedHoursEffort">
-      <mat-header-cell *matHeaderCellDef> Estimated Hours </mat-header-cell>
-      <mat-cell *matCellDef="let action"> 
-          <editable-cell [column]="'estimatedHoursEffort'"
-                         [action]="action"
-                         [rowActionStream]="rowActionStream"
-                         [editableStream]="editableStream"></editable-cell>
-      </mat-cell>
-    </ng-container>
+  <ng-container matColumnDef="estimatedHoursEffort">
+    <mat-header-cell *matHeaderCellDef> Estimated Hours </mat-header-cell>
+    <mat-cell *matCellDef="let action">
+      <editable-cell [column]="'estimatedHoursEffort'" [action]="action" [rowActionStream]="rowActionStream"
+        [editableStream]="editableStream"></editable-cell>
+    </mat-cell>
+  </ng-container>
 
-    <ng-container matColumnDef="remainingHoursEffort">
-      <mat-header-cell *matHeaderCellDef> Remaining Hours </mat-header-cell>
-      <mat-cell *matCellDef="let action"> 
-          <editable-cell [column]="'remainingHoursEffort'"
-                         [action]="action"
-                         [rowActionStream]="rowActionStream"
-                         [editableStream]="editableStream"></editable-cell>
-      </mat-cell>
-    </ng-container>
+  <ng-container matColumnDef="remainingHoursEffort">
+    <mat-header-cell *matHeaderCellDef> Remaining Hours </mat-header-cell>
+    <mat-cell *matCellDef="let action">
+      <editable-cell [column]="'remainingHoursEffort'" [action]="action" [rowActionStream]="rowActionStream"
+        [editableStream]="editableStream"></editable-cell>
+    </mat-cell>
+  </ng-container>
 
-    <ng-container matColumnDef="actualHoursEffort">
-      <mat-header-cell *matHeaderCellDef> Actual Hours </mat-header-cell>
-      <mat-cell *matCellDef="let action"> 
-          <editable-cell [column]="'actualHoursEffort'"
-                         [action]="action"
-                         [rowActionStream]="rowActionStream"
-                         [editableStream]="editableStream"></editable-cell>
-      </mat-cell>
-    </ng-container>
+  <ng-container matColumnDef="actualHoursEffort">
+    <mat-header-cell *matHeaderCellDef> Actual Hours </mat-header-cell>
+    <mat-cell *matCellDef="let action">
+      <editable-cell [column]="'actualHoursEffort'" [action]="action" [rowActionStream]="rowActionStream"
+        [editableStream]="editableStream"></editable-cell>
+    </mat-cell>
+  </ng-container>
 
-    <ng-container matColumnDef="actions" *ngIf="editable">
-      <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
-      <mat-cell *matCellDef="let action" style="z-index: 10">
-          <button mat-icon-button class="fa fa-edit"
-                  *ngIf="!editableRows[action.proxy.item.id]"
-                  (click)="toggleRowEdit(action.proxy)"></button>
-          <button mat-icon-button class="fa fa-close"
-                  *ngIf="editableRows[action.proxy.item.id]"
-                  (click)="toggleRowEdit(action.proxy)"></button>
-          <button mat-icon-button class="fa fa-save" (click)="saveRow(action.proxy)"></button>
-      </mat-cell>
-    </ng-container>
+  <ng-container matColumnDef="actions" *ngIf="editable">
+    <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
+    <mat-cell *matCellDef="let action" style="z-index: 10">
+      <button mat-icon-button class="fa fa-edit" *ngIf="!editableRows[action.proxy.item.id]"
+        (click)="toggleRowEdit(action.proxy)"></button>
+      <button mat-icon-button class="fa fa-close" *ngIf="editableRows[action.proxy.item.id]"
+        (click)="toggleRowEdit(action.proxy)"></button>
+      <button mat-icon-button class="fa fa-save" (click)="saveRow(action.proxy)"></button>
+    </mat-cell>
+  </ng-container>
 
-    <mat-header-row style="position: sticky; top: 0; 
-                           background-color: inherit; z-index: 1;" 
-                    *matHeaderRowDef="rowDef"></mat-header-row>
-    <mat-row *matRowDef="let action; columns: rowDef"></mat-row>
+  <ng-container matColumnDef="nav">
+    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+    <mat-cell *matCellDef="let action" style="display: flex; justify-content: flex-end;">
+      <div class="hidden-buttons"> <!-- div and class for scss styling -->
+        <button mat-icon-button matTooltip="Display Item Information"
+          (click)="displayInformation(action.proxy)">
+          <mat-icon class="fa fa-clone"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
+          (click)="$event.stopPropagation();">
+          <mat-icon class="fa fa-bars"></mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" [overlapTrigger]="false">
+          <button mat-menu-item
+            (click)="navigationService.navigate('Explore', { id: action.proxy.item.id })">
+            <mat-icon class="fa fa-arrow-right"></mat-icon>
+            Navigate in Explorer
+          </button>
+          <button mat-menu-item
+            (click)="navigationService.addTab('Explore', { id: action.proxy.item.id })">
+            <mat-icon class="fa fa-external-link"></mat-icon>
+            Navigate in New Tab
+          </button>
+        </mat-menu>
+      </div>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row style="position: sticky; top: 0;
+    background-color: inherit; z-index: 1;" *matHeaderRowDef="rowDef"></mat-header-row>
+  <mat-row *matRowDef="let action; columns: rowDef"></mat-row>
 </mat-table>

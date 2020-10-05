@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy, ChangeDet
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { DetailsComponent } from '../details/details.component';
 
 import { ItemProxy } from '../../../../common/src/item-proxy.js'
 import { Observable, Subscription, Subject } from 'rxjs';
@@ -11,6 +13,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 @Component({
   selector: 'action-table',
   templateUrl: './action-table.component.html',
+  styleUrls: ['./action-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ActionTableComponent extends NavigatableComponent
@@ -28,20 +31,26 @@ export class ActionTableComponent extends NavigatableComponent
   editableRows: any = {};
   rowActionStream: Subject<any> = new Subject();
 
-  baseRowDef: Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort'];
+  baseRowDef: Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'nav'];
   actionRowDef: Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'actions'];
 
   /* Subscriptions */
   proxyStreamSub: Subscription;
-  
+
   get Array() {
     return Array;
   }
 
-  constructor(protected NavigationService: NavigationService,
+  get navigationService() {
+    return this._navigationService;
+  }
+
+  constructor(
+    private _navigationService: NavigationService,
     private itemRepository: ItemRepository,
-    private changeRef: ChangeDetectorRef) {
-    super(NavigationService);
+    private changeRef: ChangeDetectorRef,
+    private _dialogService: DialogService) {
+    super(_navigationService);
   }
 
   ngOnInit() {
@@ -111,5 +120,11 @@ export class ActionTableComponent extends NavigatableComponent
       type: 'Edit',
       rowProxy: action
     })
+  }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsComponent, {
+      data: { itemProxy: itemProxy }
+    }).updateSize('90%', '90%');
   }
 }

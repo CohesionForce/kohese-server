@@ -23,25 +23,30 @@
       <ng-container matColumnDef="Nav">
         <mat-header-cell *matHeaderCellDef></mat-header-cell>
         <mat-cell *matCellDef="let reference" style="display: flex; justify-content: flex-end;">
-          <div class="hidden-buttons"> <!-- div and class for scss styling -->
-            <button mat-icon-button matTooltip="Open Modal Viewer" (click)="displayInformation(reference)">
+          <div class="hidden-buttons">
+            <!-- div and class for scss styling -->
+            <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(reference)">
               <mat-icon class="fa fa-clone"></mat-icon>
             </button>
-            <button mat-icon-button matTooltip="Navigate to Explorer"
-              (click)="navigationService.navigate('Explore', { id: reference.item.id })">
-              <mat-icon class="fa fa-arrow-right"></mat-icon>
+            <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
+              (click)="$event.stopPropagation();">
+              <mat-icon class="fa fa-bars"></mat-icon>
             </button>
-            <button mat-icon-button matTooltip="Navigate to New Tab"
-              (click)="navigationService.addTab('Explore', { id: reference.item.id })">
-              <mat-icon class="fa fa-external-link"></mat-icon>
-            </button>
+            <mat-menu #menu="matMenu" [overlapTrigger]="false">
+              <button mat-menu-item (click)="navigationService.navigate('Explore', { id: reference.item.id })">
+                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                Navigate in Explorer
+              </button>
+              <button mat-menu-item (click)="navigationService.addTab('Explore', { id: reference.item.id })">
+                <mat-icon class="fa fa-external-link"></mat-icon>
+                Navigate in New Tab
+              </button>
+            </mat-menu>
           </div>
         </mat-cell>
       </ng-container>
-
       <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
-      <mat-row *matRowDef="let proxy; columns: rowDef">
-      </mat-row>
+      <mat-row *matRowDef="let proxy; columns: rowDef"></mat-row>
     </mat-table>
   </div>
 </div>
