@@ -51,7 +51,8 @@
         <ng-container *ngFor="let item of categoryItems.items">
           <mat-expansion-panel style="width: 100%;
             box-shadow: 0 3px 1px -2px rgba(0,0,0,.8), 0 2px 2px 0 rgba(0,0,0,.64), 0 1px 5px 0 rgba(0,0,0,.62);">
-            <mat-expansion-panel-header draggable="{{mayDrag(item)}}" (dragstart)="$event.dataTransfer.setData(item[selectedAttribute.name], item.id);
+            <mat-expansion-panel-header draggable="{{mayDrag(item)}}"
+              (dragstart)="$event.dataTransfer.setData(item[selectedAttribute.name], item.id);
               $event.dataTransfer.dropEffect = 'move';
               changeDetectorRef.detach();" (dragend)="changeDetectorRef.reattach();
               changeDetectorRef.markForCheck();" [ngStyle]="{ 'background-color': viewModel.color }"
