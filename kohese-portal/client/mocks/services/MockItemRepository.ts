@@ -488,7 +488,7 @@ export class MockItemRepository {
           numberAttribute: 3,
           multivaluedNumberAttribute: [3, 1],
           timeAttribute: 86400000,
-          multivaluedTimeAttribute: [0, 86400000],
+          multivaluedTimeAttribute: [0, 86400000, null],
           stateAttribute: 'First',
           multivaluedStateAttribute: ['First', 'Second'],
           usernameAttribute: 'admin',
