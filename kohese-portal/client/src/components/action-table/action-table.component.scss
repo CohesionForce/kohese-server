@@ -1,6 +1,11 @@
+// Individual row highlight on click
+mat-row:focus {
+  background-color: lightgray;
+}
+
 // Highlights row when mouse hovers over it
 mat-row:hover {
-  background-color: lightgray;
+  background-color: rgb(230,230,230);
 }
 
 // Buttons are initially hidden

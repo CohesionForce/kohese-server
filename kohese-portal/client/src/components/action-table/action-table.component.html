@@ -77,8 +77,7 @@
           (click)="displayInformation(action.proxy)">
           <mat-icon class="fa fa-clone"></mat-icon>
         </button>
-        <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
-          (click)="$event.stopPropagation();">
+        <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu">
           <mat-icon class="fa fa-bars"></mat-icon>
         </button>
         <mat-menu #menu="matMenu" [overlapTrigger]="false">
@@ -99,5 +98,5 @@
 
   <mat-header-row style="position: sticky; top: 0;
     background-color: inherit; z-index: 1;" *matHeaderRowDef="rowDef"></mat-header-row>
-  <mat-row *matRowDef="let action; columns: rowDef"></mat-row>
+  <mat-row *matRowDef="let action; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
 </mat-table>
