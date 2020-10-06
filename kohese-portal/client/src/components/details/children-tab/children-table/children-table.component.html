@@ -51,6 +51,8 @@
   <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
   <mat-row *matRowDef="let proxy; columns: rowDef" draggable="true"
     (dragstart)="$event.dataTransfer.setData('id', proxy.item.id)" (dragover)="$event.preventDefault()"
-    (drop)="whenDropOccurs(proxy, $event)">
+    (drop)="whenDropOccurs(proxy, $event)"
+    (contextmenu)="onContextMenu($event, contextMenuComponent)">
+    <context-menu #contextMenuComponent [menuItems]="getMenuItems(proxy)"></context-menu>
   </mat-row>
 </mat-table>
