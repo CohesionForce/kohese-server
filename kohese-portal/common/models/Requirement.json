@@ -1,0 +1,108 @@
+{
+  "id": "Requirement",
+  "name": "Requirement",
+  "description": "Contains the attributes necessary to define a requirement.",
+  "parentId": "Decision",
+  "namespace": {
+    "id": "com.kohese"
+  },
+  "base": "Decision",
+  "idInjection": true,
+  "properties": {
+    "TestMethod": {
+      "name": "TestMethod",
+      "type": [
+        "TestMethodType"
+      ],
+      "required": false,
+      "relation": {
+        "contained": true
+      }
+    },
+    "TestLevel": {
+      "name": "TestLevel",
+      "type": "TestLevelType",
+      "required": false,
+      "relation": {
+        "contained": true
+      }
+    },
+    "BuildAllocation": {
+      "name": "BuildAllocation",
+      "type": [
+        "Decision"
+      ],
+      "required": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    },
+    "Safety": {
+      "name": "Safety",
+      "type": "boolean",
+      "required": false,
+      "default": null
+    },
+    "Security": {
+      "name": "Security",
+      "type": "boolean",
+      "required": false,
+      "default": null
+    },
+    "Privacy": {
+      "name": "Privacy",
+      "type": "boolean",
+      "required": false,
+      "default": null
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": [],
+  "localTypes": {
+    "TestMethodType": {
+      "metatype": "Enumeration",
+      "id": "TestMethodType",
+      "name": "TestMethodType",
+      "values": [
+        {
+          "name": "Analysis",
+          "description": ""
+        },
+        {
+          "name": "Demonstration",
+          "description": ""
+        },
+        {
+          "name": "Inspection",
+          "description": ""
+        },
+        {
+          "name": "Test",
+          "description": ""
+        }
+      ]
+    },
+    "TestLevelType": {
+      "metatype": "Enumeration",
+      "id": "TestLevelType",
+      "name": "TestLevelType",
+      "values": [
+        {
+          "name": "Unit",
+          "description": ""
+        },
+        {
+          "name": "SI",
+          "description": ""
+        },
+        {
+          "name": "System",
+          "description": ""
+        }
+      ]
+    }
+  }
+}
