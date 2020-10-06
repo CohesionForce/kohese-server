@@ -10,12 +10,10 @@
         <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
         <mat-cell *matCellDef="let reference"> {{reference.item.name}}</mat-cell>
       </ng-container>
-
       <ng-container matColumnDef="state">
         <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
         <mat-cell *matCellDef="let reference">{{reference.state}}</mat-cell>
       </ng-container>
-
       <ng-container matColumnDef="description">
         <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
         <mat-cell *matCellDef="let reference"> {{reference.item.description | truncate : 30}}</mat-cell>
