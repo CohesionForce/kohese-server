@@ -75,4 +75,11 @@ describe('FormatObjectEditorComponent', () => {
       'multivaluedGlobalTypeAttribute'][0].id).item, 'globalTypeAttribute')).
       toBe('[object Object]');
   });
+
+  it('retrieves the Field corresponding to the given attribute name', () => {
+    expect(component.getField('globalTypeAttribute', false).propertyDefinition.
+      propertyName).toBe('globalTypeAttribute');
+    expect(component.getField('multivaluedGlobalTypeAttribute', true).
+      propertyDefinition.propertyName).toBe('multivaluedGlobalTypeAttribute');
+  });
 });

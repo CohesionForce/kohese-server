@@ -248,19 +248,6 @@
             <mat-icon class="fa fa-ellipsis-h"></mat-icon>
           </button>
         </ng-template>
-        <ng-container *ngIf="(!isLocalTypeAttribute() || koheseObject[
-          isVariantField ? 'value' : propertyDefinition.propertyName])">
-          <button mat-icon-button matTooltip="Remove the selection for
-            {{propertyDefinition.propertyName}}"
-            [disabled]="(!propertyDefinition.editable || (koheseObject[
-            isVariantField ? 'value' : propertyDefinition.propertyName] ==
-            null))" [ngStyle]="{ 'margin-left': (koheseObject[isVariantField ?
-            'value' : propertyDefinition.propertyName] ? 'auto' : '') }"
-            (click)="koheseObject[isVariantField ? 'value' :
-            propertyDefinition.propertyName] = undefined">
-            <mat-icon class="fa fa-times"></mat-icon>
-          </button>
-        </ng-container>
       </ng-template>
     </div>
   </ng-container>
