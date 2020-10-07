@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input,
-  OnInit, Optional } from '@angular/core';
+  OnInit, Optional, QueryList, ViewChildren } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { FormatContainer, FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
@@ -8,6 +8,9 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { Field } from './field/field.class';
+import { MultivaluedFieldComponent } from './field/multivalued-field/multivalued-field.component';
+import { SinglevaluedFieldComponent } from './field/singlevalued-field/singlevalued-field.component';
 
 @Component({
   selector: 'format-object-editor',
@@ -171,7 +174,15 @@ export class FormatObjectEditorComponent implements OnInit {
   get itemRepository() {
     return this._itemRepository;
   }
-  
+
+  @ViewChildren(SinglevaluedFieldComponent)
+  private _singlevaluedFieldComponentQueryList:
+    QueryList<SinglevaluedFieldComponent>;
+
+  @ViewChildren(MultivaluedFieldComponent)
+  private _multivaluedFieldComponentQueryList:
+    QueryList<MultivaluedFieldComponent>;
+
   get Array() {
     return Array;
   }
@@ -301,7 +312,32 @@ export class FormatObjectEditorComponent implements OnInit {
       return String(row[columnId]);
     };
   }
-  
+
+  /**
+   * Returns the Field (either a SinglevaluedFieldComponent instance or a
+   * MultivaluedFieldComponent instance) corresponding to the attribute name.
+   * The given ```boolean``` should indicate whether the corresponding
+   * attribute is single-valued or multi-valued.
+   * 
+   * @param attributeName
+   * @param isMultivalued
+   */
+  public getField(attributeName: string, isMultivalued: boolean): Field {
+    if (isMultivalued) {
+      return this._multivaluedFieldComponentQueryList.toArray().find(
+        (multivaluedFieldComponent: MultivaluedFieldComponent) => {
+        return (multivaluedFieldComponent.propertyDefinition.propertyName ===
+          attributeName);
+      });
+    } else {
+      return this._singlevaluedFieldComponentQueryList.toArray().find(
+        (singlevaluedFieldComponent: SinglevaluedFieldComponent) => {
+        return (singlevaluedFieldComponent.propertyDefinition.propertyName ===
+          attributeName);
+      });
+    }
+  }
+
   public isObjectValid(): boolean {
     for (let attributeName in this._selectedType.classProperties) {
       let attributeValue: any = this._object[attributeName];

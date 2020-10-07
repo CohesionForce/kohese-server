@@ -104,4 +104,11 @@ describe('FormatObjectEditorComponent', () => {
       TreeConfiguration.getWorkingTree().getProxyFor('Issue').item,
       TreeConfiguration.getWorkingTree().getProxyFor('Observation').item]);
   });
+
+  it('retrieves the Field corresponding to the given attribute name', () => {
+    expect(component.getField('globalTypeAttribute', false).propertyDefinition.
+      propertyName).toBe('globalTypeAttribute');
+    expect(component.getField('multivaluedGlobalTypeAttribute', true).
+      propertyDefinition.propertyName).toBe('multivaluedGlobalTypeAttribute');
+  });
 });

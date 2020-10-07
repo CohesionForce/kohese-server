@@ -91,6 +91,10 @@ export class Field {
     return Metatype;
   }
 
+  get changeDetectorRef() {
+    return this._changeDetectorRef;
+  }
+
   get itemRepository() {
     return this._itemRepository;
   }
