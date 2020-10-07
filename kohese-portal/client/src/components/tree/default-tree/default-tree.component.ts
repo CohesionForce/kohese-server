@@ -145,11 +145,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             let processItemProxy: (itemProxy: ItemProxy) => void = (itemProxy:
               ItemProxy) => {
               initialContent += this._itemRepository.getMarkdownRepresentation(
-                itemProxy.item, undefined, itemProxy.model.item, this.
-                _itemRepository.getTreeConfig().getValue().config.getProxyFor(
-                'view-' + itemProxy.kind.toLowerCase()).item,
-                FormatDefinitionType.DOCUMENT, itemProxy.getDepthFromAncestor(
-                object as ItemProxy), reportSpecifications.addLinks);
+                itemProxy.item, undefined, itemProxy.model.item, itemProxy.
+                model.view.item, FormatDefinitionType.DOCUMENT, itemProxy.
+                getDepthFromAncestor(object as ItemProxy),
+                reportSpecifications.addLinks);
             };
             
             if (reportSpecifications.includeDescendants) {
@@ -180,17 +179,6 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(analyzeAction);
     this.menuActions.unshift(analyzeAction);
-    
-    let openAsDocumentAction: Action = new Action('Open As Document', 'Open ' +
-      'this Item and its descendants as a document', 'fa fa-file-text-o',
-      (object: any) => {
-      return !(object as ItemProxy).internal;
-    }, (object: any) => {
-      this._navigationService.navigate('Document',
-        { id: (object as ItemProxy).item.id });
-    });
-    this.rootMenuActions.unshift(openAsDocumentAction);
-    this.menuActions.unshift(openAsDocumentAction);
     
     let importAction: Action = new Action('Import...', 'Import one or more ' +
       'files as children of this Item', 'fa fa-file-o', (object: any) => {

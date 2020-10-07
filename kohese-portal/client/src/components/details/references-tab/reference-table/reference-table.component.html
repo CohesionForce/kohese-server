@@ -10,19 +10,35 @@
         <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
         <mat-cell *matCellDef="let reference"> {{reference.item.name}}</mat-cell>
       </ng-container>
-
       <ng-container matColumnDef="state">
         <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
         <mat-cell *matCellDef="let reference">{{reference.state}}</mat-cell>
       </ng-container>
-
       <ng-container matColumnDef="description">
         <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
         <mat-cell *matCellDef="let reference"> {{reference.item.description | truncate : 30}}</mat-cell>
       </ng-container>
-
+      <ng-container matColumnDef="Nav">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let reference" style="display: flex; justify-content: flex-end;">
+          <div class="hidden-buttons">
+            <!-- div and class for scss styling -->
+            <button mat-icon-button matTooltip="Open pop-up" (click)="displayInformation(reference)">
+              <mat-icon class="fa fa-clone"></mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Navigate to Explorer"
+              (click)="navigationService.navigate('Explore', { id: reference.item.id })">
+              <mat-icon class="fa fa-arrow-right"></mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Navigate to New Tab"
+              (click)="navigationService.addTab('Explore', { id: reference.item.id })">
+              <mat-icon class="fa fa-external-link"></mat-icon>
+            </button>
+          </div>
+        </mat-cell>
+      </ng-container>
       <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
-      <mat-row (click)="customNavigation('Explore', {id:proxy.item.id})" *matRowDef="let proxy; columns: rowDef">
+      <mat-row *matRowDef="let proxy; columns: rowDef">
       </mat-row>
     </mat-table>
   </div>

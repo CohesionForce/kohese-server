@@ -5,7 +5,9 @@
         (click)="navigate('Dashboard', {})">
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
-                                          'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState) || (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
+                    'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState)  ||
+                                            (State.USER_LOCKED_OUT === itemRepositoryState) ||
+                                            (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
         (click)="navigate('Dashboard', {})">
         Dashboard
         <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
@@ -15,32 +17,26 @@
       <span class="navbar-brand" (click)="navigate('Explore', {id : ''})">
         Explorer
       </span>
-      <span class="navbar-brand" (click)="navigate('Document', { id: '' })">
-        Document
-      </span>
       <span class="navbar-brand" (click)="navigate('Reports', {})">
         Reports
       </span>
     </div>
     <div class="nav navbar-top-links navbar-right">
-      <ng-container *ngIf="(modifiedItems.length > 0)">
+      <ng-container *ngIf="(modifiedProxies.length > 0)">
         <button mat-icon-button [matMenuTriggerFor]="modifiedItemsMenu">
           <img src="assets/icons/versioncontrol/dirty.ico"/>
         </button>
+        <mat-menu #modifiedItemsMenu="matMenu" [overlapTrigger]="false">
+          <ng-container *ngFor="let modifiedProxy of modifiedProxies">
+            <button mat-menu-item (click)="navigate('Explore',
+              { id: modifiedProxy.item.id })">
+              <mat-icon class="{{modifiedProxy.model.view.item.icon}}">
+              </mat-icon>
+              {{modifiedProxy.item.name}}
+            </button>
+          </ng-container>
+        </mat-menu>
       </ng-container>
-      <mat-menu #modifiedItemsMenu="matMenu" [overlapTrigger]="false">
-        <ng-container *ngFor="let modifiedItem of modifiedItems">
-          <button mat-menu-item (click)="navigate('Explore',
-            { id: modifiedItem.id })">
-            <mat-icon class="{{itemRepository.getTreeConfig().getValue().
-              config.getProxyFor('view-' + itemRepository.getTreeConfig().
-              getValue().config.getProxyFor(modifiedItem.id).kind.
-              toLowerCase()).item.icon}}">
-            </mat-icon>
-            {{modifiedItem.name}}
-          </button>
-        </ng-container>
-      </mat-menu>
       <button mat-button [matMenuTriggerFor]="notificationMenu">
         <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
           [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>

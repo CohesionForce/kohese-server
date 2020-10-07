@@ -14,17 +14,20 @@
     "password": {
       "type": "string",
       "required": true,
-      "hidden": true
+      "hidden": true,
+      "name": "password"
     },
     "email": {
       "type": "string",
-      "required": false
+      "required": false,
+      "name": "email"
     },
     "username": {
       "type": "string",
       "derived": true,
       "id": true,
-      "calculated": "name"
+      "calculated": "name",
+      "name": "username"
     }
   },
   "validations": [],

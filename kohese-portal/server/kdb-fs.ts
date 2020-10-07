@@ -7,6 +7,29 @@ let fs = require('fs');
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function loadJSONDocIfItExists(filePath) {
+
+  //  console.log('::: Loading ' + filePath);
+
+  try {
+    if (fs.existsSync(filePath)){
+      var fileData = fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
+      var jsonObject = JSON.parse(fileData);
+      return jsonObject;
+    } else {
+      return undefined;
+    }
+  } catch (err){
+    console.log('*** Error processing file:  ' + filePath);
+    throw err;
+  }
+
+}
+module.exports.loadJSONDocIfItExists = loadJSONDocIfItExists;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function loadJSONDoc(filePath) {
 
 //  console.log('::: Loading ' + filePath);

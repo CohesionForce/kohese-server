@@ -2,15 +2,11 @@
   "id": "KeyEvent",
   "name": "KeyEvent",
   "description": "This Kind allows for the definition of the attributes associated with a Key Event.",
-  "parentId": "Decision",
-  "createdBy": "gmckune",
-  "createdOn": 1566607211922,
-  "modifiedBy": "gmckune",
-  "modifiedOn": 1586900797128,
+  "parentId": "Requirement",
   "namespace": {
     "id": "com.kohese"
   },
-  "base": "Decision",
+  "base": "Requirement",
   "idInjection": true,
   "properties": {
     "DetectionMechanism": {

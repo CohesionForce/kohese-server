@@ -22,6 +22,7 @@ import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
+import { KoheseView } from '../../../../common/src/KoheseView';
 
 import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback } from 'rxjs';
 
@@ -34,6 +35,7 @@ import { KoheseDataModel,
 
 export enum RepoStates {
   DISCONNECTED,
+  USER_LOCKED_OUT,
   SYNCHRONIZING,
   SYNCHRONIZATION_FAILED,
   KOHESEMODELS_SYNCHRONIZED,
@@ -143,6 +145,8 @@ export class ItemRepository {
 
     console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
     this._worker = new SharedWorker(cacheWorkerBundle);
+
+    // Set up the worker messaging
     this._worker.port.addEventListener('message', (messageEvent: any) => {
 
       let msg: any = messageEvent.data;
@@ -178,22 +182,37 @@ export class ItemRepository {
           );
 
           break;
+
+        case 'userLockedOut':
+
+          this.updateRepositorySyncState(
+            RepoStates.USER_LOCKED_OUT,
+            'User is locked out'
+          );
+
+          break;
+
         case 'verifyConnection':
           this.sendMessageToWorker('connectionVerification', undefined, false);
           break;
+
         case 'update':
           this.buildOrUpdateProxy(msg.data.item, msg.data.kind, msg.data.status);
           break;
+
         case 'updateItemStatus':
           this.updateItemStatus(msg.data.itemId, msg.data.status);
           break;
+
         case 'deletion':
           TreeConfiguration.getWorkingTree().getProxyFor(msg.data.id).deleteItem();
           break;
+
         case 'cachePiece':
           const cachePiece: any = msg.data;
           this.processCachePiece(cachePiece);
           break;
+
         default:
           console.log('*** Received unexpected message: ' + msg.message);
           console.log(messageEvent);
@@ -206,6 +225,12 @@ export class ItemRepository {
       }
     });
 
+    // Try to notify cacheWorker if the tab is closing
+    addEventListener( 'unload', () => {
+      this.sendMessageToWorker('tabIsClosing', undefined, false)
+    });
+
+    // Establish the Item Repository
     ItemCache.setItemCache(this._cache);
     this._worker.port.start();
 
@@ -282,6 +307,9 @@ export class ItemRepository {
         const fundamentalItemsResponse = await this.sendMessageToWorker(
           'getFundamentalItems', { refresh: false }, true);
         this.processBulkUpdate(fundamentalItemsResponse.data);
+        KoheseModel.modelDefinitionLoadingComplete();
+        this.updateRepositorySyncState(RepoStates.KOHESEMODELS_SYNCHRONIZED,
+          'KoheseModels are available for use');
 
         let afterSyncMetaModels = Date.now();
         console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
@@ -434,6 +462,8 @@ export class ItemRepository {
       } else {
         if (kind === 'KoheseModel') {
           proxy = new KoheseModel(item);
+        } else if (kind === 'KoheseView') {
+          proxy = new KoheseView(item);
         } else {
           proxy = new ItemProxy(kind, item);
         }
@@ -553,6 +583,8 @@ export class ItemRepository {
         let iProxy;
         if (kind === 'KoheseModel') {
           iProxy = new KoheseModel(item);
+        } else if (kind === 'KoheseView') {
+          new KoheseView(item, TreeConfiguration.getWorkingTree());
         } else {
           try {
             iProxy = new ItemProxy(kind, item);
@@ -565,13 +597,6 @@ export class ItemRepository {
           }
         }
       }
-      if (kind === 'KoheseView') {
-        KoheseModel.modelDefinitionLoadingComplete();
-        this.updateRepositorySyncState(
-          RepoStates.KOHESEMODELS_SYNCHRONIZED,
-          'KoheseModels are available for use'
-        );
-      }
     }
 
     if (response.addItems) {
@@ -579,7 +604,8 @@ export class ItemRepository {
         let iProxy;
         if (addedItem.kind === 'KoheseModel') {
           iProxy = new KoheseModel(addedItem.item);
-
+        } else if (addedItem.kind === 'KoheseView') {
+          new KoheseView(addedItem.item);
         } else {
           iProxy = new ItemProxy(addedItem.kind, addedItem.item);
         }
@@ -591,6 +617,8 @@ export class ItemRepository {
         let iProxy;
         if (changededItem.kind === 'KoheseModel') {
           iProxy = new KoheseModel(changededItem.item);
+        } else if (changededItem.kind === 'KoheseView') {
+          new KoheseView(changededItem.item);
         } else {
           iProxy = new ItemProxy(changededItem.kind, changededItem.item);
         }
@@ -716,6 +744,8 @@ export class ItemRepository {
           if (!item.id) {
             if (type === 'KoheseModel') {
               proxy = new KoheseModel(response.item);
+            } else if (type === 'KoheseView') {
+              proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
             } else {
               proxy = new ItemProxy(response.kind, response.item);
             }
@@ -820,13 +850,13 @@ export class ItemRepository {
 	  if (formatDefinitionId) {
 	    formatDefinition = viewModel.formatDefinitions[formatDefinitionId];
 	  } else {
-	    let treeConfiguration: TreeConfiguration = this.getTreeConfig().
+	    let treeConfiguration: TreeConfiguration = this.currentTreeConfigSubject.
 	      getValue().config;
 	    let dataModelItemProxy: ItemProxy = treeConfiguration.getProxyFor(
 	      dataModel.id);
 	    while (dataModelItemProxy) {
-	      let ancestorViewModel: any = treeConfiguration.getProxyFor(
-	        'view-' + dataModelItemProxy.item.name.toLowerCase()).item;
+        let ancestorViewModel: any = (dataModelItemProxy as KoheseModel).view.
+          item;
 	      formatDefinitionId = ancestorViewModel.defaultFormatKey[
 	        formatDefinitionType];
 	      if (formatDefinitionId) {
@@ -846,7 +876,7 @@ export class ItemRepository {
 	  }
 
     let globalTypeNames: Array<string> = [];
-    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
+    this.currentTreeConfigSubject.getValue().config.getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
       if (itemProxy.kind === 'KoheseModel') {
         globalTypeNames.push(itemProxy.item.name);
@@ -893,8 +923,9 @@ export class ItemRepository {
         representation += '\n\n<table><tr><th>' +
           'Name</th></tr>';
 
-        let reverseReferencesObject: any = TreeConfiguration.getWorkingTree().
-          getProxyFor(koheseObject.id).relations.referencedBy;
+        let reverseReferencesObject: any = this.currentTreeConfigSubject.
+          getValue().config.getProxyFor(koheseObject.id).relations.
+          referencedBy;
         for (let j: number = 0; j < formatContainer.contents.length; j++) {
           let propertyDefinition: PropertyDefinition = formatContainer.
             contents[j];
@@ -972,17 +1003,16 @@ export class ItemRepository {
                     attributeTypeDataModel = (enclosingType ? enclosingType :
                       dataModel).classLocalTypes[typeName].definition;
                     attributeTypeViewModel = this.currentTreeConfigSubject.
-                      getValue().config.getProxyFor('view-' + (enclosingType ?
+                      getValue().config.getProxyFor((enclosingType ?
                       enclosingType : dataModel).classLocalTypes[typeName].
-                      definedInKind.toLowerCase()).item.localTypes[typeName];
+                      definedInKind).view.item.localTypes[typeName];
                     tableDefinition = attributeTypeViewModel.tableDefinitions[
                       propertyDefinition.tableDefinition];
                   } else {
                     attributeTypeDataModel = this.currentTreeConfigSubject.
                       getValue().config.getProxyFor(typeName).item;
                     attributeTypeViewModel = this.currentTreeConfigSubject.
-                      getValue().config.getProxyFor('view-' + typeName.
-                      toLowerCase()).item;
+                      getValue().config.getProxyFor(typeName).view.item;
                     tableDefinition = attributeTypeViewModel.tableDefinitions[
                       propertyDefinition.tableDefinition];
                   }
@@ -999,8 +1029,8 @@ export class ItemRepository {
                     if (isLocalTypeAttribute) {
                       reference = value[l];
                     } else {
-                      reference = TreeConfiguration.getWorkingTree().
-                        getProxyFor(value[l].id).item;
+                      reference = this.currentTreeConfigSubject.getValue().
+                        config.getProxyFor(value[l].id).item;
                     }
 
                     body += '<tr style="vertical-align: top;">';
@@ -1057,8 +1087,8 @@ export class ItemRepository {
                         definition;
                       let localTypeViewModel: any = this.
                         currentTreeConfigSubject.getValue().config.getProxyFor(
-                        'view-' + classLocalTypesEntry.definedInKind.
-                        toLowerCase()).item.localTypes[type];
+                        classLocalTypesEntry.definedInKind).view.item.
+                        localTypes[type];
                       switch (localTypeDataModel.metatype) {
                         case Metatype.STRUCTURE:
                           if (Array.isArray(value)) {
@@ -1126,8 +1156,9 @@ export class ItemRepository {
                           id = arrayComponent;
                         }
 
-                        stringComponents.push('* ' + TreeConfiguration.
-                          getWorkingTree().getProxyFor(id).item.name);
+                        stringComponents.push('* ' + this.
+                          currentTreeConfigSubject.getValue().config.
+                          getProxyFor(id).item.name);
                       }
 
                       body += stringComponents.join('\n');
@@ -1140,7 +1171,7 @@ export class ItemRepository {
                         id = value;
                       }
 
-                      body += TreeConfiguration.getWorkingTree().
+                      body += this.currentTreeConfigSubject.getValue().config.
                         getProxyFor(id).item.name;
                     }
                   }
@@ -1215,9 +1246,9 @@ export class ItemRepository {
       switch (classLocalTypes[type].definition.metatype) {
         case Metatype.ENUMERATION:
           return this.currentTreeConfigSubject.getValue().config.getProxyFor(
-            'view-' + classLocalTypes[type].definedInKind.toLowerCase()).item.
-            localTypes[type].values[classLocalTypes[type].definition.values.
-            map((enumerationValue: EnumerationValue) => {
+            classLocalTypes[type].definedInKind).view.item.localTypes[type].
+            values[classLocalTypes[type].definition.values.map(
+            (enumerationValue: EnumerationValue) => {
             return enumerationValue.name;
           }).indexOf(value)];
       }
@@ -1232,8 +1263,8 @@ export class ItemRepository {
           return value.id;
         } else {
           viewModel = this.currentTreeConfigSubject.getValue().config.
-            getProxyFor('view-' + classLocalTypes[type].definedInKind.
-            toLowerCase()).item.localTypes[type];
+            getProxyFor(classLocalTypes[type].definedInKind).view.item.
+            localTypes[type];
           let formatDefinitionId: string = viewModel.defaultFormatKey[
             formatDefinitionType];
           if (!formatDefinitionId) {
@@ -1248,8 +1279,6 @@ export class ItemRepository {
               containers[0].kind !== FormatContainerKind.
               REVERSE_REFERENCE_TABLE) && (formatDefinition.containers[0].
               contents.length > 0)) {
-              let propertyDefinition: PropertyDefinition = formatDefinition.
-                containers[0].contents[0];
               if (classLocalTypes[type].definition.metatype === Metatype.
                 VARIANT) {
                 formatDefinitionId = viewModel.defaultFormatKey[
@@ -1293,14 +1322,22 @@ export class ItemRepository {
                   }
                 }
               } else {
-                return propertyDefinition.customLabel + ': ' + String(value[
-                  propertyDefinition.propertyName]);
+                let propertyDefinition: PropertyDefinition = formatDefinition.
+                  containers[0].contents[0];
+                return propertyDefinition.customLabel + ': ' + this.
+                  getStringRepresentation(value, propertyDefinition.
+                  propertyName, undefined, (enclosingType ? enclosingType :
+                  dataModel), classLocalTypes[type].definition, viewModel,
+                  formatDefinitionType);
               }
             }
           }
 
           let firstAttributeName: string = Object.keys(value)[0];
-          return firstAttributeName + ': ' + String(value[firstAttributeName]);
+          return firstAttributeName + ': ' + this.getStringRepresentation(
+            value, firstAttributeName, undefined, (enclosingType ?
+            enclosingType : dataModel), classLocalTypes[type].definition,
+            viewModel, formatDefinitionType);
         }
       } else {
         return this.currentTreeConfigSubject.getValue().config.getProxyFor(
