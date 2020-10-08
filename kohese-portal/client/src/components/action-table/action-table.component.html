@@ -43,30 +43,31 @@
   <ng-container matColumnDef="estimatedHoursEffort">
     <mat-header-cell *matHeaderCellDef> Estimated Hours </mat-header-cell>
     <mat-cell *matCellDef="let action">
-      <editable-cell [column]="'estimatedHoursEffort'" [action]="action" [rowActionStream]="rowActionStream"
-        [editableStream]="editableStream"></editable-cell>
+      <ng-container *ngIf="action.proxy.kind === 'Action' || action.proxy.kind === 'Task' else noEstimatedHours">
+        {{ action.proxy.item.estimatedHoursEffort }}
+      </ng-container>
+      <ng-template #noEstimatedHours>---</ng-template>
     </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="remainingHoursEffort">
     <mat-header-cell *matHeaderCellDef> Remaining Hours </mat-header-cell>
     <mat-cell *matCellDef="let action">
-      <editable-cell [column]="'remainingHoursEffort'" [action]="action" [rowActionStream]="rowActionStream"
-        [editableStream]="editableStream"></editable-cell>
+      <ng-container *ngIf="action.proxy.kind === 'Action' || action.proxy.kind === 'Task' else noRemainingHours">
+        {{ action.proxy.item.remainingHoursEffort }}
+      </ng-container>
+      <ng-template #noRemainingHours>---</ng-template>
     </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="actualHoursEffort">
     <mat-header-cell *matHeaderCellDef> Actual Hours </mat-header-cell>
     <mat-cell *matCellDef="let action">
-      <editable-cell [column]="'actualHoursEffort'" [action]="action" [rowActionStream]="rowActionStream"
-        [editableStream]="editableStream"></editable-cell>
+      <ng-container *ngIf="action.proxy.kind === 'Action' || action.proxy.kind === 'Task' else noActualHours">
+        {{ action.proxy.item.actualHoursEffort }}
+      </ng-container>
+      <ng-template #noActualHours>---</ng-template>
     </mat-cell>
-  </ng-container>
-
-  <ng-container matColumnDef="actions" *ngIf="editable">
-    <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
-    <mat-cell *matCellDef="let action" style="z-index: 10"></mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="nav">
@@ -97,6 +98,6 @@
   </ng-container>
 
   <mat-header-row style="position: sticky; top: 0;
-    background-color: inherit; z-index: 1;" *matHeaderRowDef="rowDef"></mat-header-row>
+    background-color: inherit; z-index: 1;" *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
   <mat-row *matRowDef="let action; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
 </mat-table>
