@@ -16,9 +16,18 @@
             ellipsis; text-align: left;">
             {{namespace.name}}
           </button>
+          <ng-container *ngIf="(itemRepository.getTreeConfig().getValue().
+            config.getProxyFor(namespace.id).dirty === true)">
+            <button mat-icon-button [disabled]="true" style="margin-left:
+              auto;">
+              <img src="assets/icons/versioncontrol/dirty.ico" />
+            </button>
+          </ng-container>
           <ng-container *ngIf="(namespace.preventModification !== true)">
             <button mat-icon-button matTooltip="Remove this Namespace"
-              (click)="remove(namespace)" style="margin-left: auto;">
+              (click)="remove(namespace)" [ngStyle]="{ 'margin-left':
+              ((itemRepository.getTreeConfig().getValue().config.getProxyFor(
+              namespace.id).dirty === true) ? '' : 'auto') }">
               <mat-icon class="fa fa-trash"></mat-icon>
             </button>
           </ng-container>
@@ -31,9 +40,17 @@
       <div style="margin: 0px 3px 0px 3px;">
         <div style="display: flex; flex-direction: row;">
           <button mat-icon-button matTooltip="Save this Namespace"
+            [disabled]="(itemRepository.getTreeConfig().getValue().config.
+            getProxyFor(selectedNamespace.id).dirty === false)"
             (click)="itemRepository.upsertItem('Namespace', selectedNamespace)"
             style="margin-left: auto;" [disabled]="!isValid()">
             <mat-icon class="fa fa-save"></mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Discard changes"
+            [disabled]="(itemRepository.getTreeConfig().getValue().config.
+            getProxyFor(selectedNamespace.id).dirty === false)"
+            (click)="discardChanges(selectedNamespace)">
+            <mat-icon class="fa fa-times"></mat-icon>
           </button>
         </div>
         <mat-form-field style="width: 100%;">
