@@ -173,19 +173,23 @@ export class NamespaceEditorComponent implements Dialog {
       getTreeConfig().getValue().config;
     treeConfiguration.getProxyFor('Model-Definitions').visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
-      if (itemProxy.kind === 'Namespace') {
-        let namespaceItemProxy: ItemProxy = itemProxy;
-        while (namespaceItemProxy != null) {
-          if (namespaceItemProxy.item === this._selectedNamespace) {
-            unselectableSubcomponents.push(itemProxy);
-            break;
-          }
-
-          namespaceItemProxy = namespaceItemProxy.parentProxy;
-        }
-      } else if (itemProxy.item['namespace'].id === this._selectedNamespace.
-        id) {
+      if (itemProxy.item.preventModification) {
         unselectableSubcomponents.push(itemProxy);
+      } else {
+        if (itemProxy.kind === 'Namespace') {
+          let namespaceItemProxy: ItemProxy = itemProxy;
+          while (namespaceItemProxy != null) {
+            if (namespaceItemProxy.item === this._selectedNamespace) {
+              unselectableSubcomponents.push(itemProxy);
+              break;
+            }
+  
+            namespaceItemProxy = namespaceItemProxy.parentProxy;
+          }
+        } else if (itemProxy.item['namespace'].id === this._selectedNamespace.
+          id) {
+          unselectableSubcomponents.push(itemProxy);
+        }
       }
     }, undefined);
 
