@@ -45,8 +45,6 @@ describe('Component: Action Table', ()=>{
     let proxy: ItemProxy = itemRepository.getRootProxy();
 
     actionTableComponent.proxyStream = new BehaviorSubject<any>(proxy);
-    actionTableComponent.editableStream = new BehaviorSubject<boolean>(true);
-
     actionTableFixture.detectChanges();
 
   })

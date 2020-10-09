@@ -53,7 +53,7 @@
           Details
           &nbsp;
           <img *ngIf="itemProxy.dirty"src="assets/icons/versioncontrol/dirty.ico"/>
-        </ng-template>    
+        </ng-template>
         <ng-template matTabContent>
           <format-object-editor [object]="itemProxy.item" [type]="itemProxy.
             model.item" [formatDefinitionType]="FormatDefinitionType.DEFAULT"
@@ -83,9 +83,7 @@
       </mat-tab>
       <mat-tab label="Action Table" *ngIf="itemProxy.children">
         <ng-template matTabContent>
-          <action-table [proxyStream]="proxyStream"
-            [editableStream]="editableStream">
-          </action-table>
+          <action-table [proxyStream]="proxyStream"></action-table>
         </ng-template>
       </mat-tab>
       <mat-tab label="Raw Data">
