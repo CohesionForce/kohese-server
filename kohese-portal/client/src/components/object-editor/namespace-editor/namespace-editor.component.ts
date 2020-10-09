@@ -44,7 +44,7 @@ export class NamespaceEditorComponent implements Dialog {
 
   /**
    * @see Dialog.interface.ts
-   * 
+   *
    * @param accept
    */
   public close(accept: boolean): any {
@@ -65,7 +65,7 @@ export class NamespaceEditorComponent implements Dialog {
   /**
    * Returns an Array containing all Namespaces except the selected Namespace
    * should a parameter of ```true``` be passed
-   * 
+   *
    * @param excludeSelectedNamespace
    */
   public getNamespaces(excludeSelectedNamespace: boolean): Array<any> {
@@ -90,33 +90,36 @@ export class NamespaceEditorComponent implements Dialog {
    * Upon confirmation, removes the given Namespace and all of its descendants
    * from the system and adjusts all types that have a supertype of a type to
    * be removed
-   * 
+   *
    * @param namespace
    */
   public async remove(namespace: any): Promise<void> {
-    let proceed: boolean = await this._dialogService.openYesNoDialog(
-      'Remove ' + namespace.name, 'Removing ' + namespace.name + ' is to ' +
-      'remove all types and Namespaces contained within. Are you sure that ' +
-      'you want to remove ' + namespace.name + '?');
-    if (proceed) {
-      let namespaceItemProxy: ItemProxy = this._itemRepository.getTreeConfig().
-        getValue().config.getProxyFor(namespace.id);
-      let namespaceItemProxysToRemove: Array<ItemProxy> = [namespaceItemProxy,
-        ...namespaceItemProxy.getDescendants()];
-      let typeItemProxysToRemove: Array<ItemProxy> = [];
-      let modelDefinitionsItemProxy: ItemProxy = this._itemRepository.
-        getTreeConfig().getValue().config.getProxyFor('Model-Definitions');
-      // Collect all types that have a Namespace of a Namespace to be removed
-      modelDefinitionsItemProxy.visitTree({ includeOrigin: false }, (itemProxy:
-        ItemProxy) => {
-        if ((itemProxy.kind !== 'Namespace') && (namespaceItemProxysToRemove.
-          map((namespaceItemProxy: ItemProxy) => {
-            return namespaceItemProxy.item.id;
-        }).indexOf(itemProxy.item.namespace.id) !== -1)) {
-          typeItemProxysToRemove.push(itemProxy);
-        }
-      }, undefined);
+    let namespaceItemProxy: ItemProxy = this._itemRepository.getTreeConfig().
+      getValue().config.getProxyFor(namespace.id);
+    let namespaceItemProxysToRemove: Array<ItemProxy> = [namespaceItemProxy,
+      ...namespaceItemProxy.getDescendants()];
+    let typeItemProxysToRemove: Array<ItemProxy> = [];
+    let modelDefinitionsItemProxy: ItemProxy = this._itemRepository.
+      getTreeConfig().getValue().config.getProxyFor('Model-Definitions');
+    // Collect all types that have a Namespace of a Namespace to be removed
+    modelDefinitionsItemProxy.visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if ((itemProxy.kind !== 'Namespace') && (namespaceItemProxysToRemove.
+        map((namespaceItemProxy: ItemProxy) => {
+          return namespaceItemProxy.item.id;
+      }).indexOf(itemProxy.item.namespace.id) !== -1)) {
+        typeItemProxysToRemove.push(itemProxy);
+      }
+    }, undefined);
 
+    let proceed: boolean = await this._dialogService.openYesNoDialog(
+      'Remove ' + namespace.name, 'Removing ' + namespace.name + ' will ' +
+      'remove the following types and Namespaces: ' + typeItemProxysToRemove.
+      concat(namespaceItemProxysToRemove).map((itemProxy: ItemProxy) => {
+        return itemProxy.item.name;
+      }).join(', ') + '. Are you sure that you want to remove ' + namespace.
+      name + '?');
+    if (proceed) {
       // Adjust all types that have a supertype of a type that is to be removed
       modelDefinitionsItemProxy.visitTree({ includeOrigin: false },
         async (itemProxy: ItemProxy) => {
@@ -143,14 +146,28 @@ export class NamespaceEditorComponent implements Dialog {
     }
   }
 
+  public async discardChanges(item: any): Promise<void> {
+    await this._itemRepository.fetchItem(this._itemRepository.getTreeConfig().
+      getValue().config.getProxyFor(item.id));
+    this._changeDetectorRef.markForCheck();
+  }
+
   /**
    * Allows addition of Namespaces and, if the given boolean is false, types to
    * the selected Namespace
-   * 
+   *
    * @param allowNamespaceAdditionOnly
    */
   public async addSubcomponent(allowNamespaceAdditionOnly: boolean):
     Promise<void> {
+    let proceed: boolean = await this._dialogService.openYesNoDialog(
+      'Modifications To Be Saved', 'Adding subcomponents to this ' +
+      'Namespace will automatically save all changes to all added ' +
+      'subcomponents. Do you want to continue?');
+    if (!proceed) {
+      return;
+    }
+
     let treeConfiguration: TreeConfiguration = this._itemRepository.
       getTreeConfig().getValue().config;
     let results: Array<any> = await this._dialogService.openComponentsDialog(
@@ -184,14 +201,16 @@ export class NamespaceEditorComponent implements Dialog {
       }
     }], { data: {} }).updateSize('80%', '80%').afterClosed().toPromise();
     if (results) {
-      let selection: Array<any> = results[0];
-      for (let j: number = 0; j < selection.length; j++) {
-        if (selection[j].kind === 'Namespace') {
-          selection[j].item.parentId = this._selectedNamespace.id;
+      await Promise.all(results[0].map((element: any) => {
+        let itemProxy: ItemProxy = (element as ItemProxy);
+        if (itemProxy.kind === 'Namespace') {
+          itemProxy.item.parentId = this._selectedNamespace.id;
         } else {
-          selection[j].item.namespace.id = this._selectedNamespace.id;
+          itemProxy.item.namespace.id = this._selectedNamespace.id;
         }
-      }
+
+        return this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+      }));
 
       this._changeDetectorRef.markForCheck();
     }
