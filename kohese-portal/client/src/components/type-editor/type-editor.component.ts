@@ -32,7 +32,13 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
   }
   set selectedNamespace(selectedNamespace: any) {
     this._selectedNamespace = selectedNamespace;
-    this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
+    let namespaceTypes: Array<any> = this.getNamespaceTypes(this.
+      _selectedNamespace);
+    if (namespaceTypes.length > 0) {
+      this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
+    } else {
+      this._selectedType = null;
+    }
   }
 
   private _selectedType: any;
@@ -79,15 +85,14 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Returns an Array containing all Namespaces that contain at least one type
+   * Returns an Array containing all Namespaces
    */
   public getNamespaces(): Array<any> {
     let namespaces: Array<any> = [];
     this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
       ItemProxy) => {
-      if ((itemProxy.kind === 'Namespace') && (this.getNamespaceTypes(
-        itemProxy.item).length > 0)) {
+      if (itemProxy.kind === 'Namespace') {
         namespaces.push(itemProxy.item);
       }
     }, undefined);
