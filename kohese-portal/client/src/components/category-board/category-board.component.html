@@ -70,13 +70,29 @@
                     <img src="assets/icons/versioncontrol/dirty.ico" />
                   </button>
                 </ng-container>
-                <button mat-icon-button matTooltip="Display Item information" style="margin-left: auto;"
-                  (click)="displayInformation(item)">
-                  <mat-icon class="fa fa-search"></mat-icon>
+
+                <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
+                  style="margin-left: auto;"
+                  (click)="$event.stopPropagation();">
+                  <mat-icon class="fa fa-bars"></mat-icon>
                 </button>
-                <button mat-icon-button matTooltip="Navigate to this Item" (click)="navigate(item)">
-                  <mat-icon class="fa fa-arrow-right"></mat-icon>
-                </button>
+                <mat-menu #menu="matMenu" [overlapTrigger]="false">
+                  <button mat-menu-item
+                    (click)="displayInformation(item)">
+                    <mat-icon class="fa fa-clone"></mat-icon>
+                    Display Item information
+                  </button>
+                  <button mat-menu-item
+                    (click)="$event.stopPropagation(); navigationService.navigate('Explore', { id: item.id })">
+                    <mat-icon class="fa fa-arrow-right"></mat-icon>
+                    Navigate in Explorer
+                  </button>
+                  <button mat-menu-item
+                    (click)="$event.stopPropagation(); navigationService.addTab('Explore', { id: item.id })">
+                    <mat-icon class="fa fa-external-link"></mat-icon>
+                    Navigate in New Tab
+                  </button>
+                </mat-menu>
               </mat-panel-description>
             </mat-expansion-panel-header>
             <ng-template matExpansionPanelContent>

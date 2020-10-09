@@ -16,9 +16,18 @@
             ellipsis; text-align: left;">
             {{namespace.name}}
           </button>
+          <ng-container *ngIf="(itemRepository.getTreeConfig().getValue().
+            config.getProxyFor(namespace.id).dirty === true)">
+            <button mat-icon-button [disabled]="true" style="margin-left:
+              auto;">
+              <img src="assets/icons/versioncontrol/dirty.ico" />
+            </button>
+          </ng-container>
           <ng-container *ngIf="(namespace.preventModification !== true)">
             <button mat-icon-button matTooltip="Remove this Namespace"
-              (click)="remove(namespace)" style="margin-left: auto;">
+              (click)="remove(namespace)" [ngStyle]="{ 'margin-left':
+              ((itemRepository.getTreeConfig().getValue().config.getProxyFor(
+              namespace.id).dirty === true) ? '' : 'auto') }">
               <mat-icon class="fa fa-trash"></mat-icon>
             </button>
           </ng-container>
@@ -28,63 +37,73 @@
   </split-area>
   <split-area [size]="60">
     <ng-container *ngIf="selectedNamespace">
-      <div style="margin: 0px 3px 0px 3px;">
+      <div style="height: 100%; margin: 0px 3px 0px 3px;">
         <div style="display: flex; flex-direction: row;">
           <button mat-icon-button matTooltip="Save this Namespace"
+            [disabled]="(itemRepository.getTreeConfig().getValue().config.
+            getProxyFor(selectedNamespace.id).dirty === false)"
             (click)="itemRepository.upsertItem('Namespace', selectedNamespace)"
             style="margin-left: auto;" [disabled]="!isValid()">
             <mat-icon class="fa fa-save"></mat-icon>
           </button>
+          <button mat-icon-button matTooltip="Discard changes"
+            [disabled]="(itemRepository.getTreeConfig().getValue().config.
+            getProxyFor(selectedNamespace.id).dirty === false)"
+            (click)="discardChanges(selectedNamespace)">
+            <mat-icon class="fa fa-times"></mat-icon>
+          </button>
         </div>
-        <mat-form-field style="width: 100%;">
-          <input matInput type="text" placeholder="Name"
-            [(ngModel)]="selectedNamespace.name" [required]="true"/>
-        </mat-form-field>
-        <ng-container *ngIf="(selectedNamespace.preventModification !==
-          true)">
+        <div style="height: calc(100% - 40px); overflow-y: auto;">
           <mat-form-field style="width: 100%;">
-            <mat-select placeholder="Enclosing Namespace"
-              [(ngModel)]="selectedNamespace.parentId">
-              <ng-container *ngFor="let namespace of getNamespaces(true)">
-                <mat-option [value]="namespace.id">
-                  {{namespace.name}}
-                </mat-option>
-              </ng-container>
-            </mat-select>
+            <input matInput type="text" placeholder="Name"
+              [(ngModel)]="selectedNamespace.name" [required]="true"/>
           </mat-form-field>
-        </ng-container>
-        <mat-form-field style="width: 100%;">
-          <input matInput type="text" placeholder="Alias"
-            [(ngModel)]="selectedNamespace.alias"/>
-        </mat-form-field>
-        <mat-form-field style="width: 100%;">
-          <textarea matInput placeholder="Description"
-            [(ngModel)]="selectedNamespace.description">
-          </textarea>
-        </mat-form-field>
-        <div>
-          <div style="display: flex; flex-direction: row;">
-            <h3>
-              Subcomponents
-            </h3>
-            <button mat-icon-button style="margin-left: auto;" matTooltip="Add
-              a subcomponent" (click)="addSubcomponent(selectedNamespace.
-              preventModification === true)">
-              <mat-icon class="fa fa-plus"></mat-icon>
-            </button>
-          </div>
+          <ng-container *ngIf="(selectedNamespace.preventModification !==
+            true)">
+            <mat-form-field style="width: 100%;">
+              <mat-select placeholder="Enclosing Namespace"
+                [(ngModel)]="selectedNamespace.parentId">
+                <ng-container *ngFor="let namespace of getNamespaces(true)">
+                  <mat-option [value]="namespace.id">
+                    {{namespace.name}}
+                  </mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
+          </ng-container>
+          <mat-form-field style="width: 100%;">
+            <input matInput type="text" placeholder="Alias"
+              [(ngModel)]="selectedNamespace.alias"/>
+          </mat-form-field>
+          <mat-form-field style="width: 100%;">
+            <textarea matInput placeholder="Description"
+              [(ngModel)]="selectedNamespace.description">
+            </textarea>
+          </mat-form-field>
           <div>
-            <ng-container *ngFor="let subcomponent of getSubcomponents()">
-              <div style="display: flex; flex-direction: row;">
-                <button mat-button matTooltip="{{subcomponent.name}}"
-                  [disabled]="(subcomponent.namespace != null)" style="width:
-                  100%; white-space: nowrap; overflow: hidden; text-overflow:
-                  ellipsis; text-align: left;" (click)="selectedNamespace =
-                  subcomponent">
-                  {{subcomponent.name}}
-                </button>
-              </div>
-            </ng-container>
+            <div style="display: flex; flex-direction: row;">
+              <h3>
+                Subcomponents
+              </h3>
+              <button mat-icon-button style="margin-left: auto;" matTooltip="Add
+                a subcomponent" (click)="addSubcomponent(selectedNamespace.
+                preventModification === true)">
+                <mat-icon class="fa fa-ellipsis-h"></mat-icon>
+              </button>
+            </div>
+            <div>
+              <ng-container *ngFor="let subcomponent of getSubcomponents()">
+                <div style="display: flex; flex-direction: row;">
+                  <button mat-button matTooltip="{{subcomponent.name}}"
+                    [disabled]="(subcomponent.namespace != null)" style="width:
+                    100%; white-space: nowrap; overflow: hidden; text-overflow:
+                    ellipsis; text-align: left;" (click)="selectedNamespace =
+                    subcomponent">
+                    {{subcomponent.name}}
+                  </button>
+                </div>
+              </ng-container>
+            </div>
           </div>
         </div>
       </div>
