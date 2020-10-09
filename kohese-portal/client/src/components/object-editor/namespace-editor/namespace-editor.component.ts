@@ -87,6 +87,41 @@ export class NamespaceEditorComponent implements Dialog {
   }
 
   /**
+   * Returns an Array of Namespaces allowed to be the enclosing Namespace of
+   * the selected Namespace.
+   */
+  public getEnclosingNamespaceOptions(): Array<any> {
+    let namespaces: Array<any> = [];
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+      ItemProxy) => {
+      if ((itemProxy.kind === 'Namespace') && (itemProxy.item.id !==
+        'com.kohese') && (itemProxy.item.id !== 'com.kohese.metamodel')) {
+        let isOption: boolean = true;
+        let namespaceItemProxy: ItemProxy = itemProxy;
+        while (namespaceItemProxy != null) {
+          if (namespaceItemProxy.item === this._selectedNamespace) {
+            isOption = false;
+            break;
+          }
+
+          namespaceItemProxy = namespaceItemProxy.parentProxy;
+        }
+
+        if (isOption === true) {
+          namespaces.push(itemProxy.item);
+        }
+      }
+    }, undefined);
+
+    namespaces.sort((oneNamespace: any, anotherNamespace: any) => {
+      return oneNamespace.name.localeCompare(anotherNamespace.name);
+    });
+
+    return namespaces;
+  }
+
+  /**
    * Upon confirmation, removes the given Namespace and all of its descendants
    * from the system and adjusts all types that have a supertype of a type to
    * be removed
