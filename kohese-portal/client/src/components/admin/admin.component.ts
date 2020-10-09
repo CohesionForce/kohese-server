@@ -9,6 +9,10 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { NavigationService } from '../../services/navigation/navigation.service';
+import { DetailsComponent } from '../details/details.component';
+
+
 
 import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
 
@@ -64,13 +68,20 @@ export class AdminComponent implements OnInit, OnDestroy {
     return Object;
   }
 
+  get navigationService() {
+    return this._navigationService;
+  }
+
   @ViewChildren(MatExpansionPanel)
   private expansionPanels: QueryList<MatExpansionPanel>;
 
-  public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _sessionService: SessionService, private _itemRepository:
-    ItemRepository, private _lensService: LensService, private _dialogService:
-    DialogService) {
+  public constructor(
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _sessionService: SessionService,
+    private _itemRepository:ItemRepository,
+    private _lensService: LensService,
+    private _dialogService: DialogService,
+    private _navigationService: NavigationService) {
   }
 
   public ngOnInit(): void {
@@ -124,6 +135,17 @@ export class AdminComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       }
     });
+  }
+
+  public displayInformation(user: any): void {
+    let userIdProxy: ItemProxy = this._itemRepository.getTreeConfig().
+    getValue().config.getProxyFor(user.id);
+
+    this._dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: userIdProxy
+      }
+    }).updateSize('90%', '90%');
   }
 
   public save(user: any): void {

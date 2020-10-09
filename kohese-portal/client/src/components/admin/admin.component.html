@@ -70,9 +70,32 @@
                   <mat-icon class="fa fa-times"></mat-icon>
                 </button>
               </ng-template>
-              <button mat-icon-button matTooltip="Remove this user" (click)="$event.stopPropagation(); remove(user)">
-                <mat-icon class="fa fa-trash"></mat-icon>
+
+              <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
+                (click)="$event.stopPropagation();">
+                <mat-icon class="fa fa-bars"></mat-icon>
               </button>
+              <mat-menu #menu="matMenu" [overlapTrigger]="false">
+                <button mat-menu-item (click)="displayInformation(user)">
+                  <mat-icon class="fa fa-clone"></mat-icon>
+                  Display Item information
+                </button>
+                <button mat-menu-item
+                  (click)="$event.stopPropagation(); navigationService.navigate('Explore', { id: user.id })">
+                  <mat-icon class="fa fa-arrow-right"></mat-icon>
+                  Navigate in Explorer
+                </button>
+                <button mat-menu-item
+                  (click)="$event.stopPropagation(); navigationService.addTab('Explore', { id: user.id })">
+                  <mat-icon class="fa fa-external-link"></mat-icon>
+                  Navigate in New Tab
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="remove(user)">
+                  <mat-icon class="fa fa-trash"></mat-icon>
+                  Remove This User
+                </button>
+              </mat-menu>
             </mat-panel-description>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
