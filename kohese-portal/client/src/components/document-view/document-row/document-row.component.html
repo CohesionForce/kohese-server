@@ -1,5 +1,40 @@
 <div #menuDiv style="visibility: hidden; position: fixed" [matMenuTriggerFor]="contextMenu"></div>
 <div class="document-row" (contextmenu)="onContextMenu($event, menuDiv, docInfo.proxy)">
+
+  <div id="menuWrapper">
+    <button mat-icon-button matTooltip="Edit this Item" style="margin-left: auto;"
+      [disabled]="row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing"
+      (click)="row.editable = true">
+      <mat-icon class="fa fa-edit"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Save this Item"
+      [disabled]="!row.editable" (click)="upsertItem(docInfo.proxy, row, docInfo);">
+      <mat-icon class="fa fa-save"></mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Discard unsaved changes to this Item"
+      [disabled]="!row.editable" (click)="discardChanges()">
+      <mat-icon class="fa fa-times"></mat-icon>
+    </button>
+    <button mat-icon-button (click)="displayInformation(docInfo.proxy)">
+      <mat-icon class="fa fa-clone"></mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="rowMenu">
+      <mat-icon class="fa fa-bars"></mat-icon>
+    </button>
+    <mat-menu #rowMenu="matMenu">
+      <ng-template matMenuContent>
+        <button mat-menu-item (click)="navigationService.navigate('Explore', { id: docInfo.proxy.item.id })">
+          <mat-icon class="fa fa-arrow-right"></mat-icon>
+          Navigate in Explorer
+        </button>
+        <button mat-menu-item (click)="navigationService.addTab('Explore', { id: docInfo.proxy.item.id })">
+          <mat-icon class="fa fa-external-link"></mat-icon>
+          Navigate in New Tab
+        </button>
+      </ng-template>
+    </mat-menu>
+  </div>
+
   <mat-menu #contextMenu="matMenu">
     <ng-template matMenuContent>
       <button mat-menu-item
@@ -16,7 +51,6 @@
         <mat-icon class="fa fa-times"></mat-icon>
         Discard Changes
       </button>
-
       <button mat-menu-item (click)="displayInformation(docInfo.proxy)">
         <mat-icon class="fa fa-clone"></mat-icon>
         Display Item
@@ -31,23 +65,14 @@
       </button>
     </ng-template>
   </mat-menu>
-  <ng-container *ngIf="row.editable else notEditable">
-    <format-object-editor [type]="docInfo.proxy.model.item" [object]="docInfo.proxy.item"
-      [formatDefinitionType]="FormatDefinitionType.DOCUMENT">
-    </format-object-editor>
-  </ng-container>
-  <ng-template #notEditable>
-    <markdown [data]="itemRepository.getMarkdownRepresentation(docInfo.
-          proxy.item, undefined, docInfo.proxy.model.item, itemRepository.
-          getTreeConfig().getValue().config.getProxyFor('view-' + docInfo.
-          proxy.model.item.name.toLowerCase()).item, FormatDefinitionType.
-          DOCUMENT, docInfo.depth, false)">
-    </markdown>
-  </ng-template>
+  <format-object-editor [disabled]="(
+    !row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing)"
+    [type]="docInfo.proxy.model.item" [object]="docInfo.proxy.item"
+    [formatDefinitionType]="FormatDefinitionType.DOCUMENT">
+  </format-object-editor>
 </div>
 
-<!-- This is the best, incomplete example of a standalone contextMenu component executed in another component
-         that we have.
+<!-- This is the best, incomplete example that we have of a standalone contextMenu component executed in another component.
 
       <ng-container *ngFor="let menuItem of getMenuItems(docInfo.proxy)">
         <button mat-menu-item (click)="menuItem.execute()">

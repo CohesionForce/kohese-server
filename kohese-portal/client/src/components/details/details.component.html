@@ -1,8 +1,8 @@
-<div [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 40px)' :
-  '100%' }">
-  <div class="panel-heading" style="display: flex; flex-direction: row;
-    align-items: center;">
-    {{itemProxy.kind}} Information: {{itemProxy.item.name}}
+<div [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 40px)' :'100%' }">
+  <div class="panel-heading" style="width: 100%; display: flex; flex-direction: row; align-items: center">
+    <label style="width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+      {{itemProxy.kind}} Information: {{itemProxy.item.name}}
+    </label>
     <ng-container *ngIf="itemProxy.item.parentId">
       <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
         itemProxy.item.parentId, false)" style="margin-left: auto;">
@@ -33,7 +33,7 @@
       <mat-icon class="fa fa-arrows-alt"></mat-icon>
     </button>
   </div>
-  <div style="height: calc(100% - 44px);">
+  <div style="height: calc(100% - 50px);">
     <!-- Nav tabs -->
     <mat-tab-group id="details-tabs">
       <mat-tab id="defaultTab">
@@ -53,7 +53,7 @@
           Details
           &nbsp;
           <img *ngIf="itemProxy.dirty"src="assets/icons/versioncontrol/dirty.ico"/>
-        </ng-template>    
+        </ng-template>
         <ng-template matTabContent>
           <format-object-editor [object]="itemProxy.item" [type]="itemProxy.
             model.item" [formatDefinitionType]="FormatDefinitionType.DEFAULT"

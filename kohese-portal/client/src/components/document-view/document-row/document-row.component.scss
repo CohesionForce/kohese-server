@@ -1,0 +1,10 @@
+.document-row:hover #menuWrapper {
+  visibility: visible;
+}
+
+.document-row #menuWrapper {
+  display: flex;
+  visibility: hidden;
+}
+
+
