@@ -47,22 +47,39 @@
           kind === 'list') ? 'column' : 'row') }">
           <ng-container *ngFor="let attributeDefinition of container.contents">
             <ng-container *ngIf="attributeDefinition.visible">
-              <ng-container *ngIf="Array.isArray(selectedType.classProperties[
-                attributeDefinition.propertyName].definition.type) else
-                singleValuedBlock">
-                <multivalued-field [koheseObject]="object"
-                  [dataModel]="selectedType" [viewModel]="viewModel"
-                  [enclosingDataModel]="enclosingType"
-                  [propertyDefinition]="attributeDefinition">
-                </multivalued-field>
-              </ng-container>
-              <ng-template #singleValuedBlock>
-                <singlevalued-field [koheseObject]="object"
-                  [dataModel]="selectedType" [viewModel]="viewModel"
-                  [enclosingDataModel]="enclosingType"
-                  [propertyDefinition]="attributeDefinition">
-                </singlevalued-field>
-              </ng-template>
+              <div style="display: flex; flex-direction: row;">
+                <ng-container *ngIf="Array.isArray(selectedType.classProperties[
+                  attributeDefinition.propertyName].definition.type) else
+                  singleValuedBlock">
+                  <multivalued-field [koheseObject]="object"
+                    [dataModel]="selectedType" [viewModel]="viewModel"
+                    [enclosingDataModel]="enclosingType"
+                    [propertyDefinition]="attributeDefinition" style="width:
+                    100%;">
+                  </multivalued-field>
+                </ng-container>
+                <ng-template #singleValuedBlock>
+                  <singlevalued-field [koheseObject]="object"
+                    [dataModel]="selectedType" [viewModel]="viewModel"
+                    [enclosingDataModel]="enclosingType"
+                    [propertyDefinition]="attributeDefinition" style="width:
+                    100%;">
+                  </singlevalued-field>
+                </ng-template>
+                <ng-container *ngIf="!selectedType.classProperties[
+                  attributeDefinition.propertyName].definition.required">
+                  <button mat-icon-button matTooltip="Clear this field"
+                    [disabled]="((attributeDefinition.editable === false) ||
+                    (object[attributeDefinition.propertyName] == null))"
+                    (click)="object[attributeDefinition.propertyName] = null;
+                    getField(attributeDefinition.propertyName, Array.isArray(
+                    selectedType.classProperties[attributeDefinition.
+                    propertyName].definition.type)).changeDetectorRef.
+                    markForCheck()" style="margin-left: auto;">
+                    <mat-icon class="fa fa-times"></mat-icon>
+                  </button>
+                </ng-container>
+              </div>
             </ng-container>
           </ng-container>
         </div>

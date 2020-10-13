@@ -50,7 +50,11 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     return TreeConfiguration;
   }
 
-  constructor(private navigationService : NavigationService,
+  get navigationService() {
+    return this._navigationService;
+  }
+
+  constructor(private _navigationService : NavigationService,
     private changeRef : ChangeDetectorRef, private _itemRepository:
     ItemRepository, private _dialogService: DialogService) {
     this.assignmentTypes = DashboardSelections;
@@ -101,10 +105,6 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
         itemProxy: itemProxy
       }
     }).updateSize('90%', '90%');
-  }
-
-  public navigate(itemProxy: ItemProxy): void {
-    this.navigationService.addTab('Explore', { id: itemProxy.item.id });
   }
 
   sortAssignments(sortStrategy : DashboardSelections, assignmentList : Array<ItemProxy>) {

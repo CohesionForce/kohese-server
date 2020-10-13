@@ -44,7 +44,7 @@ export class NamespaceEditorComponent implements Dialog {
 
   /**
    * @see Dialog.interface.ts
-   * 
+   *
    * @param accept
    */
   public close(accept: boolean): any {
@@ -65,7 +65,7 @@ export class NamespaceEditorComponent implements Dialog {
   /**
    * Returns an Array containing all Namespaces except the selected Namespace
    * should a parameter of ```true``` be passed
-   * 
+   *
    * @param excludeSelectedNamespace
    */
   public getNamespaces(excludeSelectedNamespace: boolean): Array<any> {
@@ -90,7 +90,7 @@ export class NamespaceEditorComponent implements Dialog {
    * Upon confirmation, removes the given Namespace and all of its descendants
    * from the system and adjusts all types that have a supertype of a type to
    * be removed
-   * 
+   *
    * @param namespace
    */
   public async remove(namespace: any): Promise<void> {
@@ -113,7 +113,7 @@ export class NamespaceEditorComponent implements Dialog {
     }, undefined);
 
     let proceed: boolean = await this._dialogService.openYesNoDialog(
-      'Remove ' + namespace.name, 'Removing ' + namespace.name + ' is to ' +
+      'Remove ' + namespace.name, 'Removing ' + namespace.name + ' will ' +
       'remove the following types and Namespaces: ' + typeItemProxysToRemove.
       concat(namespaceItemProxysToRemove).map((itemProxy: ItemProxy) => {
         return itemProxy.item.name;
@@ -155,14 +155,14 @@ export class NamespaceEditorComponent implements Dialog {
   /**
    * Allows addition of Namespaces and, if the given boolean is false, types to
    * the selected Namespace
-   * 
+   *
    * @param allowNamespaceAdditionOnly
    */
   public async addSubcomponent(allowNamespaceAdditionOnly: boolean):
     Promise<void> {
     let proceed: boolean = await this._dialogService.openYesNoDialog(
       'Modifications To Be Saved', 'Adding subcomponents to this ' +
-      'Namespace is to automatically save all changes to all added ' +
+      'Namespace will automatically save all changes to all added ' +
       'subcomponents. Do you want to continue?');
     if (!proceed) {
       return;
@@ -237,7 +237,7 @@ export class NamespaceEditorComponent implements Dialog {
 
         return this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
       }));
-      
+
       this._changeDetectorRef.markForCheck();
     }
   }
