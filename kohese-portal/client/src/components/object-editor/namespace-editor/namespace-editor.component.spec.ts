@@ -81,6 +81,18 @@ describe('NamespaceEditorComponent', () => {
     expect(allNamespaces.indexOf(component.selectedNamespace)).not.toBe(-1);
   });
 
+  it('retrieves enclosing Namespace options', () => {
+    let enclosingNamespaceOptions: Array<any> = component.
+      getEnclosingNamespaceOptions();
+    expect(enclosingNamespaceOptions.indexOf(TreeConfiguration.
+      getWorkingTree().getProxyFor('com.kohese').item)).toBe(-1);
+    expect(enclosingNamespaceOptions.indexOf(TreeConfiguration.
+      getWorkingTree().getProxyFor('com.kohese.metamodel').item)).toBe(-1);
+    expect(enclosingNamespaceOptions.indexOf(TreeConfiguration.
+      getWorkingTree().getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913').
+      item)).toBe(-1);
+  });
+
   it('removes Namespaces', async () => {
     await component.remove(component.selectedNamespace);
     let selectedNamespaceFound: boolean = false;
