@@ -147,7 +147,8 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
       ItemProxy) => {
-      if (itemProxy.kind === 'Namespace') {
+      if ((itemProxy.kind === 'Namespace') && !((itemProxy.item.id ===
+        'com.kohese') || (itemProxy.item.id === 'com.kohese.metamodel'))) {
         namespaceOptions[itemProxy.item.name] = itemProxy.item;
       }
     }, undefined);
@@ -181,7 +182,12 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           text: '',
           fieldName: 'Namespace',
           value: Object.values(namespaceOptions).find((namespace: any) => {
-            return (this._selectedNamespace.id === namespace.id);
+            if ((this._selectedNamespace.id === 'com.kohese') || (this.
+              _selectedNamespace.id === 'com.kohese.metamodel')) {
+              return true;
+            } else {
+              return (this._selectedNamespace.id === namespace.id);
+            }
           }),
           validate: (input: any) => {
             return true;

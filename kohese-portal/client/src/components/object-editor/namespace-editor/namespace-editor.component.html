@@ -63,7 +63,8 @@
             <mat-form-field style="width: 100%;">
               <mat-select placeholder="Enclosing Namespace"
                 [(ngModel)]="selectedNamespace.parentId">
-                <ng-container *ngFor="let namespace of getNamespaces(true)">
+                <ng-container *ngFor="let namespace of
+                  getEnclosingNamespaceOptions()">
                   <mat-option [value]="namespace.id">
                     {{namespace.name}}
                   </mat-option>
@@ -86,8 +87,10 @@
                 Subcomponents
               </h3>
               <button mat-icon-button style="margin-left: auto;" matTooltip="Add
-                a subcomponent" (click)="addSubcomponent(selectedNamespace.
-                preventModification === true)">
+                a subcomponent" [disabled]="((selectedNamespace.id ===
+                'com.kohese') || (selectedNamespace.id ===
+                'com.kohese.metamodel'))" (click)="addSubcomponent(
+                selectedNamespace.preventModification === true)">
                 <mat-icon class="fa fa-ellipsis-h"></mat-icon>
               </button>
             </div>
