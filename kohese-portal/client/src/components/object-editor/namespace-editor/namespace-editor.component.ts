@@ -168,8 +168,31 @@ export class NamespaceEditorComponent implements Dialog {
       return;
     }
 
+    let unselectableSubcomponents: Array<ItemProxy> = [];
     let treeConfiguration: TreeConfiguration = this._itemRepository.
       getTreeConfig().getValue().config;
+    treeConfiguration.getProxyFor('Model-Definitions').visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if (itemProxy.item.preventModification) {
+        unselectableSubcomponents.push(itemProxy);
+      } else {
+        if (itemProxy.kind === 'Namespace') {
+          let namespaceItemProxy: ItemProxy = itemProxy;
+          while (namespaceItemProxy != null) {
+            if (namespaceItemProxy.item === this._selectedNamespace) {
+              unselectableSubcomponents.push(itemProxy);
+              break;
+            }
+  
+            namespaceItemProxy = namespaceItemProxy.parentProxy;
+          }
+        } else if (itemProxy.item['namespace'].id === this._selectedNamespace.
+          id) {
+          unselectableSubcomponents.push(itemProxy);
+        }
+      }
+    }, undefined);
+
     let results: Array<any> = await this._dialogService.openComponentsDialog(
       [{
       component: TreeComponent,
@@ -195,6 +218,9 @@ export class NamespaceEditorComponent implements Dialog {
         getIcon: (element: any) => {
           return treeConfiguration.getProxyFor('view-' +
             (element as ItemProxy).kind.toLowerCase()).item.icon;
+        },
+        maySelect: (element: any) => {
+          return (unselectableSubcomponents.indexOf(element) === -1);
         },
         allowMultiselect: true,
         showSelections: true
