@@ -66,9 +66,11 @@
         <mat-icon class="fa fa-clone"></mat-icon>
         Display Item
       </button>
-      <button mat-menu-item [matMenuTriggerFor]="nestedMenu1">
-        More Options
-      </button>
+      <ng-container *ngIf="!row.editable">
+        <button mat-menu-item [matMenuTriggerFor]="nestedMenu1">
+          More Options
+        </button>
+      </ng-container>
     </ng-template>
   </mat-menu>
 
