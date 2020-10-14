@@ -64,17 +64,13 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
   save(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
     if(proxy.dirty === true) {
       this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
-        row.editable = false;
         docInfo.proxy = newProxy;
         this.upsertComplete.next();
-        this._editableSet.splice(this._editableSet.indexOf(proxy.item.id), 1);
-        this.changeRef.markForCheck();
       });
-    } else {
-        row.editable = false;
-        this._editableSet.splice(this._editableSet.indexOf(proxy.item.id), 1);
-        this.changeRef.markForCheck();
-      }
+    }
+    row.editable = false;
+    this._editableSet.splice(this._editableSet.indexOf(proxy.item.id), 1);
+    this.changeRef.markForCheck();
   }
 
   public async discardChanges(proxy: ItemProxy): Promise<void> {
