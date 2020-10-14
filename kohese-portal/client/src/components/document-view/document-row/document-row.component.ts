@@ -40,6 +40,11 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     return this._navigationService;
   }
 
+  private _editableSet: Array<string> = [];
+  get editableSet() {
+    return this._editableSet;
+  }
+
   constructor(private changeRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository,
     private _dialogService: DialogService,
@@ -56,20 +61,26 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     this.viewInitialized.emit(this.element);
   }
 
-  upsertItem(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
-    this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
-      row.editable = false;
-      docInfo.proxy = newProxy;
-      this.upsertComplete.next();
-      this.changeRef.markForCheck();
-    })
+  save(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
+    if(proxy.dirty === true) {
+      this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
+        row.editable = false;
+        docInfo.proxy = newProxy;
+        this.upsertComplete.next();
+        this._editableSet.splice(this._editableSet.indexOf(proxy.item.id), 1);
+        this.changeRef.markForCheck();
+      });
+    } else {
+        row.editable = false;
+        this._editableSet.splice(this._editableSet.indexOf(proxy.item.id), 1);
+        this.changeRef.markForCheck();
+      }
   }
 
-  public async discardChanges(): Promise<void> {
+  public async discardChanges(proxy: ItemProxy): Promise<void> {
     await this._itemRepository.fetchItem(this.docInfo.proxy);
     this.row.editable = false;
-    /* Not needed, but added with hope that this component will be made to use
-    ChangeDetectionStrategy.OnPush */
+    this._editableSet.splice(this._editableSet.indexOf(proxy.item.id), 1);
     this.changeRef.markForCheck();
   }
 
@@ -85,7 +96,6 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     event.preventDefault();
     contextMenuComponent.style.left = event.clientX + 'px';
     contextMenuComponent.style.top = event.clientY + 'px';
-    // this.contextMenu.toArray()[0].menu.focusFirstItem('mouse');
     this.contextMenu.toArray()[0].openMenu();
   }
 }
