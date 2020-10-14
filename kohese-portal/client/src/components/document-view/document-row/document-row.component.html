@@ -29,11 +29,13 @@
       </button>
       <mat-menu #rowMenu="matMenu">
         <ng-template matMenuContent>
-          <button mat-menu-item (click)="navigationService.navigate('Explore', { id: docInfo.proxy.item.id })">
+          <button mat-menu-item [disabled]="row.editable"
+            (click)="navigationService.navigate('Explore', { id: docInfo.proxy.item.id })">
             <mat-icon class="fa fa-arrow-right"></mat-icon>
             Navigate in Explorer
           </button>
-          <button mat-menu-item (click)="navigationService.addTab('Explore', { id: docInfo.proxy.item.id })">
+          <button mat-menu-item [disabled]="row.editable"
+            (click)="navigationService.addTab('Explore', { id: docInfo.proxy.item.id })">
             <mat-icon class="fa fa-external-link"></mat-icon>
             Navigate in New Tab
           </button>
@@ -66,20 +68,20 @@
         <mat-icon class="fa fa-clone"></mat-icon>
         Display Item
       </button>
-      <ng-container *ngIf="!row.editable">
-        <button mat-menu-item [matMenuTriggerFor]="nestedMenu1">
-          More Options
-        </button>
-      </ng-container>
+      <button mat-menu-item [matMenuTriggerFor]="nestedMenu1">
+        More Options
+      </button>
     </ng-template>
   </mat-menu>
 
   <mat-menu #nestedMenu1="matMenu">
-    <button mat-menu-item (click)="navigationService.navigate('Explore', { id: docInfo.proxy.item.id })">
+    <button mat-menu-item [disabled]="row.editable"
+      (click)="navigationService.navigate('Explore', { id: docInfo.proxy.item.id })">
       <mat-icon class="fa fa-arrow-right"></mat-icon>
       Navigate in Explorer
     </button>
-    <button mat-menu-item (click)="navigationService.addTab('Explore', { id: docInfo.proxy.item.id })">
+    <button mat-menu-item [disabled]="row.editable"
+      (click)="navigationService.addTab('Explore', { id: docInfo.proxy.item.id })">
       <mat-icon class="fa fa-external-link"></mat-icon>
       Navigate in New Tab
     </button>
