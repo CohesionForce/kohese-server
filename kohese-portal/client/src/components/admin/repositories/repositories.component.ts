@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Observable ,  Subscription } from 'rxjs';
 
@@ -15,7 +15,8 @@ import { VersionControlService } from '../../../services/version-control/version
 
 @Component({
   selector: 'repositories',
-  templateUrl: './repositories.component.html'
+  templateUrl: './repositories.component.html',
+  styleUrls: ['./repositories.component.scss']
 })
 
 export class RepositoriesComponent extends NavigatableComponent implements
@@ -28,19 +29,27 @@ export class RepositoriesComponent extends NavigatableComponent implements
   repositories: Array<any>;
   rootProxy: ItemProxy;
 
+  @Input()
+  routingStrategy: string;
+  rowDef: Array<string> = ["name", "count", "description", "nav"];
+
+  get navigationService() {
+    return this._navigationService;
+  }
+
   /* Subscriptions */
   repositoryStatusSubscription: Subscription;
   treeConfigSubscription: Subscription;
 
   constructor(
-    private navigationService: NavigationService,
+    private _navigationService: NavigationService,
     private versionControlService: VersionControlService,
     private itemRepository: ItemRepository,
     private _toastrService: ToastrService,
     private _notificationService: NotificationService,
     private _sessionService: SessionService,
     private dialogueService: DialogService) {
-    super(navigationService);
+    super(_navigationService);
     // TODO update this file to do the repo status sequence
     // leaving it out since it is currently in flux on another branch
   }
