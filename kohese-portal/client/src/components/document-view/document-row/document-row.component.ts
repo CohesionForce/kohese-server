@@ -40,11 +40,6 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     return this._navigationService;
   }
 
-  private _editableSet: Array<string> = [];
-  get editableSet() {
-    return this._editableSet;
-  }
-
   constructor(private changeRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository,
     private _dialogService: DialogService,
@@ -69,14 +64,12 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
       });
     }
     row.editable = false;
-    this._editableSet.splice(this._editableSet.indexOf(proxy.item.id), 1);
     this.changeRef.markForCheck();
   }
 
   public async discardChanges(proxy: ItemProxy): Promise<void> {
     await this._itemRepository.fetchItem(this.docInfo.proxy);
     this.row.editable = false;
-    this._editableSet.splice(this._editableSet.indexOf(proxy.item.id), 1);
     this.changeRef.markForCheck();
   }
 
