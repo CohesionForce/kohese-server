@@ -39,22 +39,3 @@
   }
 }
 
-.version-control-admin {
-  border: 1px solid black;
-  border-radius: 10px;
-  padding: 5px;
-  height: calc(100% - 90px);
-  width: calc(100% - 65px);
-  overflow: auto;
-
-  .repository-panel {
-    margin: 5px;
-  }
-
-  .remote-container {
-    height: 20%;
-    overflow: auto;
-    border: 1px solid black;
-  }
-}
-
