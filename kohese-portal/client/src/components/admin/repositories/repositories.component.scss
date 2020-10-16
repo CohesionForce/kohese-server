@@ -20,6 +20,11 @@
   overflow: auto;
 }
 
+// Every other row is colored
+mat-row:nth-child(even) {
+  background-color: rgb(245,245,245);
+}
+
 // Highlights row when mouse hovers over it
 mat-row:hover {
   background-color: rgb(230,230,230);
@@ -31,6 +36,6 @@ mat-row:hover {
 }
 
 // Buttons become visible when mouse hovers over row
-mat-row:hover button{
+mat-row:hover button {
   visibility: visible;
 }
