@@ -50,6 +50,10 @@
               (click)="$event.stopPropagation(); save(observationItemProxy)">
               <mat-icon class="fa fa-save"></mat-icon>
             </button>
+            <button mat-icon-button matTooltip="Discard unsaved changes to this Item"
+              (click)="$event.stopPropagation(); discardChanges(observationItemProxy)">
+              <mat-icon class="fa fa-times"></mat-icon>
+            </button>
           </ng-template>
           <button mat-icon-button matTooltip="Display Item information"
             (click)="$event.stopPropagation(); displayInformation(observationItemProxy)">
