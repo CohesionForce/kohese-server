@@ -19,9 +19,7 @@ import { FormControl } from '@angular/forms';
 @Component({
   selector: 'phrase-view',
   templateUrl: './phrase-view.component.html',
-  styleUrls: [
-    './phrase-view.component.scss'
-  ],
+  styleUrls: ['./phrase-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PhraseViewComponent extends AnalysisViewComponent

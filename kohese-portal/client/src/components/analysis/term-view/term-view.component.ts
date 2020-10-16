@@ -16,6 +16,7 @@ import { FormControl } from '@angular/forms';
 @Component({
   selector: 'term-view',
   templateUrl : './term-view.component.html',
+  styleUrls: ['./term-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TermViewComponent extends AnalysisViewComponent

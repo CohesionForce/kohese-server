@@ -39,33 +39,35 @@
     </mat-menu>
   </div>
   <div class="panel-body">
-    <mat-form-field>
+    <div>
+      <mat-form-field>
       <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processPhrases()">
         <mat-option *ngFor="let filterCriteria of phrasePOSFilterCriteriaList" [value]="filterCriteria">
           {{filterCriteria}}
         </mat-option>
       </mat-select>
-    </mat-form-field>
-    <span>
-      <mat-checkbox [(ngModel)]="filterExactMatch">
-        Exact Match
-      </mat-checkbox>
-      <mat-checkbox [(ngModel)]="filterIgnoreCase">
-        Ignore Case
-      </mat-checkbox>
-    </span>
-    <br/>
-    <mat-form-field>
-      <input matInput type="text" class="input-sm"
-        [formControl]="filterControl" placeholder="Filter"
-        [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processPhrases()"/>
-    </mat-form-field>
-    <button mat-raised-button (click)="submitFilter(filterControl.value)"
-      class="btn btn-default fa fa-search">Submit
-    </button>
+      </mat-form-field>
+      <span>
+        <mat-checkbox [(ngModel)]="filterExactMatch">
+          Exact Match
+        </mat-checkbox>
+        <mat-checkbox [(ngModel)]="filterIgnoreCase">
+          Ignore Case
+        </mat-checkbox>
+      </span>
+      <br/>
+      <mat-form-field>
+        <input matInput type="text" class="input-sm"
+          [formControl]="filterControl" placeholder="Filter"
+          [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processPhrases()"/>
+      </mat-form-field>
+      <button mat-raised-button (click)="submitFilter(filterControl.value)"
+        class="btn btn-default fa fa-search">Submit
+      </button>
+    </div>
     <div id="phrase-div">
       <table id="thePhrasesSummary"
         class="table tree-grid table-striped table-condensed table-hover">

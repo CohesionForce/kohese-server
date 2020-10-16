@@ -3,26 +3,26 @@
   width: inherit;
   overflow: hidden;
 
-  .panel{
+  .panel {
     height: 100%;
-    width: 100%;
+    width:  100%;
     overflow: hidden;
 
+    .panel-heading {
+      height: 50px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
     .panel-body {
       height: calc(100% - 50px);
       padding-right: 0px;
 
-      #sentence-div {
-        height: calc(100% - 64px);
+      #term-div {
+        height: calc(100% - 131px);
         width:  100%;
         overflow: auto;
       }
     }
   }
-}
-
-.syncOn {
-  background-color: whitesmoke;
-  color : green;
-  border-radius: 10px;
 }

@@ -1,6 +1,5 @@
 <div class="panel">
-  <div class="panel-heading" style="height: 50px; display: flex;
-    flex-direction: row; align-items: center;">
+  <div class="panel-heading">
     Term View - (<span *ngIf="displayedCount < filteredCount"style="font-weight:normal;">{{displayedCount}}/</span>{{filteredCount}}) Terms
     <button mat-icon-button matTooltip="Copy table content to clipboard"
       style="margin-left: auto;" (click)="copy(terms, showPOS)">

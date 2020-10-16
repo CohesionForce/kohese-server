@@ -36,19 +36,19 @@
             [(ngModel)]="loadLimit" (ngModelChange)="processSentences()" placeholder="Details Limit"/>
         </mat-form-field>
       </span>
+      <mat-checkbox [(ngModel)]="showItemsInDetails" (ngModelChange)="onCriteriaChange()">
+        Items
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="showSentencesInDetails" (ngModelChange)="onCriteriaChange()">
+        Sentences
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="showPhrasesInDetails" (ngModelChange)="onCriteriaChange()">
+        Phrases
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="showTokensInDetails" (ngModelChange)="onCriteriaChange()">
+        Tokens
+      </mat-checkbox>
     </div>
-    <mat-checkbox [(ngModel)]="showItemsInDetails" (ngModelChange)="onCriteriaChange()">
-      Items
-    </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showSentencesInDetails" (ngModelChange)="onCriteriaChange()">
-      Sentences
-    </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showPhrasesInDetails" (ngModelChange)="onCriteriaChange()">
-      Phrases
-    </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showTokensInDetails" (ngModelChange)="onCriteriaChange()">
-      Tokens
-    </mat-checkbox>
     <div id="sentence-div">
       <table id="theDetails"
         class="table tree-grid table-striped table-condensed table-hover">
