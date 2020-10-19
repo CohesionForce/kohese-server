@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, EventEmitter, Output, Input, AfterViewInit,
-  Component, OnInit, ElementRef, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
+  Component, OnInit, OnDestroy, ElementRef, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -18,16 +18,21 @@ import { NavigationService } from "../../../services/navigation/navigation.servi
   styleUrls: ['../document-view.component.scss', './document-row.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DocumentRowComponent implements OnInit, AfterViewInit {
+export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() row;
   @Input() docInfo;
   @Input() showActions: boolean = true;
   @Output() viewInitialized: EventEmitter<ElementRef> = new EventEmitter<ElementRef>()
 
+  /* Variable Declarations */
   docReader: Parser;
   docWriter: HtmlRenderer;
   upsertComplete: Subject<any> = new Subject();
+  private treeConfig;
+  private treeConfigSub;
+  private treeConfigProxyChangeSub;
 
+  /* Getters */
   get itemRepository() {
     return this._itemRepository;
   }
@@ -40,7 +45,8 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     return this._navigationService;
   }
 
-  constructor(private changeRef: ChangeDetectorRef,
+  constructor(
+    private changeRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository,
     private _dialogService: DialogService,
     private _navigationService: NavigationService,
@@ -50,7 +56,39 @@ export class DocumentRowComponent implements OnInit, AfterViewInit {
     );
   }
 
-  ngOnInit() { }
+   ngOnInit() {
+    this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe(
+      (treeConfigurationObject: any) => {
+      this.treeConfig = treeConfigurationObject.config;
+
+      if (this.treeConfigProxyChangeSub) {
+        this.treeConfigProxyChangeSub.unsubscribe();
+      }
+      this.treeConfigProxyChangeSub = this.treeConfig.getChangeSubject()
+        .subscribe((notification: any) => {
+          if(notification.id === this.docInfo.proxy.item.id) {
+            switch (notification.type) {
+              case 'create':
+              case 'update':
+              case 'dirty':
+              case 'delete': {
+                this.changeRef.markForCheck();
+                break;
+              }
+            }
+          }
+        });
+      });
+  }
+
+  public ngOnDestroy(): void {
+    if (this.treeConfigProxyChangeSub) {
+      this.treeConfigProxyChangeSub.unsubscribe();
+    }
+    if(this.treeConfigSub) {
+      this.treeConfigSub.unsubscribe();
+    }
+  }
 
   ngAfterViewInit() {
     this.viewInitialized.emit(this.element);
