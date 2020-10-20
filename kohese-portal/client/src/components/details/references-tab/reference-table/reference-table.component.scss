@@ -1,6 +1,6 @@
-// Individual row highlight on click
-mat-row:focus {
-  background-color: lightgray;
+// Every other row is colored
+mat-row:nth-child(even) {
+  background-color: rgb(245,245,245);
 }
 
 // Highlights row when mouse hovers over it
