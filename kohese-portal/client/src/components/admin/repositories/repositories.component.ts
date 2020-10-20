@@ -1,19 +1,22 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
-
-import { NavigationService } from '../../../services/navigation/navigation.service';
-import { VersionControlService } from '../../../services/version-control/version-control.service';
-import { NotificationService } from '../../../services/notifications/notification.service';
-import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
-import { SessionService } from '../../../services/user/session.service';
 import { Observable ,  Subscription } from 'rxjs';
 
+import { DetailsComponent } from '../../details/details.component';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
+import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { NotificationService } from '../../../services/notifications/notification.service';
+import { SessionService } from '../../../services/user/session.service';
+import { VersionControlService } from '../../../services/version-control/version-control.service';
+
 
 @Component({
   selector: 'repositories',
-  templateUrl: './repositories.component.html'
+  templateUrl: './repositories.component.html',
+  styleUrls: ['./repositories.component.scss']
 })
 
 export class RepositoriesComponent extends NavigatableComponent implements
@@ -26,17 +29,27 @@ export class RepositoriesComponent extends NavigatableComponent implements
   repositories: Array<any>;
   rootProxy: ItemProxy;
 
+  @Input()
+  routingStrategy: string;
+  rowDef: Array<string> = ["name", "count", "description", "nav"];
+
+  get navigationService() {
+    return this._navigationService;
+  }
+
   /* Subscriptions */
   repositoryStatusSubscription: Subscription;
   treeConfigSubscription: Subscription;
 
-  constructor(private navigationService: NavigationService,
+  constructor(
+    private _navigationService: NavigationService,
     private versionControlService: VersionControlService,
     private itemRepository: ItemRepository,
     private _toastrService: ToastrService,
     private _notificationService: NotificationService,
-    private _sessionService: SessionService) {
-    super(navigationService);
+    private _sessionService: SessionService,
+    private dialogueService: DialogService) {
+    super(_navigationService);
     // TODO update this file to do the repo status sequence
     // leaving it out since it is currently in flux on another branch
   }
@@ -111,8 +124,9 @@ export class RepositoriesComponent extends NavigatableComponent implements
   }
 
   push() {
-    this.versionControlService.push([this.rootProxy.item.
-      id], this.pushRemoteNameInput).subscribe((pushStatusMap: any) => {
+    this.versionControlService.push(
+      [this.rootProxy.item.id], this.pushRemoteNameInput).subscribe(
+        (pushStatusMap: any) => {
         if (pushStatusMap.error) {
           this._toastrService.error('Push Failed', 'Version Control');
           this._notificationService.addNotifications('ERROR: Version Control - Push Failed');
@@ -122,4 +136,11 @@ export class RepositoriesComponent extends NavigatableComponent implements
         }
       });
   }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this.dialogueService.openComponentDialog(DetailsComponent, {
+      data: { itemProxy: itemProxy }
+    }).updateSize('90%', '90%');
+  }
+
 }

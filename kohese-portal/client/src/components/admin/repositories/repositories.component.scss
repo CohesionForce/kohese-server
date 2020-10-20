@@ -1,3 +1,25 @@
+.version-control-admin {
+  padding: 5px;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+
+  .repository-panel {
+    margin: 5px;
+  }
+
+  .remote-container {
+    height: 80px;
+    overflow: auto;
+    border: 1px solid black;
+  }
+}
+
+.repo-list {
+  height: calc(100% - 365.7px);
+  overflow: auto;
+}
+
 // Every other row is colored
 mat-row:nth-child(even) {
   background-color: rgb(245,245,245);
@@ -14,6 +36,6 @@ mat-row:hover {
 }
 
 // Buttons become visible when mouse hovers over row
-mat-row:hover button{
+mat-row:hover button {
   visibility: visible;
 }

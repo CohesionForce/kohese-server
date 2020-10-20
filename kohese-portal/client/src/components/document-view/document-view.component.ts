@@ -182,7 +182,7 @@ implements OnInit, OnDestroy {
     if (this.filterSubscription) {
       this.filterSubscription.unsubscribe();
     }
-    
+
     if (this.proxyStreamSubscription) {
       this.proxyStreamSubscription.unsubscribe();
     }
@@ -299,10 +299,5 @@ implements OnInit, OnDestroy {
         this.invalidFilterRegex = false;
       }
     }
-  }
-
-  selectRow(row: any, proxy: ItemProxy) {
-    row.rowState = 'show';
-    this.proxySelected.emit(proxy);
   }
 }

@@ -25,7 +25,6 @@ export class ActionTableComponent extends NavigatableComponent
 
 
   baseRowDef: Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'nav'];
-  actionRowDef: Array<string> = ['name', 'predecessors', 'state', 'assignedTo', 'estimatedHoursEffort', 'remainingHoursEffort', 'actualHoursEffort', 'actions'];
 
   /* Subscriptions */
   proxyStreamSub: Subscription;

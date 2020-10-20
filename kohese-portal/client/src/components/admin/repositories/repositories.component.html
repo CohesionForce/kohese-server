@@ -1,67 +1,79 @@
 <div class="version-control-admin">
-        <h4>
-            Version Control:
-        </h4>
-        <button (click)="getRemotes()"
-                        class="btn btn-primary">Refresh Remotes</button>
-          <h5>Repository List:</h5>
-              <div class="remote-container">
-                <div *ngFor="let repo of remotes">
-                  {{repo}}
-                </div>
-              </div>
-        <div>
-            <label for="add-remote-input">Remote Name: </label>
-            <input id="add-remote-input" type="text" [(ngModel)]="remoteNameInput"/>
-            <label for="push-remote-url">Push URL:</label>
-            <input id="add-remote-url" type="text" 
-                    [(ngModel)]="remoteUrlInput">
-            <button (click)="addRemote()" 
-                    class="btn btn-primary">Add Remote</button>
-        </div>
+  <div>
+    <h4>Version Control:</h4>
+    <button class="btn btn-primary" (click)="getRemotes()">Refresh Remotes</button>
 
-        <div>
-            <h4>Commit/Push Item Changes</h4>
-            <label for="commit-message-input">Commit Message: </label>
-            <input id="commit-message-input" type="text" [(ngModel)]="commitMessageInput" />
-            <button (click)="commit()"
-                    class="btn btn-primary">Commit Staged Items</button>
-            <br/>
-            <label for="push-remote-name">Push to :</label>
-            <input id="push-remote-name" type="text" 
-                   [(ngModel)]="pushRemoteNameInput">
-            <button (click)="push()"
-                    class="btn btn-primary">Push</button>
-        </div>
-        
-        <hr/>
-    <h4>
-        Repositories:
-    </h4>
-    <hr/>
-    <div class="panel repository-panel"
-         *ngFor="let repository of repositories"
-            >
-        <div class="panel-title">
-            {{repository.item.name}}
-        </div>
-        <div class="panel-body">
-            <h5>
-                <b>Description:</b>
-            </h5>
-            {{repository.item.description}}
-            <br/>
-            <h5>
-                <b>Items:</b>
-            </h5>
-            {{repository.descendantCount}}
-        </div>
-        <div class="panel-footer">
-            <button class="btn btn-default"
-                    (click)="navigate('Explore', { id: repository.item.id })">
-                Go <i class="fa fa-chevron-right"></i>
-            </button>
-        </div>
+      <div class="remote-container">
+        <div *ngFor="let repo of remotes">{{repo}}</div>
+      </div>
 
+    <div class="remote-options">
+      <label for="add-remote-input">Remote Name: </label>
+      <input id="add-remote-input" type="text" [(ngModel)]="remoteNameInput"/>
+      <label for="push-remote-url">Push URL:</label>
+      <input id="add-remote-url" type="text" [(ngModel)]="remoteUrlInput"/>
+      <button class="btn btn-primary" (click)="addRemote()">Add Remote</button>
     </div>
+
+    <div class="commit-options">
+      <h4>Commit/Push Item Changes</h4>
+      <label for="commit-message-input">Commit Message: </label>
+      <input id="commit-message-input" type="text" [(ngModel)]="commitMessageInput"/>
+      <button class="btn btn-primary" (click)="commit()">Commit Staged Items</button>
+      <br/>
+      <label for="push-remote-name">Push to :</label>
+      <input id="push-remote-name" type="text" [(ngModel)]="pushRemoteNameInput"/>
+      <button class="btn btn-primary" (click)="push()">Push</button>
+    </div>
+
+    <hr/>
+    <h4>Repositories:</h4>
+  </div>
+  <div class="repo-list">
+    <mat-table [dataSource] = "repositories"
+      class="mat-elevation-z8" style="width: 100%;">
+
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+        <mat-cell *matCellDef="let repository">{{repository.item.name}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="count">
+        <mat-header-cell *matHeaderCellDef> Items </mat-header-cell>
+        <mat-cell *matCellDef="let repository">{{repository.descendantCount}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+        <mat-cell *matCellDef="let repository"> {{repository.item.description | truncate : 120}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="nav">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let repository" style="display: flex; justify-content: flex-end;">
+          <div class="hidden-buttons"> <!-- For SCSS styling -->
+            <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(repository)">
+              <mat-icon class="fa fa-clone"></mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu">
+              <mat-icon class="fa fa-bars"></mat-icon>
+            </button>
+            <mat-menu #menu="matMenu" [overlapTrigger]="false">
+              <button mat-menu-item (click)="navigationService.navigate('Explore', { id: repository.item.id })">
+                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                Navigate in Explorer
+              </button>
+              <button mat-menu-item (click)="navigationService.addTab('Explore', { id: repository.item.id })">
+                <mat-icon class="fa fa-external-link"></mat-icon>
+                Navigate in New Tab
+              </button>
+            </mat-menu>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
+      <mat-row *matRowDef="let proxy; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
+    </mat-table>
+  </div>
 </div>
