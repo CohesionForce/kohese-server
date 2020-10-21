@@ -73,7 +73,7 @@
       <mat-table [dataSource]="phrasesDataSource" class="mat-elevation-z8" style="width: 100%;">
         <ng-container matColumnDef="text">
           <mat-header-cell *matHeaderCellDef (click)="sort('text')">
-             Text &nbsp;
+             Phrase &nbsp;
             <span *ngIf="sortField === 'text'">
               <i *ngIf="ascending" class="fa fa-caret-up"></i>
               <i *ngIf="!ascending" class="fa fa-caret-down"></i>
