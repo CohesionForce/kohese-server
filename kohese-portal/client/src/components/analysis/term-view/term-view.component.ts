@@ -13,6 +13,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 
 import * as $ from 'jquery';
 import { FormControl } from '@angular/forms';
+import { MatTableDataSource } from '@angular/material';
 @Component({
   selector: 'term-view',
   templateUrl : './term-view.component.html',
@@ -23,7 +24,7 @@ export class TermViewComponent extends AnalysisViewComponent
                                    implements OnInit, OnDestroy {
    /* UI Switches */
    loadLimit: number = 1000;
-   ascending: boolean = true;
+   ascending: boolean = false;
    sortField: string = 'count';
    filters: Array<RegExp> = [];
    filterOptions : object;
@@ -35,6 +36,7 @@ export class TermViewComponent extends AnalysisViewComponent
    filteredCount : number;
    displayedCount : number;
    terms: Array<any>;
+   termsDataSource: MatTableDataSource<any>;
 
    /* Data */
    public itemProxy: ItemProxy;
@@ -52,11 +54,23 @@ export class TermViewComponent extends AnalysisViewComponent
    private filterSubjectSubscription: Subscription;
    private proxyStreamSubscription : Subscription;
 
-   constructor(NavigationService: NavigationService, AnalysisService:
-     AnalysisService, private dataProcessingService: DataProcessingService,
-     private changeRef : ChangeDetectorRef, dialogService: DialogService,
-     itemRepository: ItemRepository) {
-     super(NavigationService, AnalysisService, dialogService, itemRepository);
+   /* Table Data and Column Definitions */
+   defaultRowDef: Array<string> = ["text", "count"];
+   POSrowDef: Array<string> = ["text", "count", "posCount"];
+   rowDef: Array<string> = this.defaultRowDef;
+
+
+   constructor(
+     NavigationService: NavigationService,
+     AnalysisService: AnalysisService,
+     private dataProcessingService: DataProcessingService,
+     private changeRef : ChangeDetectorRef,
+     dialogService: DialogService,
+     itemRepository: ItemRepository
+     ) {
+     super(
+       NavigationService, AnalysisService,
+       dialogService, itemRepository);
    }
 
   ngOnInit(): void {
@@ -92,7 +106,21 @@ export class TermViewComponent extends AnalysisViewComponent
   }
 
   sort(property: string): void {
-    this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
+    if(this.sortField === property) {
+      this.ascending = !this.ascending;
+    } else {
+      // Establish default sort order based on property
+      switch(property) {
+        case 'text':
+          this.ascending = true;
+          break;
+        case 'count':
+          this.ascending = false;
+          break;
+        default:
+          break;
+      }
+    }
     this.sortField = property;
     this.processTerms();
     this.changeRef.markForCheck();
@@ -129,11 +157,17 @@ export class TermViewComponent extends AnalysisViewComponent
       }]
     );
 
-  this.filteredCount = filteredList.length;
+    this.filteredCount = filteredList.length;
 
     this.terms = this.dataProcessingService.sort(filteredList,[this.sortField],
       this.ascending).slice(0, this.loadLimit);
 
+    this.termsDataSource = new MatTableDataSource(this.terms);
     this.displayedCount = this.terms.length;
+  }
+
+  toggleShowPOS(): void {
+    this.showPOS = !this.showPOS;
+    this.rowDef = this.showPOS ? this.POSrowDef : this.defaultRowDef;
   }
 }

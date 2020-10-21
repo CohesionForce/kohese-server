@@ -10,6 +10,7 @@ import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { MatTableDataSource } from '@angular/material';
 
 import * as $ from 'jquery';
 import { FormControl } from '@angular/forms';
@@ -26,7 +27,7 @@ export class PhraseViewComponent extends AnalysisViewComponent
   implements OnInit, OnDestroy {
   /* UI Switches */
   loadLimit: number = 1000;
-  ascending: boolean = true;
+  ascending: boolean = false;
   sortField: string = 'count';
   filters: Array<RegExp> = [];
   showPOS: boolean = false;
@@ -34,6 +35,7 @@ export class PhraseViewComponent extends AnalysisViewComponent
   filteredCount: number;
   displayedCount: number;
   phrases: Array<any> = [];
+  phrasesDataSource: MatTableDataSource<any>;
   filterOptions : object;
   filterControl : FormControl = new FormControl('');
   lastFilter : AnalysisFilter;
@@ -55,10 +57,19 @@ export class PhraseViewComponent extends AnalysisViewComponent
   private filterSubjectSubscription: Subscription;
   private proxyStreamSubscription : Subscription;
 
-  constructor(NavigationService: NavigationService, AnalysisService:
-    AnalysisService, private dataProcessingService: DataProcessingService,
-    private changeRef : ChangeDetectorRef, dialogService: DialogService,
-    itemRepository: ItemRepository) {
+  /* Table Data and Column Definitions */
+  defaultRowDef: Array<string> = ["text", "count"];
+  POSrowDef: Array<string> = ["text", "count", "posCount"];
+  rowDef: Array<string> = this.defaultRowDef;
+
+  constructor(
+    NavigationService: NavigationService,
+    AnalysisService: AnalysisService,
+    private dataProcessingService: DataProcessingService,
+    private changeRef : ChangeDetectorRef,
+    dialogService: DialogService,
+    itemRepository: ItemRepository
+    ) {
     super(NavigationService, AnalysisService, dialogService, itemRepository);
   }
 
@@ -112,7 +123,21 @@ export class PhraseViewComponent extends AnalysisViewComponent
   }
 
   sort(property: string): void {
-    this.sortField === property ? (this.ascending = !this.ascending) : (this.ascending = true);
+    if(this.sortField === property) {
+      this.ascending = !this.ascending;
+    } else {
+      // Establish default sort order based on property
+      switch(property) {
+        case 'text':
+          this.ascending = true;
+          break;
+        case 'count':
+          this.ascending = false;
+          break;
+        default:
+          break;
+      }
+    }
     this.sortField = property;
     this.processPhrases();
     this.changeRef.markForCheck();
@@ -154,7 +179,13 @@ export class PhraseViewComponent extends AnalysisViewComponent
 
     this.phrases = this.dataProcessingService.sort(filteredList,
       [this.sortField], this.ascending).slice(0, this.loadLimit);
+    this.phrasesDataSource = new MatTableDataSource(this.phrases);
 
     this.displayedCount = this.phrases.length;
+  }
+
+  toggleShowPOS(): void {
+    this.showPOS = !this.showPOS;
+    this.rowDef = this.showPOS ? this.POSrowDef : this.defaultRowDef;
   }
 }
