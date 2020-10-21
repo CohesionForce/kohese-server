@@ -21,6 +21,7 @@ import { NavigationService } from "../../../services/navigation/navigation.servi
 export class DocumentRowComponent implements OnInit, AfterViewInit {
   @Input() row;
   @Input() docInfo;
+  @Input() showActions: boolean = true;
   @Output() viewInitialized: EventEmitter<ElementRef> = new EventEmitter<ElementRef>()
 
   docReader: Parser;
