@@ -1,51 +1,59 @@
 <div #menuDiv style="visibility: hidden; position: fixed" [matMenuTriggerFor]="contextMenu"></div>
 <div class="document-row" (contextmenu)="onContextMenu($event, menuDiv, docInfo.proxy)">
 
-    <div id="menuWrapper">
+  <div class="float-container">
+    <div class="float-child-1">
       <ng-container id="dirty" *ngIf="docInfo.proxy.dirty">
         <button mat-icon-button [disabled]="true">
           <img src="assets/icons/versioncontrol/dirty.ico" />
         </button>
       </ng-container>
-      <ng-container *ngIf="!row.editable else editableBlock">
-        <button mat-icon-button matTooltip="Edit this Item" style="margin-left: auto;"
-          [disabled]="row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing"
-          (click)="row.editable = true">
-          <mat-icon class="fa fa-edit"></mat-icon>
-        </button>
-      </ng-container>
-      <ng-template #editableBlock>
-        <button mat-icon-button matTooltip="Save this Item" style="margin-left: auto;"
-          [disabled]="!row.editable || !docInfo.proxy.dirty"
-          (click)="save(docInfo.proxy, row, docInfo);">
-          <mat-icon class="fa fa-save"></mat-icon>
-        </button>
-        <button mat-icon-button matTooltip="Discard unsaved changes to this Item"
-          [disabled]="!row.editable" (click)="discardChanges(docInfo.proxy)">
-          <mat-icon class="fa fa-times"></mat-icon>
-        </button>
-      </ng-template>
-      <button mat-icon-button (click)="displayInformation(docInfo.proxy)">
-        <mat-icon class="fa fa-clone"></mat-icon>
-      </button>
-      <button mat-icon-button [matMenuTriggerFor]="rowMenu">
-        <mat-icon class="fa fa-bars"></mat-icon>
-      </button>
-      <mat-menu #rowMenu="matMenu">
-        <ng-template matMenuContent>
-          <button mat-menu-item
-            (click)="navigationService.navigate('Explore', { id: docInfo.proxy.item.id })">
-            <mat-icon class="fa fa-arrow-right"></mat-icon>
-            Navigate in Explorer
+    </div>
+    <div class="float-child-2">
+      <div id="menuWrapper">
+        <ng-container *ngIf="!row.editable else editableBlock">
+          <button mat-icon-button matTooltip="Edit this Item" style="margin-left: auto;"
+            [disabled]="row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing"
+            (click)="row.editable = true">
+            <mat-icon class="fa fa-edit"></mat-icon>
           </button>
-          <button mat-menu-item
-            (click)="navigationService.addTab('Explore', { id: docInfo.proxy.item.id })">
-            <mat-icon class="fa fa-external-link"></mat-icon>
-            Navigate in New Tab
+        </ng-container>
+        <ng-template #editableBlock>
+          <button mat-icon-button matTooltip="Save this Item" style="margin-left: auto;"
+            [disabled]="!row.editable || !docInfo.proxy.dirty"
+            (click)="save(docInfo.proxy, row, docInfo);">
+            <mat-icon class="fa fa-save"></mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Discard unsaved changes to this Item"
+            [disabled]="!row.editable" (click)="discardChanges(docInfo.proxy)">
+            <mat-icon class="fa fa-times"></mat-icon>
           </button>
         </ng-template>
-      </mat-menu>
+        <button mat-icon-button (click)="displayInformation(docInfo.proxy)">
+          <mat-icon class="fa fa-clone"></mat-icon>
+        </button>
+        <button mat-icon-button [matMenuTriggerFor]="rowMenu">
+          <mat-icon class="fa fa-bars"></mat-icon>
+        </button>
+        <mat-menu #rowMenu="matMenu">
+          <ng-template matMenuContent>
+            <button mat-menu-item
+              (click)="navigationService.navigate('Explore', { id: docInfo.proxy.item.id })">
+              <mat-icon class="fa fa-arrow-right"></mat-icon>
+              Navigate in Explorer
+            </button>
+            <button mat-menu-item
+              (click)="navigationService.addTab('Explore', { id: docInfo.proxy.item.id })">
+              <mat-icon class="fa fa-external-link"></mat-icon>
+              Navigate in New Tab
+            </button>
+          </ng-template>
+        </mat-menu>
+      </div>
     </div>
+  </div>
+
+
 
   <mat-menu #contextMenu="matMenu">
     <ng-template matMenuContent>
