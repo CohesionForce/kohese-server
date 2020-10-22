@@ -6,7 +6,6 @@ import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../../details/details.component';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { MatMenuTrigger } from "@angular/material";
-import { MenuItem } from "../../../context-menu/context-menu.component";
 
 @Component({
   selector: "reference-table",

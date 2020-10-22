@@ -8,7 +8,6 @@ import { DialogService } from '../../../../services/dialog/dialog.service';
 import { Subscription, BehaviorSubject, Observable } from 'rxjs';
 import { MatMenuTrigger, MatTableDataSource } from '@angular/material'
 import { DetailsComponent } from '../../../details/details.component';
-import { ContextMenuComponent, MenuItem } from '../../../context-menu/context-menu.component';
 
 @Component({
   selector: 'children-table',
@@ -41,9 +40,6 @@ export class ChildrenTableComponent extends NavigatableComponent implements OnIn
   /* Data */
   rowDef: Array<string>;
   children: Array<ItemProxy>;
-
-  /*Context Menu */
-  contextMenuPosition = { x: '0px', y: '0px' };
 
   get navigationService() {
     return this._navigationService;
@@ -106,39 +102,4 @@ export class ChildrenTableComponent extends NavigatableComponent implements OnIn
       data: { itemProxy: itemProxy }
     }).updateSize('90%', '90%');
   }
-
-  onContextMenu(event: MouseEvent, contextMenuComponent: ContextMenuComponent) {
-    event.preventDefault();
-    contextMenuComponent.x = event.clientX + 'px';
-    contextMenuComponent.y = event.clientY + 'px';
-    contextMenuComponent.contextMenu.menu.focusFirstItem('mouse');
-    contextMenuComponent.contextMenu.openMenu();
-  }
-
-  public getMenuItems(itemProxy: ItemProxy): MenuItem[] {
-    return [{
-      action: 'Display Item',
-      icon: 'fa fa-clone',
-      execute: () => {
-        this._dialogService.openComponentDialog(DetailsComponent, {
-          data: { itemProxy: itemProxy }
-        }).updateSize('90%', '90%');
-      }
-    }, {
-      action: 'Navigate in Explorer',
-      icon: 'fa fa-arrow-right',
-      execute: () => {
-        console.log('Executed: Navigate in Explorer');
-        this._navigationService.navigate('Explore', { id: itemProxy.item.id });
-      },
-    }, {
-      action: 'Open in New Tab',
-      icon: 'fa fa-external-link',
-      execute: () => {
-        this._navigationService.addTab('Explore', { id: itemProxy.item.id });
-      }
-    }]
-  }
-
 }
-
