@@ -1,3 +1,51 @@
+:host {
+  height: 100%;
+  width:  100%;
+  overflow: hidden;
+
+  .panel {
+    height: 100%;
+    width:  100%;
+    overflow: hidden;
+
+    .panel-body {
+      height: calc(100% - 50px);
+      padding-right: 0px;
+
+      #phrase-div {
+        height: calc(100% - 131px);
+        width: 100%;
+        overflow: auto;
+      }
+    }
+  }
+}
+
+// Every other row is colored
+mat-row:nth-child(even) {
+  background-color: rgb(245,245,245);
+}
+
+// Highlights row when mouse hovers over it
+mat-row:hover {
+  background-color: rgb(230,230,230);
+}
+
+// Buttons are initially hidden
+.hidden-buttons button {
+  visibility:hidden;
+}
+
+// Buttons become visible when mouse hovers over row
+mat-row:hover button {
+  visibility: visible;
+}
+
+mat-header-cell {
+  font-size: medium;
+  font-weight: bold;
+}
+
 .syncOn {
   background-color: whitesmoke;
   color : green;

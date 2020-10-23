@@ -31,7 +31,7 @@
       <mat-icon class="fa fa-gear"></mat-icon>
     </button>
     <mat-menu #optionsMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item (click)="showPOS = !showPOS">
+      <button mat-menu-item (click)="toggleShowPOS()">
         <mat-icon *ngIf="showPOS" class="fa fa-check"></mat-icon>
         <mat-icon *ngIf="!showPOS" class="fa fa-uncheck"></mat-icon>
         Show POS
@@ -39,68 +39,74 @@
     </mat-menu>
   </div>
   <div class="panel-body">
-    <mat-form-field>
+    <div>
+      <mat-form-field>
       <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processPhrases()">
         <mat-option *ngFor="let filterCriteria of phrasePOSFilterCriteriaList" [value]="filterCriteria">
           {{filterCriteria}}
         </mat-option>
       </mat-select>
-    </mat-form-field>
-    <span>
-      <mat-checkbox [(ngModel)]="filterExactMatch">
-        Exact Match
-      </mat-checkbox>
-      <mat-checkbox [(ngModel)]="filterIgnoreCase">
-        Ignore Case
-      </mat-checkbox>
-    </span>
-    <br/>
-    <mat-form-field>
-      <input matInput type="text" class="input-sm"
-        [formControl]="filterControl" placeholder="Filter"
-        [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processPhrases()"/>
-    </mat-form-field>
-    <button mat-raised-button (click)="submitFilter(filterControl.value)"
-      class="btn btn-default fa fa-search">Submit
-    </button>
+      </mat-form-field>
+      <span>
+        <mat-checkbox [(ngModel)]="filterExactMatch">
+          Exact Match
+        </mat-checkbox>
+        <mat-checkbox [(ngModel)]="filterIgnoreCase">
+          Ignore Case
+        </mat-checkbox>
+      </span>
+      <br/>
+      <mat-form-field>
+        <input matInput type="text" class="input-sm"
+          [formControl]="filterControl" placeholder="Filter"
+          [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processPhrases()"/>
+      </mat-form-field>
+      <button mat-raised-button (click)="submitFilter(filterControl.value)"
+        class="btn btn-default fa fa-search">Submit
+      </button>
+    </div>
     <div id="phrase-div">
-      <table id="thePhrasesSummary"
-        class="table tree-grid table-striped table-condensed table-hover">
-        <thead>
-          <th>
-            <span (click)="sort('text')">
-              Text
-              <span *ngIf="sortField === 'text'">
-                <i *ngIf="ascending" class="fa fa-chevron-up"></i>
-                <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
-              </span>
+
+      <mat-table [dataSource]="phrasesDataSource" class="mat-elevation-z8" style="width: 100%;">
+        <ng-container matColumnDef="text">
+          <mat-header-cell *matHeaderCellDef (click)="sort('text')">
+             Phrase &nbsp;
+            <span *ngIf="sortField === 'text'">
+              <i *ngIf="ascending" class="fa fa-caret-up"></i>
+              <i *ngIf="!ascending" class="fa fa-caret-down"></i>
             </span>
-          </th>
-          <th (click)="sort('count')">
-            <span>Count
-              <span *ngIf="sortField === 'count'">
-                <i *ngIf="ascending" class="fa fa-chevron-up"></i>
-                <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
-              </span>
+            </mat-header-cell>
+          <mat-cell *matCellDef="let summary" (click)="submitFilter(summary.text)">
+            {{summary.text}}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="count">
+          <mat-header-cell *matHeaderCellDef (click)="sort('count')">
+             Occurrences &nbsp;
+            <span *ngIf="sortField === 'count'">
+              <i *ngIf="ascending" class="fa fa-caret-up"></i>
+              <i *ngIf="!ascending" class="fa fa-caret-down"></i>
             </span>
-          </th>
-          <th *ngIf="showPOS">POS Count</th>
-        </thead>
-        <tbody id="thePhrasesBody">
-          <tr class="tree-grid-row" id="Phrase:{{summary.text}}"
-            *ngFor="let summary of phrases">
-            <td (click)="submitFilter(summary.text)"
-              class="tree-label"
-              [innerHTML]="summary.text | highlightRegex:filterRegexHighlight:true">
-            </td>
-            <td>{{summary.count}}</td>
-            <td *ngIf="showPOS">{{summary.posCount | json}}</td>
-          </tr>
-        </tbody>
-      </table>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let summary">
+            {{summary.count}}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="posCount">
+          <mat-header-cell *matHeaderCellDef> POS Occurrences </mat-header-cell>
+          <mat-cell *matCellDef="let summary">
+            {{summary.posCount | json}}
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let summary; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
+      </mat-table>
     </div>
   </div>
 </div>

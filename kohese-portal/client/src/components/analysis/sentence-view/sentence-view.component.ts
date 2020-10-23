@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetect
 import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
 import * as Mark from 'mark.js';
 
-import { AnalysisViewComponent, AnalysisFilter, AnalysisViews,
-  DataFormat } from '../AnalysisViewComponent.class';
+import { AnalysisViewComponent, AnalysisFilter, AnalysisViews, DataFormat } from '../AnalysisViewComponent.class';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
@@ -13,6 +12,7 @@ import { DataProcessingService } from '../../../services/data/data-processing.se
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
+import { MatTableDataSource } from '@angular/material';
 
 import * as $ from 'jquery';
 
@@ -36,6 +36,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
   filteredCount : number;
   displayedCount : number;
   sentences: Array<any>;
+  sentencesDataSource: MatTableDataSource<any>;
   filterOptions : object;
   lastFilter : AnalysisFilter;
 
@@ -53,6 +54,9 @@ export class SentenceViewComponent extends AnalysisViewComponent
   /* Subscriptions */
   private filterSubjectSubscription: Subscription;
   private proxyStreamSubscription : Subscription;
+
+  /* Table Data and Column Definitions */
+  rowDef: Array<string> = ["category", "type","text"];
 
   constructor(NavigationService: NavigationService, AnalysisService:
     AnalysisService, private dataProcessingService: DataProcessingService,
@@ -101,15 +105,19 @@ export class SentenceViewComponent extends AnalysisViewComponent
   sort(property: string): void {
     if (this.sortField === property){
       if (this.ascending){
+        // Change to Descending Sort
         this.ascending = false;
       } else {
+        // Remove Sorting on Third Click
         this.sortField = null;
       }
     } else {
+      // Establish Sorting on Property
       this.sortField = property;
       this.ascending = true;
     }
     this.processSentences();
+    this.changeRef.markForCheck();
   }
 
   toggleLink () {
@@ -150,33 +158,33 @@ export class SentenceViewComponent extends AnalysisViewComponent
     }
 
     this.sentences = filteredList.slice(0, this.loadLimit);
+    this.sentencesDataSource = new MatTableDataSource(this.sentences);
     this.displayedCount = this.sentences.length;
-
   }
-  
+
   public sentenceCopy(): void {
     let copyEventListener: (clipboardEvent: ClipboardEvent) => void =
       (clipboardEvent: ClipboardEvent) => {
       clipboardEvent.preventDefault();
-      
+
       clipboardEvent.clipboardData.setData('text/html', this.
         getSentenceTableContent(DataFormat.HTML));
       clipboardEvent.clipboardData.setData('text/plain', this.
         getSentenceTableContent(DataFormat.TXT));
-      
+
       document.removeEventListener('copy', copyEventListener);
     };
-    
+
     document.addEventListener('copy', copyEventListener);
     document.execCommand('copy');
   }
-  
+
   private getSentenceTableContent(dataFormat: DataFormat): string {
     let content: string;
     if (dataFormat === DataFormat.HTML) {
       content = '<table><tr><th>Category</th><th>Type</th><th>Content</th>' +
         '</tr>';
-      
+
       for (let j: number = 0; j < this.sentences.length; j++) {
         let type: string = this.sentences[j].displayType;
         if (((type === 'Item') && this.showItemsInDetails) || ((type ===
@@ -188,11 +196,11 @@ export class SentenceViewComponent extends AnalysisViewComponent
             '</td></tr>');
         }
       }
-      
+
       content += '</table>';
     } else if (dataFormat === DataFormat.CSV) {
       content = 'Category,Type,Content';
-      
+
       for (let j: number = 0; j < this.sentences.length; j++) {
         let type: string = this.sentences[j].displayType;
         if (((type === 'Item') && this.showItemsInDetails) || ((type ===
@@ -207,7 +215,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
       // Limit total width to 80 characters
       content = 'Category   Type                              ' +
         'Content\n\n';
-      
+
       for (let j: number = 0; j < this.sentences.length; j++) {
         let type: string = this.sentences[j].displayType;
         if (((type === 'Item') && this.showItemsInDetails) || ((type ===
@@ -219,9 +227,9 @@ export class SentenceViewComponent extends AnalysisViewComponent
           for (let k: number = category.length; k < 8; k++) {
             category += ' ';
           }
-          
+
           content += (category + '   ');
-          
+
           let typeRemainder: string = type;
           let contentRemainder: string = sentence.text;
           for (let k: number = (contentRemainder.length - 1); k >= 0; k--) {
@@ -232,44 +240,44 @@ export class SentenceViewComponent extends AnalysisViewComponent
                 contentRemainder.substring(k + 1));
             }
           }
-          
+
           let afterFirstLine: boolean = false;
           while (typeRemainder || contentRemainder) {
             if (afterFirstLine) {
               content += '           ';
             }
-            
+
             if (typeRemainder.length < 31) {
               for (let k: number = typeRemainder.length; k < 31; k++) {
                 typeRemainder += ' ';
               }
             }
-            
+
             content += (typeRemainder.substring(0, 31) + '   ');
             typeRemainder = typeRemainder.substring(31);
-            
+
             if (contentRemainder.length < 34) {
               for (let k: number = contentRemainder.length; k < 34; k++) {
                 contentRemainder += ' ';
               }
             }
-            
+
             content += contentRemainder.substring(0, 34);
             contentRemainder = contentRemainder.substring(34);
-            
+
             content += '\n';
-            
+
             afterFirstLine = true;
           }
-          
+
           content += '\n';
         }
       }
     }
-    
+
     return content;
   }
-  
+
   public async sentenceExport(dataFormat: DataFormat): Promise<void> {
     let name: any = await this.dialogService.openInputDialog('Export', '',
       InputDialogKind.STRING, 'Name', this.itemProxy.item.name + '_' + new Date().
@@ -285,7 +293,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
       downloadAnchor.click();
     }
   }
-  
+
   public highlight(element: any): void {
     let highlightContext: any = new Mark('document-row h1, document-row h2, ' +
       'document-row h3, document-row h4, document-row h5, document-row h6, '+
@@ -302,7 +310,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
       }
     });
   }
-  
+
   public getCategory(element: any): string {
     switch (element.displayLevel) {
       case 1:
@@ -314,7 +322,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
       case 4:
         return 'Token';
     }
-    
+
     return '';
   }
 }

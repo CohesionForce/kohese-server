@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 export class DataProcessingService {
   constructor() {
   }
-  
+
   filter<T>(array: Array<T>, criteria: Array<(value: T) => boolean>): Array<T> {
     let filteredArray: Array<T> = [];
     for (let j = 0; j < array.length; j++) {
@@ -15,15 +15,15 @@ export class DataProcessingService {
           break;
         }
       }
-      
+
       if (passes) {
         filteredArray.push(array[j]);
       }
     }
-    
+
     return filteredArray;
   }
-  
+
   sort<T>(array: Array<T>, properties: Array<string>, ascending: boolean) {
     let sortedArray: Array<T> = array;
     for (let j = 0; j < properties.length; j++) {
@@ -32,7 +32,7 @@ export class DataProcessingService {
         let secondValue: any = second[properties[j]];
         let comparison: number = 0;
         if (typeof firstValue === 'number') {
-          let difference: number = +secondValue - +firstValue;
+          let difference: number = +firstValue - +secondValue;
           comparison = ((difference > 0) ? 1 : (difference < 0 ? -1 : 0));
         } else {
           let firstString: string = JSON.stringify(firstValue);
@@ -43,15 +43,15 @@ export class DataProcessingService {
             comparison = -1;
           }
         }
-      
+
         if (!ascending) {
           comparison = -comparison;
         }
-      
+
         return comparison;
       });
     }
-    
+
     return sortedArray;
   }
 }

@@ -36,47 +36,56 @@
             [(ngModel)]="loadLimit" (ngModelChange)="processSentences()" placeholder="Details Limit"/>
         </mat-form-field>
       </span>
+      <mat-checkbox [(ngModel)]="showItemsInDetails" (ngModelChange)="onCriteriaChange()">
+        Items
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="showSentencesInDetails" (ngModelChange)="onCriteriaChange()">
+        Sentences
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="showPhrasesInDetails" (ngModelChange)="onCriteriaChange()">
+        Phrases
+      </mat-checkbox>
+      <mat-checkbox [(ngModel)]="showTokensInDetails" (ngModelChange)="onCriteriaChange()">
+        Tokens
+      </mat-checkbox>
     </div>
-    <mat-checkbox [(ngModel)]="showItemsInDetails" (ngModelChange)="onCriteriaChange()">
-      Items
-    </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showSentencesInDetails" (ngModelChange)="onCriteriaChange()">
-      Sentences
-    </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showPhrasesInDetails" (ngModelChange)="onCriteriaChange()">
-      Phrases
-    </mat-checkbox>
-    <mat-checkbox [(ngModel)]="showTokensInDetails" (ngModelChange)="onCriteriaChange()">
-      Tokens
-    </mat-checkbox>
     <div id="sentence-div">
-      <table id="theDetails"
-        class="table tree-grid table-striped table-condensed table-hover">
-        <thead>
-          <th>Category</th>
-          <th style="width:20%; min-width:200px; max-width:350px">Type</th>
-          <th>
-            <span (click)="sort('text')">
-              Text
-              <span *ngIf="sortField === 'text'">
-                <i *ngIf="ascending" class="fa fa-chevron-up"></i>
-                <i *ngIf="!ascending" class="fa fa-chevron-down"></i>
-              </span>
+      <mat-table [dataSource]="sentencesDataSource" class="mat-elevation-z8" style="width: 100%;">
+
+        <ng-container matColumnDef="category">
+          <mat-header-cell *matHeaderCellDef>
+             Category &nbsp;
+          </mat-header-cell>
+          <mat-cell *matCellDef="let listItem">{{getCategory(listItem)}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <mat-header-cell *matHeaderCellDef>
+             Type &nbsp;
+          </mat-header-cell>
+          <mat-cell *matCellDef="let listItem" class="indented">{{listItem.displayType}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="text">
+          <mat-header-cell *matHeaderCellDef
+            (click)="sort('text')">
+             Sentence &nbsp;
+            <span *ngIf="sortField === 'text'">
+              <i *ngIf="ascending" class="fa fa-caret-up"></i>
+              <i *ngIf="!ascending" class="fa fa-caret-down"></i>
             </span>
-          </th>
-        </thead>
-        <tbody id="theDetailsBody">
-          <ng-container *ngFor="let listItem of sentences">
-            <tr class="level-{{listItem.displayLevel}}"
-              class="tree-grid-row" id="{{listItem.displayId}}"
-              (click)="highlight(listItem)">
-              <td>{{getCategory(listItem)}}</td>
-              <td><span class="indented">{{listItem.displayType}}</span></td>
-              <td [innerHTML]="listItem.text | highlightRegex:filterRegexHighlight:true"></td>
-            </tr>
-          </ng-container>
-        </tbody>
-      </table>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let listItem" (click)="highlight(listItem)">
+            {{listItem.text}}
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let listItem; columns: rowDef; let j=index;"
+          class="level-{{listItem.displayLevel}}"
+          tabindex="{{j}}">
+        </mat-row>
+      </mat-table>
     </div>
   </div>
 </div>
