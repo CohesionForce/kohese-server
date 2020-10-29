@@ -23,7 +23,7 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy {
     BehaviorSubject<Array<Comparison>>) {
     this._comparisonsSubject = comparisonsSubject;
   }
-  
+
   private _expanded: boolean = false;
   get expanded() {
     return this._expanded;
@@ -32,7 +32,7 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy {
   set expanded(expanded: boolean) {
     this._expanded = expanded;
   }
-  
+
   private _showDifferencesOnlySubject: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(true);
   get showDifferencesOnlySubject() {
@@ -43,31 +43,31 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy {
     BehaviorSubject<boolean>) {
     this._showDifferencesOnlySubject = showDifferencesOnlySubject;
   }
-  
+
   @ViewChildren(MatExpansionPanel)
   private _differencePanels: QueryList<MatExpansionPanel>;
-  
+
   get Comparison() {
     return Comparison;
   }
-  
+
   private _comparisonsSubscription: Subscription;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dialogService: DialogService) {
   }
-  
+
   public ngOnInit(): void {
     this._comparisonsSubscription = this._comparisonsSubject.subscribe((
       comparisons: Array<Comparison>) => {
       this._changeDetectorRef.markForCheck();
     });
   }
-  
+
   public ngOnDestroy(): void {
     this._comparisonsSubscription.unsubscribe();
   }
-  
+
   public expandAll(): void {
     let differencePanels: Array<MatExpansionPanel> = this._differencePanels.
       toArray();
@@ -75,7 +75,7 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy {
       differencePanels[j].open();
     }
   }
-  
+
   public collapseAll(): void {
     let differencePanels: Array<MatExpansionPanel> = this._differencePanels.
       toArray();
@@ -83,7 +83,7 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy {
       differencePanels[j].close();
     }
   }
-  
+
   public openComparisonDialog(comparison: Comparison): void {
     this._dialogService.openComponentDialog(CompareItemsComponent, {
       data: {
@@ -93,10 +93,10 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy {
       }
     }).updateSize('90%', '90%');
   }
-  
+
   public hasChanges(comparison: Comparison): boolean {
     let hasChanges: boolean = false;
-    if (comparison.propertyDiffDeferred) {
+    if (comparison.propertyDiffPending) {
       // Since this detection may occur more than once, only request the detail diff
       // if it is not already in progess
       if(!comparison.propertyDiffInProgress){
@@ -118,7 +118,7 @@ export class ChangeSummaryComponent implements OnInit, OnDestroy {
         break;
       }
     }
-    
+
     return hasChanges;
   }
 }

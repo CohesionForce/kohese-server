@@ -22,26 +22,31 @@ export class HistoryTabComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   @Input()
   proxyStream: BehaviorSubject<ItemProxy>;
-  
+
   private _versions: Array<any> = [];
   get versions() {
     return this._versions;
   }
-  
+
   @ViewChildren(MatExpansionPanel)
   private _expansionPanels: QueryList<MatExpansionPanel>;
-  
+
   private _differenceMap: Map<string, any> = new Map<string, any>();
   get differenceMap() {
     return this._differenceMap;
   }
-  
-  streamSub: Subscription;
 
-  constructor(protected NavigationService: NavigationService,
-    private changeRef: ChangeDetectorRef, private _dynamicTypesService:
-    DynamicTypesService) {
+  streamSub: Subscription;
+  itemCache: ItemCache;
+
+  constructor(
+    protected NavigationService: NavigationService,
+    private changeRef: ChangeDetectorRef,
+    private _dynamicTypesService:
+    DynamicTypesService,
+    ) {
     super(NavigationService);
+    this.itemCache = ItemCache.getItemCache();
   }
 
   ngOnInit() {
@@ -58,38 +63,44 @@ export class HistoryTabComponent extends NavigatableComponent
   ngOnDestroy() {
     this.streamSub.unsubscribe();
   }
-  
+
   public changeAllExpansionStates(expand: boolean): void {
     let expansionPanels: Array<MatExpansionPanel> = this.
       _expansionPanels.toArray();
     for (let j: number = 0; j < expansionPanels.length; j++) {
       expansionPanels[j].expanded = expand;
     }
-    
+
     this.changeRef.markForCheck();
   }
-  
+
   public async compare(version: any): Promise<void> {
     let itemProxy: ItemProxy = this.proxyStream.getValue();
-    let changeKoheseCommit: KoheseCommit = await ItemCache.getItemCache().
-      getCommit(version.commit);
-    let changeBlob: any = (await changeKoheseCommit.getTreeHashMap())[itemProxy.
-      item.id];
+    let changeKoheseCommit: KoheseCommit = await ItemCache.getItemCache().getCommit(version.commit);
+    let changeBlobTreeHash: any = (await changeKoheseCommit.getTreeHashMap())[itemProxy.item.id];
+    let changeBlob = await this.itemCache.getBlob(changeBlobTreeHash.oid);
+
+    let baseBlobTreeHash: any;
     let baseBlob: any;
     for (let j: number = 0; j < changeKoheseCommit.parents.length; j++) {
-      let baseKoheseCommit: KoheseCommit = await ItemCache.getItemCache().
-        getCommit(changeKoheseCommit.parents[j]);
-      baseBlob = (await baseKoheseCommit.getTreeHashMap())[itemProxy.item.
-        id];
-      if (baseBlob) {
-        break;
+      let baseKoheseCommit: KoheseCommit = await ItemCache.getItemCache().getCommit(changeKoheseCommit.parents[j]);
+      baseBlobTreeHash = (await baseKoheseCommit.getTreeHashMap())[itemProxy.item.id];
+      if (baseBlobTreeHash) {
+        baseBlob = await this.itemCache.getBlob(baseBlobTreeHash.oid);
+        if (baseBlob) {
+          break;
+        }
       }
     }
-    
+
     this._differenceMap.set(version.commit, await Compare.compareItems(
-      itemProxy.item.id, (baseBlob ? baseBlob.kind : undefined), (baseBlob ?
-      baseBlob.oid : undefined), itemProxy.item.id, changeBlob.kind,
-      changeBlob.oid, this._dynamicTypesService));
+      itemProxy.item.id,
+      baseBlobTreeHash ? baseBlobTreeHash.kind : undefined,
+      baseBlob,
+      itemProxy.item.id,
+      changeBlobTreeHash ? changeBlobTreeHash.kind : undefined,
+      changeBlob,
+      this._dynamicTypesService));
     this.changeRef.markForCheck();
   }
 }
