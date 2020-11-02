@@ -1,6 +1,6 @@
 <div style="height: 100%; width: 100%;">
   <lens></lens>
-  <split direction="vertical">
+  <split direction="horizontal">
     <split-area [size]="50">
       <commit-tree (rowSelected)="commitTreeRowSelected($event)"></commit-tree>
     </split-area>
@@ -17,7 +17,12 @@
                 <br/>
                 {{selectedVersionObject.koheseCommit.time | date:'medium'}}
               </h2>
-              <change-summary [comparisonsSubject]="comparisonsSubject">
+              <mat-checkbox (change)="toggleShowingDifferencesOnly()"
+                [checked]="(showDifferencesOnlySubject | async)">
+                Show Differences Only
+              </mat-checkbox>
+              <change-summary [comparisonsSubject]="comparisonsSubject"
+                [showDifferencesOnlySubject]="showDifferencesOnlySubject">
               </change-summary>
             </ng-container>
             <ng-container *ngSwitchCase="'Comparison'">
@@ -27,20 +32,11 @@
               <h3>
                 Path: {{selectedVersionObject.path}}
               </h3>
-              <!-- split direction="horizontal">
-                <split-area [size]="50">
-                  <comparison-side [sideChangeable]="false"
-                    [isBaseVersion]="true"
-                    [showDifferencesOnlySubject]="showDifferencesOnly">
-                  </comparison-side>
-                </split-area>
-                <split-area [size]="50">
-                  <comparison-side [sideChangeable]="false"
-                    [isBaseVersion]="false"
-                    [showDifferencesOnlySubject]="showDifferencesOnly">
-                  </comparison-side>
-                </split-area>
-              </split-->
+              <mat-checkbox (change)="toggleShowingDifferencesOnly()"
+                [checked]="(showDifferencesOnlySubject | async)">
+                Show Differences Only
+              </mat-checkbox>
+              <comparison [comparison]="selectedVersionObject" [showDifferencesOnlySubject]="showDifferencesOnlySubject"></comparison>
             </ng-container>
           </ng-container>
         </div>

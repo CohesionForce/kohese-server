@@ -22,18 +22,7 @@
             </mat-icon>
           </ng-container>
         </mat-expansion-panel-header>
-        <div
-          style="height: 50px; width: 100%; display: flex;
-            flex-direction: row;">
-          <button mat-icon-button matTooltip="Open comparison dialog"
-            (click)="openComparisonDialog(comparison)"
-            class="flex-right-align">
-            <mat-icon class="fa fa-exchange"></mat-icon>
-          </button>
-        </div>
-        <comparison [comparison]="comparison"
-          [showDifferencesOnlySubject]="showDifferencesOnlySubject">
-        </comparison>
+        <comparison [comparison]="comparison" [showDifferencesOnlySubject]="showDifferencesOnlySubject"></comparison>
       </mat-expansion-panel>
     </ng-container>
   </ng-container>
