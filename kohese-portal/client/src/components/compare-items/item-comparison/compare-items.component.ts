@@ -28,7 +28,7 @@ export class CompareItemsComponent implements OnInit {
   get baseProxySubject() {
     return this._baseProxySubject;
   }
-  
+
   private _selectedBaseVersion: string;
   get selectedBaseVersion() {
     return this._selectedBaseVersion;
@@ -36,18 +36,18 @@ export class CompareItemsComponent implements OnInit {
   set selectedBaseVersion(selectedBaseVersion: string) {
     this._selectedBaseVersion = selectedBaseVersion;
   }
-  
+
   private _baseVersions: Array<any> = [];
   get baseVersions() {
     return this._baseVersions;
   }
-  
+
   private _changeProxySubject: BehaviorSubject<ItemProxy> =
     new BehaviorSubject<ItemProxy>(undefined);
   get changeProxySubject() {
     return this._changeProxySubject;
   }
-  
+
   private _selectedChangeVersion: string;
   get selectedChangeVersion() {
     return this._selectedChangeVersion;
@@ -55,17 +55,17 @@ export class CompareItemsComponent implements OnInit {
   set selectedChangeVersion(selectedChangeVersion: string) {
     this._selectedChangeVersion = selectedChangeVersion;
   }
-  
+
   private _changeVersions: Array<any> = [];
   get changeVersions() {
     return this._changeVersions;
   }
-  
+
   private _comparison: Comparison;
   get comparison() {
     return this._comparison;
   }
-  
+
   private _showDifferencesOnlySubject: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(true);
   get showDifferencesOnlySubject() {
@@ -75,7 +75,7 @@ export class CompareItemsComponent implements OnInit {
   get dialogParameters() {
     return this._dialogParameters;
   }
-  
+
   get navigationService() {
     return this._navigationService;
   }
@@ -113,11 +113,11 @@ export class CompareItemsComponent implements OnInit {
               }
             }
           }
-          
+
           resolve();
         });
       }
-      
+
       let changeProxyProcessingPromise: Promise<void>;
       let changeProxy: ItemProxy = this._dialogParameters['changeProxy'];
       if (changeProxy) {
@@ -141,11 +141,11 @@ export class CompareItemsComponent implements OnInit {
               }
             }
           }
-          
+
           resolve();
         });
       }
-      
+
       if (baseProxyProcessingPromise && changeProxyProcessingPromise) {
         (async () => {
           await Promise.all([baseProxyProcessingPromise,
@@ -155,7 +155,7 @@ export class CompareItemsComponent implements OnInit {
       }
     }
   }
-  
+
   public openProxySelectionDialog(proxySubject: BehaviorSubject<ItemProxy>):
     void {
     this._dialogService.openComponentDialog(TreeComponent, {
@@ -168,9 +168,7 @@ export class CompareItemsComponent implements OnInit {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
-          return this._itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
-            item.icon;
+          return (element as ItemProxy).model.view.item.icon;
         },
         selection: [proxySubject.getValue()],
         quickSelectElements: this._itemRepository.getRecentProxies()
@@ -182,7 +180,7 @@ export class CompareItemsComponent implements OnInit {
       }
     });
   }
-  
+
   public proxySelectionChanged(proxySubject: BehaviorSubject<ItemProxy>,
     proxy: ItemProxy): Promise<Array<any>> {
     return new Promise<Array<any>>(async (resolve: (history:
@@ -196,7 +194,7 @@ export class CompareItemsComponent implements OnInit {
         'Unstaged' to operate on the working tree version of that Item. */
         history[0].commit = 'Unstaged';
       }
-      
+
       if (proxySubject === this._baseProxySubject) {
         this._selectedBaseVersion = '';
       } else {
@@ -211,7 +209,7 @@ export class CompareItemsComponent implements OnInit {
           message: 'Unstaged'
         });
       }
-  
+
       if (proxy.vcStatus.statusArray.filter((status: string) => {
         return status.startsWith('INDEX');
       }).length > 0) {
@@ -219,7 +217,7 @@ export class CompareItemsComponent implements OnInit {
           commit: 'Staged',
           message: 'Staged'
         });
-        
+
         if (proxySubject === this._baseProxySubject) {
           this._selectedBaseVersion = 'Staged';
         } else {
@@ -227,7 +225,7 @@ export class CompareItemsComponent implements OnInit {
         }
       }
       history.splice(0, 0, ...uncommittedVersions);
-      
+
       if (proxySubject === this._baseProxySubject) {
         if (!this._selectedBaseVersion) {
           this._selectedBaseVersion = history[0].commit;
@@ -239,45 +237,62 @@ export class CompareItemsComponent implements OnInit {
           this._changeVersions = history;
         }
       }
-      
+
       proxySubject.next(proxy);
       await this.compare();
-      
+
       resolve(history);
     });
   }
-  
+
   public compare(): Promise<void> {
     if (this._selectedBaseVersion && this._selectedChangeVersion) {
-      return new Promise<void>(async (resolve: () => void, reject:
-        () => void) => {
+      return new Promise<void>(async (resolve: () => void, reject: () => void) => {
         let itemCache: ItemCache = ItemCache.getItemCache();
-        let baseTreeHashMap = await itemCache.getTreeHashMap(this._selectedBaseVersion);
-        let baseItemId = this._baseProxySubject.getValue().item.id;
+        let baseProxy = this._baseProxySubject.getValue();
+        let baseItemId = baseProxy.item.id;
+        let baseBlob;
         let baseBlobKind;
-        let baseBlobOID;
-        if (baseTreeHashMap){
-          baseBlobKind = baseTreeHashMap[baseItemId].kind;
-          baseBlobOID = baseTreeHashMap[baseItemId].oid;
+        // TODO: Add support for staged
+        if (this._selectedBaseVersion === 'Unstaged') {
+          baseBlob = baseProxy.cloneItemAndStripDerived();
+          baseBlobKind = baseProxy.kind;
+        } else {
+          let baseTreeHashMap = await itemCache.getTreeHashMap(this._selectedBaseVersion);
+          if (baseTreeHashMap) {
+            let baseBlobOID = baseTreeHashMap[baseItemId].oid;
+            baseBlob = await itemCache.getBlob(baseBlobOID);
+            baseBlobKind = baseTreeHashMap[baseItemId].kind;
+          }
         }
-        let changeTreeHashMap = await itemCache.getTreeHashMap(this._selectedChangeVersion);
-        let changeItemId = this._changeProxySubject.getValue().item.id;
-        let changeBlobKind; 
-        let changeBlobOID;
-        if (changeTreeHashMap){
-          changeBlobKind = changeTreeHashMap[changeItemId].kind;
-          changeBlobOID = changeTreeHashMap[changeItemId].oid;  
+
+        let changeProxy = this._changeProxySubject.getValue();
+        let changeItemId = changeProxy.item.id;
+        let changeBlob;
+        let changeBlobKind;
+        // TODO: Add support for staged
+        if (this._selectedChangeVersion === 'Unstaged') {
+          changeBlob = changeProxy.cloneItemAndStripDerived();
+          changeBlobKind = changeProxy.kind;
+        } else {
+          let changeTreeHashMap = await itemCache.getTreeHashMap(this._selectedChangeVersion);
+          if (changeTreeHashMap){
+            let changeBlobOID = changeTreeHashMap[changeItemId].oid;
+            changeBlob = await itemCache.getBlob(changeBlobOID);
+            changeBlobKind = changeTreeHashMap[changeItemId].kind;
+          }
         }
+
         this._comparison = await Compare.compareItems(
           baseItemId,
           baseBlobKind,
-          baseBlobOID,
+          baseBlob,
           changeItemId,
           changeBlobKind,
-          changeBlobOID,
+          changeBlob,
           this._dynamicTypesService);
         this._changeDetectorRef.markForCheck();
-        
+
         resolve();
       });
     } else {

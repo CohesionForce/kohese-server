@@ -21,7 +21,8 @@
   </div>
   <div style="height: calc(100% - 50px); overflow: auto;">
     <ng-container *ngFor="let version of versions">
-      <mat-expansion-panel (opened)="compare(version)">
+      <mat-expansion-panel (opened)="compare(version)"
+        style="box-shadow: 0 3px 1px -2px rgba(0,0,0,.8), 0 2px 2px 0 rgba(0,0,0,.64), 0 1px 5px 0 rgba(0,0,0,.62);">
         <mat-expansion-panel-header>
           <mat-panel-title>
             {{version.message}}
