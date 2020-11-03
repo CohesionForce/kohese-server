@@ -147,10 +147,6 @@ export class CategoryBoardComponent {
         relation)) && (this._selectedAttribute.type[0] !== 'number'));
   }
 
-  public save(): void {
-    this._itemRepository.upsertItem('Project', this._project);
-  }
-
   public getCategoryItems(): Array<CategoryItems> {
     let categoryItems: { [key: string]: CategoryItems } = {};
     let attributeType: string = (Array.isArray(this._selectedAttribute.type) ?
