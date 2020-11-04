@@ -38,6 +38,23 @@ export class Comparison {
     return this._changeObject;
   }
 
+  private _parent : Comparison;
+  get parent() {
+    return this._parent;
+  }
+  set parent(parent: Comparison) {
+    this._parent = parent;
+    // Only add to the parent's children's list if it currently doesn't exist
+    if (-1 === this._children.indexOf(this)) {
+      this._parent._children.push(this);
+    }
+  }
+
+  private _children : Array<Comparison> = [];
+  get children() {
+    return this._children;
+  }
+
   private _propertyComparisonMap: Map<Property, Array<any>> = new Map<Property, Array<any>>();
   get propertyComparisonMap() {
     return this._propertyComparisonMap;

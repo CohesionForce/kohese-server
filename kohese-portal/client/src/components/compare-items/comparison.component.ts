@@ -18,8 +18,19 @@ export class ComparisonComponent {
   @Input('comparison')
   set comparison(comparison: Comparison) {
     this._comparison = comparison;
+
+    // Check to see if the comparison has been deferred
+    if (comparison.propertyDiffPending) {
+      // Since this detection may occur more than once, only request the detail diff
+      // if it is not already in progess
+      if(!comparison.propertyDiffInProgress){
+        comparison.compareProperties().then(() => {
+          this._changeDetectorRef.detectChanges();
+        });
+      }
+    }
   }
-  
+
   private _showDifferencesOnlySubject: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(true);
   get showDifferencesOnlySubject() {
@@ -30,14 +41,16 @@ export class ComparisonComponent {
     BehaviorSubject<boolean>) {
     this._showDifferencesOnlySubject = showDifferencesOnlySubject;
   }
-  
+
   get Array() {
     return Array;
   }
-  
-  public constructor() {
+
+  public constructor(
+    private _changeDetectorRef: ChangeDetectorRef
+  ) {
   }
-  
+
   public getChangeStyle(change: any): object {
     let style: object = {};
     if (change.added) {
@@ -51,7 +64,7 @@ export class ComparisonComponent {
         'color': 'darkred'
       };
     }
-    
+
     return style;
   }
 }

@@ -188,20 +188,20 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
 
         let commitObject: any = sortedCommitArray.pop();
         await thisComponent.buildRowsForCommit(commitObject, commits);
-  
+
         thisComponent.rootSubject.next(rootRow.object);
 
         if (thisComponent._changeDetectorRef && !(thisComponent._changeDetectorRef as ViewRef).destroyed) {
           // The view still exists, so detectChanges and keep processing the commits
           thisComponent._changeDetectorRef.detectChanges();
           commitIteration++;
-  
+
           if (sortedCommitArray.length) {
             setTimeout(processCommit, yieldWithNoDelay);
           } else {
             let afterTime = Date.now();
-            console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);      
-          }  
+            console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);
+          }
         }
       }
     }
@@ -234,12 +234,24 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     if (object instanceof Commit) {
       return this.getRow(this._repositoryProxy.item.id).object;
     } else if (object instanceof Comparison) {
-      let repository: Repository = (<Repository> this.getRow(this.
-        _repositoryProxy.item.id).object);
+      let repository: Repository = (<Repository> this.getRow(this._repositoryProxy.item.id).object);
+      let comparisonObject: ItemProxyComparison = object as ItemProxyComparison;
+      let commitObject: Comparison;
+
+      // Find the Commit that contains the comparison object
       for (let j: number = 0; j < repository.commits.length; j++) {
-        if (-1 !== repository.commits[j].comparisons.indexOf(
-          object as Comparison)) {
-          return this.getRow(this.getId(repository.commits[j])).object;
+        if (-1 !== repository.commits[j].comparisons.indexOf(comparisonObject)) {
+          commitObject = this.getRow(this.getId(repository.commits[j])).object;
+          break;
+        }
+      }
+
+      // Finds the parent of the commit object
+      if (commitObject) {
+        if (comparisonObject.parent) {
+          return comparisonObject.parent;
+        } else {
+          return commitObject;
         }
       }
     }
@@ -257,8 +269,13 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     } else if (object instanceof Commit) {
       let comparisons: Array<Comparison> = (object as Commit).comparisons;
       for (let j: number = 0; j < comparisons.length; j++) {
-        children.push(comparisons[j]);
+        // Push top level comparisons (those without a parent)
+        if (!comparisons[j].parent) {
+          children.push(comparisons[j]);
+        }
       }
+    } else if (object instanceof Comparison) {
+      children = (object as Comparison).children;
     }
 
     return children;

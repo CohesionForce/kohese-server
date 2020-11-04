@@ -26,17 +26,14 @@
               </change-summary>
             </ng-container>
             <ng-container *ngSwitchCase="'Comparison'">
-              <h1>
-                {{selectedVersionObject.changeObject.name}}
-              </h1>
-              <h3>
-                Path: {{selectedVersionObject.path}}
-              </h3>
+              <h1>{{selectedVersionObject.changeObject.name}}</h1>
               <mat-checkbox (change)="toggleShowingDifferencesOnly()"
                 [checked]="(showDifferencesOnlySubject | async)">
                 Show Differences Only
               </mat-checkbox>
-              <comparison [comparison]="selectedVersionObject" [showDifferencesOnlySubject]="showDifferencesOnlySubject"></comparison>
+              <comparison [comparison]="selectedVersionObject"
+                [showDifferencesOnlySubject]="showDifferencesOnlySubject">
+              </comparison>
             </ng-container>
           </ng-container>
         </div>
