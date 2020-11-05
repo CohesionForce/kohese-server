@@ -8,7 +8,7 @@
     <mat-icon class="fa fa-chevron-up"></mat-icon>
   </button>
 </div>
-<div style="height: calc(100% - 50px); width: 100%; overflow: auto;">
+<div>
   <ng-container *ngFor="let comparison of (comparisonsSubject | async)">
     <ng-container *ngIf="hasChanges(comparison)">
       <mat-expansion-panel [expanded]="expanded">

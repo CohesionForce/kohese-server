@@ -9,14 +9,14 @@
         <div style="height: 100%; width: 100%;">
           <ng-container [ngSwitch]="getSelectionType()">
             <ng-container *ngSwitchCase="'Commit'">
-              <h1>
+              <h3>
                 {{selectedVersionObject.koheseCommit.message}}
-              </h1>
-              <h2>
+              </h3>
+              <h4>
                 {{selectedVersionObject.koheseCommit.author}}
                 <br/>
                 {{selectedVersionObject.koheseCommit.time | date:'medium'}}
-              </h2>
+              </h4>
               <mat-checkbox (change)="toggleShowingDifferencesOnly()"
                 [checked]="(showDifferencesOnlySubject | async)">
                 Show Differences Only
