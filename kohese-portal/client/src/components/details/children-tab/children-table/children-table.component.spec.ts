@@ -9,6 +9,8 @@ import { PipesModule } from '../../../../pipes/pipes.module';
 import { ChildrenTableComponent } from './children-table.component';
 import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 
+import { DialogService } from '../../../../services/dialog/dialog.service';
+import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
@@ -30,7 +32,8 @@ describe('Component: Children Table', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide: NavigationService, useClass: MockNavigationService}
+        {provide: NavigationService, useClass: MockNavigationService},
+        {provide: DialogService, useClass: MockDialogService}
       ]
     }).compileComponents();
 

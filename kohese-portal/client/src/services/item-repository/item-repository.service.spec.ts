@@ -6,15 +6,23 @@ import { KoheseDataModel,
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { ItemCache } from '../../../../common/src/item-cache';
 
 describe('ItemRepository', () => {
+  // Save ItemCache used for testing since the ItemRepository creates an empty ItemCache
+  let mockItemCache = ItemCache.getItemCache();
+
+  // Create ItemRepository with Spy
   let itemRepository: ItemRepository = new ItemRepository(jasmine.createSpyObj(
     ['']), jasmine.createSpyObj({
       getCurrentUserSubject: new BehaviorSubject('')
     }), jasmine.createSpyObj(['']), jasmine.createSpyObj(['']), jasmine.
     createSpyObj(['']), jasmine.createSpyObj(['getComponentId', 'getEventId',
     'log']), jasmine.createSpyObj(['']));
-  
+
+  // Restore ItemCache used for testing
+  ItemCache.setItemCache(mockItemCache);
+
   beforeEach(() => {
     new MockItemRepository();
     itemRepository.setTreeConfig('Unstaged', TreeConfigType.DEFAULT);
