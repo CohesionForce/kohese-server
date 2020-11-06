@@ -1,3 +1,39 @@
+.mat-column-kind {
+  white-space: unset;
+  flex: 0 0 15%;
+  width: 10%;
+}
+
+.mat-column-name {
+  white-space: unset;
+  flex: 0 0 40%;
+  width: 40%;
+}
+
+.mat-column-assignedTo {
+  white-space: unset;
+  flex: 0 0 15%;
+  width: 15%;
+}
+
+.mat-column-state {
+  white-space: unset;
+  flex: 0 0 10%;
+  width: 10%;
+}
+
+.mat-column-childrenCount {
+  white-space: unset;
+  flex: 0 0 10%;
+  width: 10%;
+}
+
+.mat-column-nav {
+  white-space: unset;
+  flex: 0 0 12%;
+  width: 12%;
+}
+
 // Every other row is colored
 mat-row:nth-child(even) {
   background-color: rgb(245,245,245);
