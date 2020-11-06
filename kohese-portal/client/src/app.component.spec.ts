@@ -19,18 +19,20 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent
       ],
-      imports : [ 
+      imports : [
       ],
       schemas: [
         CUSTOM_ELEMENTS_SCHEMA
       ],
       providers: [ {provide: AuthenticationService, useClass: MockAuthenticationService}]
     }).compileComponents();
-    
+
     // Set up mock ItemCache
-    let mockItemCache = new MockItemCache();
-    ItemCache.setItemCache(mockItemCache);
-    
+    if (!ItemCache.getItemCache()) {
+      let mockItemCache = new MockItemCache();
+      ItemCache.setItemCache(mockItemCache);
+    }
+
     // Set a substitute 'tinyMCE' object.
     window['tinyMCE'] = {
       overrideDefaults: (settingsObject: any) => {}

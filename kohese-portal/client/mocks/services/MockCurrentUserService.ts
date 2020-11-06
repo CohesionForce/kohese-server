@@ -4,8 +4,7 @@ import { TreeConfiguration } from '../../../common/src/tree-configuration';
 
 export class MockCurrentUserService {
   getCurrentUserSubject () {
-    return new BehaviorSubject<any>(TreeConfiguration.getWorkingTree().
-      getProxyFor('AdminKoheseUser'));
+    return new BehaviorSubject<any>({username: 'admin'});
   }
 
   setCurrentUser (updatedUser) {

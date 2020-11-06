@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of as ObservableOf, BehaviorSubject } from 'rxjs';
+import { of as ObservableOf } from 'rxjs';
 
 import { DashboardModule } from '../dashboard.module';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -24,7 +24,7 @@ describe('ProjectDashboardComponent', () => {
 
     fixture = TestBed.createComponent(ProjectDashboardComponent);
     projectDashboardComponent = fixture.componentInstance;
-    projectDashboardComponent.dashboardSelectionStream = new BehaviorSubject(DashboardSelections.PROJECT_OVERVIEW);
+    projectDashboardComponent.dashboardSelectionStream = ObservableOf(DashboardSelections.PROJECT_OVERVIEW);
 
     fixture.detectChanges();
   });
