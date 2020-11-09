@@ -21,6 +21,18 @@
   }
 }
 
+.pos-and-checkbox-options {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 20px;
+}
+
+.filter-and-limit-options {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 20px;
+}
+
 // Every other row is colored
 mat-row:nth-child(even) {
   background-color: rgb(245,245,245);

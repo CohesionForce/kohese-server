@@ -29,34 +29,39 @@
     </mat-menu>
   </div>
   <div class="panel-body">
-    <div>
-      <mat-form-field>
-        <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processTerms()">
-          <mat-option *ngFor="let filterCriteria of termPOSFilterCriteriaList" [value]="filterCriteria">
-            {{filterCriteria}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <span>
-        <mat-checkbox [(ngModel)]="filterExactMatch">
-          Exact Match
-        </mat-checkbox>
-        <mat-checkbox [(ngModel)]="filterIgnoreCase">
-          Ignore Case
-        </mat-checkbox>
-      </span>
-      <br/>
-      <mat-form-field>
+    <div class="search-options">
+      <div class="pos-and-checkbox-options" style="padding-left: 10px;">
+        <mat-form-field>
+          <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processTerms()">
+            <mat-option *ngFor="let filterCriteria of termPOSFilterCriteriaList" [value]="filterCriteria">
+              {{filterCriteria}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <span style="padding-top: 10px;">
+          <mat-checkbox [(ngModel)]="filterExactMatch">
+            Exact Match
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="filterIgnoreCase" style="padding-left: 50px;">
+            Ignore Case
+          </mat-checkbox>
+        </span>
+      </div>
+      <div class="filter-and-limit-options" style="padding-left: 10px;">
+        <mat-form-field>
         <input matInput type="text" class="input-sm"
           [formControl]="filterControl" placeholder="Filter"
           [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processTerms()"/>
-      </mat-form-field>
-      <button mat-raised-button (click)="submitFilter(filterControl.value)"
-        class="btn btn-default fa fa-search">Submit
-      </button>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processTerms()"/>
+        </mat-form-field>
+        <h6>
+          <button mat-raised-button (click)="submitFilter(filterControl.value)"
+            class="btn btn-default fa fa-search">Submit
+          </button>
+        </h6>
+      </div>
     </div>
     <div id="term-div">
       <mat-table [dataSource]="termsDataSource" class="mat-elevation-z8" style="width: 100%;">

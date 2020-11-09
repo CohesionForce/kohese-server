@@ -28,14 +28,7 @@
     </mat-menu>
   </div>
   <div class="panel-body">
-    <div>
-      <span><b>Analysis Details</b></span>
-      <span class="col-xs-4 pull-right">
-        <mat-form-field>
-          <input matInput class="input-sm col-xs-6 pull-right" type="number"
-            [(ngModel)]="loadLimit" (ngModelChange)="processSentences()" placeholder="Details Limit"/>
-        </mat-form-field>
-      </span>
+    <div class="sentences-header" style="padding-left: 5px; padding-right: 5px; padding-top: 5px;">
       <mat-checkbox [(ngModel)]="showItemsInDetails" (ngModelChange)="onCriteriaChange()">
         Items
       </mat-checkbox>
@@ -46,8 +39,12 @@
         Phrases
       </mat-checkbox>
       <mat-checkbox [(ngModel)]="showTokensInDetails" (ngModelChange)="onCriteriaChange()">
-        Tokens
+        Terms
       </mat-checkbox>
+      <mat-form-field>
+        <input matInput class="input-sm col-xs-6 pull-right" type="number"
+          [(ngModel)]="loadLimit" (ngModelChange)="processSentences()" placeholder="Details Limit"/>
+      </mat-form-field>
     </div>
     <div id="sentence-div">
       <mat-table [dataSource]="sentencesDataSource" class="mat-elevation-z8" style="width: 100%;">
