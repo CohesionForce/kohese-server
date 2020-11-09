@@ -28,7 +28,6 @@ import { StateBarChartComponent } from './project-dashboard/status-dashboard/sta
 import { StatusDashboardComponent } from './project-dashboard/status-dashboard/status-dashboard.component';
 import { UserStatisticsComponent } from './project-dashboard/user-statistics/user-statistics.component';
 import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
-import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
 
 describe('Component: Dashboard', ()=>{
   let dashboardComponent: DashboardComponent;
@@ -40,7 +39,6 @@ describe('Component: Dashboard', ()=>{
         DashboardComponent,
         DashboardSelectorComponent,
         AssignmentDashboardComponent,
-        UserDashboardComponent,
         ProjectDashboardComponent,
         ReportDashboardComponent,
         ActivityFeedComponent,
@@ -71,12 +69,12 @@ describe('Component: Dashboard', ()=>{
 
     dashboardFixture = TestBed.createComponent(DashboardComponent);
     dashboardComponent = dashboardFixture.componentInstance;
-    
+
     dashboardFixture.detectChanges();
-    
+
   })
 
   it('instantiates the dashboard component', ()=>{
-    expect(dashboardComponent).toBeTruthy(); 
+    expect(dashboardComponent).toBeTruthy();
   })
 })

@@ -15,7 +15,6 @@ import { DashboardComponent } from './dashboard.component';
 import { DashboardSelectorComponent } from './dashboard-selector/dashboard-selector.component';
 import { UserInputModule } from '../user-input/user-input.module';
 import { AssignmentDashboardComponent } from './assignment-dashboard/assignment-dashboard.component'
-import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
 import { PipesModule } from "../../pipes/pipes.module";
 import { DueAssignmentComponent } from "./assignment-dashboard/due-assignment/due-assignment.component";
 import { OpenAssignmentComponent } from "./assignment-dashboard/open-assignment/open-assignment.component";
@@ -40,7 +39,6 @@ import { CategoryBoardModule } from '../category-board/category-board.module';
     DashboardComponent,
     DashboardSelectorComponent,
     AssignmentDashboardComponent,
-    UserDashboardComponent,
     DueAssignmentComponent,
     CompletedAssignmentComponent,
     DependencyInfoComponent,
