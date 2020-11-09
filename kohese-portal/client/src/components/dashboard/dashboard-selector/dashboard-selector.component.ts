@@ -7,7 +7,6 @@ export enum DashboardSelections {
   DUE_ASSIGNMENTS,
   OPEN_ASSIGNMENTS,
   COMPLETED_ASSIGNMENTS,
-  USER_PREFERENCES,
   PROJECT_OVERVIEW,
   USER_STATISTICS,
   PROJECT_STATUS,
@@ -84,11 +83,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         this.menuType = MenuTypes.PROJECT
         this.dashboardSelected.emit(this.selectedDashboard);
         break;
-      case (DashboardTypes.USER):
-        this.selectedDashboard = {
-          dashboard: DashboardSelections.USER_PREFERENCES,
-          dashboardType: DashboardTypes.PROJECT
-        };
         this.menuType = MenuTypes.PERSONAL
         this.dashboardSelected.emit(this.selectedDashboard);
         break;
@@ -130,11 +124,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         this.menuType = MenuTypes.PERSONAL;
         break;
 
-      case (DashboardSelections.USER_PREFERENCES):
-        this.selectedDashboard = {
-          dashboard: DashboardSelections.USER_PREFERENCES,
-          dashboardType: DashboardTypes.USER
-        };
         this.menuType = MenuTypes.PERSONAL;
         break;
 

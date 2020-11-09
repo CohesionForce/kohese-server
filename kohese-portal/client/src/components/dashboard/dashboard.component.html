@@ -10,9 +10,6 @@
           [dashboardSelectionStream]="dashboardSelectionStream">
         </assignment-dashboard>
       </ng-container>
-      <ng-container *ngSwitchCase="DashboardSelections.USER_PREFERENCES">
-        <user-dashboard [user]="currentUser"></user-dashboard>
-      </ng-container>
       <ng-container *ngSwitchCase="DashboardTypes.PROJECT">
         <project-dashboard
           [dashboardSelectionStream]="dashboardSelectionStream"
