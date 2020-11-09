@@ -11,8 +11,8 @@
   </ng-container>
 
   <ng-container matColumnDef="assignedTo">
-    <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
-    <mat-cell *matCellDef="let child"> {{child.item.assignedTo}}</mat-cell>
+    <mat-header-cell *matHeaderCellDef style="padding-left: 20px;"> Assigned To </mat-header-cell>
+    <mat-cell *matCellDef="let child" style="padding-left: 20px;"> {{child.item.assignedTo}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="state">
