@@ -42,15 +42,6 @@
                       DashboardSelections.COMPLETED_ASSIGNMENTS}">Completed</h6>
       </div>
       <mat-divider></mat-divider>
-      <div *ngIf="user">
-        <h5 class="dashListHeader"> User</h5>
-        <div>
-          <h6 class="dashListItem"
-              (click)="selectDashboard(DashboardSelections.USER_PREFERENCES)"
-              [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard ===
-                            DashboardSelections.USER_PREFERENCES}">Preferences</h6>
-        </div>
-      </div>
     </div>
   </div>
   <div *ngIf="menuType === MenuTypes.PROJECT">
