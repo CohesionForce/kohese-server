@@ -1,3 +1,27 @@
+.mat-column-kind {
+  white-space: unset;
+  flex: 0 0 15%;
+  width: 10%;
+}
+
+.mat-column-name {
+  white-space: unset;
+  flex: 0 0 55%;
+  width: 55%;
+}
+
+.mat-column-state {
+  white-space: unset;
+  flex: 0 0 15%;
+  width: 15%;
+}
+
+.mat-column-nav {
+  white-space: unset;
+  flex: 0 0 15%;
+  width: 15%;
+}
+
 // Every other row is colored
 mat-row:nth-child(even) {
   background-color: rgb(245,245,245);

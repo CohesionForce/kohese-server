@@ -18,7 +18,7 @@ export class ReferenceTableComponent implements OnInit {
   referencesInfo: Array<ReferenceTableInfo>;
   @Input()
   routingStrategy: string;
-  rowDef: Array<string> = ["kind", "name", "state", "description", "Nav"];
+  rowDef: Array<string> = ["kind", "name", "state", "nav"];
 
   get navigationService() {
     return this._navigationService;

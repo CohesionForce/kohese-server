@@ -59,7 +59,7 @@ export class ChildrenTableComponent extends NavigatableComponent implements OnIn
         this.tableStream = new MatTableDataSource<ItemProxy>(this.children)
         this.changeRef.markForCheck();
       });
-    this.rowDef = ['kind', 'name', 'assignedTo', 'state', 'description', 'childrenCount', "Nav"]
+    this.rowDef = ['kind', 'name', 'assignedTo', 'state', 'childrenCount', "nav"]
     this.filterSub = this.filterSubject.subscribe((newFilter) => {
       this.tableStream.filter = newFilter.trim().toLowerCase();
     })

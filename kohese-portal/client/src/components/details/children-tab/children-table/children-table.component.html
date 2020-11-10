@@ -1,18 +1,18 @@
 <mat-table *ngIf="tableStream" #childTable [dataSource]="tableStream">
+
+  <ng-container matColumnDef="kind">
+    <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
+    <mat-cell *matCellDef="let child">{{child.kind}}</mat-cell>
+  </ng-container>
+
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
     <mat-cell *matCellDef="let child"> {{child.item.name}}</mat-cell>
   </ng-container>
 
-  <ng-container matColumnDef="kind">
-    <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
-    <mat-cell *matCellDef="let child">
-      {{child.kind}}</mat-cell>
-  </ng-container>
-
   <ng-container matColumnDef="assignedTo">
-    <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
-    <mat-cell *matCellDef="let child"> {{child.item.assignedTo}}</mat-cell>
+    <mat-header-cell *matHeaderCellDef style="padding-left: 20px;"> Assigned To </mat-header-cell>
+    <mat-cell *matCellDef="let child" style="padding-left: 20px;"> {{child.item.assignedTo}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="state">
@@ -20,17 +20,13 @@
     <mat-cell *matCellDef="let child"> {{child.state}}</mat-cell>
   </ng-container>
 
-  <ng-container matColumnDef="description">
-    <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-    <mat-cell *matCellDef="let child"> {{child.item.description | truncate : 30}}</mat-cell>
-  </ng-container>
-
   <ng-container matColumnDef="childrenCount">
     <mat-header-cell *matHeaderCellDef> Children(#) </mat-header-cell>
-    <mat-cell *matCellDef="let child"> {{child.children.length}}</mat-cell>
+    <mat-cell *matCellDef="let child" style="justify-content: center;"> {{child.children.length}}</mat-cell>
   </ng-container>
-  <ng-container matColumnDef="Nav">
-    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+
+  <ng-container matColumnDef="nav">
+    <mat-header-cell *matHeaderCellDef>Navigation</mat-header-cell>
     <mat-cell *matCellDef="let child" style="display: flex; justify-content: flex-end;">
       <div class="hidden-buttons"> <!-- div and class for scss styling -->
         <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(child)">
