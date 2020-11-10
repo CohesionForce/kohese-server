@@ -1,5 +1,5 @@
 <div style="height: 100%; width: 100%; overflow: auto;">
-  <ng-container *ngIf="comparison">
+  <ng-container *ngIf="comparison && !comparison.propertyDiffPending">
     <ng-container
       *ngFor="let property of Array.from(comparison.propertyComparisonMap.
         keys())">

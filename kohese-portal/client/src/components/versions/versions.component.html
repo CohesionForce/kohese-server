@@ -1,6 +1,6 @@
 <div style="height: 100%; width: 100%;">
   <lens></lens>
-  <split direction="vertical">
+  <split direction="horizontal">
     <split-area [size]="50">
       <commit-tree (rowSelected)="commitTreeRowSelected($event)"></commit-tree>
     </split-area>
@@ -9,38 +9,31 @@
         <div style="height: 100%; width: 100%;">
           <ng-container [ngSwitch]="getSelectionType()">
             <ng-container *ngSwitchCase="'Commit'">
-              <h1>
+              <h3>
                 {{selectedVersionObject.koheseCommit.message}}
-              </h1>
-              <h2>
+              </h3>
+              <h4>
                 {{selectedVersionObject.koheseCommit.author}}
                 <br/>
                 {{selectedVersionObject.koheseCommit.time | date:'medium'}}
-              </h2>
-              <change-summary [comparisonsSubject]="comparisonsSubject">
+              </h4>
+              <mat-checkbox (change)="toggleShowingDifferencesOnly()"
+                [checked]="(showDifferencesOnlySubject | async)">
+                Show Differences Only
+              </mat-checkbox>
+              <change-summary [comparisonsSubject]="comparisonsSubject"
+                [showDifferencesOnlySubject]="showDifferencesOnlySubject">
               </change-summary>
             </ng-container>
             <ng-container *ngSwitchCase="'Comparison'">
-              <h1>
-                {{selectedVersionObject.changeObject.name}}
-              </h1>
-              <h3>
-                Path: {{selectedVersionObject.path}}
-              </h3>
-              <!-- split direction="horizontal">
-                <split-area [size]="50">
-                  <comparison-side [sideChangeable]="false"
-                    [isBaseVersion]="true"
-                    [showDifferencesOnlySubject]="showDifferencesOnly">
-                  </comparison-side>
-                </split-area>
-                <split-area [size]="50">
-                  <comparison-side [sideChangeable]="false"
-                    [isBaseVersion]="false"
-                    [showDifferencesOnlySubject]="showDifferencesOnly">
-                  </comparison-side>
-                </split-area>
-              </split-->
+              <h1>{{selectedVersionObject.changeObject.name}}</h1>
+              <mat-checkbox (change)="toggleShowingDifferencesOnly()"
+                [checked]="(showDifferencesOnlySubject | async)">
+                Show Differences Only
+              </mat-checkbox>
+              <comparison [comparison]="selectedVersionObject"
+                [showDifferencesOnlySubject]="showDifferencesOnlySubject">
+              </comparison>
             </ng-container>
           </ng-container>
         </div>

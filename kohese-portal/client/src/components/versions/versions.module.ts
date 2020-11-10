@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AngularSplitModule } from 'angular-split';
+import { MaterialModule } from '../../material.module';
 
 import { LensModule } from '../lens/lens.module';
 import { TreeViewModule } from '../tree/tree.module';
@@ -14,7 +15,8 @@ import { VersionsComponent } from './versions.component';
     AngularSplitModule,
     LensModule,
     TreeViewModule,
-    CompareItemsModule
+    CompareItemsModule,
+    MaterialModule
   ]
 })
 export class VersionsModule {

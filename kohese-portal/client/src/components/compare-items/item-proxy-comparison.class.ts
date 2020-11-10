@@ -3,12 +3,16 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { Comparison, Property } from './comparison.class';
 
 export class ItemProxyComparison extends Comparison {
-  private _path: string;
+  private _path: Array<Comparison>;
   get path() {
     return this._path;
   }
-  set path(path: string) {
+  set path(path: Array<Comparison>) {
     this._path = path;
+    if (this._path.length) {
+      // The parent of the current comparison is the last comparison in the path
+      this.parent = this._path[this._path.length - 1];
+    }
   }
 
   public constructor(

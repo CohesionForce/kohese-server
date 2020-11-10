@@ -1,27 +1,27 @@
-<div class="top-bar">
-</div>
-<div style="height: 12%; width: 100%;">
-  <div class="kt-head kth-cell">
-    Root
-  </div>
-  <ng-container *ngIf="rootSubject.getValue()">
-    <div class="kt-body">
-      <tree-row [treeRow]="getRootRow()"
-        [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
-      </tree-row>
+<div style="height: 100%; overflow: hidden;">
+  <div>
+    <div class="kt-head kth-cell">
+      Root
     </div>
-  </ng-container>
-</div>
-<div style="height: 81%; width: 100%;">
-  <div class="kt-head kth-cell">
-    Descendants
+    <ng-container *ngIf="rootSubject.getValue()">
+      <div class="kt-body">
+        <tree-row [treeRow]="getRootRow()"
+          [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
+        </tree-row>
+      </div>
+    </ng-container>
   </div>
-  <div class="kt-body">
-    <virtual-scroll #tree [items]="visibleRows">
-      <tree-row *ngFor="let row of tree.viewPortItems"
-        [treeRow]="row" [rowActions]="rowActions"
-        [menuActions]="menuActions" [images]="images">
-      </tree-row>
-    </virtual-scroll>
+  <div style="height: calc(100% - 71px); width: 100%; overflow: hidden">
+    <div class="kt-head kth-cell">
+      Descendants
+    </div>
+    <div class="kt-body">
+      <virtual-scroll #tree [items]="visibleRows">
+        <tree-row *ngFor="let row of tree.viewPortItems"
+          [treeRow]="row" [rowActions]="rowActions"
+          [menuActions]="menuActions" [images]="images">
+        </tree-row>
+      </virtual-scroll>
+    </div>
   </div>
 </div>

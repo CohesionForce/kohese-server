@@ -4,7 +4,7 @@ import { ItemProxyComparison } from './item-proxy-comparison.class';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { ItemCache } from '../../../../common/src/item-cache';
-import { TreeHashMap, TreeHashEntryDifference,  TreeHashMapDifference, ObjectHashValueType, ItemIdType} from '../../../../common/src/tree-hash';
+import { TreeHashMap, TreeHashEntryDifference, TreeHashMapDifference, ItemIdType } from '../../../../common/src/tree-hash';
 import * as _ from 'underscore';
 
 export class Compare {
@@ -28,6 +28,7 @@ export class Compare {
       }
 
       if (!diff.match) {
+        // Construct Comparisons for Every Item with a Difference
         for (let itemId in diff.details) {
           let diffEntry: TreeHashEntryDifference = diff.details[itemId];
 
@@ -84,16 +85,17 @@ export class Compare {
           }
         }
 
+        // Determine the Path to Each Item After All Items Have Been Processed
         for (let j: number = 0; j < comparisons.length; j++) {
           let comparison: ItemProxyComparison = comparisons[j];
-          let path: Array<string> = [];
+          let path: Array<Comparison> = [];
           let parentId: string = comparison.changeObject.parentId;
           while (parentId) {
             let k: number = 0;
             while (k < comparisons.length) {
               let commitComparison: ItemProxyComparison = comparisons[k];
               if (commitComparison.changeObject.id === parentId) {
-                path.push(commitComparison.changeObject.name);
+                path.push(commitComparison);
                 parentId = commitComparison.changeObject.parentId;
                 break;
               }
@@ -105,10 +107,9 @@ export class Compare {
             }
           }
 
+          // Paths intially built from the bottom-up. Reversed for correct order.
           path.reverse();
-          // Adds path right-arrow after each item and doesn't allow navigating comparisons due to the arrow.
-          // TODO: Give the path as an object or else associate comparison objects
-          comparison.path = path.join(' \u2192 ');
+          comparison.path = path;
         }
       }
     }
