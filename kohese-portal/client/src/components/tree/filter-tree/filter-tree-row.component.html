@@ -9,87 +9,90 @@
     'fa-caret-right': (treeRow.hasChildren() && !treeRow.expanded),
     'no-children': !treeRow.hasChildren() }">
   </i>
-  <ng-container
-    *ngIf="(treeRow.isMultiselectEnabled() && (getType() !== 'AddRowObject'))">
-    <mat-checkbox (change)="treeRow.rowSelected()"
-      (click)="$event.stopPropagation()"
-      style="padding-top: 7px; padding-right: 3px; padding-left: 3px;">
-    </mat-checkbox>
-  </ng-container>
-  <ng-container [ngSwitch]="getType()">
-    <ng-container *ngSwitchCase="'FilterCriteriaConnection'">
-      {{treeRow.object.toString()}}
+  <div class="filter-options">
+    <ng-container
+      *ngIf="(treeRow.isMultiselectEnabled() && (getType() !== 'AddRowObject'))">
+      <mat-checkbox (change)="treeRow.rowSelected()"
+        (click)="$event.stopPropagation()"
+        style="padding-top: 7px; padding-right: 20px; padding-left: 3px;">
+      </mat-checkbox>
     </ng-container>
-    <ng-container *ngSwitchCase="'FilterCriterion'">
-      <mat-form-field style="padding-right: 7px;">
-        <mat-select placeholder="Property"
-          [(ngModel)]="treeRow.object.property">
-          <mat-option
-            *ngFor="let property of (filterSubject | async).filterableProperties"
-            [value]="property">
-            {{property.displayText}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="padding-right: 7px;">
-        <mat-select placeholder="Condition"
-          [(ngModel)]="treeRow.object.condition">
-          <mat-option
-            *ngFor="let condition of (FilterCriterion.CONDITIONS | mapKey)"
-            [value]="FilterCriterion.CONDITIONS[condition]">
-            {{FilterCriterion.CONDITIONS[condition]}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <ng-container *ngIf="treeRow.object.property.values.length > 0">
-        <mat-form-field style="padding-right: 7px;">
-          <mat-select placeholder="Value" [(ngModel)]="treeRow.object.value">
-            <mat-option *ngFor="let value of treeRow.object.property.values"
-              [value]="value">
-              {{value}}
+    <ng-container [ngSwitch]="getType()">
+      <ng-container *ngSwitchCase="'FilterCriteriaConnection'">
+        {{treeRow.object.toString()}}
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'FilterCriterion'">
+        <mat-form-field style="padding-right: 20px; min-width: 150px;">
+          <mat-select placeholder="Property"
+            [(ngModel)]="treeRow.object.property">
+            <mat-option
+              *ngFor="let property of (filterSubject | async).filterableProperties"
+              [value]="property">
+              {{property.displayText}}
             </mat-option>
           </mat-select>
         </mat-form-field>
-      </ng-container>
-      <ng-container *ngIf="0 === treeRow.object.property.values.length">
-        <mat-form-field style="padding-right: 7px;">
-          <input matInput type="text" placeholder="Value"
-            [(ngModel)]="treeRow.object.value"/>
+        <mat-form-field style="padding-right: 20px; padding-top: 15px; min-width: 150px;">
+          <mat-select placeholder="Condition"
+            [(ngModel)]="treeRow.object.condition">
+            <mat-option
+              *ngFor="let condition of (FilterCriterion.CONDITIONS | mapKey)"
+              [value]="FilterCriterion.CONDITIONS[condition]">
+              {{FilterCriterion.CONDITIONS[condition]}}
+            </mat-option>
+          </mat-select>
         </mat-form-field>
-        <mat-checkbox [(ngModel)]="treeRow.object.ignoreCase"
-          style="padding-right: 7px;">
-          Ignore Case
+        <ng-container *ngIf="treeRow.object.property.values.length > 0">
+          <mat-form-field style="padding-right: 20px;">
+            <mat-select placeholder="Value" [(ngModel)]="treeRow.object.value">
+              <mat-option *ngFor="let value of treeRow.object.property.values"
+                [value]="value">
+                {{value}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngIf="0 === treeRow.object.property.values.length">
+          <mat-form-field style="padding-right: 20px;">
+            <input matInput type="text" placeholder="Value"
+              [(ngModel)]="treeRow.object.value"/>
+          </mat-form-field>
+          <mat-checkbox [(ngModel)]="treeRow.object.ignoreCase"
+            style="padding-right: 20px;">
+            Ignore Case
+          </mat-checkbox>
+        </ng-container>
+        <mat-checkbox [(ngModel)]="treeRow.object.negate"
+          style="padding-right: 20px;">
+          Negate
         </mat-checkbox>
+        <ng-container *ngIf="treeRow.object.external">
+          <mat-icon class="fa fa-star" matTooltip="External criterion">
+          </mat-icon>
+        </ng-container>
       </ng-container>
-      <mat-checkbox [(ngModel)]="treeRow.object.negate"
-        style="padding-right: 7px;">
-        Negate
-      </mat-checkbox>
-      <ng-container *ngIf="treeRow.object.external">
-        <mat-icon class="fa fa-star" matTooltip="External criterion">
-        </mat-icon>
+      <ng-container *ngSwitchCase="'AddRowObject'">
+        <button mat-icon-button [matMenuTriggerFor]="addMenu">
+          <mat-icon class="fa fa-plus" style="color: green;"></mat-icon>
+        </button>
+        <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
+          <button mat-menu-item (click)="addCriterion()">
+            <mat-icon class="fa fa-plus"></mat-icon>
+            Add Criterion
+          </button>
+          <button mat-menu-item (click)="addConnection('AND')">
+            <mat-icon class="fa fa-plus"></mat-icon>
+            Add AND Connection
+          </button>
+          <button mat-menu-item (click)="addConnection('OR')">
+            <mat-icon class="fa fa-plus"></mat-icon>
+            Add OR Connection
+          </button>
+        </mat-menu>
       </ng-container>
     </ng-container>
-    <ng-container *ngSwitchCase="'AddRowObject'">
-      <button mat-icon-button [matMenuTriggerFor]="addMenu">
-        <mat-icon class="fa fa-plus" style="color: green;"></mat-icon>
-      </button>
-      <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item (click)="addCriterion()">
-          <mat-icon class="fa fa-plus"></mat-icon>
-          Add Criterion
-        </button>
-        <button mat-menu-item (click)="addConnection('AND')">
-          <mat-icon class="fa fa-plus"></mat-icon>
-          Add AND Connection
-        </button>
-        <button mat-menu-item (click)="addConnection('OR')">
-          <mat-icon class="fa fa-plus"></mat-icon>
-          Add OR Connection
-        </button>
-      </mat-menu>
-    </ng-container>
-  </ng-container>
+  </div>
   <span class="flex-right-align">
     <ng-container *ngFor="let action of rowActions">
       <ng-container *ngIf="action.canActivate(treeRow.object)">

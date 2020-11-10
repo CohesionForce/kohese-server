@@ -39,34 +39,39 @@
     </mat-menu>
   </div>
   <div class="panel-body">
-    <div>
-      <mat-form-field>
-      <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processPhrases()">
-        <mat-option *ngFor="let filterCriteria of phrasePOSFilterCriteriaList" [value]="filterCriteria">
-          {{filterCriteria}}
-        </mat-option>
-      </mat-select>
-      </mat-form-field>
-      <span>
-        <mat-checkbox [(ngModel)]="filterExactMatch">
-          Exact Match
-        </mat-checkbox>
-        <mat-checkbox [(ngModel)]="filterIgnoreCase">
-          Ignore Case
-        </mat-checkbox>
-      </span>
-      <br/>
-      <mat-form-field>
-        <input matInput type="text" class="input-sm"
-          [formControl]="filterControl" placeholder="Filter"
-          [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processPhrases()"/>
-      </mat-form-field>
-      <button mat-raised-button (click)="submitFilter(filterControl.value)"
-        class="btn btn-default fa fa-search">Submit
-      </button>
+    <div class="search-options">
+      <div class="pos-and-checkbox-options" style="padding-left: 10px;">
+        <mat-form-field>
+        <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processPhrases()">
+          <mat-option *ngFor="let filterCriteria of phrasePOSFilterCriteriaList" [value]="filterCriteria">
+            {{filterCriteria}}
+          </mat-option>
+        </mat-select>
+        </mat-form-field>
+        <span style="padding-top: 10px;">
+          <mat-checkbox [(ngModel)]="filterExactMatch" style="padding-top: 5px;">
+            Exact Match
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="filterIgnoreCase" style="padding-left: 50px; padding-top: 5px;">
+            Ignore Case
+          </mat-checkbox>
+        </span>
+      </div>
+      <div class="filter-and-limit-options" style="padding-left: 10px;">
+        <mat-form-field>
+          <input matInput type="text" class="input-sm"
+            [formControl]="filterControl" placeholder="Filter"
+            [ngStyle]="invalidFilterRegex && {'background-color':'pink'}"/>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="number" placeholder="Limit" [(ngModel)]="loadLimit" (ngModelChange)="processPhrases()"/>
+        </mat-form-field>
+        <h6>
+          <button mat-raised-button (click)="submitFilter(filterControl.value)"
+            class="btn btn-default fa fa-search">Submit
+          </button>
+        </h6>
+      </div>
     </div>
     <div id="phrase-div">
 
