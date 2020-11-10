@@ -21,7 +21,7 @@ export class MockItemCache extends ItemCache {
     }
 
     for (let key in mockData.mismatch_blob) {
-      this.cacheBlob(key, mockData.blob[key]);
+      this.cacheBlob(key, mockData.mismatch_blob[key]);
     }
 
   }

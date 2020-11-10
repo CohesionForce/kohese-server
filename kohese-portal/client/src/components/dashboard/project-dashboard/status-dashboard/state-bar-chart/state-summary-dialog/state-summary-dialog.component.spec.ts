@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { MaterialModule } from '../../../../../../material.module';
 import { MAT_DIALOG_DATA } from '@angular/material';
 
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
@@ -18,7 +19,10 @@ describe('StateSummaryDialogComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ StateSummaryDialogComponent ],
-      imports: [ NgxDatatableModule ],
+      imports: [
+        NgxDatatableModule,
+        MaterialModule
+      ],
       providers: [ {
           provide: MAT_DIALOG_DATA,
           useValue: {

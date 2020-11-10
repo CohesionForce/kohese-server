@@ -13,7 +13,9 @@ import { BehaviorSubject } from 'rxjs';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
+import { DialogService } from '../../services/dialog/dialog.service';
 
+import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
 import { MockKoheseType } from '../../../mocks/data/MockKoheseType';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
@@ -32,6 +34,7 @@ describe('Component: Action Table', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
+        {provide: DialogService, useClass: MockDialogService},
         {provide: NavigationService, useClass : MockNavigationService},
         {provide: ChangeDetectorRef, useValue : {markForCheck : ()=>{}}},
         {provide: ItemRepository, useClass: MockItemRepository}

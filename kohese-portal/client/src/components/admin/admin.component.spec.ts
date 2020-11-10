@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../material.module'
 
+import { NavigationService } from '../../services/navigation/navigation.service';
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { SessionService } from '../../services/user/session.service';
 import { AdminComponent } from './admin.component';
 import { MockItem } from '../../../mocks/data/MockItem';
@@ -40,6 +42,7 @@ describe('Component: Admin', () => {
       schemas: [NO_ERRORS_SCHEMA],
 
       providers: [
+        { provide: NavigationService, useClass: MockNavigationService },
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: SessionService, useClass: MockSessionService },
         { provide: DialogService, useClass: MockDialogService },

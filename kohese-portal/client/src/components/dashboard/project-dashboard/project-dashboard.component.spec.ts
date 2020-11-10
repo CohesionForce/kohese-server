@@ -10,7 +10,7 @@ import { DashboardSelections } from '../dashboard-selector/dashboard-selector.co
 import { ProjectDashboardComponent } from './project-dashboard.component';
 
 describe('ProjectDashboardComponent', () => {
-  let component: ProjectDashboardComponent;
+  let projectDashboardComponent: ProjectDashboardComponent;
   let fixture: ComponentFixture<ProjectDashboardComponent>;
 
   beforeEach(() => {
@@ -21,15 +21,15 @@ describe('ProjectDashboardComponent', () => {
         { provide: ItemRepository, useClass: MockItemRepository }
       ]
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(ProjectDashboardComponent);
-    component = fixture.componentInstance;
-    component.dashboardSelectionStream = ObservableOf(DashboardSelections.
-      PROJECT_OVERVIEW);
+    projectDashboardComponent = fixture.componentInstance;
+    projectDashboardComponent.dashboardSelectionStream = ObservableOf(DashboardSelections.PROJECT_OVERVIEW);
+
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should instantiate', () => {
+    expect(projectDashboardComponent).toBeTruthy();
   });
 });
