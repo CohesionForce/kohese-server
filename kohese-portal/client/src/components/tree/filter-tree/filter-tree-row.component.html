@@ -23,7 +23,7 @@
       </ng-container>
 
       <ng-container *ngSwitchCase="'FilterCriterion'">
-        <mat-form-field style="padding-right: 20px;">
+        <mat-form-field style="padding-right: 20px; min-width: 150px;">
           <mat-select placeholder="Property"
             [(ngModel)]="treeRow.object.property">
             <mat-option
@@ -33,7 +33,7 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-form-field style="padding-right: 20px;">
+        <mat-form-field style="padding-right: 20px; padding-top: 15px; min-width: 150px;">
           <mat-select placeholder="Condition"
             [(ngModel)]="treeRow.object.condition">
             <mat-option
