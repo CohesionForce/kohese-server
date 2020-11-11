@@ -26,7 +26,7 @@
               </change-summary>
             </ng-container>
             <ng-container *ngSwitchCase="'Comparison'">
-              <h1>{{selectedVersionObject.changeObject.name}}</h1>
+              <h1>{{selectedVersionObject.changeObject? selectedVersionObject.changeObject.name : selectedVersionObject.baseObject.name}}</h1>
               <mat-checkbox (change)="toggleShowingDifferencesOnly()"
                 [checked]="(showDifferencesOnlySubject | async)">
                 Show Differences Only

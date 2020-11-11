@@ -172,6 +172,25 @@ export class TreeHashMap {
               } else {
                 // Child was added
                 result.summary.itemAdded[addedEntry.id] = addedEntry.treeId;
+                let childEntry = right[addedEntry.id];
+                result.details[addedEntry.id] = {
+                  match: false,
+                  left: undefined,
+                  right: childEntry,
+                  treeHashChanged: {
+                    fromTreeId: undefined,
+                    toTreeId: childEntry.treeHash
+                  },
+                  kindChanged: {
+                    fromKind: undefined,
+                    toKind: childEntry.kind
+                  },
+                  contentChanged: {
+                    fromOID: undefined,
+                    toOID: childEntry.oid
+                  }
+                }
+
               }
 
               // Now check it's children
@@ -206,6 +225,25 @@ export class TreeHashMap {
                 // Child was moved, it will be added to diff list where it is added
               } else {
                 result.summary.itemDeleted[deletedEntry.id] = deletedEntry.treeId;
+                let childEntry = left[deletedEntry.id];
+                result.details[deletedEntry.id] = {
+                  match: false,
+                  left: childEntry,
+                  right: undefined,
+                  treeHashChanged: {
+                    fromTreeId: childEntry.treeHash,
+                    toTreeId: undefined
+                  },
+                  kindChanged: {
+                    fromKind: childEntry.kind,
+                    toKind: undefined
+                  },
+                  contentChanged: {
+                    fromOID: childEntry.oid,
+                    toOID: undefined
+                  }
+                }
+
 
                 // Now check it's children
                 let childIds = Object.keys(deletedItem.childTreeHashes);
