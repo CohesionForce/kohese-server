@@ -220,8 +220,9 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       let repository: Repository = (<Repository> this.getRow(this.
         _repositoryProxy.item.id).object);
       for (let j: number = 0; j < repository.commits.length; j++) {
+        let itemId = comparison.changeObject ? comparison.changeObject.id : comparison.baseObject.id;
         if (-1 !== repository.commits[j].comparisons.indexOf(comparison)) {
-          id = repository.commits[j].id + '_' + comparison.changeObject.id;
+          id = repository.commits[j].id + '_' + itemId;
           break;
         }
       }
@@ -288,7 +289,8 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
     } else if (object instanceof Commit) {
       text = (object as Commit).koheseCommit.message;
     } else if (object instanceof Comparison) {
-      text = (object as Comparison).changeObject.name;
+      let comparison = object as Comparison;
+      text = comparison.changeObject ? comparison.changeObject.name : comparison.baseObject.name;
     }
 
     return text;

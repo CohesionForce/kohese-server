@@ -32,12 +32,24 @@ export class Compare {
         for (let itemId in diff.details) {
           let diffEntry: TreeHashEntryDifference = diff.details[itemId];
 
-          let baseBlobKind = diffEntry.left.kind;
-          let baseBlobOID = diffEntry.left.oid;
-          let baseBlob = await cache.getBlob(baseBlobOID);
-          let changeBlobKind = diffEntry.right.kind;
-          let changeBlobOID = diffEntry.right.oid;
-          let changeBlob = await cache.getBlob(changeBlobOID);
+          let baseBlobKind;
+          let baseBlobOID;
+          let baseBlob;
+          if (diffEntry.left) {
+            baseBlobKind = diffEntry.left.kind;
+            baseBlobOID = diffEntry.left.oid;
+            baseBlob = await cache.getBlob(baseBlobOID);
+          }
+
+          let changeBlobKind;
+          let changeBlobOID;
+          let changeBlob;
+          if (diffEntry.right) {
+            changeBlobKind = diffEntry.right.kind;
+            changeBlobOID = diffEntry.right.oid;
+            changeBlob = await cache.getBlob(changeBlobOID);
+          }
+
           let beforeItemDiff = Date.now();
           let comparison: ItemProxyComparison = await Compare.compareItems(
             itemId,
@@ -89,14 +101,20 @@ export class Compare {
         for (let j: number = 0; j < comparisons.length; j++) {
           let comparison: ItemProxyComparison = comparisons[j];
           let path: Array<Comparison> = [];
-          let parentId: string = comparison.changeObject.parentId;
+          let parentId: string = comparison.changeObject ? comparison.changeObject.parentId : comparison.baseObject.parentId;
           while (parentId) {
             let k: number = 0;
             while (k < comparisons.length) {
               let commitComparison: ItemProxyComparison = comparisons[k];
-              if (commitComparison.changeObject.id === parentId) {
+              if (commitComparison.changeObject && (commitComparison.changeObject.id === parentId)) {
+                // Associate with changed parent
                 path.push(commitComparison);
                 parentId = commitComparison.changeObject.parentId;
+                break;
+              } else if (commitComparison.baseObject && (commitComparison.baseObject.id === parentId)) {
+                // Associate with deleted parent
+                path.push(commitComparison);
+                parentId = commitComparison.baseObject.parentId;
                 break;
               }
               k++;
@@ -116,8 +134,9 @@ export class Compare {
 
     comparisons.sort((oneComparison: ItemProxyComparison, anotherComparison:
       ItemProxyComparison) => {
-      return oneComparison.changeObject.name - anotherComparison.changeObject.
-        name;
+      let leftName = oneComparison.changeObject ? oneComparison.changeObject.name : oneComparison.baseObject.name;
+      let rightName = anotherComparison.changeObject ? anotherComparison.changeObject.name : anotherComparison.baseObject.name;
+      return leftName - rightName;
     });
 
     return comparisons;

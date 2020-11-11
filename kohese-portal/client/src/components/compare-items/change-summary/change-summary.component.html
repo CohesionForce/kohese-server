@@ -13,7 +13,7 @@
     <ng-container *ngIf="hasChanges(comparison)">
       <mat-expansion-panel [expanded]="expanded">
         <mat-expansion-panel-header>
-          {{comparison.changeObject.name}}
+          {{comparison.changeObject? comparison.changeObject.name : comparison.baseObject.name}}
           <ng-container
             *ngFor="let changeType of comparison.changeTypes">
             <mat-icon

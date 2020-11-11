@@ -51,14 +51,14 @@ export class KoheseCommit {
       for (let repoId of reversedRootIds){
         treeHashEntryStack.push({id:repoId, treeId:this.repoTreeRoots[repoId].treeHash});
       }
-  
+
       while (treeHashEntryStack.length > 0) {
         let mapEntry = treeHashEntryStack.pop();
         let treeHashEntry = await itemCache.getTree(mapEntry.treeId)
-  
+
         if (treeHashEntry) {
           this.treeHashMap [mapEntry.id] = treeHashEntry;
-  
+
           let reversedChildIds = Object.keys(treeHashEntry.childTreeHashes).reverse();
           for (let childId of reversedChildIds){
             let treeId = treeHashEntry.childTreeHashes[childId];
@@ -198,10 +198,10 @@ export class KoheseCommit {
                   left[leftChildId] = leftChildTreeClone;
                   if(_.indexOf(gatherStack, leftChildId) === -1) {
                     gatherStack.push(leftChildId);
-                  }  
+                  }
                 }
             }
-          }  
+          }
         }
 
         if (rightVersion) {
@@ -219,10 +219,10 @@ export class KoheseCommit {
                   right[rightChildId] = rightChildTreeClone;
                   if(_.indexOf(gatherStack, rightChildId) === -1) {
                     gatherStack.push(rightChildId);
-                  }  
+                  }
                 }
             }
-          }  
+          }
         }
 
       } catch (err){
@@ -288,7 +288,7 @@ export class KoheseCommit {
         if (diff.childrenAdded){
           let childrenThatMoved : Array<ItemIdType> = [];
           for(let addedChild of diff.childrenAdded) {
-          
+
             // Recursively add children for item that moved
             let childStack : Array<{id:ItemIdType, treeId:TreeHashValueType}> = [ addedChild ];
             while (childStack.length > 0){
@@ -314,6 +314,24 @@ export class KoheseCommit {
               } else {
                 // Child was added
                 treeDifference.summary.itemAdded[addedEntry.id] = addedEntry.treeId;
+                let childEntry = right[addedEntry.id];
+                treeDifference.details[addedEntry.id] = {
+                  match: false,
+                  left: undefined,
+                  right: childEntry,
+                  treeHashChanged: {
+                    fromTreeId: undefined,
+                    toTreeId: childEntry.treeHash
+                  },
+                  kindChanged: {
+                    fromKind: undefined,
+                    toKind: childEntry.kind
+                  },
+                  contentChanged: {
+                    fromOID: undefined,
+                    toOID: childEntry.oid
+                  }
+                }
               }
 
               // Now check it's children
@@ -359,6 +377,24 @@ export class KoheseCommit {
                 // Child was moved, it will be added to diff list where it is added
               } else {
                 treeDifference.summary.itemDeleted[deletedEntry.id] = deletedEntry.treeId;
+                let childEntry = left[deletedEntry.id];
+                treeDifference.details[deletedEntry.id] = {
+                  match: false,
+                  left: childEntry,
+                  right: undefined,
+                  treeHashChanged: {
+                    fromTreeId: childEntry.treeHash,
+                    toTreeId: undefined
+                  },
+                  kindChanged: {
+                    fromKind: childEntry.kind,
+                    toKind: undefined
+                  },
+                  contentChanged: {
+                    fromOID: childEntry.oid,
+                    toOID: undefined
+                  }
+                }
 
                 // Now check it's children
                 let childIds = Object.keys(deletedItem.childTreeHashes);
