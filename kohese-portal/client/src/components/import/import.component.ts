@@ -104,9 +104,7 @@ export class ImportComponent implements OnInit {
   }
 
   private _getIcon: (element: any) => string = (element: any) => {
-    return this._itemRepository.getTreeConfig().getValue().config.
-      getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
-      item.icon;
+    return (element as ItemProxy).model.view.item.icon;
   };
   get getIcon() {
     return this._getIcon;

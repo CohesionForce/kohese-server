@@ -1,7 +1,7 @@
 'use strict'; //Required for use of 'class'
-import { ItemProxy, KoheseModelInterface }  from './item-proxy';
-import { TreeConfiguration } from './tree-configuration';
 import * as  _ from 'underscore';
+import { TreeConfiguration } from './tree-configuration';
+import { ItemProxy, KoheseModelInterface }  from './item-proxy';
 import { KoheseView } from './KoheseView';
 
 
@@ -143,7 +143,7 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
           // Detect if number is malformed
           if (definition.type === 'number' && (typeof itemContent[property] !== 'number')) {
             validationResult.valid = false;
-            validationResult.malformedNumber.push(property);  
+            validationResult.malformedNumber.push(property);
             validationResult.invalidData[property] = itemContent[property];
           }
 
@@ -151,14 +151,14 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
           if (definition.type === 'timestamp'){
             if (typeof itemContent[property] !== 'number') {
               validationResult.valid = false;
-              validationResult.malformedTimestamp.push(property);  
+              validationResult.malformedTimestamp.push(property);
               validationResult.invalidData[property] = itemContent[property];
             } else {
               if (itemContent[property] < 50000000){
                 // Detect timestamps that were entered in YYMMDD format
                 validationResult.valid = false;
-                validationResult.malformedTimestamp.push(property);  
-                validationResult.invalidData[property] = itemContent[property];  
+                validationResult.malformedTimestamp.push(property);
+                validationResult.invalidData[property] = itemContent[property];
               }
             }
           }
@@ -193,7 +193,7 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  static getModelProxyFor(kind) {
+  static getModelProxyFor(kind) : KoheseModel {
     let modelProxy = modelMap[kind];
 
     // Create a placeholder kind if it does not exist yet
@@ -274,7 +274,7 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
       classLocalType.stateProperties = _.clone(classLocalParentType.stateProperties) || [];
       classLocalType.relationProperties = _.clone(classLocalParentType.relationProperties) || [];
       classLocalType.idProperties = _.clone(classLocalParentType.idProperties) || [];
-      
+
       for (var property in localTypeSettings.properties){
         var propertySettings = localTypeSettings.properties[property];
 

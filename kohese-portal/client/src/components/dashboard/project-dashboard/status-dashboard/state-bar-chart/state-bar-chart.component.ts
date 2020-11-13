@@ -36,21 +36,21 @@ export class StateBarChartComponent implements AfterViewInit {
   yScale;
   xAxis;
   yAxis;
-  
+
   private static readonly _X_AXIS_PADDING: number = 125;
   private static readonly _Y_AXIS_PADDING: number = 50;
-  
+
   private _kindNames: Array<string> = [];
   get kindNames() {
     return this._kindNames;
   }
-  
+
   private _stateMap: { [kind: string]: { [attributeName: string]: { [stateName:
     string]: Array<ItemProxy> } } } = {};
   get stateMap() {
     return this._stateMap;
   }
-  
+
   private _hideEmptyStates: boolean = true;
   get hideEmptyStates() {
     return this._hideEmptyStates;
@@ -61,34 +61,34 @@ export class StateBarChartComponent implements AfterViewInit {
     for (let j: number = 0; j < selectedKindNames.length; j++) {
       delete this._stateMap[selectedKindNames[j]];
     }
-    
+
     this.kindSelectionToggled(selectedKindNames, true);
   }
-  
+
   private _selection: { kindNames: Array<string>, attributeName: string,
     stateName: string };
   get selection() {
     return this._selection;
   }
-  
+
   get TreeConfiguration() {
     return TreeConfiguration;
   }
-  
+
   get Object() {
     return Object;
   }
 
   constructor(private dialogService : DialogService) {}
-  
+
   public ngAfterViewInit(): void {
     this.svg = d3.select(this._svgElement.nativeElement);
-    
+
     // Add the svg canvas
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
-        
+
         for (let j: number = 0; j < this.project.projectItems.length; j++) {
           this.project.projectItems[j].visitTree(undefined, (itemProxy:
             ItemProxy) => {
@@ -101,16 +101,16 @@ export class StateBarChartComponent implements AfterViewInit {
         this._kindNames.sort((oneKindName: string, anotherKindName: string) => {
           return oneKindName.localeCompare(anotherKindName);
         });
-        
+
         if (Object.keys(this._stateMap).length !== 0) {
           this.kindSelectionToggled(this._kindNames, false);
         }
-        
+
         this.kindSelectionToggled(this._kindNames, true);
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this.projectStreamSub.unsubscribe();
   }
@@ -138,7 +138,7 @@ export class StateBarChartComponent implements AfterViewInit {
       this._svgElement.nativeElement.removeChild(this._svgElement.
         nativeElement.childNodes[j]);
     }
-    
+
     this.setScales();
 
     this.xAxis = d3.axisBottom(this.xScale);
@@ -168,10 +168,9 @@ export class StateBarChartComponent implements AfterViewInit {
     this.svg.append('g').attr('class', 'y-axis').attr('transform',
       'translate(' + StateBarChartComponent._Y_AXIS_PADDING + ',' +
       -StateBarChartComponent._X_AXIS_PADDING + ')').call(this.yAxis);
-    
+
     for (let kindName in this._stateMap) {
-      let kindColor: string = TreeConfiguration.getWorkingTree().getProxyFor(
-        'view-' + kindName.toLowerCase()).item.color;
+      let kindColor: string = TreeConfiguration.getWorkingTree().getModelProxyFor(kindName).view.item.color;
       for (let attributeName in this._stateMap[kindName]) {
         for (let stateName in this._stateMap[kindName][attributeName]) {
           let proxies: Array<ItemProxy> = this._stateMap[kindName][
@@ -207,7 +206,7 @@ export class StateBarChartComponent implements AfterViewInit {
       for (let attributeName in this._stateMap[kindName]) {
         for (let stateName in this._stateMap[kindName][attributeName]) {
           horizontalLabels.push(attributeName + ': ' + stateName);
-          
+
           let numberOfItems: number = this._stateMap[kindName][attributeName][
             stateName].length;
           if (numberOfItems > maxItems) {
@@ -220,7 +219,7 @@ export class StateBarChartComponent implements AfterViewInit {
     this.xScale = d3.scaleBand().domain(horizontalLabels).rangeRound([
       StateBarChartComponent._Y_AXIS_PADDING, this._svgElement.nativeElement.
       width.baseVal.value]).paddingInner(0.05);
-    
+
     this.yScale = d3.scaleLinear().domain([0, maxItems]).range([this.
       _svgElement.nativeElement.clientHeight, StateBarChartComponent.
       _X_AXIS_PADDING]);
@@ -253,7 +252,7 @@ export class StateBarChartComponent implements AfterViewInit {
 
     return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
 }
-  
+
   public toggleAllSelected(select: boolean): void {
     if (select) {
       this.kindSelectionToggled(this._kindNames.filter((kindName: string) => {
@@ -263,11 +262,11 @@ export class StateBarChartComponent implements AfterViewInit {
       for (let kindName in this._stateMap) {
         delete this._stateMap[kindName];
       }
-      
+
       this.updateGraph();
     }
   }
-  
+
   public canMove(kindName: string, moveUp: boolean): boolean {
     let kindNames: Array<string> = Object.keys(this._stateMap);
     if (moveUp) {
@@ -276,7 +275,7 @@ export class StateBarChartComponent implements AfterViewInit {
       return (kindNames.indexOf(kindName) !== (kindNames.length - 1));
     }
   }
-  
+
   public move(kindName: string, moveUp: boolean): void {
     let intermediateMap: any = {};
     let kindNames: Array<string> = Object.keys(this._stateMap);
@@ -285,36 +284,36 @@ export class StateBarChartComponent implements AfterViewInit {
       intermediateMap[kindNames[j]] = this._stateMap[kindNames[j]];
       delete this._stateMap[kindNames[j]];
     }
-    
+
     if (!moveUp) {
       intermediateMap[kindNames[kindIndex + 1]] = this._stateMap[kindNames[
         kindIndex + 1]];
       delete this._stateMap[kindNames[kindIndex + 1]];
     }
-    
+
     intermediateMap[kindName] = this._stateMap[kindName];
     delete this._stateMap[kindName];
-    
+
     if (moveUp) {
       intermediateMap[kindNames[kindIndex - 1]] = this._stateMap[kindNames[
         kindIndex - 1]];
       delete this._stateMap[kindNames[kindIndex - 1]];
     }
-    
+
     for (let j: number = (moveUp ? (kindIndex + 1) : (kindIndex + 2)); j <
       kindNames.length; j++) {
       intermediateMap[kindNames[j]] = this._stateMap[kindNames[j]];
       delete this._stateMap[kindNames[j]];
     }
-    
+
     for (let intermediateKindName in intermediateMap) {
       this._stateMap[intermediateKindName] = intermediateMap[
         intermediateKindName];
     }
-    
+
     this.updateGraph();
   }
-  
+
   public kindSelectionToggled(kindNames: Array<string>, selected: boolean):
     void {
     if (selected) {
@@ -328,7 +327,7 @@ export class StateBarChartComponent implements AfterViewInit {
               kindMap = {};
               this._stateMap[itemProxy.kind] = kindMap;
             }
-            
+
             let stateAttributeNames: Array<string> = itemProxy.model.item.
               stateProperties;
             for (let k: number = 0; k < stateAttributeNames.length; k++) {
@@ -342,20 +341,20 @@ export class StateBarChartComponent implements AfterViewInit {
                   attributeMap[stateName] = [];
                 }
               }
-              
+
               let values: Array<ItemProxy> = attributeMap[itemProxy.item[
                 stateAttributeNames[k]]];
               if (!values) {
                 values = [];
                 attributeMap[itemProxy.item[stateAttributeNames[k]]] = values;
               }
-              
+
               values.push(itemProxy);
             }
           }
         }, undefined);
       }
-      
+
       if (this._hideEmptyStates) {
         for (let kindName in this._stateMap) {
           for (let attributeName in this._stateMap[kindName]) {
@@ -373,20 +372,20 @@ export class StateBarChartComponent implements AfterViewInit {
         delete this._stateMap[kindNames[j]];
       }
     }
-    
+
     this.updateGraph();
   }
-  
+
   public getStateTotal(): number {
     let total: number = 0;
     for (let j: number = 0; j < this._selection.kindNames.length; j++) {
       total += this._stateMap[this._selection.kindNames[j]][this._selection.
         attributeName][this._selection.stateName].length;
     }
-    
+
     return total;
   }
-  
+
   public getStateDescription(kindName: string): string {
     return TreeConfiguration.getWorkingTree().getProxyFor(kindName).item.
       classProperties[this._selection.attributeName].definition.properties.

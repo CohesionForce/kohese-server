@@ -9,6 +9,7 @@ import { MarkdownModule } from 'ngx-markdown';
 import { FormatDefinitionType } from '../../../../../../../common/src/FormatDefinition.interface';
 import { PropertyDefinition } from '../../../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
+import { KoheseModel } from '../../../../../../../common/src/KoheseModel';
 import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../../../../mocks/services/MockSessionService';
@@ -60,9 +61,10 @@ describe('MultivaluedFieldComponent', () => {
 
     let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
       getTreeConfig().getValue().config;
-    component.koheseObject = treeConfiguration.getProxyFor('KoheseModel').item;
+    let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
+    component.koheseObject = modelProxy.item;
     component.dataModel = component.koheseObject;
-    component.viewModel = treeConfiguration.getProxyFor('view-kohesemodel').item;
+    component.viewModel = modelProxy.view.item;
     component.propertyDefinition = component.viewModel.formatDefinitions[
       component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
       containers[1].contents.filter((propertyDefinition:
@@ -172,7 +174,7 @@ describe('MultivaluedFieldComponent', () => {
     for (let j: number = 0; j < textLines.length; j++) {
       expect(textLines[j].substring(0, 2)).toBe('\u2022 ');
     }
-    
+
     expect(textRetrievalFunction(referencedItem, 'enumerationAttribute').
       substring(0, 2)).not.toBe('\u2022 ');
   });
@@ -203,7 +205,7 @@ describe('MultivaluedFieldComponent', () => {
       toBe(elements[0].id);
     expect(component.koheseObject['multivaluedGlobalTypeAttribute'][1].id).
       toBe(elements[1].id);
-    
+
     component.propertyDefinition = component.viewModel.formatDefinitions[
       component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
       containers[1].contents.filter((propertyDefinition:
@@ -299,11 +301,11 @@ describe('MultivaluedFieldComponent', () => {
     component.moveValue(2, 0, true);
     expect(component.koheseObject[component.propertyDefinition.propertyName]).
       toEqual([values[2], values[0], values[1]]);
-    
+
     component.moveValue(2, 0, false);
     expect(component.koheseObject[component.propertyDefinition.propertyName]).
       toEqual([values[2], values[1], values[0]]);
-    
+
     let dataModel: any = TreeConfiguration.getWorkingTree().getProxyFor(
       'KoheseModel').item;
     component.koheseObject = dataModel['multivaluedVariantAttribute'][1];

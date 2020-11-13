@@ -698,20 +698,12 @@ export class ItemRepository {
         // The itemIds attribute is currently absent from classProperties.
         if (attributeName !== 'itemIds') {
           let isMarkdownAttribute: boolean = false;
-          let dataModelItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-            getProxyFor(type);
+          let dataModelItemProxy: KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(type);
           if (dataModelItemProxy.item.classProperties[attributeName].definition.
             type === 'markdown') {
             isMarkdownAttribute = true;
           } else {
-            let viewModelItemProxy: ItemProxy = TreeConfiguration.
-              getWorkingTree().getProxyFor('view-' + dataModelItemProxy.item.
-              name.toLowerCase());
-            // Currently, not every data model has a view model.
-            if (!viewModelItemProxy) {
-              viewModelItemProxy = TreeConfiguration.getWorkingTree().
-                getProxyFor('view-item');
-            }
+            let viewModelItemProxy: ItemProxy = dataModelItemProxy.view;
 
             let viewModelAttribute: any = viewModelItemProxy.item.viewProperties[
               attributeName];

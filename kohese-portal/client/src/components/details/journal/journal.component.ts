@@ -199,11 +199,6 @@ export class JournalComponent {
     });
   }
 
-  public getViewModel(typeName: string): any {
-    return TreeConfiguration.getWorkingTree().getProxyFor('view-' + typeName.
-      toLowerCase()).item;
-  }
-
   public save(itemProxy: ItemProxy): void {
     this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
       (returnedItemProxy: ItemProxy) => {

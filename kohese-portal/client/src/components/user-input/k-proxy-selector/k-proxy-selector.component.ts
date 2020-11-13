@@ -117,9 +117,7 @@ export class KProxySelectorComponent extends UserInput
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
-          return this.itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
-            item.icon;
+          return (element as ItemProxy).model.view.item.icon;
         },
         selection: (Array.isArray(this.selected) ? this.selected : [this.
           selected]),

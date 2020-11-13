@@ -9,6 +9,8 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../common/src/KoheseModel';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DetailsComponent } from '../details/details.component';
 
@@ -88,10 +90,9 @@ export class AdminComponent implements OnInit, OnDestroy {
     this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
       subscribe(async (treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
-        this._koheseUserDataModel = treeConfigurationObject.config.getProxyFor(
-          'KoheseUser').item;
-        this._koheseUserViewModel = treeConfigurationObject.config.getProxyFor(
-          'view-koheseuser').item;
+        let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseUser');
+        this._koheseUserDataModel = modelProxy.item;
+        this._koheseUserViewModel = modelProxy.view.item;
         this._sessionMap = await this._itemRepository.getSessionMap();
         this._changeDetectorRef.markForCheck();
       }

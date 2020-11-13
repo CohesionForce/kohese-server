@@ -4,6 +4,7 @@ import { Attribute } from '../../../../../../common/src/Attribute.interface';
 import { FormatDefinition,
   FormatDefinitionType } from '../../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../../../common/src/KoheseModel';
 import { KoheseDataModel, KoheseViewModel } from '../../../../../../common/src/KoheseModel.interface';
 import { PropertyDefinition } from '../../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
@@ -82,7 +83,7 @@ export class Field {
   get Object() {
     return Object;
   }
-  
+
   get Array() {
     return Array;
   }
@@ -102,7 +103,7 @@ export class Field {
   get sessionService() {
     return this._sessionService;
   }
-  
+
   protected constructor(protected _changeDetectorRef: ChangeDetectorRef,
     protected _itemRepository: ItemRepository, protected _dialogService:
     DialogService, protected _sessionService: SessionService) {
@@ -119,21 +120,21 @@ export class Field {
       'classProperties'][this._propertyDefinition.propertyName].definition.
       required ? '*' : ''));
   }
-  
+
   /**
    * Returns an ISO-format Date representation for the given number of
    * milliseconds since January 1, 1970
-   * 
+   *
    * @param timestamp
    */
   public getDateString(timestamp: number): string {
     if (timestamp == null) {
       return undefined;
     }
-    
+
     return new Date(timestamp).toISOString();
   }
-  
+
   /**
    * Returns the names of states to which the attribute corresponding to the
    * associated PropertyDefinition may be transitioned
@@ -150,7 +151,7 @@ export class Field {
         stateTransitionCandidates.push(transitionName);
       }
     }
-    
+
     return stateTransitionCandidates;
   }
 
@@ -168,21 +169,21 @@ export class Field {
     return ((type.classLocalTypes != null) && (type.classLocalTypes[typeName]
       != null));
   }
-  
+
   /**
    * Allows selection of one or more references for the attribute corresponding
    * to the associated PropertyDefinition
-   * 
+   *
    * This method is used for the following cases:
    *   - Selecting a value for a singlevalued attribute
    *   - Adding values to a multivalued attribute
    *   - Replacing a single value of a multivalued attribute
-   * 
+   *
    * The given index is expected to be ```null``` in the second case;
    * otherwise, it should be a number.
-   * 
-   * @param attributeName 
-   * @param index 
+   *
+   * @param attributeName
+   * @param index
    */
   public async openObjectSelector(index: number): Promise<void> {
     let attributeName: string = this._propertyDefinition.propertyName;
@@ -237,7 +238,7 @@ export class Field {
           if (type === 'Item') {
             return true;
           }
-          
+
           let elementTypeName: string = (element as ItemProxy).kind;
           if ((attributeName === 'parentId') && !this._enclosingDataModel) {
             let objectItemProxy: ItemProxy = treeConfiguration.getProxyFor(
@@ -247,17 +248,17 @@ export class Field {
               if (itemProxy === objectItemProxy) {
                 return false;
               }
-              
+
               itemProxy = itemProxy.parentProxy;
             }
-            
+
             return true;
           } else {
             while (true) {
               if (elementTypeName === type) {
                 return true;
               }
-              
+
               let itemProxy: ItemProxy = treeConfiguration.getProxyFor(
                 elementTypeName);
               if (itemProxy) {
@@ -267,12 +268,11 @@ export class Field {
               }
             }
           }
-          
+
           return false;
         },
         getIcon: (element: any) => {
-          return treeConfiguration.getProxyFor('view-' +
-            (element as ItemProxy).kind.toLowerCase()).item.icon;
+          return (element as ItemProxy).model.view.item.icon;
         },
         selection: selection,
         allowMultiselect: allowMultiselect,
@@ -280,7 +280,7 @@ export class Field {
         quickSelectElements: this._itemRepository.getRecentProxies()
       }
     }).updateSize('90%', '90%').afterClosed().toPromise();
-    
+
     if (selection) {
       if (allowMultiselect) {
         this._koheseObject[this._isVariantField ? 'value' : attributeName].
@@ -304,7 +304,7 @@ export class Field {
           }
         }
       }
-      
+
       this._changeDetectorRef.markForCheck();
     }
   }
@@ -319,7 +319,7 @@ export class Field {
     if (defaultValue != null) {
       return defaultValue;
     }
-    
+
     let type: any = (Array.isArray(attribute.type) ? attribute.type[0] :
       attribute.type);
     // 'state-editor' case should be handled by the 'if' above
@@ -407,7 +407,7 @@ export class Field {
               }
             }
           }
-          
+
           return localTypeInstance;
         }
     }
@@ -446,9 +446,8 @@ export class Field {
     let classLocalTypesEntry: { definedInKind: string, definition: any } =
       (this._enclosingDataModel ? this._enclosingDataModel : this._dataModel)[
       'classLocalTypes'][type];
-    return this._itemRepository.getTreeConfig().getValue().config.
-      getProxyFor('view-' + classLocalTypesEntry.definedInKind.toLowerCase()).
-      item.localTypes[type];
+    let definedInModelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(classLocalTypesEntry.definedInKind);
+    return definedInModelProxy.view.item.localTypes[type];
   }
 
   /**
@@ -456,8 +455,8 @@ export class Field {
    * represented by the given Variant member name from the view model
    * corresponding to the attribute corresponding to the associated
    * PropertyDefinition
-   * 
-   * @param variantMemberName 
+   *
+   * @param variantMemberName
    */
   public getVariantPropertyDefinition(variantMemberName: string):
     PropertyDefinition {

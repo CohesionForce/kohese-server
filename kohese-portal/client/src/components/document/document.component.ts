@@ -62,11 +62,11 @@ export class DocumentComponent implements OnInit, OnDestroy {
               parentId: null,
               childIds: []
             };
-            
+
             let includeDescendants: boolean = this._documentConfiguration.
               components[id].includeDescendants;
             this._documentConfiguration.components[id] = documentComponent;
-            
+
             if (includeDescendants) {
               let process: (descendant: ItemProxy) => void = (descendant:
                 ItemProxy) => {
@@ -79,10 +79,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
                   parentId: descendant.item.parentId,
                   childIds: []
                 };
-                
+
                 this._documentConfiguration.components[descendant.item.id] =
                   descendantDocumentComponent;
-                
+
                 for (let j: number = 0; j < descendant.children.length; j++) {
                   let child: ItemProxy = descendant.children[j];
                   process(child);
@@ -97,7 +97,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             }
           }
         }
-        
+
         if (this._textEditor.editor.editor) {
           this.buildDocument(true);
           this._textEditor.editor.editor.undoManager.clear();
@@ -110,21 +110,21 @@ export class DocumentComponent implements OnInit, OnDestroy {
           _documentConfiguration) === -1) {
           this._documentConfigurations.unshift(this._documentConfiguration);
         }
-        
+
         this._navigationService.navigate('Document', {
           id: this._documentConfiguration.id
         });
       }
     }
-    
+
     this._changeDetectorRef.markForCheck();
   }
-  
+
   private _documentConfigurations: Array<any> = [];
   get documentConfigurations() {
     return this._documentConfigurations;
   }
-  
+
   private _linkOutlineAndDocument: boolean = false;
   get linkOutlineAndDocument() {
     return this._linkOutlineAndDocument;
@@ -132,7 +132,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
   set linkOutlineAndDocument(linkOutlineAndDocument: boolean) {
     this._linkOutlineAndDocument = linkOutlineAndDocument;
   }
-  
+
   private _getOutlineDocumentComponentChildren: (element: any) => Array<any> =
     (element: any) => {
     let children: Array<any> = [];
@@ -150,13 +150,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
         return this._documentConfiguration.components[id];
       }));
     }
-    
+
     return children;
   };
   get getOutlineDocumentComponentChildren() {
     return this._getOutlineDocumentComponentChildren;
   }
-  
+
   private _getDocumentComponentText: (element: any) => string = (element:
     any) => {
     let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
@@ -168,7 +168,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
   get getDocumentComponentText() {
     return this._getDocumentComponentText;
   }
-  
+
   private _outlineActions: Array<Action> = [
     new Action('Copy this Item', 'fa fa-copy', (element: any) => {
       return true;
@@ -196,51 +196,51 @@ export class DocumentComponent implements OnInit, OnDestroy {
   get outlineActions() {
     return this._outlineActions;
   }
-  
+
   @ViewChild('outlineTree')
   private _outlineTree: TreeComponent;
-  
+
   @ViewChild('textEditor')
   private _textEditor: TextEditorComponent;
-  
+
   private _document: string = '';
   get document() {
     return this._document;
   }
-  
+
   private _additionalToolbarButtonIds: Array<string> = ['insert', 'delineate',
     'export', 'update'];
   get additionalToolbarButtonIds() {
     return this._additionalToolbarButtonIds;
   }
-  
+
   private _selectedAttributeName: string;
-  
+
   @ViewChild('objectEditor')
   private _objectEditor: FormatObjectEditorComponent;
-  
+
   get matDialogRef() {
     return this._matDialogRef;
   }
-  
+
   get itemRepository() {
     return this._itemRepository;
   }
-  
+
   private _treeConfigurationSubscription: Subscription;
-  
+
   get Object() {
     return Object;
   }
-  
+
   get TreeConfiguration() {
     return TreeConfiguration;
   }
-  
+
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
-  
+
   private static readonly _INPUT_OPENING_HIDDEN_TAG: string =
     '<div id="" style="visibility: hidden;">' +
     '<div id="delineator" class="mceNonEditable" style="color: lightgray; text-align: center; display: none;">' +
@@ -259,7 +259,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})" style="visibility: hidden;">\s{0,2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{0,2}\\{0,1}-{12}[\s\S]+?-{12}\s{0,2}<\/div>\s{2}/g;
   private static readonly _ATTRIBUTE_REGEXP: RegExp =
     /<div id="([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]*?)" style="visibility: hidden;">\s{0,2}<div id="[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}[\s\S]*?delineator" class="mceNonEditable" style="color: lightgray; text-align: center;[\s\S]*?">\s{0,2}\\{0,1}-{12}[\s\S]+?-{12}\s{0,2}<\/div>\s{2}/g;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<DocumentComponent>,
@@ -267,14 +267,14 @@ export class DocumentComponent implements OnInit, OnDestroy {
     ItemRepository, private _navigationService: NavigationService,
     private _markdownService: MarkdownService) {
   }
-  
+
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this._documentConfiguration = this._data['documentConfiguration'];
     }
-    
+
     this.populateDocumentConfigurationArray();
-    
+
     this._treeConfigurationSubscription = TreeConfiguration.getWorkingTree().
       getChangeSubject().subscribe((notification: any) => {
       switch (notification.type) {
@@ -282,28 +282,28 @@ export class DocumentComponent implements OnInit, OnDestroy {
         case 'delete':
         case 'loaded':
           this.populateDocumentConfigurationArray();
-          
+
           if (this._documentConfiguration) {
             this.documentConfiguration = this._documentConfiguration;
           }
           break;
       }
     });
-    
+
     if (this._documentConfiguration) {
       this.documentConfiguration = this._documentConfiguration;
     }
   }
-  
+
   public ngOnDestroy(): void {
     this._treeConfigurationSubscription.unsubscribe();
   }
-  
+
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
   }
-  
+
   private populateDocumentConfigurationArray(): void {
     this._documentConfigurations.length = 0;
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(undefined,
@@ -313,7 +313,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     }, undefined);
   }
-  
+
   public editDocumentConfiguration(documentConfiguration: any):
     void {
     this._dialogService.openComponentDialog(
@@ -367,7 +367,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       this._changeDetectorRef.markForCheck();
     }
   }
-  
+
   public customizeEditor(editor: any): void {
     editor.ui.registry.addMenuButton(this._additionalToolbarButtonIds[0], {
       text: 'Insert',
@@ -400,10 +400,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
               return (otherAttributeNameSet.indexOf(attributeName) !== -1);
             });
           }
-          
+
           insertionCandidates = firstAttributeNameSet;
         }
-          
+
         for (let j: number = (insertionCandidates.length - 1); j >= 0; j--) {
           menuItems.unshift({
             type: 'menuitem',
@@ -413,7 +413,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             }
           });
         }
-        
+
         callback(menuItems);
       }
     });
@@ -441,7 +441,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public addDocumentComponents(): void {
     let includeDescendantsArray: Array<ItemProxy> = [];
     this._dialogService.openComponentDialog(TreeComponent, {
@@ -454,9 +454,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
-          return this._itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
-            item.icon;
+          return (element as ItemProxy).model.view.item.icon;
         },
         allowMultiselect: true,
         actions: [new ToggleAction('Include descendants', 'fa fa-arrow-down',
@@ -489,10 +487,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
             parentId: null,
             childIds: []
           };
-          
+
           this._documentConfiguration.components[itemProxy.item.id] =
             documentComponent;
-          
+
           if (includeDescendantsArray.indexOf(itemProxy) !== -1) {
             let process: (descendant: ItemProxy) => void = (descendant:
               ItemProxy) => {
@@ -505,10 +503,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 parentId: descendant.item.parentId,
                 childIds: []
               };
-              
+
               this._documentConfiguration.components[descendant.item.id] =
                 descendantDocumentComponent;
-              
+
               for (let j: number = 0; j < descendant.children.length; j++) {
                 let child: ItemProxy = descendant.children[j];
                 process(child);
@@ -522,7 +520,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             }
           }
         }
-        
+
         this.buildDocument(false);
         this._textEditor.editor.editor.setDirty(true);
         this._outlineTree.update(true);
@@ -530,7 +528,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public copyDocumentComponents(documentComponents: Array<DocumentComponent>):
     void {
     this._dialogService.openComponentDialog(CopyComponent, {
@@ -551,7 +549,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             /* Removing the below attribute should cause a related attribute to
             also be set. */
             delete item.createdBy;
-            
+
             if (copySpecifications.clearNonNameAttributes) {
               for (let attributeName in item) {
                 if ((attributeName !== 'name') && (attributeName !==
@@ -571,18 +569,18 @@ export class DocumentComponent implements OnInit, OnDestroy {
                   attributeName];
               }
             }
-            
+
             item.parentId = parentId;
-            
+
             if (copySpecifications.appendToOriginalName) {
               item.name += copySpecifications.nameOrSuffix;
             } else {
               item.name = copySpecifications.nameOrSuffix;
             }
-            
+
             let copiedItemProxy: ItemProxy = await this._itemRepository.
               upsertItem(itemProxy.kind, item);
-            
+
             let childIds: Array<string> = [];
             if (copySpecifications.copyDescendants) {
               for (let k: number = 0; k < itemProxy.children.length; k++) {
@@ -591,7 +589,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 // To-do: populate itemIds for copiedItemProxy
               }
             }
-            
+
             if (copySpecifications.addToDocument) {
               let documentComponentCopy: DocumentComponent = JSON.parse(JSON.
                 stringify(documentComponent));
@@ -599,13 +597,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
               for (let attributeName in documentComponentCopy.attributeMap) {
                 documentComponentCopy.attributeMap[attributeName] =
                   copiedItemProxy.item[attributeName];
-                
+
                 if ((attributeName === 'description') &&
                   (documentComponentCopy[attributeName] == null)) {
                   documentComponentCopy[attributeName] = '';
                 }
               }
-              
+
               if (documentComponent.parentId === null) {
                 documentComponentCopy.parentId = null;
               } else {
@@ -617,31 +615,31 @@ export class DocumentComponent implements OnInit, OnDestroy {
                   parent.childIds.push(documentComponentCopy.id);
                 }
               }
-              
+
               documentComponentCopy.childIds = childIds;
-              
+
               this._documentConfiguration.components[documentComponentCopy.id] =
                 documentComponentCopy;
             }
-            
+
             return copiedItemProxy;
           };
           let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
             getProxyFor(documentComponents[j].id);
           await process(itemProxy, itemProxy.item.parentId);
         }
-        
+
         if (copySpecifications.addToDocument) {
           this.buildDocument(false);
           this._textEditor.editor.editor.setDirty(true);
           this._outlineTree.update(true);
         }
-        
+
         this._changeDetectorRef.markForCheck();
       }
     });
   }
-  
+
   public moveDocumentComponents(documentComponents: Array<DocumentComponent>):
     void {
     let selectedMoveLocation: string;
@@ -663,7 +661,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
               children.splice(moveCandidateIndex, 1);
             }
           }
-          
+
           return children;
         },
         getText: this._getDocumentComponentText,
@@ -693,7 +691,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             previousParent.childIds.splice(previousParent.childIds.indexOf(
               outlineDocumentComponent.id), 1);
           }
-          
+
           if (selectedMoveLocation === locations[2]) {
             outlineDocumentComponent.parentId = referenceDocumentComponent.id;
             referenceDocumentComponent.childIds.push(outlineDocumentComponent.
@@ -707,7 +705,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
               locations[0]) ? 0 : 1), 0, outlineDocumentComponent.id);
           }
         }
-        
+
         this.buildDocument(false);
         this._textEditor.editor.editor.setDirty(true);
         this._outlineTree.update(true);
@@ -715,7 +713,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   public async removeDocumentComponents(documentComponents:
     Array<DocumentComponent>): Promise<void> {
     if ((documentComponents.length === 1) && (documentComponents[0].childIds.
@@ -728,7 +726,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
           1);
       }
       delete this._documentConfiguration.components[documentComponent.id];
-      
+
       this.buildDocument(false);
       this._textEditor.editor.editor.setDirty(true);
       this._outlineTree.update(true);
@@ -771,7 +769,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 childIds[j]].parentId = documentComponent.parentId;
             }
           }
-          
+
           if (documentComponent.parentId !== null) {
             let parent: DocumentComponent = this._documentConfiguration.
               components[documentComponent.parentId];
@@ -781,7 +779,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
           delete this._documentConfiguration.components[documentComponent.
             id];
         }
-        
+
         this.buildDocument(false);
         this._textEditor.editor.editor.setDirty(true);
         this._outlineTree.update(true);
@@ -789,7 +787,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   public outlineDocumentComponentSelected(id: string): void {
     this._textEditor.editor.editor.dom.select('div#' + id)[0].scrollIntoView();
     let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
@@ -798,7 +796,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     this._objectEditor.type = itemProxy.model.item;
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public selectionChanged(selection: any): void {
     let anchorReference: any = selection.getSel().anchorNode;
     let focusReference: any = selection.getSel().focusNode;
@@ -823,7 +821,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
               to the Selection. */
               break;
             }
-            
+
             if ((focusMatch = attributeStartRegExp.exec(focusReference.
               outerHTML)) !== null) {
               let focusNode: any;
@@ -840,7 +838,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
                   // Forward selection
                   focusNode = this._textEditor.editor.editor.dom.select(
                     'div#' + this.getDocumentComponent(
-                    anchorDocumentComponentIndex + 1).id)[0];                      
+                    anchorDocumentComponentIndex + 1).id)[0];
                 } else {
                   // Reverse selection. Skip the delineator.
                   focusNode = anchorReference.childNodes.item(1);
@@ -864,37 +862,37 @@ export class DocumentComponent implements OnInit, OnDestroy {
                     childNodes.item(1);
                 }
               }
-              
+
               if (focusNode) {
                 selection.getSel().extend(focusNode, 0);
               }
-            
+
               break;
             }
-            
+
             focusReference = focusReference.parentNode;
           } while (focusReference);
         }
-        
+
         if (this._outlineTree && this._linkOutlineAndDocument) {
           this._outlineTree.selection = [this._documentConfiguration.
             components[itemId]];
         }
-        
+
         let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
           getProxyFor(itemId);
         this._objectEditor.object = itemProxy.item;
         this._objectEditor.type = itemProxy.model.item;
-        
+
         this._changeDetectorRef.markForCheck();
-        
+
         break;
       }
-      
+
       anchorReference = anchorReference.parentNode;
     } while (anchorReference);
   }
-  
+
   private getDocumentComponentIndex(id: string): number {
     let index: number = 0;
     let process: (documentComponent: DocumentComponent) => number =
@@ -910,7 +908,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             return index;
           }
         }
-        
+
         return undefined;
       }
     };
@@ -924,10 +922,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     return -1;
   }
-  
+
   private getDocumentComponent(index: number): DocumentComponent {
     if (index > -1) {
       let process: (documentComponent:
@@ -945,7 +943,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
               return result;
             }
           }
-          
+
           return undefined;
         }
       };
@@ -960,10 +958,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     return undefined;
   }
-  
+
   public textEditorContentChanged(text: string): void {
     // Remove the last '</div>\n\n'.
     let regExpTarget: string = text.substring(0, text.length - 8);
@@ -980,7 +978,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
     }
     // Re-orient splitTarget.
     splitTarget = splitTarget.split('').reverse().join('');
-    
+
     let itemIdsAndContent: Array<string> = splitTarget.split(
       DocumentComponent._SEPARATOR_DIV_REGEXP);
     // Remove the first element, as it should be empty.
@@ -999,7 +997,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             delete attributeMap[attributeName];
           }
         }
-        
+
         let content: string = itemIdsAndContent[j + 1];
         // Remove the last '</div>\n\n'.
         let attributeRegExpTarget: string = content.substring(0, content.
@@ -1021,7 +1019,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
         // Re-orient attributeSplitTarget.
         attributeSplitTarget = attributeSplitTarget.split('').reverse().
           join('');
-        
+
         let idsAndValues: Array<string> = attributeSplitTarget.split(
           DocumentComponent._ATTRIBUTE_REGEXP);
         idsAndValues.shift();
@@ -1034,13 +1032,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
               (idsAndValues.length - 2)))) {
               attribute = attribute.substring(0, attribute.length - 1);
             }
-            
+
             if ((idsAndValues[k] === 'description') || attribute) {
               attributeMap[idsAndValues[k].substring(36)] = attribute;
             }
           }
         }
-        
+
         let element: any = this._textEditor.editor.editor.dom.select('div#' +
           itemId + 'delineator')[0];
         if (element) {
@@ -1052,14 +1050,14 @@ export class DocumentComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     if (this._outlineTree) {
       this._outlineTree.update(false);
     }
-    
+
     this._changeDetectorRef.markForCheck();
   }
-  
+
   private async insert(insertionIdentifier: string): Promise<void> {
     if (insertionIdentifier) {
       let insertionPositions: { [optionName: string]: any } = {
@@ -1077,7 +1075,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
         if (insertionIdentifierIndex !== -1) {
           attributeNames.splice(insertionIdentifierIndex, 1);
         }
-        
+
         let selectedAttributeIndex: number = attributeNames.indexOf(this.
           _selectedAttributeName);
         let insertionPosition: any = await this._dialogService.
@@ -1090,7 +1088,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
               j]];
           }
-          
+
           let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
             getProxyFor(documentComponent.id);
           if (insertionPosition === insertionPositions[0]) {
@@ -1104,21 +1102,21 @@ export class DocumentComponent implements OnInit, OnDestroy {
             intermediateMap[insertionIdentifier] = itemProxy.item[
               insertionIdentifier];
           }
-          
+
           for (let j: number = selectedAttributeIndex + 1; j <
             attributeNames.length; j++) {
             intermediateMap[attributeNames[j]] = attributeMap[attributeNames[
               j]];
           }
-          
+
           for (let attributeName in attributeMap) {
             delete attributeMap[attributeName];
           }
-          
+
           for (let attributeName in intermediateMap) {
             attributeMap[attributeName] = intermediateMap[attributeName];
           }
-          
+
           this.buildDocument(false);
           this._textEditor.editor.editor.setDirty(true);
           this._changeDetectorRef.markForCheck();
@@ -1148,12 +1146,12 @@ export class DocumentComponent implements OnInit, OnDestroy {
                     getAttributeInsertionString(itemProxy, attributeName,
                     typeObject.attributes[attributeName]);
                 }
-                
+
                 for (let attributeName in attributeMap) {
                   intermediateMap[attributeName] = attributeMap[attributeName];
                   delete attributeMap[attributeName];
                 }
-                
+
                 for (let attributeName in intermediateMap) {
                   attributeMap[attributeName] = intermediateMap[attributeName];
                 }
@@ -1166,7 +1164,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
               }
             }
           }
-          
+
           this.buildDocument(false);
           this._textEditor.editor.editor.setDirty(true);
           this._changeDetectorRef.markForCheck();
@@ -1174,18 +1172,18 @@ export class DocumentComponent implements OnInit, OnDestroy {
       });
     }
   }
-  
+
   private getAttributeInsertionString(itemProxy: ItemProxy, attributeName:
     string, insertionParametersObject: any): string {
     let attributeString: string = '';
     attributeString += this.getFormattedOpeningHiddenTag(itemProxy.item.id +
       attributeName, attributeName, false);
-    
+
     if (attributeName === 'name') {
       if (insertionParametersObject.showAttributeName) {
         attributeString += attributeName + ': ';
       }
-      
+
       let headingLevel: number = -1;
       if (insertionParametersObject.headingStyle === HeadingStyle.STRUCTURAL) {
         let componentIds: Array<string> = Object.keys(this.
@@ -1204,11 +1202,11 @@ export class DocumentComponent implements OnInit, OnDestroy {
         headingLevel = headingStyleValues.indexOf(insertionParametersObject.
           headingStyle);
       }
-      
+
       for (let j: number = 0; j < headingLevel; j++) {
         attributeString += '#';
       }
-      
+
       if (headingLevel > 0) {
         attributeString += ' ';
       }
@@ -1242,10 +1240,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
 
       attributeString += addition;
     }
-    
+
     return attributeString;
   }
-  
+
   private toggleDelineation(delineate: boolean): void {
     let documentIds: Array<string> = Object.keys(this._documentConfiguration.
       components);
@@ -1265,10 +1263,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     this._documentConfiguration.delineated = delineate;
   }
-  
+
   private export(): void {
     this._dialogService.openComponentDialog(
       ReportSpecificationComponent, {
@@ -1289,7 +1287,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 for (let k: number = 0; k < attributeNames.length; k++) {
                   content += attributeMap[attributeNames[k]] + '\n\n';
                 }
-                
+
                 for (let k: number = 0; k < documentComponent.childIds.length;
                   k++) {
                   process(this._documentConfiguration.components[
@@ -1299,7 +1297,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
               process(documentComponents[j]);
             }
           }
-          
+
           // Trim off the last '\n\n'.
           content = content.substring(0, content.length - 2);
           return content;
@@ -1307,7 +1305,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       }
     }).updateSize('40%', '40%');
   }
-  
+
   private areUpdatesAvailable(): boolean {
     let documentIds: Array<string> = Object.keys(this._documentConfiguration.
       components);
@@ -1326,10 +1324,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     return false;
   }
-  
+
   private update(): void {
     let differences: Array<Difference> = [];
     let documentIds: Array<string> = Object.keys(this._documentConfiguration.
@@ -1350,13 +1348,13 @@ export class DocumentComponent implements OnInit, OnDestroy {
             difference = new Difference(itemProxy, undefined, undefined, []);
             differences.push(difference);
           }
-          
+
           difference.subDifferences.push(new Difference(attributeNames[k],
             localValue, remoteValue, []));
         }
       }
     }
-    
+
     if (differences.length > 0) {
       this._dialogService.openComponentDialog(MergeComponent, {
         data: {
@@ -1380,7 +1378,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
               }
             }
           }
-          
+
           this.buildDocument(true);
           /* Only save the documentConfiguration if it has already been
           persisted */
@@ -1389,24 +1387,24 @@ export class DocumentComponent implements OnInit, OnDestroy {
           if (itemProxy.kind === 'DocumentConfiguration') {
             this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
           }
-          
+
           if (this._outlineTree) {
             this._outlineTree.update(false);
           }
-          
+
           this._changeDetectorRef.markForCheck();
         }
       });
     }
   }
-  
+
   public saveObjectEditorObject(): void {
     let objectEditorObject: any = this._objectEditor.close(true);
     let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       objectEditorObject['id']);
     this._itemRepository.upsertItem(itemProxy.kind, objectEditorObject);
   }
-  
+
   private buildDocument(clearModificationIndicator: boolean): void {
     let document: string = '';
     let documentComponents: Array<DocumentComponent> = Object.values(this.
@@ -1419,7 +1417,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
             getProxyFor(documentComponent.id);
           document += this.getFormattedOpeningHiddenTag(documentComponent.id,
             itemProxy.item.name, false);
-          
+
           let attributeMap: any = this._documentConfiguration.components[
             documentComponent.id].attributeMap;
           let attributeNames: Array<string> = Object.keys(attributeMap);
@@ -1429,9 +1427,9 @@ export class DocumentComponent implements OnInit, OnDestroy {
             document += attributeMap[attributeNames[k]] + '\n\n';
             document += DocumentComponent._CLOSING_HIDDEN_TAG;
           }
-          
+
           document += DocumentComponent._CLOSING_HIDDEN_TAG;
-          
+
           if (clearModificationIndicator) {
             let element: any = this._textEditor.editor.editor.dom.select(
               'div#' + documentComponent.id + 'delineator')[0];
@@ -1440,7 +1438,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
                 '------------' + itemProxy.item.name + '------------');
             }
           }
-          
+
           for (let k: number = 0; k < documentComponent.childIds.length; k++) {
             process(this._documentConfiguration.components[documentComponent.
               childIds[k]]);
@@ -1449,10 +1447,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
         process(documentComponents[j]);
       }
     }
-    
+
     this._document = this._markdownService.compile(document);
   }
-  
+
   public async save(text: string): Promise<void> {
     this.textEditorContentChanged(text);
     let documentIds: Array<string> = Object.keys(this._documentConfiguration.
@@ -1465,7 +1463,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
       if (description == null) {
         description = '';
       }
-      
+
       // Don't save any Items whose description was not modified.
       if (itemProxy.item.description !== description) {
         itemProxy.item.description = description;
@@ -1479,19 +1477,19 @@ export class DocumentComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     // Only save the documentConfiguration if it has already been persisted
     let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor(this._documentConfiguration.id);
     if (itemProxy.kind === 'DocumentConfiguration') {
       this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
     }
-    
+
     if (this._outlineTree) {
       this._outlineTree.update(false);
     }
   }
-  
+
   private getFormattedOpeningHiddenTag(id: string, text: string,
     inOutputFormat: boolean): string {
     let formattedOpeningHiddenTag: string;
@@ -1501,7 +1499,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
         _OUTPUT_OPENING_HIDDEN_TAG.substring(0, 9) + id + DocumentComponent.
         _OUTPUT_OPENING_HIDDEN_TAG.substring(9, 50) + id + DocumentComponent.
         _OUTPUT_OPENING_HIDDEN_TAG.substring(50));
-      
+
       // Insert text in the middle of the 24 '-'s.
       formattedOpeningHiddenTag = formattedOpeningHiddenTag.substring(0,
         formattedOpeningHiddenTag.length - 22) + text +
@@ -1513,21 +1511,21 @@ export class DocumentComponent implements OnInit, OnDestroy {
         _INPUT_OPENING_HIDDEN_TAG.substring(0, 9) + id + DocumentComponent.
         _INPUT_OPENING_HIDDEN_TAG.substring(9, 48) + id + DocumentComponent.
         _INPUT_OPENING_HIDDEN_TAG.substring(48));
-      
+
       // Insert text in the middle of the 24 '-'s.
       formattedOpeningHiddenTag = formattedOpeningHiddenTag.substring(0,
         formattedOpeningHiddenTag.length - 20) + text +
         formattedOpeningHiddenTag.substring(formattedOpeningHiddenTag.length -
         20);
     }
-    
+
     /* If the document was previously delineated, display Item-level
     delineation. */
     if (this._documentConfiguration.delineated && (id.length === 36)) {
       formattedOpeningHiddenTag = formattedOpeningHiddenTag.replace(
         /display: none;/, '');
     }
-    
+
     return formattedOpeningHiddenTag;
   }
 }

@@ -11,6 +11,7 @@ import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { Attribute } from '../../../../../common/src/Attribute.interface';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 
 describe('FormatDefinitionEditorComponent', () => {
   let component: FormatDefinitionEditorComponent;
@@ -35,9 +36,9 @@ describe('FormatDefinitionEditorComponent', () => {
     component = componentFixture.componentInstance;
     let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
       getTreeConfig().getValue().config;
-    component.dataModel = treeConfiguration.getProxyFor('KoheseModel').item;
-    component.viewModel = treeConfiguration.getProxyFor('view-kohesemodel').
-      item;
+    let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
+    component.dataModel = modelProxy.item;
+    component.viewModel = modelProxy.view.item;
     component.formatDefinition = component.viewModel.formatDefinitions[
       component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
     component.attributes = Object.values(component.dataModel.classProperties).

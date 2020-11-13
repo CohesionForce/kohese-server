@@ -7,6 +7,7 @@ import { MatCheckboxModule, MatDatepickerModule, MatDialogModule,
 import { MarkdownModule } from 'ngx-markdown';
 
 import { MarkdownEditorModule } from '../../../../../components/markdown-editor/markdown-editor.module';
+import { KoheseModel } from '../../../../../../../common/src/KoheseModel';
 import { KoheseViewModel } from '../../../../../../../common/src/KoheseModel.interface';
 import { FormatDefinitionType } from '../../../../../../../common/src/FormatDefinition.interface';
 import { PropertyDefinition } from '../../../../../../../common/src/PropertyDefinition.interface';
@@ -62,9 +63,10 @@ describe('SinglevaluedFieldComponent', () => {
 
     let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
       getTreeConfig().getValue().config;
-    component.koheseObject = treeConfiguration.getProxyFor('KoheseModel').item;
+    let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
+    component.koheseObject = modelProxy.item;
     component.dataModel = component.koheseObject;
-    component.viewModel = treeConfiguration.getProxyFor('view-kohesemodel').item;
+    component.viewModel = modelProxy.view.item;
     component.propertyDefinition = component.viewModel.formatDefinitions[
       component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
       header.contents[0];
@@ -147,7 +149,7 @@ describe('SinglevaluedFieldComponent', () => {
     await component.openObjectSelector(undefined);
     expect(component.koheseObject[component.propertyDefinition.propertyName].
       id).toBe(TreeConfiguration.getWorkingTree().getRootProxy().item.id);
-    
+
     component.propertyDefinition = component.viewModel.formatDefinitions[
       component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
       containers[0].contents.filter((propertyDefinition:
@@ -157,7 +159,7 @@ describe('SinglevaluedFieldComponent', () => {
     await component.openObjectSelector(undefined);
     expect(component.koheseObject[component.propertyDefinition.propertyName]).
       toBe(TreeConfiguration.getWorkingTree().getRootProxy().item.id);
-    
+
     component.propertyDefinition = component.viewModel.formatDefinitions[
       component.viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]].
       containers[0].contents.filter((propertyDefinition:

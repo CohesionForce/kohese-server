@@ -363,6 +363,20 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getModelProxyFor(id) : KoheseModel {
+    let modelProxy: ItemProxy;
+    modelProxy = this.proxyMap[id];
+
+    if (modelProxy.kind !== 'KoheseModel') {
+      console.log('*** Request for model %s returned a %s', id, modelProxy.kind);
+    }
+
+    return modelProxy as KoheseModel;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   getProxyByProperty(kind, idProperty, idValue) {
     let proxy;
     if (this.idMap[kind] && this.idMap[kind][idProperty] &&
