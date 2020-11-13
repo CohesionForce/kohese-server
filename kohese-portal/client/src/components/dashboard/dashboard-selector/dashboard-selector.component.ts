@@ -124,9 +124,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         this.menuType = MenuTypes.PERSONAL;
         break;
 
-        this.menuType = MenuTypes.PERSONAL;
-        break;
-
       case (DashboardSelections.USER_STATISTICS):
         this.selectedDashboard = {
           dashboard: DashboardSelections.USER_STATISTICS,
