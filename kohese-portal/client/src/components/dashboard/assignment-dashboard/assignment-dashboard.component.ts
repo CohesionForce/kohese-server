@@ -80,8 +80,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   }
 
   public getViewModel(itemProxy: ItemProxy): any {
-    return TreeConfiguration.getWorkingTree().getProxyFor('view-' + itemProxy.
-      kind.toLowerCase()).item;
+    return itemProxy.model.view.item;
   }
 
   public save(itemProxy: ItemProxy): void {

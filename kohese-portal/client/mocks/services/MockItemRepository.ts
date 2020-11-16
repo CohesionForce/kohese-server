@@ -1151,8 +1151,7 @@ export class MockItemRepository {
     let working = ItemProxy.getWorkingTree();
     for(let modelName in MockItemRepository.modelDefinitions.model) {
       let modelProxy : KoheseModel = (working.getProxyFor(modelName)) as KoheseModel;
-      let viewId = 'view-' + modelName.toLowerCase();
-      let viewProxy = working.getProxyFor(viewId);
+      let viewProxy = modelProxy.view;
       modelProxy.type = new KoheseType(modelProxy, viewProxy);
     }
 

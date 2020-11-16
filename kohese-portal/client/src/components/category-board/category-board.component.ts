@@ -47,8 +47,7 @@ export class CategoryBoardComponent {
     } else {
       this._selectedAttribute = this._selectedKind.classProperties['createdBy'].definition;
     }
-    this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-      this._selectedKind.name.toLowerCase()).item;
+    this._viewModel = TreeConfiguration.getWorkingTree().getModelProxyFor(this._selectedKind.name).view.item;
 
     this._changeDetectorRef.markForCheck();
   }

@@ -75,8 +75,7 @@ export class StateSummaryDialogComponent implements OnInit {
       this._proxies = data.proxies;
       this._kindName = data.kindName;
       this._stateName = data.stateName;
-      this.color = TreeConfiguration.getWorkingTree().getProxyFor(
-        'view-' + this._kindName.toLowerCase()).item.color;
+      this.color = TreeConfiguration.getWorkingTree().getModelProxyFor(this._kindName).view.item.color;
     }
   }
 
@@ -88,8 +87,7 @@ export class StateSummaryDialogComponent implements OnInit {
   }
 
   public getViewModel(itemProxy: ItemProxy): any {
-    return TreeConfiguration.getWorkingTree().getProxyFor('view-' + itemProxy.
-      kind.toLowerCase()).item;
+    return itemProxy.model.view.item;
   }
 
   public save(itemProxy: ItemProxy): void {

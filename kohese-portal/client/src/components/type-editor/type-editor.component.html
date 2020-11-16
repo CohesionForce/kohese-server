@@ -41,19 +41,15 @@
       <mat-tab>
         <ng-template mat-tab-label>
           Structure
-          <ng-container *ngIf="((selectedType != null) && itemRepository.
-            getTreeConfig().getValue().config.getProxyFor(selectedType.id).
-            dirty)">
+          <ng-container *ngIf="((selectedType != null) && modelProxy.dirty)">
             <img src="assets/icons/versioncontrol/dirty.ico"/>
           </ng-container>
         </ng-template>
         <ng-template matTabContent>
           <ng-container *ngIf="(selectedType != null)">
             <data-model-editor [dataModel]="selectedType"
-              [hasUnsavedChanges]="itemRepository.getTreeConfig().getValue().
-              config.getProxyFor(selectedType.id).dirty"
-              (modified)="itemRepository.getTreeConfig().getValue().config.
-              getProxyFor(selectedType.id).dirty = true">
+              [hasUnsavedChanges]="modelProxy.dirty"
+              (modified)="modelProxy.dirty = true">
             </data-model-editor>
           </ng-container>
         </ng-template>
@@ -61,21 +57,16 @@
       <mat-tab>
         <ng-template mat-tab-label>
           Display
-          <ng-container *ngIf="((selectedType != null) && itemRepository.
-            getTreeConfig().getValue().config.getProxyFor('view-' +
-            selectedType.name.toLowerCase()).dirty)">
+          <ng-container *ngIf="((selectedType != null) && modelProxy.view.dirty)">
             <img src="assets/icons/versioncontrol/dirty.ico"/>
           </ng-container>
         </ng-template>
         <ng-template matTabContent>
           <ng-container *ngIf="(selectedType != null)">
-            <view-model-editor [viewModel]="itemRepository.getTreeConfig().
-              getValue().config.getProxyFor('view-' + selectedType.name.
-              toLowerCase()).item" [hasUnsavedChanges]="itemRepository.
-              getTreeConfig().getValue().config.getProxyFor('view-' +
-              selectedType.name.toLowerCase()).dirty" (modified)="itemRepository.
-              getTreeConfig().getValue().config.getProxyFor('view-' +
-              selectedType.name.toLowerCase()).dirty = true"
+            <view-model-editor
+              [viewModel]="modelProxy.view.item"
+              [hasUnsavedChanges]="modelProxy.view.dirty"
+              (modified)="modelProxy.view.dirty = true"
               [dataModel]="selectedType">
             </view-model-editor>
           </ng-container>

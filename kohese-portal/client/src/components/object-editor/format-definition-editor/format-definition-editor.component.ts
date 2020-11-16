@@ -9,6 +9,7 @@ import { FormatContainer,
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { Type, Metatype } from '../../../../../common/src/Type.interface';
 
@@ -24,7 +25,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
   set enclosingType(enclosingType: any) {
     this._enclosingType = enclosingType;
   }
-  
+
   private _dataModel: any;
   get dataModel() {
     return this._dataModel;
@@ -33,7 +34,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
   set dataModel(dataModel: any) {
     this._dataModel = dataModel;
   }
-  
+
   private _viewModel: any;
   get viewModel() {
     return this._viewModel;
@@ -42,7 +43,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
   set viewModel(viewModel: any) {
     this._viewModel = viewModel;
   }
-  
+
   private _formatDefinition: FormatDefinition;
   get formatDefinition() {
     return this._formatDefinition;
@@ -50,11 +51,11 @@ export class FormatDefinitionEditorComponent implements OnInit {
   @Input('formatDefinition')
   set formatDefinition(formatDefinition: FormatDefinition) {
     this._formatDefinition = formatDefinition;
-    
+
     this._isDefaultFormatDefinition = (this._viewModel.defaultFormatKey[
       FormatDefinitionType.DEFAULT] === this._formatDefinition.id);
   }
-  
+
   private _attributes: Array<any>;
   get attributes() {
     return this._attributes;
@@ -63,12 +64,12 @@ export class FormatDefinitionEditorComponent implements OnInit {
   set attributes(attributes: Array<any>) {
     this._attributes = attributes;
   }
-  
+
   private _referenceAttributes: { [kindName: string]: Array<any> } = {};
   get referenceAttributes() {
     return this._referenceAttributes;
   }
-  
+
   private _isDisabled: boolean = false;
   get isDisabled() {
     return this._isDisabled;
@@ -77,12 +78,12 @@ export class FormatDefinitionEditorComponent implements OnInit {
   set isDisabled(isDisabled: boolean) {
     this._isDisabled = isDisabled;
   }
-  
+
   private _isDefaultFormatDefinition: boolean;
   get isDefaultFormatDefinition() {
     return this._isDefaultFormatDefinition;
   }
-  
+
   private _userInterfaceTypes: any = {
     'boolean': {
       'Boolean': 'boolean'
@@ -105,19 +106,19 @@ export class FormatDefinitionEditorComponent implements OnInit {
       'Username': 'user-selector'
     }
   };
-  
+
   get FormatContainerKind() {
     return FormatContainerKind;
   }
-  
+
   get Object() {
     return Object;
   }
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository) {
   }
-  
+
   public ngOnInit(): void {
     let typeNames: Array<string> = [];
     let dataModelItemProxy: ItemProxy = ({
@@ -128,7 +129,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
       dataModelItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
         dataModelItemProxy.item.base);
     } while (dataModelItemProxy);
-    
+
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
       if (itemProxy.kind === 'KoheseModel') {
@@ -146,7 +147,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
                 this._referenceAttributes[itemProxy.item.name] =
                   kindAttributes;
               }
-              
+
               let attributeCopy: any = JSON.parse(JSON.stringify(attribute));
               attributeCopy.containingType = itemProxy.item.name;
               kindAttributes.push(attributeCopy);
@@ -156,7 +157,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
       }
     }, undefined);
   }
-  
+
   public toggleStateAttributeGrouping(): void {
     if (!this._viewModel.ungroupDefaultFormatDefinitionStateAttributes) {
       if (Object.values(this._dataModel.classProperties).filter(
@@ -177,7 +178,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
           this._formatDefinition.containers[0].contents.splice(attributeNames.
             indexOf(propertyDefinition.propertyName) - 1, 0, propertyDefinition);
         }
-        
+
         this._formatDefinition.containers.splice(1, 1);
       }
     } else {
@@ -185,7 +186,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
         kind: FormatContainerKind.VERTICAL,
         contents: []
       };
-      
+
       for (let j: number = (this._formatDefinition.containers[0].contents.
         length - 1); j >= 0; j--) {
         let propertyDefinition: PropertyDefinition = this._formatDefinition.
@@ -195,21 +196,21 @@ export class FormatDefinitionEditorComponent implements OnInit {
           formatContainer.contents.unshift(propertyDefinition);
         }
       }
-      
+
       this._formatDefinition.containers.splice(1, 0, formatContainer);
     }
-    
+
     this._viewModel.ungroupDefaultFormatDefinitionStateAttributes = !this.
       _viewModel.ungroupDefaultFormatDefinitionStateAttributes;
     console.log(this._viewModel.ungroupDefaultFormatDefinitionStateAttributes);
   }
-  
+
   public doesPropertyDefinitionMatchSelection(option: any, selection: any):
     boolean {
     return ((option.kind === selection.kind) && (option.attribute ===
       selection.attribute));
   }
-  
+
   public getSelectableAttributes(): Array<any> {
     if ((this._enclosingType ? this._enclosingType : this._dataModel).
       localTypes) {
@@ -218,17 +219,21 @@ export class FormatDefinitionEditorComponent implements OnInit {
           0] : attribute.type);
         let classLocalTypesEntry: any = (this._enclosingType ? this.
           _enclosingType : this._dataModel).classLocalTypes[typeName];
-        return (!classLocalTypesEntry || (classLocalTypesEntry.definition.
-          metatype === Metatype.ENUMERATION) || (Object.values(this.
-          _itemRepository.getTreeConfig().getValue().config.getProxyFor(
-          'view-' + classLocalTypesEntry.definedInKind.toLowerCase()).item.
-          localTypes[typeName].formatDefinitions).length > 0));
+        let hasFormatDefinition : boolean = false;
+        let isEnumeration : boolean = (classLocalTypesEntry && classLocalTypesEntry.definition.metatype === Metatype.ENUMERATION);
+        if (classLocalTypesEntry && !isEnumeration) {
+          let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(classLocalTypesEntry.definedInKind);
+          hasFormatDefinition = (Object.values(modelProxy.view.item.localTypes[typeName].formatDefinitions).length > 0);
+        }
+        return (!classLocalTypesEntry ||
+          isEnumeration ||
+          hasFormatDefinition);
       });
     } else {
       return this._attributes;
     }
   }
-  
+
   public attributeSelected(attributeName: string, propertyDefinition:
     PropertyDefinition): void {
     propertyDefinition.propertyName = attributeName;
@@ -263,17 +268,16 @@ export class FormatDefinitionEditorComponent implements OnInit {
         break;
     }
     propertyDefinition.kind = userInterfaceType;
-    
+
     if ((this._enclosingType ? this._enclosingType : this._dataModel).
       localTypes) {
       let dataModelType: any = this._dataModel.classProperties[attributeName].
         definition.type;
       let typeName: string = (Array.isArray(dataModelType) ? dataModelType[0] :
         dataModelType);
-      let localTypeViewModelEntry: any = this._itemRepository.getTreeConfig().
-        getValue().config.getProxyFor('view-' + (this._enclosingType ? this.
-        _enclosingType : this._dataModel).classLocalTypes[typeName].
-        definedInKind.toLowerCase()).item.localTypes[typeName];
+      let definedInKind = (this._enclosingType ? this._enclosingType : this._dataModel).classLocalTypes[typeName].definedInKind;
+      let definedInModelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(definedInKind);
+      let localTypeViewModelEntry: any = definedInModelProxy.view.item.localTypes[typeName];
       if (localTypeViewModelEntry) {
         propertyDefinition.formatDefinition = Object.values(
           localTypeViewModelEntry.formatDefinitions)[0]['id'];
@@ -281,10 +285,10 @@ export class FormatDefinitionEditorComponent implements OnInit {
         delete propertyDefinition.formatDefinition;
       }
     }
-    
+
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public getFormatContainerPanelTitle(formatContainer: FormatContainer):
     string {
     if (formatContainer.kind === FormatContainerKind.REVERSE_REFERENCE_TABLE) {
@@ -299,19 +303,19 @@ export class FormatDefinitionEditorComponent implements OnInit {
       }).join(', ');
     }
   }
-  
+
   public addFormatContainer(formatContainerKind: FormatContainerKind): void {
     this._formatDefinition.containers.push({
       kind: formatContainerKind,
       contents: []
     });
   }
-  
+
   public removeFormatContainer(formatContainer: FormatContainer): void {
     this._formatDefinition.containers.splice(this._formatDefinition.containers.
       indexOf(formatContainer), 1);
   }
-  
+
   public addAttribute(formatContainer: FormatContainer): void {
     let propertyDefinition: PropertyDefinition;
     if (formatContainer.kind === FormatContainerKind.
@@ -357,23 +361,22 @@ export class FormatDefinitionEditorComponent implements OnInit {
           userInterfaceType = 'user-selector';
           break;
       }
-      
+
       let formatDefinitionId: string;
       if ((this._enclosingType ? this._enclosingType : this._dataModel).
         localTypes) {
         let classLocalTypesEntry: any = (this._enclosingType ? this.
           _enclosingType : this._dataModel).classLocalTypes[attributeType];
         if (classLocalTypesEntry) {
-          let formatDefinitions: Array<FormatDefinition> = Object.values(this.
-            _itemRepository.getTreeConfig().getValue().config.getProxyFor(
-            'view-' + classLocalTypesEntry.definedInKind.toLowerCase()).item.
-            localTypes[attributeType].formatDefinitions);
+          let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(classLocalTypesEntry.definedInKind);
+          let formatDefinitions: Array<FormatDefinition> = Object.values(
+            modelProxy.view.item.localTypes[attributeType].formatDefinitions);
           if (formatDefinitions.length > 0) {
             formatDefinitionId = formatDefinitions[0].id;
           }
         }
       }
-      
+
       propertyDefinition = {
         propertyName: attribute.name,
         customLabel: attribute.name,
@@ -385,10 +388,10 @@ export class FormatDefinitionEditorComponent implements OnInit {
         editable: true
       };
     }
-    
+
     formatContainer.contents.push(propertyDefinition);
   }
-  
+
   public getUserInterfaceTypes(propertyDefinition: PropertyDefinition):
     Array<string> {
     let type: any = this._dataModel.classProperties[propertyDefinition.
@@ -411,7 +414,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
       }
     }
   }
-  
+
   public getUserInterfaceTypeValue(propertyDefinition: PropertyDefinition,
     userInterfaceType: string): string {
     if ((userInterfaceType === 'Reference') || (userInterfaceType ===
@@ -430,7 +433,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
       }
     }
   }
-  
+
   public areUserInterfaceTypeValuesEqual(option: string, selection: string):
     boolean {
     if ((option === '') && (selection === 'proxy-selector')) {
@@ -441,19 +444,18 @@ export class FormatDefinitionEditorComponent implements OnInit {
       return (option === selection);
     }
   }
-  
+
   public getLocalTypeFormatDefinitions(propertyDefinition: PropertyDefinition):
     Array<FormatDefinition> {
     let dataModelType: any = this._dataModel.classProperties[
       propertyDefinition.propertyName].definition.type;
     let typeName: string = (Array.isArray(dataModelType) ? dataModelType[0] :
       dataModelType);
-    return Object.values(this._itemRepository.getTreeConfig().getValue().
-      config.getProxyFor('view-' + (this._enclosingType ? this._enclosingType :
-      this._dataModel).classLocalTypes[typeName].definedInKind.toLowerCase()).
-      item.localTypes[typeName].formatDefinitions);
+    let definedInKind = (this._enclosingType ? this._enclosingType : this._dataModel).classLocalTypes[typeName].definedInKind;
+    let definedInKindProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(definedInKind);
+    return Object.values(definedInKindProxy.view.item.localTypes[typeName].formatDefinitions);
   }
-  
+
   public isMultivaluedReferenceAttribute(propertyDefinition:
     PropertyDefinition): boolean {
     for (let j: number = 0; j < this._attributes.length; j++) {
@@ -463,36 +465,36 @@ export class FormatDefinitionEditorComponent implements OnInit {
         return true;
       }
     }
-    
+
     return false;
   }
-  
+
   public getTableDefinitions(propertyDefinition: PropertyDefinition):
     Array<TableDefinition> {
     let attributeTypeName: string = this._attributes.filter((attribute:
       any) => {
       return (attribute.name === propertyDefinition.propertyName);
     })[0].type[0];
-    
+
     let classLocalTypes: any = (this._enclosingType ? this._enclosingType :
       this._dataModel).classLocalTypes;
     if (classLocalTypes && classLocalTypes[attributeTypeName]) {
-      return Object.values(this._itemRepository.getTreeConfig().getValue().
-        config.getProxyFor('view-' + classLocalTypes[attributeTypeName].
-        definedInKind.toLowerCase()).item.localTypes[attributeTypeName].
+      let definedInKind = (this._enclosingType ? this._enclosingType : this._dataModel).classLocalTypes[attributeTypeName].definedInKind;
+      let definedInKindProxy : KoheseModel = TreeConfiguration.getWorkingTree().getProxyFor(definedInKind) as KoheseModel
+      return Object.values(definedInKindProxy.view.item.localTypes[attributeTypeName].
         tableDefinitions);
     } else {
-      return Object.values(TreeConfiguration.getWorkingTree().getProxyFor(
-        'view-' + attributeTypeName.toLowerCase()).item.tableDefinitions);
+      let attributeKindProxy : KoheseModel = TreeConfiguration.getWorkingTree().getProxyFor(attributeTypeName) as KoheseModel;
+      return Object.values(attributeKindProxy.view.item.tableDefinitions);
     }
   }
-  
+
   public removeAttribute(formatContainer: FormatContainer, propertyDefinition:
     PropertyDefinition): void {
     formatContainer.contents.splice(formatContainer.contents.indexOf(
       propertyDefinition), 1);
   }
-  
+
   public mayMove(formatContainer: FormatContainer, propertyDefinition:
     PropertyDefinition, moveUp: boolean): boolean {
     let index: number = formatContainer.contents.indexOf(propertyDefinition);
@@ -502,7 +504,7 @@ export class FormatDefinitionEditorComponent implements OnInit {
       return (index !== (formatContainer.contents.length - 1));
     }
   }
-  
+
   public move(formatContainer: FormatContainer, propertyDefinition:
     PropertyDefinition, moveUp: boolean): void {
     let index: number = formatContainer.contents.indexOf(propertyDefinition);

@@ -80,8 +80,7 @@
         <h5>Total Count: {{getStateTotal()}}</h5>
       </ng-container>
       <ng-container *ngFor="let kindName of selection.kindNames">
-        <h1 [ngStyle]="{ 'background-color': TreeConfiguration.getWorkingTree().
-          getProxyFor('view-' + kindName.toLowerCase()).item.color }"
+        <h1 [ngStyle]="{ 'background-color': TreeConfiguration.getWorkingTree().getModelProxyFor(kindName).view.item.color }"
           style="color: white;">
           {{kindName}}
         </h1>

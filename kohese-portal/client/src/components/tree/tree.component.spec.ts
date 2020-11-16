@@ -41,8 +41,7 @@ describe('TreeComponent', () => {
       return (element as ItemProxy).item.name;
     };
     component.getIcon = (element: any) => {
-      return TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        (element as ItemProxy).kind.toLowerCase()).item.icon;
+      return (element as ItemProxy).model.view.item.icon;
     };
     component.allowMultiselect = true;
     component.showSelections = true;
@@ -59,7 +58,7 @@ describe('TreeComponent', () => {
       getProxyFor('Item'), TreeConfiguration.getWorkingTree().getProxyFor(
       'KoheseModel'), TreeConfiguration.getWorkingTree().getProxyFor(
       'KoheseView')]);
-    
+
     component.moveElement(2, 0, false);
     expect(component.selection).toEqual([TreeConfiguration.getWorkingTree().
       getProxyFor('Item'), TreeConfiguration.getWorkingTree().getProxyFor(

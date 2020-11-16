@@ -23,16 +23,16 @@ export class DocumentConfigurationEditorComponent implements OnInit {
   set documentConfiguration(documentConfiguration: any) {
     this._documentConfiguration = documentConfiguration;
   }
-  
+
   private _copy: any;
   get copy() {
     return this._copy;
   }
-  
+
   get TreeConfiguration() {
     return TreeConfiguration;
   }
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef:
@@ -40,13 +40,13 @@ export class DocumentConfigurationEditorComponent implements OnInit {
     private _dialogService: DialogService, private _itemRepository:
     ItemRepository) {
   }
-  
+
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this._documentConfiguration = this._data[
         'documentConfiguration'];
     }
-    
+
     if (this._documentConfiguration) {
       this._copy = JSON.parse(JSON.stringify(this.
         _documentConfiguration));
@@ -61,12 +61,12 @@ export class DocumentConfigurationEditorComponent implements OnInit {
       };
     }
   }
-  
+
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
   }
-  
+
   public openParentSelector(): void {
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
@@ -78,9 +78,7 @@ export class DocumentConfigurationEditorComponent implements OnInit {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
-          return this._itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
-            item.icon;
+          return (element as ItemProxy).model.view.item.icon;
         },
         selection: (this._copy.parentId ? [TreeConfiguration.getWorkingTree().
           getProxyFor(this._copy.parentId)] : [])
@@ -91,14 +89,14 @@ export class DocumentConfigurationEditorComponent implements OnInit {
       this._changeDetectorRef.markForCheck();
     });
   }
-  
+
   public openComponentSelector(): void {
     let components: Array<ItemProxy> = [];
     for (let componentId in this._copy.components) {
       components.push(TreeConfiguration.getWorkingTree().getProxyFor(
         componentId));
     }
-    
+
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
@@ -109,9 +107,7 @@ export class DocumentConfigurationEditorComponent implements OnInit {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
-          return this._itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
-            item.icon;
+          return (element as ItemProxy).model.view.item.icon;
         },
         allowMultiselect: true,
         selection: components
@@ -130,35 +126,35 @@ export class DocumentConfigurationEditorComponent implements OnInit {
               includeDescendants: true
             };
           }
-          
+
           intermediateObject[ids[j]] = componentSettings;
         }
-        
+
         for (let componentId in this._copy.components) {
           delete this._copy.components[componentId];
         }
-        
+
         for (let componentId in intermediateObject) {
           this._copy.components[componentId] = intermediateObject[componentId];
         }
-        
+
         this._changeDetectorRef.markForCheck();
       }
     });
   }
-  
+
   public close(accept: boolean): void {
     if (accept) {
       if (!this._documentConfiguration) {
         this._documentConfiguration = {};
       }
-      
+
       for (let attributeName in this._copy) {
         this._documentConfiguration[attributeName] = this._copy[
           attributeName];
       }
     }
-    
+
     this._matDialogRef.close(accept ? this._documentConfiguration :
       undefined);
   }

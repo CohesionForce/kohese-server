@@ -4,6 +4,7 @@ import { MatExpansionPanel } from '@angular/material';
 
 import { Attribute } from '../../../../../../../common/src/Attribute.interface';
 import { ItemProxy } from '../../../../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../../../../common/src/KoheseModel';
 import { KoheseDataModel } from '../../../../../../../common/src/KoheseModel.interface';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../../../../components/tree/tree.component';
@@ -25,11 +26,11 @@ export class MultivaluedFieldComponent extends Field {
   @ViewChildren('multivaluedAttributeExpansionPanel')
   private _multivaluedAttributeExpansionPanelQueryList:
     QueryList<MatExpansionPanel>;
-  
+
   get changeDetectorRef() {
     return this._changeDetectorRef;
   }
-    
+
   public constructor(changeDetectorRef: ChangeDetectorRef, itemRepository:
     ItemRepository, dialogService: DialogService, sessionService:
     SessionService) {
@@ -56,10 +57,10 @@ export class MultivaluedFieldComponent extends Field {
         }
       });
     }
-    
+
     return [];
   }
-  
+
   /**
    * Returns the attribute names from the TableDefinition associated with the
    * associated PropertyDefinition that corresponds to the type of the
@@ -75,13 +76,13 @@ export class MultivaluedFieldComponent extends Field {
       _enclosingDataModel ? this._enclosingDataModel : this._dataModel)[
       'classLocalTypes'][typeName];
     if (classLocalTypesEntry) {
-      return treeConfiguration.getProxyFor('view-' + classLocalTypesEntry.
-        definedInKind.toLowerCase()).item.localTypes[typeName].
+      let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(classLocalTypesEntry.definedInKind);
+      return modelProxy.view.item.localTypes[typeName].
         tableDefinitions[this._propertyDefinition.tableDefinition].columns;
     } else {
-      return treeConfiguration.getProxyFor('view-' + this._dataModel[
-        'classProperties'][this._propertyDefinition.propertyName].definition.type[0].
-        toLowerCase()).item.tableDefinitions[this._propertyDefinition.
+      let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(
+        this._dataModel['classProperties'][this._propertyDefinition.propertyName].definition.type[0]);
+      return modelProxy.view.item.tableDefinitions[this._propertyDefinition.
         tableDefinition].columns;
     }
   }
@@ -103,20 +104,19 @@ export class MultivaluedFieldComponent extends Field {
       _enclosingDataModel : this._dataModel)['classLocalTypes'][type];
     if (classLocalTypesEntry) {
       dataModel = classLocalTypesEntry.definition;
-      viewModel = this._itemRepository.getTreeConfig().getValue().config.
-        getProxyFor('view-' + classLocalTypesEntry.definedInKind.
-        toLowerCase()).item.localTypes[type];
+      viewModel = TreeConfiguration.getWorkingTree().getModelProxyFor(classLocalTypesEntry.definedInKind)
+        .view.item.localTypes[type];
     } else {
-      dataModel = treeConfiguration.getProxyFor(type).item;
-      viewModel = treeConfiguration.getProxyFor('view-' + type.
-        toLowerCase()).item;
+      let modelProxy = TreeConfiguration.getWorkingTree().getModelProxyFor(type);
+      dataModel = modelProxy.item;
+      viewModel = modelProxy.view.item;
     }
 
     return (row: any, columnId: string) => {
       if (row[columnId] == null) {
         return '';
       }
-      
+
       if (Array.isArray(dataModel['classProperties'][columnId].definition.
         type)) {
         return row[columnId].map((value: any, index: number) => {
@@ -131,7 +131,7 @@ export class MultivaluedFieldComponent extends Field {
       }
     };
   }
-  
+
   /**
    * Returns a function intended to be called by TableComponent to add elements
    * to the associated multivalued attribute
@@ -161,13 +161,13 @@ export class MultivaluedFieldComponent extends Field {
             if (typeName === 'Item') {
               return true;
             }
-            
+
             let elementTypeName: string = (element as ItemProxy).kind;
             while (true) {
               if (elementTypeName === typeName) {
                 return true;
               }
-              
+
               let itemProxy: ItemProxy = this._itemRepository.getTreeConfig().
                 getValue().config.getProxyFor(elementTypeName);
               if (itemProxy) {
@@ -176,13 +176,11 @@ export class MultivaluedFieldComponent extends Field {
                 break;
               }
             }
-            
+
             return true;
           },
           getIcon: (element: any) => {
-            return this._itemRepository.getTreeConfig().getValue().config.
-              getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
-              item.icon;
+            return (element as ItemProxy).model.view.item.icon;
           },
           selection: references.map((reference: { id: string }) => {
             return TreeConfiguration.getWorkingTree().getProxyFor(reference.
@@ -193,7 +191,7 @@ export class MultivaluedFieldComponent extends Field {
           showSelections: true
         }
       }).updateSize('90%', '90%').afterClosed().toPromise();
-      
+
       let rows: Array<any> = [];
       if (selection) {
         references.length = 0;
@@ -206,18 +204,18 @@ export class MultivaluedFieldComponent extends Field {
         return TreeConfiguration.getWorkingTree().getProxyFor(reference.id).
           item;
       }));
-      
+
       // Delete the array if it becomes empty
       if (references.length === 0) {
         delete this._koheseObject[this._isVariantField ? 'value' :
           attributeName];
       }
-      
+
       this._changeDetectorRef.markForCheck();
       return rows;
     };
   }
-  
+
   /**
    * Returns a function intended to be called by TableComponent to move the
    * given elements before or after the given reference element
@@ -245,7 +243,7 @@ export class MultivaluedFieldComponent extends Field {
           }).indexOf(elements[j]), 1);
         }
       }
-      
+
       if (moveBefore) {
         if (isLocalTypeAttribute) {
           references.splice(references.indexOf(referenceElement), 0,
@@ -273,7 +271,7 @@ export class MultivaluedFieldComponent extends Field {
       this._changeDetectorRef.markForCheck();
     };
   }
-  
+
   /**
    * Returns a function intended to be called by TableComponent to remove the
    * given elements from a multivalued attribute
@@ -298,7 +296,7 @@ export class MultivaluedFieldComponent extends Field {
           }).indexOf(elements[j]), 1);
         }
       }
-      
+
       this._changeDetectorRef.markForCheck();
     };
   }
@@ -306,7 +304,7 @@ export class MultivaluedFieldComponent extends Field {
   /**
    * Determines whether a drop on this instance of MultivaluedFieldComponent
    * should be allowed and responds accordingly
-   * 
+   *
    * @param dragOverEvent The Event corresponding to the drag in question
    */
   public draggedOver(dragOverEvent: DragEvent): void {
@@ -331,7 +329,7 @@ export class MultivaluedFieldComponent extends Field {
   /**
    * Moves the value at the given ```sourceIndex``` to or immediately after
    * the given ```targetIndex``` based on the given boolean
-   * 
+   *
    * @param sourceIndex
    * @param targetIndex
    * @param moveBefore
@@ -363,13 +361,13 @@ export class MultivaluedFieldComponent extends Field {
       this._koheseObject[this._isVariantField ? 'value' : attributeName] = [];
       return;
     }
-    
+
     return this.getDefaultValue();
   }
 
   /**
    * Returns an identifier for the given element at the given index
-   * 
+   *
    * @param index The index of the given element
    * @param element The element for which to retrieve an identifier
    */
@@ -389,7 +387,7 @@ export class MultivaluedFieldComponent extends Field {
       expansionPanels[j].open();
     }
   }
-  
+
   /**
    * Collapses all expansion panels for the multivalued Kohese Model local
    * type-typed attribute corresponding to the associated PropertyDefinition

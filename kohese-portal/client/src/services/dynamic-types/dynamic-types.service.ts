@@ -11,7 +11,7 @@ export class DynamicTypesService {
   /* Data */
   koheseTypes: object;
   treeConfig: any;
-  
+
   private _localTypeMap: Map<string, Array<string>> =
     new Map<string, Array<string>>();
   get localTypeMap() {
@@ -96,23 +96,23 @@ export class DynamicTypesService {
     for (let koheseTypeName in intermediateObject) {
       this.koheseTypes[koheseTypeName] = intermediateObject[koheseTypeName];
     }
-    
+
     this._localTypeMap.set(dataModelProxy.item.name, Object.keys(
       dataModelProxy.item.localTypes));
-    
+
     // Migration code
     if (viewModelProxyMap[dataModelProxy.item.id] && !viewModelProxyMap[
       dataModelProxy.item.id].item.tableDefinitions) {
       viewModelProxyMap[dataModelProxy.item.id].item.tableDefinitions = {};
     }
   }
-  
+
   public removeKoheseType(koheseTypeName: string): void {
     delete this.koheseTypes[koheseTypeName];
   }
 
-  getViewProxyFor(modelProxy: ItemProxy): ItemProxy {
-    return this.treeConfig.getProxyFor('view-' + modelProxy.item.name.toLowerCase());
+  getViewProxyFor(modelProxy: KoheseModel): ItemProxy {
+    return modelProxy.view;
   }
 
   getUserInputTypes(): any {

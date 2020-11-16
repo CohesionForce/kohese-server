@@ -335,9 +335,14 @@ export interface KoheseModelInterface {
   _item? : any;
 
   item? : any;
+  view : any;
+
   validateItemContent(itemContent) : ValidationResultType;
   getPropertyDetails(propertyName: string) : any;
   isDerivedProperty(propertyName: string) : boolean;
+
+  // TODO: Need to remove this attribute that is added by Dynamic Types Service
+  type : any;
 }
 
 export class ItemProxy {
@@ -346,7 +351,7 @@ export class ItemProxy {
   public static theCalcCount = 0;
   // private static shaObj = new jsSHA('SHA-1', 'TEXT');
 
-  public model; // TODO: Should be KoheseModelInterface
+  public model : KoheseModelInterface;
   public state;
   public _item
   public item;

@@ -218,7 +218,7 @@ export class NamespaceEditorComponent implements Dialog {
               unselectableSubcomponents.push(itemProxy);
               break;
             }
-  
+
             namespaceItemProxy = namespaceItemProxy.parentProxy;
           }
         } else if (itemProxy.item['namespace'].id === this._selectedNamespace.
@@ -251,8 +251,7 @@ export class NamespaceEditorComponent implements Dialog {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
-          return treeConfiguration.getProxyFor('view-' +
-            (element as ItemProxy).kind.toLowerCase()).item.icon;
+          return (element as ItemProxy).model.view.item.icon;
         },
         maySelect: (element: any) => {
           return (unselectableSubcomponents.indexOf(element) === -1);

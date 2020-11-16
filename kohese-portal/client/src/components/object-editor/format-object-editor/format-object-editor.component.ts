@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormatContainer, FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
 import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -68,12 +69,12 @@ export class FormatObjectEditorComponent implements OnInit {
     this._selectedType = selectedType;
 
     if (this._enclosingType) {
-      this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor(
-        'view-' + this._enclosingType.classLocalTypes[this._selectedType.name].
-        definedInKind.toLowerCase()).item.localTypes[this._selectedType.name];
+      let definedInKind = this._enclosingType.classLocalTypes[this._selectedType.name].definedInKind;
+      let modelProxy = TreeConfiguration.getWorkingTree().getModelProxyFor(definedInKind);
+      this._viewModel = modelProxy.view.item.localTypes[this._selectedType.name];
     } else {
-      this._viewModel = TreeConfiguration.getWorkingTree().getProxyFor('view-' +
-        this._selectedType.name.toLowerCase()).item;
+      let selectedTypeModelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(this._selectedType.name);
+      this._viewModel = selectedTypeModelProxy.view.item;
     }
 
     this._formatDefinition = this._viewModel.formatDefinitions[this._viewModel.

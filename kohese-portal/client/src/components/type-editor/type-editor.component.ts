@@ -35,9 +35,9 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     let namespaceTypes: Array<any> = this.getNamespaceTypes(this.
       _selectedNamespace);
     if (namespaceTypes.length > 0) {
-      this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
+      this.selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
     } else {
-      this._selectedType = null;
+      this.selectedType = null;
     }
   }
 
@@ -47,6 +47,16 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
   }
   set selectedType(selectedType: any) {
     this._selectedType = selectedType;
+    if (selectedType) {
+      this._modelProxy = TreeConfiguration.getWorkingTree().getModelProxyFor(selectedType.id);
+    } else {
+      this._modelProxy = undefined;
+    }
+  }
+
+  private _modelProxy: KoheseModel;
+  get modelProxy() {
+    return this._modelProxy;
   }
 
   private _treeConfigSubscription: Subscription;
@@ -74,8 +84,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       if (treeConfigInfo) {
         this._selectedNamespace = treeConfigInfo.config.getProxyFor(
           'com.kohese').item;
-        this._selectedType = this.getNamespaceTypes(this._selectedNamespace)[
-          0];
+        this.selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
       }
     });
   }
@@ -123,7 +132,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
 
   /**
    * Returns an Array containing the types in the given Namespace
-   * 
+   *
    * @param namespace
    */
   public getNamespaceTypes(namespace: any): Array<any> {
@@ -201,7 +210,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         }
       }
     }], { data: {} }).updateSize('70%', '40%').afterClosed().toPromise();
-    
+
     if (inputs) {
       let viewModel: any = {
         name: inputs[0],
@@ -237,9 +246,9 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           ]
         }]
       };
-      
-      let itemKoheseView: any = this._itemRepository.getTreeConfig().
-        getValue().config.getProxyFor('view-item').item;
+
+      let itemModelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('Item');
+      let itemKoheseView: any = itemModelProxy.view.item;
       let itemDefaultFormatDefinition: FormatDefinition = itemKoheseView.
         formatDefinitions[itemKoheseView.defaultFormatKey[
         FormatDefinitionType.DEFAULT]];
@@ -261,12 +270,12 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
             stringify(itemDefaultFormatDefinition.containers[1].contents[j])));
         }
       }
-      
+
       viewModel.formatDefinitions[formatDefinitionId] =
         defaultFormatDefinition;
       viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] =
         formatDefinitionId;
-      
+
       let itemProxys: Array<ItemProxy> = await Promise.all([this.
         _itemRepository.upsertItem('KoheseModel', {
         name: inputs[0],
@@ -281,17 +290,17 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         methods: [],
         localTypes: {}
       }), this._itemRepository.upsertItem('KoheseView', viewModel)]);
-      
+
       this._dynamicTypesService.buildKoheseType(
         itemProxys[0] as KoheseModel);
-      
+
       this._selectedNamespace = inputs[1];
-      this._selectedType = itemProxys[0].item;
+      this.selectedType = itemProxys[0].item;
 
       this._changeDetectorRef.markForCheck();
     }
   }
-  
+
   private areStateAttributesGrouped(defaultFormatDefinition: FormatDefinition):
     boolean {
     let formatContainer: FormatContainer = defaultFormatDefinition.containers[
@@ -301,7 +310,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         return false;
       }
     }
-    
+
     if (defaultFormatDefinition.containers.length > 1) {
       formatContainer = defaultFormatDefinition.containers[1];
       if (formatContainer.contents.length > 0) {
@@ -314,18 +323,18 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         return false;
       }
     }
-    
+
     return false;
   }
 
   /**
    * Upon confirmation, removes the selected Structure from the system
-   * 
+   *
    * @returns A Promise that resolves to nothing
    */
   public async delete(): Promise<void> {
     let selectedTypeItemProxy: ItemProxy = this._itemRepository.
-      getTreeConfig().getValue().config.getProxyFor(this._selectedType.id);
+      getTreeConfig().getValue().config.getProxyFor(this.selectedType.id);
       let choiceValue: any = await this.dialogService.openYesNoDialog('Delete ' +
       selectedTypeItemProxy.item.name, 'Are you sure that you want to ' +
       'delete ' + selectedTypeItemProxy.item.name + '?');
@@ -333,22 +342,20 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       this._itemRepository.deleteItem(selectedTypeItemProxy, false);
 
       if (selectedTypeItemProxy.kind === 'KoheseModel') {
-        this._itemRepository.deleteItem(this._itemRepository.getTreeConfig().
-          getValue().config.getProxyFor('view-' + selectedTypeItemProxy.item.
-          name.toLowerCase()), false);
+        this._itemRepository.deleteItem((selectedTypeItemProxy as KoheseModel).view, false);
         this._dynamicTypesService.removeKoheseType(selectedTypeItemProxy.item.
           name);
       }
 
       let types: Array<any> = this.getNamespaceTypes(this._selectedNamespace);
       if (types.length > 0) {
-        this._selectedType = types[0];
+        this.selectedType = types[0];
       } else {
         let treeConfiguration: TreeConfiguration = this._itemRepository.getTreeConfig().
           getValue().config;
         this._selectedNamespace = treeConfiguration.getProxyFor(
           'com.kohese').item;
-        this._selectedType = treeConfiguration.getProxyFor('Item').item;
+        this.selectedType = treeConfiguration.getProxyFor('Item').item;
       }
       this._changeDetectorRef.markForCheck();
     }

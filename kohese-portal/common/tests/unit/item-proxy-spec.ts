@@ -1444,6 +1444,50 @@ it('Retrieve Delta Tree Hash Map', () => {
           }
         ]
       },
+      'D': {
+        'match': false,
+        'right': {
+          'kind': 'Test',
+          'oid': 'b2bc76aba5342dc27e3b554aef387be6643917ee',
+          'childTreeHashes': {},
+          'treeHash': 'a292138764ab6ee895c6c9ba9699de22d224ba45',
+          'parentId': 'NV-TOP'
+        },
+        'treeHashChanged': {
+          'fromTreeId': undefined,
+          'toTreeId': 'a292138764ab6ee895c6c9ba9699de22d224ba45'
+        },
+        'kindChanged': {
+          'fromKind': undefined,
+          'toKind': 'Test'
+        },
+        'contentChanged': {
+          'fromOID': undefined,
+          'toOID': 'b2bc76aba5342dc27e3b554aef387be6643917ee'
+        }
+      },
+      'B': {
+        'match': false,
+        'left': {
+          'kind': 'Test',
+          'oid': '5c69c898222c3219089be690b63e418f09e93799',
+          'childTreeHashes': {},
+          'treeHash': 'e57da6530dffc225601f4b58b6dd839aae6bca3d',
+          'parentId': 'NV-TOP'
+        },
+        'treeHashChanged': {
+          'fromTreeId': 'e57da6530dffc225601f4b58b6dd839aae6bca3d',
+          'toTreeId': undefined
+        },
+        'kindChanged': {
+          'fromKind': 'Test',
+          'toKind': undefined
+        },
+        'contentChanged': {
+          'fromOID': '5c69c898222c3219089be690b63e418f09e93799',
+          'toOID': undefined
+        }
+      },
       'A': {
         'match': false,
         'left': {
@@ -1613,6 +1657,7 @@ it('Retrieve Delta Tree Hash Map', () => {
   // kdbFS.storeJSONDoc('t.thm-diff.json', thmDiff);
 
   // Strip undefined fields to match previous implementation of Jasmine toEqual
+  expectedDiffResult = JSON.parse(JSON.stringify(expectedDiffResult));
   thmDiff = JSON.parse(JSON.stringify(thmDiff));
 
   expect(thmDiff).toEqual(expectedDiffResult);

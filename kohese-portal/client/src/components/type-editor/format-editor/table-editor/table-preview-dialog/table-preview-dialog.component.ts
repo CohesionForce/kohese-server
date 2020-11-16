@@ -45,9 +45,7 @@ export class TablePreviewDialogComponent implements OnInit {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
-          return this._itemRepository.getTreeConfig().getValue().config.
-            getProxyFor('view-' + (element as ItemProxy).kind.toLowerCase()).
-            item.icon;
+          return (element as ItemProxy).model.view.item.icon;
         },
         selection: [this.previewProxy],
         quickSelectElements: this._itemRepository.getRecentProxies()
@@ -59,7 +57,7 @@ export class TablePreviewDialogComponent implements OnInit {
       }
     });
   }
-  
+
   public getRows(): Array<any> {
     if (this.previewProxy.model.item.name === this.property.propertyName.
       kind) {
@@ -77,7 +75,7 @@ export class TablePreviewDialogComponent implements OnInit {
           });
         }
       }
-      
+
       return [];
     }
   }

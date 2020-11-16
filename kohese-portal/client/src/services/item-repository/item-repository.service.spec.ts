@@ -30,12 +30,9 @@ describe('ItemRepository', () => {
 
   it('retrieves the Markdown representation of a given object based on the ' +
     'FormatDefinition indicated by the given FormatDefinitionType', () => {
-    let treeConfiguration: TreeConfiguration = TreeConfiguration.
-      getWorkingTree();
-    let dataModel: KoheseDataModel = treeConfiguration.getProxyFor(
-      'KoheseModel').item;
-    let viewModel: KoheseViewModel = treeConfiguration.getProxyFor(
-      'view-kohesemodel').item;
+    let modelProxy = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
+    let dataModel: KoheseDataModel = modelProxy.item;
+    let viewModel: KoheseViewModel = modelProxy.view.item;
     expect(itemRepository.getMarkdownRepresentation(dataModel, undefined,
       dataModel, viewModel, FormatDefinitionType.DEFAULT, 0, true).startsWith(
       ' [KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n')).
@@ -59,12 +56,9 @@ describe('ItemRepository', () => {
 
   it('produces a string representation of the value of a given attribute of ' +
     'a given object', () => {
-    let treeConfiguration: TreeConfiguration = TreeConfiguration.
-      getWorkingTree();
-    let dataModel: KoheseDataModel = treeConfiguration.getProxyFor(
-      'KoheseModel').item;
-    let viewModel: KoheseViewModel = treeConfiguration.getProxyFor(
-      'view-kohesemodel').item;
+    let modelProxy = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
+    let dataModel: KoheseDataModel = modelProxy.item;
+    let viewModel: KoheseViewModel = modelProxy.view.item;
     expect(itemRepository.getStringRepresentation(dataModel, 'name', undefined,
       undefined, dataModel, viewModel, FormatDefinitionType.DEFAULT)).toBe(
       'KoheseModel');

@@ -11,6 +11,7 @@ import { MockDialogService } from '../../../../mocks/services/MockDialogService'
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { ViewModelEditorComponent } from './view-model-editor.component';
 import { TableEditorComponent } from '../format-editor/table-editor/table-editor.component';
 
@@ -49,8 +50,9 @@ describe('ViewModelEditorComponent', () => {
 
     let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
       getTreeConfig().getValue().config;
-    component.viewModel = treeConfiguration.getProxyFor('view-kohesemodel').item;
-    component.dataModel = treeConfiguration.getProxyFor('KoheseModel').item;
+    let koheseModelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
+    component.dataModel = koheseModelProxy.item;
+    component.viewModel = koheseModelProxy.view.item;
 
     componentFixture.detectChanges();
   });
