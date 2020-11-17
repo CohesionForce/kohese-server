@@ -50,7 +50,7 @@ organizationName            = Organization Name (eg, company)
 organizationName_default    = CohesionForce
 
 organizationalUnitName         = Organizational Unit (eg, division)
-organizationalUnitName_default = Division_Name
+organizationalUnitName_default = Kohese
 
 commonName         = Common Name (e.g. server FQDN or YOUR name)
 commonName_default = CohesionForce

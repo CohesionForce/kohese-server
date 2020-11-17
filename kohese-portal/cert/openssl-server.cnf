@@ -11,23 +11,26 @@ string_mask        = utf8only
 
 ####################################################################
 [ server_distinguished_name ]
-countryName         = Country Name (2 letter code)
-countryName_default = US
+countryName                 = Country Name (2 letter code)
+countryName_default         = US
 
 stateOrProvinceName         = State or Province Name (full name)
 stateOrProvinceName_default = Alabama
 
-localityName         = Locality Name (eg, city)
-localityName_default = Huntsville
+localityName                = Locality Name (eg, city)
+localityName_default        = Huntsville
 
 organizationName            = Organization Name (eg, company)
 organizationName_default    = CohesionForce
 
-commonName           = Common Name (e.g. server FQDN or YOUR name)
-commonName_default   = CohesionForce
+organizationalUnitName         = Organizational Unit (eg, division)
+organizationalUnitName_default = Kohese
 
-emailAddress         = Email Address
-emailAddress_default = test@cohesionforce.com
+commonName                  = Common Name (e.g. server FQDN or YOUR name)
+commonName_default          = CohesionForce
+
+emailAddress                = Email Address
+emailAddress_default        = test@cohesionforce.com
 
 ####################################################################
 [ server_req_extensions ]

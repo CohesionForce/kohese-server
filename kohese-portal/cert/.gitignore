@@ -1,5 +1,3 @@
-openssl-ca.cnf
-openssl-server.cnf
 cacert.pem
 cakey.pem
 servercert.csr
