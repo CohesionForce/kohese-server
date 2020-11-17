@@ -320,7 +320,7 @@ export class SentenceViewComponent extends AnalysisViewComponent
       case 3:
         return 'Phrase';
       case 4:
-        return 'Token';
+        return 'Term';
     }
 
     return '';
