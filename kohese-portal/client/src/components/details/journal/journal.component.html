@@ -9,10 +9,10 @@
   <mat-form-field style="width: 50%; padding: 0px 3px 0px 3px;">
     <input matInput #filterInput type="text" placeholder="Filter" (input)="filterChanged($event.target.value)" />
   </mat-form-field>
-  <button mat-icon-button matTooltip="Expand all differences" (click)="expandAll()" class="flex-right-align">
+  <button mat-icon-button matTooltip="Expand all Observations" (click)="expandAll()" class="flex-right-align">
     <mat-icon class="fa fa-chevron-down"></mat-icon>
   </button>
-  <button mat-icon-button matTooltip="Collapse all differences" (click)="collapseAll()">
+  <button mat-icon-button matTooltip="Collapse all Observations" (click)="collapseAll()">
     <mat-icon class="fa fa-chevron-up"></mat-icon>
   </button>
   <button mat-icon-button matTooltip="Add an entry" (click)="addEntry()" style="margin-left: auto;">
