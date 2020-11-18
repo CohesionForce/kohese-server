@@ -97,6 +97,10 @@ export class CategoryBoardComponent {
     return this._editableSet;
   }
 
+  get navigationService() {
+    return this._navigationService;
+  }
+
   private _treeConfigurationSubscription;
 
   public constructor(
@@ -336,10 +340,6 @@ export class CategoryBoardComponent {
         itemProxy: TreeConfiguration.getWorkingTree().getProxyFor(item.id)
       }
     }).updateSize('90%', '90%');
-  }
-
-  public navigate(item: any): void {
-    this._navigationService.addTab('Explore', { id: item.id });
   }
 
   public save(item: any): void {
