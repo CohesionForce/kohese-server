@@ -347,8 +347,9 @@ export class TreeConfiguration {
     // TODO Need to remove this returning of the ROOT when the string is empty
     if(id === '') {
       itemProxy = this.root;
+    } else {
+      itemProxy = this.proxyMap[id];
     }
-    itemProxy = this.proxyMap[id];
 
     if ((itemProxy == null) && (this !== TreeConfiguration.getWorkingTree())) {
       itemProxy = TreeConfiguration.getWorkingTree().getProxyFor(id);
