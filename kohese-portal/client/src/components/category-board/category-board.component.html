@@ -45,7 +45,7 @@
       </div>
       <div style="height: calc(100% - 50px); overflow: auto; display: flex; flex-direction: column;">
         <ng-container *ngFor="let item of categoryItems.items">
-          <mat-expansion-panel style="width: 100%;
+          <mat-expansion-panel #panel style="width: 100%;
             box-shadow: 0 3px 1px -2px rgba(0,0,0,.8), 0 2px 2px 0 rgba(0,0,0,.64), 0 1px 5px 0 rgba(0,0,0,.62);">
             <mat-expansion-panel-header draggable="{{mayDrag(item)}}"
               (dragstart)="$event.dataTransfer.setData(item[selectedAttribute.name], item.id);
@@ -66,7 +66,23 @@
                     <img src="assets/icons/versioncontrol/dirty.ico" />
                   </button>
                 </ng-container>
-
+                <ng-container *ngIf="(editableSet.indexOf(item.id) === -1) else editableBlock">
+                  <button mat-icon-button matTooltip="Edit this Item"
+                    (click)="$event.stopPropagation(); panel.open(); editableSet.push(item.id)">
+                    <mat-icon class="fa fa-edit"></mat-icon>
+                  </button>
+                </ng-container>
+                <ng-template #editableBlock>
+                  <button mat-icon-button matTooltip="Save this Item"
+                    [ngStyle]="{ 'margin-left': ((item.id).dirty ? '' : 'auto') }"
+                    (click)="$event.stopPropagation(); save(item)">
+                    <mat-icon class="fa fa-save"></mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Discard unsaved changes to this Item"
+                    (click)="$event.stopPropagation(); discardChanges(item)">
+                    <mat-icon class="fa fa-times"></mat-icon>
+                  </button>
+                </ng-template>
                 <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
                   style="margin-left: auto;"
                   (click)="$event.stopPropagation();">
@@ -92,8 +108,10 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
             <ng-template matExpansionPanelContent>
-              <format-object-editor [type]="selectedKind" [object]="item"
-                [formatDefinitionType]="FormatDefinitionType.BOARD" [disabled]="true">
+              <format-object-editor
+                [type]="selectedKind" [object]="item"
+                [formatDefinitionType]="FormatDefinitionType.BOARD"
+                [disabled]="(editableSet.indexOf(item.id) === -1)">
               </format-object-editor>
             </ng-template>
           </mat-expansion-panel>

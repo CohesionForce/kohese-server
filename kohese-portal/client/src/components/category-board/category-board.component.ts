@@ -92,11 +92,23 @@ export class CategoryBoardComponent {
     return Object;
   }
 
+  private _editableSet: Array<string> = [];
+  get editableSet() {
+    return this._editableSet;
+  }
+
+  get navigationService() {
+    return this._navigationService;
+  }
+
   private _treeConfigurationSubscription;
 
-  public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _navigationService: NavigationService, private _itemRepository:
-      ItemRepository, private _dialogService: DialogService) {
+  public constructor(
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _navigationService: NavigationService,
+    private _itemRepository: ItemRepository,
+    private changeRef : ChangeDetectorRef,
+    private _dialogService: DialogService) {
   }
 
   public ngOnInit(): void {
@@ -330,7 +342,25 @@ export class CategoryBoardComponent {
     }).updateSize('90%', '90%');
   }
 
-  public navigate(item: any): void {
-    this._navigationService.addTab('Explore', { id: item.id });
+  public save(item: any): void {
+    let itemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.id);
+    if(itemProxy.dirty) {
+      this._itemRepository.upsertItem(itemProxy.kind, item).then(
+        // Makes sure the save is complete before marking for check
+        (returnedItemProxy: ItemProxy) => {
+          this.changeRef.markForCheck();
+        });
+      this._editableSet.splice(this._editableSet.indexOf(item.id), 1);
+    }
+
+  }
+
+  public async discardChanges(item: any): Promise<void> {
+    let itemProxy : ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.id);
+    if(itemProxy.dirty) {
+      await this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().getProxyFor(item.id));
+      this.changeRef.markForCheck();
+    }
+    this._editableSet.splice(this._editableSet.indexOf(item.id), 1);
   }
 }
