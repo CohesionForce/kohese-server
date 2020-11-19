@@ -122,6 +122,10 @@ export class Comparison {
         }
 
         let baseValue: any = this.getPropertyValue(properties[j], this._baseObject);
+        if (baseValue && (typeof baseValue == 'object')) {
+          baseValue = JSON.stringify(baseValue, null, '  ');
+        }
+
         if (null == baseValue) {
           baseValue = '';
         }
@@ -130,6 +134,10 @@ export class Comparison {
         baseValue = this.replaceImage(baseValue);
 
         let changeValue: any = this.getPropertyValue(properties[j], this._changeObject);
+        if (changeValue && (typeof changeValue == 'object')) {
+          changeValue = JSON.stringify(changeValue, null, '  ');
+        }
+
         if (null == changeValue) {
           changeValue = '';
         }

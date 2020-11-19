@@ -13,11 +13,8 @@
             {{property.name}}:
           </span>
           <ng-container
-            *ngFor="let change of comparison.propertyComparisonMap.get(
-              property)">
-            <span [ngStyle]="getChangeStyle(change)">
-              {{change.value}}
-            </span>
+            *ngFor="let change of comparison.propertyComparisonMap.get(property)">
+            <span [ngStyle]="getChangeStyle(change)" style="white-space: pre;">{{change.value}}</span>
           </ng-container>
         </div>
       </ng-container>
