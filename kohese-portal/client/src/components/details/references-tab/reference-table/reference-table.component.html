@@ -43,7 +43,7 @@
         </mat-cell>
       </ng-container>
 
-      <mat-header-row *matHeaderRowDef="rowDef"></mat-header-row>
+      <mat-header-row style="position: sticky; top: 0;" *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
       <mat-row *matRowDef="let proxy; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
     </mat-table>
   </div>
