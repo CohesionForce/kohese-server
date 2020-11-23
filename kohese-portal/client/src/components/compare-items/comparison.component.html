@@ -1,33 +1,47 @@
 <div style="height: 100%; width: 100%; overflow: auto;">
   <ng-container *ngIf="comparison && !comparison.propertyDiffPending">
-    <ng-container
-      *ngFor="let property of Array.from(comparison.propertyComparisonMap.
-        keys())">
+    <ng-container *ngFor="let property of Array.from(comparison.propertyComparisonMap.keys())">
       <ng-container
         *ngIf="(!property.hidden && (!(showDifferencesOnlySubject | async) || (
           comparison.propertyComparisonMap.get(property).length > 1) || (
           comparison.propertyComparisonMap.get(property)[0].added ||
           comparison.propertyComparisonMap.get(property)[0].removed)))">
         <div style="padding: 0px 3px;">
-          <span>
-            {{property.name}}:
-          </span>
-          <ng-container
-            *ngFor="let change of comparison.propertyComparisonMap.get(property)">
+          <span>{{property.name}}:</span>
+          <ng-container *ngFor="let change of comparison.propertyComparisonMap.get(property)">
             <span [ngStyle]="getChangeStyle(change)" style="white-space: pre;">{{change.value}}</span>
           </ng-container>
         </div>
       </ng-container>
     </ng-container>
-    <ng-container *ngIf="1 === comparison.numberOfHiddenProperties">
-      <div>
-        1 hidden property changed
-      </div>
+
+    <ng-container *ngIf="comparison.childrenAdded.length"><b>Children Added:</b>
+      <ul>
+        <li *ngFor="let addedChild of comparison.childrenAdded">{{ addedChild.name }} ({{ addedChild.id }})</li>
+      </ul>
     </ng-container>
-    <ng-container *ngIf="comparison.numberOfHiddenProperties > 1">
-      <div>
-        {{comparison.numberOfHiddenProperties}} hidden properties changed
-      </div>
+
+
+    <ng-container *ngIf="comparison.childrenRemoved.length"><b>Children Removed:</b>
+      <ul>
+        <li *ngFor="let removedChild of comparison.childrenRemoved">{{ removedChild.name }} ({{ removedChild.id }})</li>
+      </ul>
+    </ng-container>
+
+    <ng-container *ngIf="comparison.childrenMoved.length"><b>Children Moved:</b>
+      <ul>
+        <li *ngFor="let movedChild of comparison.childrenMoved">
+          {{ movedChild.name }} ({{ movedChild.id }})
+          <ul>
+            <li *ngIf="movedChild.toParentId === comparison.itemId">Moved from: {{ movedChild.fromParentName }} ({{ movedChild.fromParentId }})</li>
+            <li *ngIf="movedChild.fromParentId === comparison.itemId">Moved to: {{ movedChild.toParentName }} ({{ movedChild.toParentId }})</li>
+          </ul>
+        </li>
+      </ul>
+    </ng-container>
+
+    <ng-container *ngIf="comparison.numberOfHiddenProperties > 0">
+      <b>Hidden properties changed:&nbsp;</b> <span>{{ comparison.numberOfHiddenProperties }}</span>
     </ng-container>
   </ng-container>
 </div>

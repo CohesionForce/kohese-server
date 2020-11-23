@@ -8,6 +8,7 @@ import { TreeHashMap, TreeHashEntryDifference, TreeHashMapDifference, ItemIdType
 import * as _ from 'underscore';
 
 export class Compare {
+
   public static async compareCommits(baseCommitId: string, changeCommitId: string,
     dynamicTypesService: DynamicTypesService, deferPropertyDiffs : boolean = false): Promise<Array<Comparison>> {
     let comparisons: Array<ItemProxyComparison> = [];
@@ -80,16 +81,68 @@ export class Compare {
             comparison.changeTypes.push(ChangeType.PARENT_CHANGED);
           }
 
-          if (diffEntry.childrenAdded) {
-            comparison.changeTypes.push(ChangeType.CHILD_ADDED);
-          }
-
           if (diffEntry.childrenModified) {
             comparison.changeTypes.push(ChangeType.CHILD_MODIFIED);
           }
 
+          if (diffEntry.childrenAdded) {
+            comparison.changeTypes.push(ChangeType.CHILD_ADDED);
+            for (let childEntry of diffEntry.childrenAdded) {
+              // Look in the summary
+              let parentChanged = diff.summary.parentChanged[childEntry.id];
+              let childAddedTreeHashDiff = diff.details[childEntry.id];
+              let childBlobAdded = await ItemCache.getItemCache().getBlob(childAddedTreeHashDiff.right.oid);
+              if (parentChanged) {
+                // Indicate child moved
+                let oldParent = parentChanged.fromParentId ? parentChanged.fromParentId : 'ROOT';
+                let oldParentOID = diff.details[oldParent].left.oid;
+                let oldParentBlob = await ItemCache.getItemCache().getBlob(oldParentOID);
+                comparison.childrenMoved.push({
+                  id: childEntry.id,
+                  name: childBlobAdded.name,
+                  fromParentId: oldParentBlob.id,
+                  fromParentName: oldParentBlob.name,
+                  toParentId: itemId,
+                  toParentName: changeBlob ? changeBlob.name : baseBlob.name
+                });
+              } else {
+                // Indicate which child was added
+                comparison.childrenAdded.push({
+                  id: childEntry.id,
+                  name: childBlobAdded.name
+                });
+              }
+            }
+          }
+
           if (diffEntry.childrenDeleted) {
             comparison.changeTypes.push(ChangeType.CHILD_REMOVED);
+            for (let childEntry of diffEntry.childrenDeleted) {
+              // Look in the summary
+              let parentChanged = diff.summary.parentChanged[childEntry.id];
+              let childRemovedTreeHashDiff = diff.details[childEntry.id];
+              let childBlobRemoved = await ItemCache.getItemCache().getBlob(childRemovedTreeHashDiff.left.oid)
+              if (parentChanged) {
+                // Indicate child moved; Only need the side to which it was moved.
+                let newParent = parentChanged.toParentId ? parentChanged.toParentId : 'ROOT';
+                let newParentOID = diff.details[newParent].right.oid;
+                let newParentBlob = await ItemCache.getItemCache().getBlob(newParentOID);
+                comparison.childrenMoved.push({
+                  id: childEntry.id,
+                  name: childBlobRemoved.name,
+                  fromParentId: itemId,
+                  fromParentName: changeBlob ? changeBlob.name : baseBlob.name,
+                  toParentId: newParentBlob.id,
+                  toParentName: newParentBlob.name,
+                });
+              } else {
+                // Indicate which child was deleted
+                comparison.childrenRemoved.push({
+                  id: childEntry.id,
+                  name: childBlobRemoved.name
+                });
+              }
+            }
           }
 
           if (diffEntry.childrenReordered) {

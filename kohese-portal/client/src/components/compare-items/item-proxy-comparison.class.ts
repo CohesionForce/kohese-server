@@ -3,6 +3,7 @@ import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { Comparison, Property } from './comparison.class';
 
 export class ItemProxyComparison extends Comparison {
+
   private _path: Array<Comparison>;
   get path() {
     return this._path;
@@ -15,12 +16,37 @@ export class ItemProxyComparison extends Comparison {
     }
   }
 
+  // Children Added
+  private _childrenAdded: Array<any> = [];
+  get childrenAdded(): Array<any> {
+    return this._childrenAdded;
+  }
+
+  // Children Removed/Deleted
+  private _childrenRemoved: Array<any> = [];
+  get childrenRemoved(): Array<any> {
+    return this._childrenRemoved;
+  }
+
+  // Children Moved
+  private _childrenMoved: Array<any> = [];
+  get childrenMoved(): Array<any> {
+    return this._childrenMoved;
+  }
+
+  // Item id
+  private _itemId: string;
+  get itemId(): string {
+    return this._itemId;
+  }
+
   public constructor(
     baseObject: any,
     changeObject: any,
     private _dynamicTypesService: DynamicTypesService
     ) {
     super(baseObject, changeObject);
+    this._itemId = changeObject ? changeObject.id : baseObject.id;
   }
 
   protected getProperties(comparisonObject: any): Array<Property> {
