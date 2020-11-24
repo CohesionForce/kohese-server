@@ -28,6 +28,7 @@ import { InitializeLogs } from './item-repository.registry';
 import { Metatype } from '../../../../common/src/Type.interface';
 import { EnumerationValue } from '../../../../common/src/Enumeration.interface';
 import { KoheseDataModel, KoheseViewModel } from '../../../../common/src/KoheseModel.interface';
+import { CacheManager } from '../../../../client/cache-worker/CacheManager';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -73,18 +74,9 @@ export class ItemRepository {
 
   currentTreeConfigSubject: BehaviorSubject<TreeConfigInfo> = new BehaviorSubject<TreeConfigInfo>(undefined);
 
-  private _worker: SharedWorker.SharedWorker;
   private _cache: ItemCache = new ItemCache();
   private _initialized: boolean = false;
   private _initialWorkingTreeNotificationSent = false;
-
-  private _suppressWorkerRequestAnnouncement = {
-    connectionVerification: true
-  };
-
-  private _suppressWorkerEventAnnouncement = {
-    verifyConnection: true
-  };
 
 
   //////////////////////////////////////////////////////////////////////////
@@ -120,113 +112,55 @@ export class ItemRepository {
 
     this.recentProxies = [];
 
-    let scripts: any = document.scripts;
-    let cacheWorkerBundle: string;
-    scriptLoop: for (let scriptIdx in scripts) {
-      let script: any = scripts[scriptIdx];
-      if (script.attributes) {
-        for (let idx in script.attributes) {
-          let attribute: any = script.attributes[idx];
-          if (attribute.value) {
-            if (attribute.value.match(/^scripts/)) {
-              cacheWorkerBundle = attribute.value;
-              break scriptLoop;
-            }
-          }
-        }
-      }
-    }
+    // Establish the Item Cache
+    ItemCache.setItemCache(this._cache);
 
-    console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
-    this._worker = new SharedWorker(cacheWorkerBundle);
+    // Subscribe to messages from
 
-    // Set up the worker messaging
-    this._worker.port.addEventListener('message', (messageEvent: any) => {
+    CacheManager.subscribe('reconnected', (messageData) => {
+      this.sync();
+    });
 
-      let msg: any = messageEvent.data;
+    CacheManager.subscribe('connectionError', (messageData) => {
+      // TODO: Should only send the state changes once
+      this.updateRepositorySyncState(
+        RepoStates.DISCONNECTED,
+        'Disconnected'
+      );
+    });
 
-      if (!msg.message){
+    CacheManager.subscribe('userLockedOut', (messageData) => {
+      this.updateRepositorySyncState(
+        RepoStates.USER_LOCKED_OUT,
+        'User is locked out'
+      );
+    });
 
-        if (msg.id) {
-          // Ignore response that is directed to another event listener
-          // console.log('^^^ Received response from worker in main listener for request: ' + msg.id);
-        } else {
-          console.log('*** Received unexpected response message');
-          console.log(messageEvent);
-        }
-        return;
-      }
+    CacheManager.subscribe('verifyConnection', (messageData) => {
+      CacheManager.sendMessageToWorker('connectionVerification', undefined, false);
+    });
 
-      let beforeProcessing = Date.now();
-      if (!this._suppressWorkerEventAnnouncement[msg.message]){
-        console.log('^^^ Received message from worker: ' + msg.message);
-      }
+    CacheManager.subscribe('update', (messageData) => {
+      this.buildOrUpdateProxy(messageData.item, messageData.kind, messageData.status);
+    });
 
-      switch (msg.message) {
-        case 'reconnected':
-          this.sync();
-          break;
-        case 'connectionError':
+    CacheManager.subscribe('updateItemStatus', (messageData) => {
+      this.updateItemStatus(messageData.itemId, messageData.status);
+    });
 
-          // TODO: Should only send the state changes once
+    CacheManager.subscribe('deletion', (messageData) => {
+      TreeConfiguration.getWorkingTree().getProxyFor(messageData.id).deleteItem();
+    });
 
-          this.updateRepositorySyncState(
-            RepoStates.DISCONNECTED,
-            'Disconnected'
-          );
-
-          break;
-
-        case 'userLockedOut':
-
-          this.updateRepositorySyncState(
-            RepoStates.USER_LOCKED_OUT,
-            'User is locked out'
-          );
-
-          break;
-
-        case 'verifyConnection':
-          this.sendMessageToWorker('connectionVerification', undefined, false);
-          break;
-
-        case 'update':
-          this.buildOrUpdateProxy(msg.data.item, msg.data.kind, msg.data.status);
-          break;
-
-        case 'updateItemStatus':
-          this.updateItemStatus(msg.data.itemId, msg.data.status);
-          break;
-
-        case 'deletion':
-          TreeConfiguration.getWorkingTree().getProxyFor(msg.data.id).deleteItem();
-          break;
-
-        case 'cachePiece':
-          const cachePiece: any = msg.data;
-          this.processCachePiece(cachePiece);
-          break;
-
-        default:
-          console.log('*** Received unexpected message: ' + msg.message);
-          console.log(messageEvent);
-      }
-
-      if (!this._suppressWorkerEventAnnouncement[msg.message]){
-        let afterProcessing = Date.now();
-        console.log('^^^ Processed message from worker ' + msg.message + ' - '
-          + (afterProcessing - beforeProcessing) / 1000);
-      }
+    CacheManager.subscribe('cachePiece', (messageData) => {
+      const cachePiece: any = messageData;
+      this.processCachePiece(cachePiece);
     });
 
     // Try to notify cacheWorker if the tab is closing
     addEventListener( 'unload', () => {
-      this.sendMessageToWorker('tabIsClosing', undefined, false)
+      CacheManager.sendMessageToWorker('tabIsClosing', undefined, false)
     });
-
-    // Establish the Item Repository
-    ItemCache.setItemCache(this._cache);
-    this._worker.port.start();
 
     this.CurrentUserService.getCurrentUserSubject()
       .subscribe((decodedToken) => {
@@ -237,7 +171,7 @@ export class ItemRepository {
           RepoStates.SYNCHRONIZING,
           'Starting Repository Sync'
         );
-        this.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
+        CacheManager.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
           true).then(async () => {
           this.sync();
         });
@@ -280,7 +214,7 @@ export class ItemRepository {
   }
 
   public async getSessionMap(): Promise<any> {
-    return (await this.sendMessageToWorker('getSessionMap', undefined, true)).
+    return (await CacheManager.sendMessageToWorker('getSessionMap', undefined, true)).
       data;
   }
 
@@ -298,9 +232,9 @@ export class ItemRepository {
       let afterCalcTreeHashes;
 
       if (!this._initialized) {
-        const fundamentalItemsResponse = await this.sendMessageToWorker(
+        const fundamentalItemsResponse = await CacheManager.sendMessageToWorker(
           'getFundamentalItems', { refresh: false }, true);
-        this.processBulkUpdate(fundamentalItemsResponse.data);
+        this.processBulkUpdate(fundamentalItemsResponse);
         KoheseModel.modelDefinitionLoadingComplete();
         this.updateRepositorySyncState(RepoStates.KOHESEMODELS_SYNCHRONIZED,
           'KoheseModels are available for use');
@@ -308,7 +242,7 @@ export class ItemRepository {
         let afterSyncMetaModels = Date.now();
         console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
 
-        await this.sendMessageToWorker('getCache', { refresh: false }, true);
+        await CacheManager.sendMessageToWorker('getCache', { refresh: false }, true);
 
         let afterSyncCache = Date.now();
         console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
@@ -345,47 +279,47 @@ export class ItemRepository {
       const treeHashes = workingTree.getAllTreeHashes();
 
       console.log('^^^ Requesting item updates');
-      const itemUpdatesResponse = await this.sendMessageToWorker(
+      const itemUpdatesResponse = await CacheManager.sendMessageToWorker(
         'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
-      this.processBulkUpdate(itemUpdatesResponse.data);
+      this.processBulkUpdate(itemUpdatesResponse);
 
       let afterGetAll = Date.now();
       console.log('^^^ Time to get and load deltas: ' + (afterGetAll - afterCalcTreeHashes) / 1000);
 
       // Ensure status for all items is updated
       console.log('^^^ Getting status');
-      const statusResponse = await this.sendMessageToWorker(
+      const statusResponse = await CacheManager.sendMessageToWorker(
         'getStatus', undefined, true);
-      statusResponse.data.idStatusArray.forEach(element => {
+      statusResponse.idStatusArray.forEach(element => {
         this.updateItemStatus(element.id, element.status);
       });
-      console.log('^^^ Received status update with count of: ' + statusResponse.data.statusCount);
+      console.log('^^^ Received status update with count of: ' + statusResponse.statusCount);
 
       let afterGetStatus = Date.now();
       console.log('^^^ Time to get status: ' + (afterGetStatus - afterGetAll) / 1000);
 
       // TODO: Need to determine if second update is required
 
-      let secondItemUpdateResponse = await this.sendMessageToWorker(
+      let secondItemUpdateResponse = await CacheManager.sendMessageToWorker(
         'getItemUpdates', { refresh: true, treeHashes: workingTree.getAllTreeHashes() }, true);
 
       let afterLoading = Date.now();
       console.log('^^^ Time to perform second sync: ' + (afterLoading - afterGetStatus) / 1000);
       console.log('^^^ Total time to sync: ' + (afterLoading - beforeSync) / 1000);
 
-      let syncIsComplete = secondItemUpdateResponse.data.kdbMatches;
+      let syncIsComplete = secondItemUpdateResponse.kdbMatches;
 
       if (syncIsComplete){
         this.logService.log(this.logEvents.kdbSynced);
       } else {
         // Process the updates
-        this.processBulkUpdate(secondItemUpdateResponse.data);
+        this.processBulkUpdate(secondItemUpdateResponse);
 
         this.logService.log(this.logEvents.compareHashAfterUpdate);
 
         let updatedTreeHashes = workingTree.getAllTreeHashes();
 
-        let diffRTH = TreeHashMap.diff(updatedTreeHashes, secondItemUpdateResponse.data.repoTreeHashes);
+        let diffRTH = TreeHashMap.diff(updatedTreeHashes, secondItemUpdateResponse.repoTreeHashes);
 
         syncIsComplete = diffRTH.match
 
@@ -629,52 +563,14 @@ export class ItemRepository {
     }
   }
 
-  private sendMessageToWorker(message: string, data: any, expectResponse:
-    boolean): Promise<any> {
-    return new Promise<void>((resolve: (data: any) => void, reject:
-      () => void) => {
 
-      let requestTime = Date.now();
-      let id: number = requestTime;
-
-      if (!this._suppressWorkerRequestAnnouncement[message]) {
-        console.log('^^^ Send message to worker: ' + message + ' - ' + id);
-      }
-
-      if (expectResponse) {
-        let responseHandler: (messageEvent: any) => void = (messageEvent:
-          any) => {
-          let msg: any = messageEvent.data;
-          if (msg.id === id) {
-            let responseTime = Date.now();
-            console.log('^^^ Received response from worker for request: ' + message + ' - ' + msg.id + ' - ' +
-              (responseTime-requestTime)/1000);
-            resolve(msg);
-            this._worker.port.removeEventListener('message',
-              responseHandler);
-
-          }
-        };
-        this._worker.port.addEventListener('message', responseHandler);
-      }
-      this._worker.port.postMessage({
-        type: message,
-        id: id,
-        data: data
-      });
-      this._worker.port.start();
-      if (!expectResponse) {
-        resolve(undefined);
-      }
-    });
-  }
 
   public async getIcons(): Promise<Array<string>> {
-    return (await this.sendMessageToWorker('getIcons', {}, true)).data;
+    return (await CacheManager.sendMessageToWorker('getIcons', {}, true));
   }
 
   public async fetchItem(proxy): Promise<void> {
-    let fetchResponse = (await this.sendMessageToWorker('fetchItem', {id: proxy.item.id}, true)).data;
+    let fetchResponse = (await CacheManager.sendMessageToWorker('fetchItem', {id: proxy.item.id}, true));
     proxy.updateItem(fetchResponse.kind, fetchResponse.item);
   }
 
@@ -682,7 +578,7 @@ export class ItemRepository {
   public async upsertItem(kind: string, item: any): Promise<ItemProxy> {
     // Clone item to strip itemChangeHandler which is causing circular references
     let clonedItem = JSON.parse(JSON.stringify(item));
-    let upsertItemResponse = (await this.sendMessageToWorker('upsertItem', {kind: kind, item: clonedItem}, true)).data;
+    let upsertItemResponse = (await CacheManager.sendMessageToWorker('upsertItem', {kind: kind, item: clonedItem}, true));
 
     return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void), reject: ((value: any) => void)) => {
       if (upsertItemResponse.error) {
@@ -714,7 +610,7 @@ export class ItemRepository {
   async deleteItem(proxy, recursive): Promise<void> {
     this.logService.log(this.logEvents.deletingItem, {item : proxy, recursive : recursive});
 
-    let deletedItemResponse = await this.sendMessageToWorker('deleteItem', {
+    let deletedItemResponse = await CacheManager.sendMessageToWorker('deleteItem', {
       kind: proxy.kind,
       id: proxy.item.id,
       recursive: recursive
@@ -727,16 +623,16 @@ export class ItemRepository {
 
   public async convertToMarkdown(content: string, contentType: string,
     parameters: any): Promise<string> {
-    return (await this.sendMessageToWorker('convertToMarkdown', {
+    return (await CacheManager.sendMessageToWorker('convertToMarkdown', {
       content: content,
       contentType: contentType,
       parameters: parameters
-    }, true)).data;
+    }, true));
   }
 
   public async getUrlContent(url: string): Promise<any> {
-    return (await this.sendMessageToWorker('getUrlContent', { url: url },
-      true)).data;
+    return (await CacheManager.sendMessageToWorker('getUrlContent', { url: url },
+      true));
   }
 
   public getImportPreview(file: File, parameters: any): Promise<string> {
@@ -744,7 +640,7 @@ export class ItemRepository {
       () => void) => {
       let fileReader: FileReader = new FileReader();
       fileReader.onload = async () => {
-        resolve(await this.convertToMarkdown(fileReader.result, file.type,
+        resolve(await this.convertToMarkdown((fileReader.result as string), file.type,
           parameters));
       };
 
@@ -754,13 +650,13 @@ export class ItemRepository {
 
   public async importMarkdown(fileName: string, markdown: string, parentId:
     string): Promise<void> {
-    return await this.sendMessageToWorker('importMarkdown',
+    return await CacheManager.sendMessageToWorker('importMarkdown',
       { fileName: fileName, markdown: markdown, parentId: parentId }, true);
   }
 
   public async produceReport(report: string, reportName: string, format:
     string): Promise<void> {
-    return await this.sendMessageToWorker('produceReport', {
+    return await CacheManager.sendMessageToWorker('produceReport', {
       reportName: reportName,
       format: format,
       content: report
@@ -768,22 +664,22 @@ export class ItemRepository {
   }
 
   public async getReportMetaData(): Promise<Array<any>> {
-    return (await this.sendMessageToWorker('getReportMetaData', {}, true)).data;
+    return (await CacheManager.sendMessageToWorker('getReportMetaData', {}, true));
   }
 
   public async renameReport(oldReportName: string, newReportName: string):
     Promise<void> {
-    return await this.sendMessageToWorker('renameReport',
+    return await CacheManager.sendMessageToWorker('renameReport',
       { oldReportName: oldReportName, newReportName: newReportName }, true);
   }
 
   public async getReportPreview(reportName: string): Promise<string> {
-    return (await this.sendMessageToWorker('getReportPreview',
-      { reportName: reportName }, true)).data;
+    return (await CacheManager.sendMessageToWorker('getReportPreview',
+      { reportName: reportName }, true));
   }
 
   public async removeReport(reportName: string): Promise<void> {
-    return await this.sendMessageToWorker('removeReport',
+    return await CacheManager.sendMessageToWorker('removeReport',
       { reportName: reportName }, true);
   }
 
@@ -1310,7 +1206,7 @@ export class ItemRepository {
   //////////////////////////////////////////////////////////////////////////
   public async performAnalysis(forProxy): Promise<any> {
     let analysisResponse =
-      (await this.sendMessageToWorker('performAnalysis', {kind: forProxy.kind, id: forProxy.item.id}, true)).data;
+      (await CacheManager.sendMessageToWorker('performAnalysis', {kind: forProxy.kind, id: forProxy.item.id}, true));
     return analysisResponse;
   }
 

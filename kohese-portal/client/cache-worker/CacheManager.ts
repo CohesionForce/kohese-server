@@ -1,108 +1,185 @@
 'use strict';
 
+export type CallbackFunctionType = (messageData: any) => void;
+
+type CallbackMapType = {
+  [id:string] : Array<CallbackFunctionType>;
+};
+
+type ResolveFunctionType = (data: any) => void;
+
+type PendingRequestType = {
+  requestId : number;
+  message : string;
+  requestData : any;
+  requestTime: number;
+  resolve: ResolveFunctionType
+};
+
+type PendingRequestsMapType = {
+  [id:string] : PendingRequestType;
+};
+
 export class CacheManager {
 
+  private static cacheWorker: SharedWorker.SharedWorker;
+
+  private static callbackMap : CallbackMapType = {};
+  private static pendingRequestMap : PendingRequestsMapType = {};
+
+  private static suppressWorkerRequestAnnouncement = {
+    connectionVerification: true
+  };
+
+  private static suppressWorkerEventAnnouncement = {
+    verifyConnection: true
+  };
+
+
+  //////////////////////////////////////////////////////////////////////////
   constructor() {
-    throw 'Invalid_Class';
-  }
-
-  static nextRequestId : number = 0;
-
-  static callbackMap = {};
-
-  static objectMap = {};
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static authenticate() {
-    console.log('$$$ authenticating');
-    cacheWorker.port.postMessage({type: 'processAuthToken', authToken: localStorage.getItem('auth-token')});
+    throw 'Can-Not-Create-Instance';
   }
 
   //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static sync(callback) {
-    console.log('$$$ requesting sync');
-
-    let requestId;
-    if (callback){
-      requestId = this.nextRequestId++;
-      this.callbackMap[requestId] = callback;
-    }
-    this.callbackMap['bulkCacheUpdate'] = this.processBulkCacheUpdate;
-    cacheWorker.port.postMessage({type: 'sync', requestId: requestId});
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static processBulkCacheUpdate(bulkUpdate){
-
-    for (let key in bulkUpdate){
-      console.log("::: Received BulkCacheUpdate for: " + key);
-      if(!this.objectMap[key]){
-        this.objectMap[key] = {};
+  static initialize() {
+    // Find the bundle containing the CacheWorker
+    let scripts: any = document.scripts;
+    let cacheWorkerBundle: string;
+    scriptLoop: for (let scriptIdx in scripts) {
+      let script: any = scripts[scriptIdx];
+      if (script.attributes) {
+        for (let idx in script.attributes) {
+          let attribute: any = script.attributes[idx];
+          if (attribute.value) {
+            if (attribute.value.match(/^scripts/)) {
+              cacheWorkerBundle = attribute.value;
+              break scriptLoop;
+            }
+          }
+        }
       }
-      Object.assign(this.objectMap[key], bulkUpdate[key]);
     }
 
-  }
-}
+    console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
+    this.cacheWorker = new SharedWorker(cacheWorkerBundle);
 
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-let scripts = document.scripts;
-let cacheWorkerBundle;
-for (let scriptIdx in scripts){
-  let script = scripts[scriptIdx];
-  if(script.attributes){
-    for(let idx in script.attributes){
-      let attribute = script.attributes[idx];
-      if (attribute.value){
-        if(attribute.value.match(/^scripts/)){
-          cacheWorkerBundle = attribute.value;
+    // Set up the worker messaging
+    this.cacheWorker.port.addEventListener('message', (messageEvent: any) => {
+
+      let msg: any = messageEvent.data;
+
+      if (!msg.message){
+        // Message does not have a message field, so it should be a request response
+
+        if (msg.id) {
+          let pendingRequest = this.pendingRequestMap[msg.id];
+          if (pendingRequest) {
+            let responseTime = Date.now();
+            console.log('^^^ Received response from worker for request: ' + pendingRequest.message + ' - ' + msg.id + ' - ' +
+              (responseTime-pendingRequest.requestTime)/1000);
+            pendingRequest.resolve(msg.data);
+            delete this.pendingRequestMap[msg.id];
+          } else {
+            console.log('*** Received unexpected response message for id: ' + msg.id);
+            console.log(messageEvent);
+          }
+
+          // Ignore response that is directed to another event listener
+          // console.log('^^^ Received response from worker in main listener for request: ' + msg.id);
+        } else {
+          console.log('*** Received malformed response message');
+          console.log(messageEvent);
+        }
+      } else {
+        // Received an unsolicited message (not a request response)
+
+        let beforeProcessing = Date.now();
+        if (!this.suppressWorkerEventAnnouncement[msg.message]){
+          console.log('^^^ Received message from worker: ' + msg.message);
         }
 
+        let callbackMapEntry : Array<CallbackFunctionType> = this.callbackMap[msg.message];
+        if (callbackMapEntry) {
+          // Deliver message data to all subscribers
+          for (let index in callbackMapEntry) {
+            let callback = callbackMapEntry[index];
+            try {
+              callback(msg.data);
+            } catch (err) {
+              console.log('*** Error' + err);
+              console.log(err.stack);
+            }
+          }
+        } else {
+          console.log('*** Received unexpected message: ' + msg.message);
+          console.log(msg.data);
+        }
+
+        if (!this.suppressWorkerEventAnnouncement[msg.message]){
+          let afterProcessing = Date.now();
+          console.log('^^^ Processed message from worker ' + msg.message + ' - '
+            + (afterProcessing - beforeProcessing) / 1000);
+        }
       }
+
+      //
+
+    });
+
+    this.cacheWorker.port.start();
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  static subscribe(message: string, callback : CallbackFunctionType) {
+    if (!this.callbackMap[message]) {
+      // Create the first callback entry
+      this.callbackMap[message] = [ callback ]
+    } else {
+      // Append to the existing callback entry
+      this.callbackMap[message].push(callback);
     }
   }
-}
-console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
-let cacheWorker : SharedWorker.SharedWorker = new SharedWorker(cacheWorkerBundle);
 
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-cacheWorker.port.onmessage = function (event){
-  let message = event.data;
+  //////////////////////////////////////////////////////////////////////////
+  static sendMessageToWorker(message: string, data: any, expectResponse: boolean): Promise<any> {
 
-  console.log('::: Message received from cache worker: ' + message.type);
+    return new Promise<any>((resolve: (data: any) => void, reject:
+      () => void) => {
 
-  switch (message.type){
-    case 'newClient':
-      console.log('$$$ New client tab connected');
-      console.log(message);
-      break;
-    case 'bulkCacheUpdate':
-      console.log('$$$ bCU');
-      CacheManager.processBulkCacheUpdate(message.chunk);
-      break;
-  }
+      let requestTime = Date.now();
+      let id: number = requestTime;
 
-  if (message.hasOwnProperty('requestId')){
-    let callback = CacheManager.callbackMap[message.requestId];
-    if (callback){
-      console.log('::: Invoking callback');
-      delete CacheManager.callbackMap[message.requestId];
-      let response = message.response;
-      if (message.type === 'sync'){
-        response.objectMap = CacheManager.objectMap;
+      if (!this.suppressWorkerRequestAnnouncement[message]) {
+        console.log('^^^ Send message to worker: ' + message + ' - ' + id);
       }
-      callback(response);
-    }
+
+      if (expectResponse) {
+        let requestInfo : PendingRequestType = {
+          requestId: id,
+          message: message,
+          requestData: data,
+          requestTime: requestTime,
+          resolve: resolve
+        };
+
+        this.pendingRequestMap[id] = requestInfo;
+      }
+
+      this.cacheWorker.port.postMessage({
+        type: message,
+        id: id,
+        data: data
+      });
+
+      if (!expectResponse) {
+        // No response expected, so immediately resolve
+        resolve(undefined);
+      }
+    });
   }
 
 }
+
+// Initialize the CacheManager class
+CacheManager.initialize();
