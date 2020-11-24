@@ -285,8 +285,42 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (icons: Array<string>) => void, reject: () => void) => {
           socket.emit('getIcons', {}, (icons: Array<string>) => {
-          resolve(icons);
+            resolve(icons);
         }); }) });
+        break;
+
+      case 'fetchItem':
+        port.postMessage({id: request.id, data: await new Promise<any>(
+          (resolve: (response: any) => void, reject: () => void) => {
+            socket.emit('Item/findById', { id: request.data.id }, (response) => {
+              let proxy = TreeConfiguration.getWorkingTree().getProxyFor(request.data.id);
+              if (proxy && !response.error) {
+                proxy.updateItem(response.kind, response.item);
+              }
+              resolve(response);
+            });
+          })
+        });
+        break;
+
+      case 'upsertItem':
+        port.postMessage({
+          id: request.id,
+          data: await upsertItem(request.data.kind, request.data.item)
+        });
+
+      case 'deleteItem':
+        port.postMessage({
+          id: request.id,
+          data: await deleteItem(request.data.kind, request.data.id, request.data.recursive)
+          });
+        break;
+
+      case 'performAnalysis':
+        port.postMessage({
+          id: request.id,
+          data: await performAnalysis(request.data.kind,request.data.id)
+        });
         break;
 
       case 'getUrlContent':
@@ -610,7 +644,7 @@ function registerKoheseIOListeners() {
 
   socket.on('Item/delete', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Deleted:  ' + notification.id);
-    deleteItem(notification);
+    itemDeleted(notification);
   });
 
   socket.on('Item/BulkUpdate', (bulkUpdate) => {
@@ -693,7 +727,20 @@ function updateItemStatus (itemId : string, itemStatus : Array<string>) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function deleteItem(notification: any): void {
+async function deleteItem(kind, itemId, recursive): Promise<any> {
+  console.log('::: Deleting: %s - %s - %s', kind, itemId, recursive);
+  var promise = new Promise((resolve, reject) => {
+    socket.emit('Item/deleteById', { kind: kind, id: itemId, recursive: recursive }, (response) => {
+      resolve(response);
+    });
+  });
+  return promise;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function itemDeleted(notification: any): void {
   let proxy = TreeConfiguration.getWorkingTree().getProxyFor(notification.id);
   if (proxy){
     proxy.deleteItem();
@@ -975,7 +1022,7 @@ function processBulkUpdate(response: any): void {
 
   if (response.deleteItems) {
     for (let j: number = 0; j < response.deleteItems.length; j++) {
-      deleteItem({ id: response.deleteItems[j] });
+      itemDeleted({ id: response.deleteItems[j] });
     }
   }
   const after = Date.now();
@@ -992,6 +1039,54 @@ function updateWorking(treeHashes: any): Promise<any> {
     socket.emit('Item/getAll', { repoTreeHashes: treeHashes },
       (response) => {
       processBulkUpdate(response);
+      resolve(response);
+    });
+  });
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function performAnalysis(kind: string, id: string) {
+  console.log('::: Performing Analysis for %s - %s', kind, id);
+  var promise = new Promise((resolve, reject) => {
+    socket.emit('Item/performAnalysis', { kind: kind, id: id }, (response) => {
+        resolve(response);
+    });
+  });
+
+  return promise;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+async function upsertItem(kind: string, item: any): Promise<any> {
+  return new Promise<any>((resolve: ((value: ItemProxy) => void),
+    reject: ((value: any) => void)) => {
+    socket.emit('Item/upsert', {
+      kind: kind,
+      item: item
+    }, (response: any) => {
+      if (response.error) {
+        console.log('*** Error: An error occurred while saving ' + item.name + '.');
+      } else {
+        let proxy: ItemProxy;
+        if (!item.id) {
+          // A new, created item will not have an id until the server responds.
+          if (kind === 'KoheseModel') {
+            proxy = new KoheseModel(response.item);
+          } else if (kind === 'KoheseView') {
+            proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
+          } else {
+            proxy = new ItemProxy(response.kind, response.item);
+          }
+        } else {
+          proxy = TreeConfiguration.getWorkingTree().getProxyFor(item.id);
+          proxy.updateItem(response.kind, response.item);
+          proxy.dirty = false;
+        }
+      }
       resolve(response);
     });
   });

@@ -4,16 +4,13 @@ import { Injectable } from '@angular/core';
 import * as _ from 'underscore';
 import { MarkdownService } from 'ngx-markdown';
 
-import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from '../user/current-user.service';
 import { ToastrService } from 'ngx-toastr';
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
-import { FormatContainer,
-  FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
+import { FormatDefinition, FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
+import { FormatContainer, FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
 import { PropertyDefinition } from '../../../../common/src/PropertyDefinition.interface';
 import { TableDefinition } from '../../../../common/src/TableDefinition.interface';
 import { LocationMap } from '../../constants/LocationMap.data';
@@ -30,8 +27,7 @@ import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';
 import { Metatype } from '../../../../common/src/Type.interface';
 import { EnumerationValue } from '../../../../common/src/Enumeration.interface';
-import { KoheseDataModel,
-  KoheseViewModel } from '../../../../common/src/KoheseModel.interface';
+import { KoheseDataModel, KoheseViewModel } from '../../../../common/src/KoheseModel.interface';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -61,8 +57,6 @@ export class ItemRepository {
   private static loggingInitialized: boolean = false;
   private static componentId: number;
   private static itemRepoInitEvent: number;
-  private static markdownNormalizationEnabled =
-    ItemRepository.loadFeatureSwitch('IR-markdown-normalization-enabled', false);
 
   shortProxyList: Array<ItemProxy>;
   modelTypes: Object;
@@ -94,7 +88,7 @@ export class ItemRepository {
 
 
   //////////////////////////////////////////////////////////////////////////
-  constructor(private socketService: SocketService,
+  constructor(
     private CurrentUserService: CurrentUserService,
     private toastrService: ToastrService,
     private dialogService: DialogService,
@@ -679,95 +673,56 @@ export class ItemRepository {
     return (await this.sendMessageToWorker('getIcons', {}, true)).data;
   }
 
-  fetchItem(proxy) {
-    var promise = new Promise((resolve, reject) => {
-      this.socketService.socket.emit('Item/findById', { id: proxy.item.id }, (response) => {
-        proxy.updateItem(response.kind, response.item);
-        proxy.dirty = false;
+  public async fetchItem(proxy): Promise<void> {
+    let fetchResponse = (await this.sendMessageToWorker('fetchItem', {id: proxy.item.id}, true)).data;
+    proxy.updateItem(fetchResponse.kind, fetchResponse.item);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  public async upsertItem(kind: string, item: any): Promise<ItemProxy> {
+    // Clone item to strip itemChangeHandler which is causing circular references
+    let clonedItem = JSON.parse(JSON.stringify(item));
+    let upsertItemResponse = (await this.sendMessageToWorker('upsertItem', {kind: kind, item: clonedItem}, true)).data;
+
+    return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void), reject: ((value: any) => void)) => {
+      if (upsertItemResponse.error) {
+        this.dialogService.openInformationDialog('Error', 'An error occurred while saving ' + clonedItem.name + '.');
+        reject(upsertItemResponse.error);
+      } else {
+        let proxy: ItemProxy;
+        if (!clonedItem.id) {
+          if (kind === 'KoheseModel') {
+            proxy = new KoheseModel(upsertItemResponse.item);
+          } else if (kind === 'KoheseView') {
+            proxy = new KoheseView(clonedItem, TreeConfiguration.getWorkingTree());
+          } else {
+            proxy = new ItemProxy(upsertItemResponse.kind, upsertItemResponse.item);
+          }
+        } else {
+          proxy = TreeConfiguration.getWorkingTree().getProxyFor(clonedItem.id);
+          proxy.updateItem(upsertItemResponse.kind, upsertItemResponse.item);
+          proxy.dirty = false;
+        }
+
         resolve(proxy);
-      });
-    });
-
-    return promise;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  public async upsertItem(type: string, item: any): Promise<ItemProxy> {
-    if (ItemRepository.markdownNormalizationEnabled){
-      for (let attributeName in item) {
-        // The itemIds attribute is currently absent from classProperties.
-        if (attributeName !== 'itemIds') {
-          let isMarkdownAttribute: boolean = false;
-          let dataModelItemProxy: KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(type);
-          if (dataModelItemProxy.item.classProperties[attributeName].definition.
-            type === 'markdown') {
-            isMarkdownAttribute = true;
-          } else {
-            let viewModelItemProxy: ItemProxy = dataModelItemProxy.view;
-
-            let viewModelAttribute: any = viewModelItemProxy.item.viewProperties[
-              attributeName];
-            if (viewModelAttribute && viewModelAttribute.inputType.type ===
-              'markdown') {
-              isMarkdownAttribute = true;
-            }
-          }
-
-          if (isMarkdownAttribute) {
-            item[attributeName] = await this.convertToMarkdown(this.
-              _markdownService.compile(item[attributeName]), 'text/html', {});
-          }
-        }
       }
-    }
-
-    return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void),
-      reject: ((value: any) => void)) => {
-      this.socketService.getSocket().emit('Item/upsert', {
-        kind: type,
-        item: item
-      }, (response: any) => {
-        if (response.error) {
-          this.dialogService.openInformationDialog('Error', 'An error ' +
-            'occurred while saving ' + item.name + '.');
-          reject(response.error);
-        } else {
-          let proxy: ItemProxy;
-          if (!item.id) {
-            if (type === 'KoheseModel') {
-              proxy = new KoheseModel(response.item);
-            } else if (type === 'KoheseView') {
-              proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
-            } else {
-              proxy = new ItemProxy(response.kind, response.item);
-            }
-          } else {
-            proxy = TreeConfiguration.getWorkingTree().getProxyFor(item.id);
-            proxy.updateItem(response.kind, response.item);
-            proxy.dirty = false;
-          }
-
-          resolve(proxy);
-        }
-      });
     });
   }
-
   //////////////////////////////////////////////////////////////////////////
-  deleteItem(proxy, recursive) {
-    this.logService.log(this.logEvents.deletingItem, {item : proxy , recursive : recursive});
+  //
+  //////////////////////////////////////////////////////////////////////////
+  async deleteItem(proxy, recursive): Promise<void> {
+    this.logService.log(this.logEvents.deletingItem, {item : proxy, recursive : recursive});
 
-    var promise = new Promise((resolve, reject) => {
-      this.socketService.socket.emit('Item/deleteById', { kind: proxy.kind, id: proxy.item.id, recursive: recursive }, (response) => {
-        if (response.error) {
-          reject(response.error);
-        } else {
-          resolve(response);
-        }
-      });
-    });
+    let deletedItemResponse = await this.sendMessageToWorker('deleteItem', {
+      kind: proxy.kind,
+      id: proxy.item.id,
+      recursive: recursive
+    }, true);
 
-    return promise;
+    if (deletedItemResponse.error) {
+      this.dialogService.openInformationDialog('Error', 'An error occurred while deleting ' + proxy.item.name + '.');
+    }
   }
 
   public async convertToMarkdown(content: string, contentType: string,
@@ -1353,20 +1308,10 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  performAnalysis(forProxy) {
-    this.logService.log(this.logEvents.performingAnalysis, {proxy : forProxy});
-
-    var promise = new Promise((resolve, reject) => {
-      this.socketService.socket.emit('Item/performAnalysis', { kind: forProxy.kind, id: forProxy.item.id }, (response) => {
-        if (response.error) {
-          reject(response.error);
-        } else {
-          resolve(response);
-        }
-      });
-    });
-
-    return promise;
+  public async performAnalysis(forProxy): Promise<any> {
+    let analysisResponse =
+      (await this.sendMessageToWorker('performAnalysis', {kind: forProxy.kind, id: forProxy.item.id}, true)).data;
+    return analysisResponse;
   }
 
   //////////////////////////////////////////////////////////////////////////

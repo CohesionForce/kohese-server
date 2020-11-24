@@ -169,6 +169,7 @@ export class NamespaceEditorComponent implements Dialog {
         }
       }, undefined);
 
+      // TODO: There is no wait or error processing on these for loops
       for (let j: number = 0; j < typeItemProxysToRemove.length; j++) {
         this._itemRepository.deleteItem(typeItemProxysToRemove[j], false);
       }
