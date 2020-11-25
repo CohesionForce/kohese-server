@@ -407,6 +407,18 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
+      case 'VersionControl/stage':
+      case 'VersionControl/unstage':
+      case 'VersionControl/revert':
+      case 'VersionControl/commit':
+      case 'VersionControl/push':
+      case 'VersionControl/addRemote':
+      case 'VersionControl/getRemotes':
+        socket.emit(request.type, request.data, (response) => {
+          port.postMessage({ id: request.id, data: response});
+        });
+        break;
+
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);

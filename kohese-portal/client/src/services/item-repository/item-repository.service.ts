@@ -81,6 +81,7 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   constructor(
+    private CacheManager : CacheManager,
     private CurrentUserService: CurrentUserService,
     private toastrService: ToastrService,
     private dialogService: DialogService,
@@ -214,7 +215,7 @@ export class ItemRepository {
   }
 
   public async getSessionMap(): Promise<any> {
-    return (await CacheManager.sendMessageToWorker('getSessionMap', undefined, true)).
+    return (await this.CacheManager.sendMessageToWorker('getSessionMap', undefined, true)).
       data;
   }
 
@@ -232,7 +233,7 @@ export class ItemRepository {
       let afterCalcTreeHashes;
 
       if (!this._initialized) {
-        const fundamentalItemsResponse = await CacheManager.sendMessageToWorker(
+        const fundamentalItemsResponse = await this.CacheManager.sendMessageToWorker(
           'getFundamentalItems', { refresh: false }, true);
         this.processBulkUpdate(fundamentalItemsResponse);
         KoheseModel.modelDefinitionLoadingComplete();
@@ -242,7 +243,7 @@ export class ItemRepository {
         let afterSyncMetaModels = Date.now();
         console.log('^^^ Time to getMetaModels: ' + (afterSyncMetaModels - beforeSync) / 1000);
 
-        await CacheManager.sendMessageToWorker('getCache', { refresh: false }, true);
+        await this.CacheManager.sendMessageToWorker('getCache', { refresh: false }, true);
 
         let afterSyncCache = Date.now();
         console.log('^^^ Time to getItemCache: ' + (afterSyncCache - afterSyncMetaModels) / 1000);
@@ -279,7 +280,7 @@ export class ItemRepository {
       const treeHashes = workingTree.getAllTreeHashes();
 
       console.log('^^^ Requesting item updates');
-      const itemUpdatesResponse = await CacheManager.sendMessageToWorker(
+      const itemUpdatesResponse = await this.CacheManager.sendMessageToWorker(
         'getItemUpdates', { refresh: false, treeHashes: treeHashes }, true);
       this.processBulkUpdate(itemUpdatesResponse);
 
@@ -288,7 +289,7 @@ export class ItemRepository {
 
       // Ensure status for all items is updated
       console.log('^^^ Getting status');
-      const statusResponse = await CacheManager.sendMessageToWorker(
+      const statusResponse = await this.CacheManager.sendMessageToWorker(
         'getStatus', undefined, true);
       statusResponse.idStatusArray.forEach(element => {
         this.updateItemStatus(element.id, element.status);
@@ -300,7 +301,7 @@ export class ItemRepository {
 
       // TODO: Need to determine if second update is required
 
-      let secondItemUpdateResponse = await CacheManager.sendMessageToWorker(
+      let secondItemUpdateResponse = await this.CacheManager.sendMessageToWorker(
         'getItemUpdates', { refresh: true, treeHashes: workingTree.getAllTreeHashes() }, true);
 
       let afterLoading = Date.now();
@@ -566,11 +567,11 @@ export class ItemRepository {
 
 
   public async getIcons(): Promise<Array<string>> {
-    return (await CacheManager.sendMessageToWorker('getIcons', {}, true));
+    return (await this.CacheManager.sendMessageToWorker('getIcons', {}, true));
   }
 
   public async fetchItem(proxy): Promise<void> {
-    let fetchResponse = (await CacheManager.sendMessageToWorker('fetchItem', {id: proxy.item.id}, true));
+    let fetchResponse = (await this.CacheManager.sendMessageToWorker('fetchItem', {id: proxy.item.id}, true));
     proxy.updateItem(fetchResponse.kind, fetchResponse.item);
   }
 
@@ -578,7 +579,7 @@ export class ItemRepository {
   public async upsertItem(kind: string, item: any): Promise<ItemProxy> {
     // Clone item to strip itemChangeHandler which is causing circular references
     let clonedItem = JSON.parse(JSON.stringify(item));
-    let upsertItemResponse = (await CacheManager.sendMessageToWorker('upsertItem', {kind: kind, item: clonedItem}, true));
+    let upsertItemResponse = (await this.CacheManager.sendMessageToWorker('upsertItem', {kind: kind, item: clonedItem}, true));
 
     return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void), reject: ((value: any) => void)) => {
       if (upsertItemResponse.error) {
@@ -610,7 +611,7 @@ export class ItemRepository {
   async deleteItem(proxy, recursive): Promise<void> {
     this.logService.log(this.logEvents.deletingItem, {item : proxy, recursive : recursive});
 
-    let deletedItemResponse = await CacheManager.sendMessageToWorker('deleteItem', {
+    let deletedItemResponse = await this.CacheManager.sendMessageToWorker('deleteItem', {
       kind: proxy.kind,
       id: proxy.item.id,
       recursive: recursive
@@ -623,7 +624,7 @@ export class ItemRepository {
 
   public async convertToMarkdown(content: string, contentType: string,
     parameters: any): Promise<string> {
-    return (await CacheManager.sendMessageToWorker('convertToMarkdown', {
+    return (await this.CacheManager.sendMessageToWorker('convertToMarkdown', {
       content: content,
       contentType: contentType,
       parameters: parameters
@@ -631,7 +632,7 @@ export class ItemRepository {
   }
 
   public async getUrlContent(url: string): Promise<any> {
-    return (await CacheManager.sendMessageToWorker('getUrlContent', { url: url },
+    return (await this.CacheManager.sendMessageToWorker('getUrlContent', { url: url },
       true));
   }
 
@@ -650,13 +651,13 @@ export class ItemRepository {
 
   public async importMarkdown(fileName: string, markdown: string, parentId:
     string): Promise<void> {
-    return await CacheManager.sendMessageToWorker('importMarkdown',
+    return await this.CacheManager.sendMessageToWorker('importMarkdown',
       { fileName: fileName, markdown: markdown, parentId: parentId }, true);
   }
 
   public async produceReport(report: string, reportName: string, format:
     string): Promise<void> {
-    return await CacheManager.sendMessageToWorker('produceReport', {
+    return await this.CacheManager.sendMessageToWorker('produceReport', {
       reportName: reportName,
       format: format,
       content: report
@@ -664,22 +665,22 @@ export class ItemRepository {
   }
 
   public async getReportMetaData(): Promise<Array<any>> {
-    return (await CacheManager.sendMessageToWorker('getReportMetaData', {}, true));
+    return (await this.CacheManager.sendMessageToWorker('getReportMetaData', {}, true));
   }
 
   public async renameReport(oldReportName: string, newReportName: string):
     Promise<void> {
-    return await CacheManager.sendMessageToWorker('renameReport',
+    return await this.CacheManager.sendMessageToWorker('renameReport',
       { oldReportName: oldReportName, newReportName: newReportName }, true);
   }
 
   public async getReportPreview(reportName: string): Promise<string> {
-    return (await CacheManager.sendMessageToWorker('getReportPreview',
+    return (await this.CacheManager.sendMessageToWorker('getReportPreview',
       { reportName: reportName }, true));
   }
 
   public async removeReport(reportName: string): Promise<void> {
-    return await CacheManager.sendMessageToWorker('removeReport',
+    return await this.CacheManager.sendMessageToWorker('removeReport',
       { reportName: reportName }, true);
   }
 
@@ -1206,7 +1207,7 @@ export class ItemRepository {
   //////////////////////////////////////////////////////////////////////////
   public async performAnalysis(forProxy): Promise<any> {
     let analysisResponse =
-      (await CacheManager.sendMessageToWorker('performAnalysis', {kind: forProxy.kind, id: forProxy.item.id}, true));
+      (await this.CacheManager.sendMessageToWorker('performAnalysis', {kind: forProxy.kind, id: forProxy.item.id}, true));
     return analysisResponse;
   }
 

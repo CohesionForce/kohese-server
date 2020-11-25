@@ -14,6 +14,7 @@ describe('ItemRepository', () => {
 
   // Create ItemRepository with Spy
   let itemRepository: ItemRepository = new ItemRepository(
+  jasmine.createSpyObj(['subscribe']),
   jasmine.createSpyObj({getCurrentUserSubject: new BehaviorSubject('')}),
   jasmine.createSpyObj(['']),
   jasmine.createSpyObj(['']),

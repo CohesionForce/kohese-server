@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 
 /* Custom */
 import { DialogModule } from '../components/dialog/dialog.module';
+import { CacheManager } from '../../cache-worker/CacheManager';
 import { ItemRepository } from './item-repository/item-repository.service';
 import { SocketService } from './socket/socket.service';
 import { SessionService } from './user/session.service';
@@ -35,6 +36,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
   exports : [],
   entryComponents: [],
   providers: [
+    CacheManager,
     ItemRepository,
     SocketService,
     SessionService,

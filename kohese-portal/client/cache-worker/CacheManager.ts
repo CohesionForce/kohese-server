@@ -1,4 +1,6 @@
 'use strict';
+import { Injectable } from '@angular/core';
+
 
 export type CallbackFunctionType = (messageData: any) => void;
 
@@ -20,6 +22,7 @@ type PendingRequestsMapType = {
   [id:string] : PendingRequestType;
 };
 
+@Injectable()
 export class CacheManager {
 
   private static cacheWorker: SharedWorker.SharedWorker;
@@ -35,15 +38,25 @@ export class CacheManager {
     verifyConnection: true
   };
 
+  private static _singleton : CacheManager = new CacheManager();
 
   //////////////////////////////////////////////////////////////////////////
   constructor() {
-    throw 'Can-Not-Create-Instance';
+    if (!CacheManager._singleton) {
+      CacheManager._singleton = this;
+      this.initialize();
+    }
+    return CacheManager._singleton;
   }
 
   //////////////////////////////////////////////////////////////////////////
-  static initialize() {
+  private initialize() {
     // Find the bundle containing the CacheWorker
+    console.log('::: Initializing Cache Manager');
+    if (CacheManager.cacheWorker) {
+      console.log('*** Unexpected attempt to initialize CacheManager');
+      return;
+    }
     let scripts: any = document.scripts;
     let cacheWorkerBundle: string;
     scriptLoop: for (let scriptIdx in scripts) {
@@ -62,10 +75,10 @@ export class CacheManager {
     }
 
     console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
-    this.cacheWorker = new SharedWorker(cacheWorkerBundle);
+    CacheManager.cacheWorker = new SharedWorker(cacheWorkerBundle);
 
     // Set up the worker messaging
-    this.cacheWorker.port.addEventListener('message', (messageEvent: any) => {
+    CacheManager.cacheWorker.port.addEventListener('message', (messageEvent: any) => {
 
       let msg: any = messageEvent.data;
 
@@ -73,13 +86,13 @@ export class CacheManager {
         // Message does not have a message field, so it should be a request response
 
         if (msg.id) {
-          let pendingRequest = this.pendingRequestMap[msg.id];
+          let pendingRequest = CacheManager.pendingRequestMap[msg.id];
           if (pendingRequest) {
             let responseTime = Date.now();
             console.log('^^^ Received response from worker for request: ' + pendingRequest.message + ' - ' + msg.id + ' - ' +
               (responseTime-pendingRequest.requestTime)/1000);
             pendingRequest.resolve(msg.data);
-            delete this.pendingRequestMap[msg.id];
+            delete CacheManager.pendingRequestMap[msg.id];
           } else {
             console.log('*** Received unexpected response message for id: ' + msg.id);
             console.log(messageEvent);
@@ -95,11 +108,11 @@ export class CacheManager {
         // Received an unsolicited message (not a request response)
 
         let beforeProcessing = Date.now();
-        if (!this.suppressWorkerEventAnnouncement[msg.message]){
+        if (!CacheManager.suppressWorkerEventAnnouncement[msg.message]){
           console.log('^^^ Received message from worker: ' + msg.message);
         }
 
-        let callbackMapEntry : Array<CallbackFunctionType> = this.callbackMap[msg.message];
+        let callbackMapEntry : Array<CallbackFunctionType> = CacheManager.callbackMap[msg.message];
         if (callbackMapEntry) {
           // Deliver message data to all subscribers
           for (let index in callbackMapEntry) {
@@ -116,7 +129,7 @@ export class CacheManager {
           console.log(msg.data);
         }
 
-        if (!this.suppressWorkerEventAnnouncement[msg.message]){
+        if (!CacheManager.suppressWorkerEventAnnouncement[msg.message]){
           let afterProcessing = Date.now();
           console.log('^^^ Processed message from worker ' + msg.message + ' - '
             + (afterProcessing - beforeProcessing) / 1000);
@@ -127,22 +140,22 @@ export class CacheManager {
 
     });
 
-    this.cacheWorker.port.start();
+    CacheManager.cacheWorker.port.start();
   }
 
   //////////////////////////////////////////////////////////////////////////
-  static subscribe(message: string, callback : CallbackFunctionType) {
-    if (!this.callbackMap[message]) {
+  subscribe(message: string, callback : CallbackFunctionType) {
+    if (!CacheManager.callbackMap[message]) {
       // Create the first callback entry
-      this.callbackMap[message] = [ callback ]
+      CacheManager.callbackMap[message] = [ callback ]
     } else {
       // Append to the existing callback entry
-      this.callbackMap[message].push(callback);
+      CacheManager.callbackMap[message].push(callback);
     }
   }
 
   //////////////////////////////////////////////////////////////////////////
-  static sendMessageToWorker(message: string, data: any, expectResponse: boolean): Promise<any> {
+  sendMessageToWorker(message: string, data: any, expectResponse: boolean): Promise<any> {
 
     return new Promise<any>((resolve: (data: any) => void, reject:
       () => void) => {
@@ -150,7 +163,7 @@ export class CacheManager {
       let requestTime = Date.now();
       let id: number = requestTime;
 
-      if (!this.suppressWorkerRequestAnnouncement[message]) {
+      if (!CacheManager.suppressWorkerRequestAnnouncement[message]) {
         console.log('^^^ Send message to worker: ' + message + ' - ' + id);
       }
 
@@ -163,10 +176,10 @@ export class CacheManager {
           resolve: resolve
         };
 
-        this.pendingRequestMap[id] = requestInfo;
+        CacheManager.pendingRequestMap[id] = requestInfo;
       }
 
-      this.cacheWorker.port.postMessage({
+      CacheManager.cacheWorker.port.postMessage({
         type: message,
         id: id,
         data: data
@@ -180,6 +193,3 @@ export class CacheManager {
   }
 
 }
-
-// Initialize the CacheManager class
-CacheManager.initialize();

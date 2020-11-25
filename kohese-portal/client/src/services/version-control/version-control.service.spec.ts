@@ -16,17 +16,14 @@ describe('Service: version-control', () => {
     let item: any = MockItem();
     item.id = 'test-uuid';
     proxy = new ItemProxy('Item', item);
-    let placeholderSocketService: any = jasmine.createSpyObj('SocketService',
-      ['getSocket']);
-    placeholderSocketService.getSocket.and.returnValue({
-      emit: (message: string, data: any, callbackFunction: Function) => {
-        callbackFunction({
-          'test-uuid': ['CURRENT']
-        });
-      }
+    let placeholderCacheManager: any = jasmine.createSpyObj('CacheManager',
+      ['sendMessageToWorker']);
+
+    let resolvedPromise = Promise.resolve({
+      'test-uuid': ['CURRENT']
     });
-    versionControlService = new VersionControlService(
-      placeholderSocketService);
+    placeholderCacheManager.sendMessageToWorker.and.returnValue(resolvedPromise);
+    versionControlService = new VersionControlService(placeholderCacheManager);
   });
 
   it('stages changes', (done: Function) => {
