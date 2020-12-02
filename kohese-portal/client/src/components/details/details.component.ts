@@ -38,7 +38,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
     this.proxyStream.next(this._itemProxy);
   }
-  
+
   treeConfig: TreeConfiguration;
 
   /* Observables */
@@ -49,15 +49,15 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   /* Subscriptions */
   treeConfigSub: Subscription;
-  
+
   get matDialogRef() {
     return this._matDialogRef;
   }
-  
+
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
-  
+
   @ViewChildren(FormatObjectEditorComponent)
   private _formatObjectEditorQueryList: QueryList<FormatObjectEditorComponent>;
 
@@ -81,7 +81,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
           this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.
             id);
         }
-        
+
         this._changeDetectorRef.markForCheck();
       });
     }
@@ -92,12 +92,12 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this.treeConfigSub.unsubscribe();
     }
   }
-  
+
   public isDialogInstance(): boolean {
     return (this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data);
   }
-  
+
   public async upsertItem(): Promise<void> {
     let kind: string;
     let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this.
@@ -107,7 +107,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     } else {
       kind = this._itemProxy.kind;
     }
-    
+
     try {
       await this._itemRepository.upsertItem(kind, this._itemProxy.item);
       this.editableStream.next(false);
@@ -117,13 +117,12 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   public cancelEditing(): void {
-    this._itemRepository.fetchItem(this._itemProxy).then((proxy:
-      ItemProxy) => {
+    this._itemRepository.fetchItem(this._itemProxy).then(() => {
       this.editableStream.next(false);
       this._changeDetectorRef.markForCheck();
     });
   }
-  
+
   public navigate(id: string, openNewTab: boolean): void {
     if (openNewTab) {
       this._navigationService.addTab('Explore', { id: id });
@@ -131,7 +130,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this._navigationService.navigate('Explore', { id: id });
     }
   }
-  
+
   public shouldDocumentTabIndicateModification(): boolean {
     let itemProxyStack: Array<ItemProxy> = [this.itemProxy];
     while (itemProxyStack.length > 0) {
@@ -139,10 +138,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
       if (ip.dirty) {
         return true;
       }
-      
+
       itemProxyStack.push(...ip.children);
     }
-    
+
     return false;
   }
 }

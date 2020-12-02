@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
 
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { SocketService } from '../socket/socket.service';
-import { Observable, bindCallback } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { CacheManager } from '../../../cache-worker/CacheManager';
 
 
 @Injectable()
 export class VersionControlService {
-  private _emitReturningObservable: (message: string, data: any) => Observable<any> =
-    bindCallback(this.socketService.getSocket().emit.bind(this.
-    socketService.getSocket()));
 
-  public constructor(private socketService: SocketService) {
+  public constructor(private CacheManager: CacheManager) {
   }
 
   public stageItems(proxies: Array<ItemProxy>): Observable<any> {
@@ -24,7 +21,7 @@ export class VersionControlService {
       data.proxyIds.push(proxies[j].item.id);
     }
 
-    return this._emitReturningObservable('VersionControl/stage', data);
+    return from(this.CacheManager.sendMessageToWorker('VersionControl/stage', data, true));
   }
 
   public unstageItems(proxies: Array<ItemProxy>): Observable<any> {
@@ -37,7 +34,7 @@ export class VersionControlService {
       data.proxyIds.push(proxies[j].item.id);
     }
 
-    return this._emitReturningObservable('VersionControl/unstage', data);
+    return from(this.CacheManager.sendMessageToWorker('VersionControl/unstage', data, true));
   }
 
   public revertItems(proxies: Array<ItemProxy>): Observable<any> {
@@ -50,7 +47,7 @@ export class VersionControlService {
       data.proxyIds.push(proxies[j].item.id);
     }
 
-    return this._emitReturningObservable('VersionControl/revert', data);
+    return from(this.CacheManager.sendMessageToWorker('VersionControl/revert', data, true));
   }
 
   public commitItems(proxies: Array<ItemProxy>, committer: any,
@@ -70,7 +67,7 @@ export class VersionControlService {
       data.proxyIds.push(proxies[j].item.id);
     }
 
-    return this._emitReturningObservable('VersionControl/commit', data);
+    return from(this.CacheManager.sendMessageToWorker('VersionControl/commit', data, true));
   }
 
   public push(ids: string[], remoteName: string): Observable<any> {
@@ -82,7 +79,7 @@ export class VersionControlService {
       remoteName: remoteName
     };
 
-    return this._emitReturningObservable('VersionControl/push', data);
+    return from(this.CacheManager.sendMessageToWorker('VersionControl/push', data, true));
   }
 
   public addRemote(id: string, remoteName: string, url: string): Observable<any> {
@@ -96,7 +93,7 @@ export class VersionControlService {
       url: url
     };
 
-    return this._emitReturningObservable('VersionControl/addRemote', data);
+    return from(this.CacheManager.sendMessageToWorker('VersionControl/addRemote', data, true));
   }
 
   getRemotes(id: string): Observable<any> {
@@ -106,6 +103,6 @@ export class VersionControlService {
       proxyId: id
     };
 
-    return this._emitReturningObservable('VersionControl/getRemotes', data);
+    return from(this.CacheManager.sendMessageToWorker('VersionControl/getRemotes', data, true));
   }
 }

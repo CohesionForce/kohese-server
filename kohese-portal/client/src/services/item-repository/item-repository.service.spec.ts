@@ -13,12 +13,14 @@ describe('ItemRepository', () => {
   let mockItemCache = ItemCache.getItemCache();
 
   // Create ItemRepository with Spy
-  let itemRepository: ItemRepository = new ItemRepository(jasmine.createSpyObj(
-    ['']), jasmine.createSpyObj({
-      getCurrentUserSubject: new BehaviorSubject('')
-    }), jasmine.createSpyObj(['']), jasmine.createSpyObj(['']), jasmine.
-    createSpyObj(['']), jasmine.createSpyObj(['getComponentId', 'getEventId',
-    'log']), jasmine.createSpyObj(['']));
+  let itemRepository: ItemRepository = new ItemRepository(
+  jasmine.createSpyObj(['subscribe']),
+  jasmine.createSpyObj({getCurrentUserSubject: new BehaviorSubject('')}),
+  jasmine.createSpyObj(['']),
+  jasmine.createSpyObj(['']),
+  jasmine.createSpyObj(['']),
+  jasmine.createSpyObj(['getComponentId', 'getEventId','log']),
+  jasmine.createSpyObj(['']));
 
   // Restore ItemCache used for testing
   ItemCache.setItemCache(mockItemCache);
