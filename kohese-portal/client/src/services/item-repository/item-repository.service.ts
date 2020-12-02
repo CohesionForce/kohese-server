@@ -215,8 +215,7 @@ export class ItemRepository {
   }
 
   public async getSessionMap(): Promise<any> {
-    return (await this.CacheManager.sendMessageToWorker('getSessionMap', undefined, true)).
-      data;
+    return (await this.CacheManager.sendMessageToWorker('getSessionMap', undefined, true));
   }
 
   private sync(): Promise<void> {
