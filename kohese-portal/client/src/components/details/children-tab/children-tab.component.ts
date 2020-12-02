@@ -1,13 +1,12 @@
-import { Component, OnInit, OnDestroy, Input, EventEmitter, SimpleChange, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
-import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 
 @Component({
   selector : 'children-tab',
@@ -19,8 +18,6 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   /* Ui Switches */
   orderedChildren : boolean;
-  treeOptions : object
-  childView : string
 
   /* Data */
   @Input()
@@ -65,12 +62,6 @@ export class ChildrenTabComponent extends NavigatableComponent
         this.itemProxy = undefined;
       }
     })
-    this.repoReadySub = this.ItemRepository.getRepoStatusSubject()
-      .subscribe(update => {
-        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
-          this.childView = 'table';
-        }
-      })
     this.saveEmitter = new EventEmitter();
     this.filterSubject = new BehaviorSubject('');
     this.initialized = true;
@@ -99,21 +90,4 @@ export class ChildrenTabComponent extends NavigatableComponent
     this.childrenStream.next(this.itemProxy.children);
   }
 
-  createChild () {
-    let createConfig = {
-      data : {
-        saveEmitter : this.saveEmitter,
-        parentId : this.itemProxy.item.id,
-      }
-    };
-
-    let dialogReference =
-    this.DialogService.openComponentDialog(CreateWizardComponent,
-                                           createConfig).updateSize('70%','70%');
-
-    this.saveEmitter.subscribe((proxy) => {
-      console.log(proxy);
-      this.ItemRepository.upsertItem(proxy.kind, proxy.item);
-    })
-  }
 }

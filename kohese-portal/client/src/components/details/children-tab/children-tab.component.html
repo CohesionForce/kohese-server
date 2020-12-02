@@ -3,25 +3,4 @@
     Ordered
   </mat-checkbox>
 </span>
-
-<h4 class="panel-heading">
-  <span>Children View - {{childView}}</span>
-  <span class="pull-right">
-    <button mat-icon-button [matMenuTriggerFor]="optionsMenu">
-      <mat-icon class="fa fa-gear"></mat-icon>
-    </button>
-    <mat-menu #optionsMenu="matMenu">
-      <button mat-menu-item (click)="childView = 'tree'">
-        <mat-icon *ngIf="childView === 'tree'" class="fa fa-check"></mat-icon>
-        Show as Tree
-      </button>
-      <button mat-menu-item (click)="childView = 'table'">
-        <i *ngIf="childView === 'table'" class="fa fa-check"></i>
-        Show as Table
-      </button>
-    </mat-menu>
-  </span>
-</h4>
-<children-table [childrenStream]="childrenStream" [filterSubject]="filterSubject" [editableStream]="editableStream"
-  *ngIf="childView === 'table'"></children-table>
-<proxy-selector-tree [itemProxy]="itemProxy" *ngIf="childView === 'tree'"></proxy-selector-tree>
+<children-table [childrenStream]="childrenStream" [filterSubject]="filterSubject" [editableStream]="editableStream"></children-table>

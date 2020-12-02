@@ -1,6 +1,0 @@
-<tree-root [nodes]="filteredItems" options="treeOptions">
-    <ng-template #treeNodeTemplate let-node let-index="index">
-      <td (click)="navigate('Explore', {id: node.data.item.id})"
-          matTooltip="{{node.data.item.description | truncate : 150}}">{{node.data.item.name}}</td>
-    </ng-template>
-  </tree-root>
