@@ -4,7 +4,6 @@ import { MarkdownModule } from 'ngx-markdown';
 import { DetailsComponent } from './details.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ChildrenTabComponent } from './children-tab/children-tab.component';
-import { ProxySelectorTreeComponent } from './children-tab/proxy-selector-tree/proxy-selector-tree.component';
 import { ChildrenTableComponent } from './children-tab/children-table/children-table.component';
 import { JournalComponent } from './journal/journal.component';
 import { ReferencesTabComponent } from './references-tab/references-tab.component';
@@ -33,7 +32,6 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     ReferenceTableComponent,
     ChildrenTabComponent,
     ChildrenTableComponent,
-    ProxySelectorTreeComponent,
     JournalComponent
   ],
   entryComponents: [
@@ -60,7 +58,6 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     DetailsComponent,
     HistoryTabComponent,
     ChildrenTabComponent,
-    ProxySelectorTreeComponent
   ]
 })
 export class DetailsModule {}
