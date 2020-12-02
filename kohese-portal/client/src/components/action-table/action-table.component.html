@@ -97,7 +97,6 @@
     </mat-cell>
   </ng-container>
 
-  <mat-header-row style="position: sticky; top: 0;
-    background-color: inherit; z-index: 1;" *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
+  <mat-header-row style="background-color: inherit; z-index: 1;" *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
   <mat-row *matRowDef="let action; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
 </mat-table>
