@@ -43,7 +43,6 @@ export class ChildrenTabComponent extends NavigatableComponent
 
 
   /* Subscriptions */
-  repoReadySub : Subscription;
   proxyChanges : Subscription;
 
 
@@ -68,7 +67,6 @@ export class ChildrenTabComponent extends NavigatableComponent
   }
 
   ngOnDestroy () {
-    this.repoReadySub.unsubscribe();
     this.proxyChanges.unsubscribe();
   }
 
