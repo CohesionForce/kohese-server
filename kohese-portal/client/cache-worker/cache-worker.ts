@@ -308,6 +308,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           id: request.id,
           data: await upsertItem(request.data.kind, request.data.item)
         });
+        break;
 
       case 'deleteItem':
         port.postMessage({
