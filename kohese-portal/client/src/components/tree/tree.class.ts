@@ -29,7 +29,7 @@ export abstract class Tree {
   get rootSubject() {
     return this._rootSubject;
   }
-  
+
   private _anchorAction: Action = new Action('Anchor', 'Set the object of ' +
     'this row as the root', 'fa fa-anchor', (object: any) => {
     return (object !== this._rootSubject.getValue() && !this.
@@ -37,6 +37,26 @@ export abstract class Tree {
     }, (object: any) => {
     this.setRoot(object);
   });
+
+  private _absoluteRoot: any;
+  get absoluteRoot() {
+    return this._absoluteRoot;
+  }
+  set absoluteRoot(absoluteRoot: any) {
+    this._absoluteRoot = absoluteRoot;
+  }
+
+  private absoluteRootAction: Action = new Action('AbsoluteRoot', 'return to the absolute root of this object',
+    'fa fa-arrow-circle-o-up', (object: any) => {
+      return (object !== this._absoluteRoot && !this._inTargetingMode);
+    }, (object: any) => {
+      if (this._absoluteRoot) {
+        this.setRoot(this._absoluteRoot);
+      } else {
+        console.log('*** No Absolute Root Available');
+      }
+    }
+  )
 
   private _showRootWithDescendants: boolean = false;
   get showRootWithDescendants() {
@@ -53,7 +73,7 @@ export abstract class Tree {
       this._rowActions.push(this._anchorAction);
     }
   }
-  
+
   private _canMoveRows: boolean = false;
   get canMoveRows() {
     return this._canMoveRows;
@@ -61,14 +81,14 @@ export abstract class Tree {
   set canMoveRows(canMoveRows: boolean) {
     this._canMoveRows = canMoveRows;
   }
-  
+
   private _expandDescendantsAction: Action = new Action('Expand Descendants',
     'Expands all descendants', 'fa fa-caret-down', (object: any) => {
     return (this.getChildren(object).length > 0);
     }, (object: any) => {
     this.expandDescendants(this._rowMap.get(this.getId(object)));
   });
-  
+
   private _collapseDescendantsAction: Action = new Action('Collapse ' +
     'Descendants', 'Collapses all descendants', 'fa fa-caret-right', (object:
     any) => {
@@ -76,7 +96,7 @@ export abstract class Tree {
     }, (object: any) => {
     this.collapseDescendants(this._rowMap.get(this.getId(object)));
   });
-  
+
   private _targetBeforeAction: Action = new Action(TargetPosition.BEFORE,
     'Place the targeting object or objects under this object', 'fa ' +
     'fa-crosshairs', (object: any) => {
@@ -119,7 +139,7 @@ export abstract class Tree {
 
     this.exitTargetingMode();
   });
-  
+
   private _targetActionGroup: ActionGroup = new ActionGroup('Target', 'Target ' +
     'this object for the current action', 'fa fa-crosshairs', (object:
     any) => {
@@ -129,7 +149,7 @@ export abstract class Tree {
       isAncestorSelected(this._selectedObjectsSubject.getValue(), object));
     }, [this._targetBeforeAction, this._targetAfterAction, this.
     _targetChildAction]);
-  
+
   private _exitTargetingModeAction: Action = new Action('Exit ' +
     'Targeting Mode', 'Exit Targeting Mode', 'fa fa-times', (object: any) => {
     return this._inTargetingMode;
@@ -146,6 +166,7 @@ export abstract class Tree {
       }, (object: any) => {
       this.setRoot(this.getParent(object));
     }),
+    this.absoluteRootAction,
     this._targetActionGroup,
     this._exitTargetingModeAction
   ];
@@ -172,7 +193,7 @@ export abstract class Tree {
     this._collapseDescendantsAction,
     new Action('Move', 'Move this object', 'fa fa-arrow-circle-o-right',
       (object: any) => {
-      return this.mayMove(object);  
+      return this.mayMove(object);
     }, (object: any) => {
       let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
       selectedObjects.push(object);
@@ -192,7 +213,7 @@ export abstract class Tree {
   get selectedObjectsSubject() {
     return this._selectedObjectsSubject;
   }
-  
+
   private _inTargetingMode: boolean = false;
   get inTargetingMode() {
     return this._inTargetingMode;
@@ -267,7 +288,7 @@ export abstract class Tree {
       }
 
       this._selectedObjectsSubject.next(selectedObjects);
-      
+
       if (this._canMoveRows) {
         let descendantTreeRowStack: Array<TreeRow> = [row];
         while (descendantTreeRowStack.length > 0) {
@@ -538,7 +559,7 @@ export abstract class Tree {
   protected abstract getText(object: any): string;
 
   protected abstract getIcon(object: any): string;
-  
+
   protected getTags(object: any): Array<string> {
     return [];
   }
@@ -575,16 +596,16 @@ export abstract class Tree {
   protected isMultiselectEnabled(object: any): boolean {
     return this._canMoveRows && this._inTargetingMode;
   }
-  
+
   protected hasError(object: any): boolean {
     return false;
   }
-  
+
   protected target(target: any, targetingObject: any, targetPosition:
     TargetPosition): void {
     // Subclasses may override this function
   }
-  
+
   protected clear(): void {
     for (let id in this._updateVisibleRowsSubscriptionMap) {
       delete this._updateVisibleRowsSubscriptionMap[id];
@@ -658,7 +679,7 @@ export abstract class Tree {
       }
     }
   }
-  
+
   protected isAncestorSelected(selectedObjects: Array<any>, object: any):
     boolean {
     let isAncestorSelected: boolean = false;
@@ -668,17 +689,17 @@ export abstract class Tree {
         isAncestorSelected = true;
         break;
       }
-      
+
       parent = this.getParent(parent);
     }
-  
+
     return isAncestorSelected;
   }
-  
+
   protected mayMove(object: any): boolean {
     return this._canMoveRows && !this._inTargetingMode;
   }
-  
+
   private exitTargetingMode(): void {
     let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     selectedObjects.length = 0;

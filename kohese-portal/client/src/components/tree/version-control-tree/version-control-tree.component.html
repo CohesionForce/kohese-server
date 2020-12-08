@@ -14,12 +14,6 @@
     (click)="removeFilter()" matTooltip="Remove filter">
     <mat-icon class="fa fa-eraser"></mat-icon>
   </button>
-  <button mat-icon-button (click)="rootSubject.next(absoluteRoot)"
-    [disabled]="(rootSubject | async) === absoluteRoot"
-    matTooltip="Changes the root to be the absolute root"
-    class="flex-right-align">
-    <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
-  </button>
   <button mat-icon-button (click)="selectAll()"
     matTooltip="Select all Items that match the current filter">
     <mat-icon class="fa fa-check-square-o"></mat-icon>

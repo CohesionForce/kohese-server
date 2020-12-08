@@ -169,8 +169,8 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
       return anotherCommitObject.commit.time - oneCommitObject.commit.time;
     });
     let commits: Array<Commit> = [];
-    let rootRow: TreeRow = this.buildRow(new Repository(this._repositoryProxy,
-      commits));
+    this.absoluteRoot = new Repository(this._repositoryProxy, commits)
+    let rootRow: TreeRow = this.buildRow(this.absoluteRoot);
 
     this.rootSubject.next(rootRow.object);
 

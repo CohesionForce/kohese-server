@@ -35,10 +35,6 @@ import { ImportComponent } from '../../import/import.component';
   //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
-  private _absoluteRoot: ItemProxy;
-  get absoluteRoot() {
-    return this._absoluteRoot;
-  }
 
   private _synchronizeWithSelection: boolean = true;
   get synchronizeWithSelection() {
@@ -127,7 +123,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(deleteAction);
     this.menuActions.unshift(deleteAction);
-    
+
     let produceReportAction: Action = new Action('Produce Report', 'Produce ' +
       'a report from this Item and its descendants', 'fa fa-file-text-o',
       (object: any) => {
@@ -150,7 +146,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
                 getDepthFromAncestor(object as ItemProxy),
                 reportSpecifications.addLinks);
             };
-            
+
             if (reportSpecifications.includeDescendants) {
               let itemProxyStack: Array<ItemProxy> = [(object as ItemProxy)];
               while (itemProxyStack.length > 0) {
@@ -161,7 +157,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             } else {
               processItemProxy((object as ItemProxy));
             }
-            
+
             return initialContent;
           }
         }
@@ -169,7 +165,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(produceReportAction);
     this.menuActions.unshift(produceReportAction);
-    
+
     let analyzeAction: Action = new Action('Analyze...', 'Analyze content ' +
       'from this Item and its descendants', 'fa fa-search', (object: any) => {
       return true;
@@ -179,11 +175,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(analyzeAction);
     this.menuActions.unshift(analyzeAction);
-    
+
     let importAction: Action = new Action('Import...', 'Import one or more ' +
       'files as children of this Item', 'fa fa-file-o', (object: any) => {
-      return !(object as ItemProxy).internal || (object === this.
-        _absoluteRoot);
+      return !(object as ItemProxy).internal || (object === this.absoluteRoot);
     }, (object: any) => {
       this._dialogService.openComponentDialog(ImportComponent, {
         data: {
@@ -193,11 +188,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(importAction);
     this.menuActions.unshift(importAction);
-    
+
     let addChildAction: Action = new Action('Add Child', 'Add a child to ' +
       'this Item', 'fa fa-plus add-button', (object: any) => {
-      return !(object as ItemProxy).internal || (object === this.
-        _absoluteRoot);
+      return !(object as ItemProxy).internal || (object === this.absoluteRoot);
     }, (object: any) => {
       this._dialogService.openComponentDialog(CreateWizardComponent, {
         data: {
@@ -244,8 +238,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
-        this._absoluteRoot = treeConfigurationObject.config.getRootProxy();
-        this._absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
+        this.absoluteRoot = treeConfigurationObject.config.getRootProxy();
+        this.absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
           ItemProxy) => {
           this.buildRow(proxy);
         });
@@ -267,17 +261,17 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
                 this.refresh();
               }
               break;
-            case 'update': 
-            case 'dirty': 
+            case 'update':
+            case 'dirty':
               this.refresh();
-              break;    
+              break;
             case 'delete': {
                 this.deleteRow(notification.id);
                 this.refresh();
               }
               break;
             case 'loaded': {
-                this._absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
+                this.absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
                   ItemProxy) => {
                   this.buildRow(proxy);
                 });
@@ -298,7 +292,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
 
-        this.rootSubject.next(this._absoluteRoot);
+        this.rootSubject.next(this.absoluteRoot);
 
         this.refresh();
 
@@ -370,7 +364,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   protected getText(object: any): string {
     return (object as ItemProxy).item.name;
   }
-  
+
   protected getTags(object: any): Array<string> {
     let item: any = (object as ItemProxy).item;
     return (item.tags ? item.tags.split(',') : []);
@@ -440,7 +434,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this._filterDelayIdentifier = undefined;
     }, 1000);
   }
-  
+
   protected hasError(object: any): boolean {
     return !!(object as ItemProxy).validationError;
   }

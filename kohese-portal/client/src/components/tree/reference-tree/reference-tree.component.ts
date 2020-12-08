@@ -109,8 +109,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
 
-        let root: Array<string> = [this._selectedTreeConfiguration.
-          getRootProxy().item.id];
+        let root: Array<string> = [this._selectedTreeConfiguration.getRootProxy().item.id];
+        this.absoluteRoot = [this._selectedTreeConfiguration.getRootProxy().item.id];
         this.buildRows(root);
         this.rootSubject.next(root);
 

@@ -30,10 +30,6 @@ import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 })
 export class VersionControlTreeComponent extends Tree implements OnInit,
   OnDestroy {
-  private _absoluteRoot: ItemProxy;
-  get absoluteRoot() {
-    return this._absoluteRoot;
-  }
 
   private _searchCriterion: FilterCriterion = new FilterCriterion(new Filter().
     filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
@@ -179,7 +175,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
-        this._absoluteRoot = treeConfigurationObject.config.getRootProxy();
+        this.absoluteRoot = treeConfigurationObject.config.getRootProxy();
 
         if (this._treeConfigurationSubscription) {
           this._treeConfigurationSubscription.unsubscribe();
@@ -211,8 +207,8 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
           }
         });
 
-        this.buildRows(this._absoluteRoot);
-        this.rootSubject.next(this._absoluteRoot);
+        this.buildRows(this.absoluteRoot);
+        this.rootSubject.next(this.absoluteRoot);
         this.refresh();
 
         this.initialize();
@@ -253,7 +249,7 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
       this.deleteRow(proxy.item.id);
 
       let ancestor: ItemProxy = proxy.parentProxy;
-      while (ancestor && (ancestor !== this._absoluteRoot) && !(this.
+      while (ancestor && (ancestor !== this.absoluteRoot) && !(this.
         proxyHasVCStatus(ancestor) || this.getChildren(ancestor).length)){
         this.deleteRow(ancestor.item.id);
         ancestor = ancestor.parentProxy;
