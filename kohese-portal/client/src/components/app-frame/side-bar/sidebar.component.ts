@@ -3,7 +3,6 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 import { ImportComponent } from '../../import/import.component';
-import { UploadImageComponent } from '../../upload-image/upload-image.component';
 import { CurrentUserService } from '../../../services/user/current-user.service';
 import { ApplicationLens, LensService } from '../../../services/lens-service/lens.service';
 import { Subscription } from 'rxjs';
@@ -58,9 +57,4 @@ export class SideBarComponent implements OnInit, OnDestroy {
     }).updateSize('90%', '90%');
   }
 
-  public openUploadDialog(): void {
-    this.dialogService.openComponentDialog(UploadImageComponent, {
-      data: {}
-    }).updateSize('70%', 'auto');
-  }
 }
