@@ -29,6 +29,7 @@ import { Metatype } from '../../../../common/src/Type.interface';
 import { EnumerationValue } from '../../../../common/src/Enumeration.interface';
 import { KoheseDataModel, KoheseViewModel } from '../../../../common/src/KoheseModel.interface';
 import { CacheManager } from '../../../../client/cache-worker/CacheManager';
+import { AuthenticationService } from '../authentication/authentication.service';
 
 export enum RepoStates {
   DISCONNECTED,
@@ -83,6 +84,7 @@ export class ItemRepository {
   constructor(
     private CacheManager : CacheManager,
     private CurrentUserService: CurrentUserService,
+    private AuthenticationService: AuthenticationService,
     private toastrService: ToastrService,
     private dialogService: DialogService,
     private _versionControlService: VersionControlService,
@@ -172,10 +174,13 @@ export class ItemRepository {
           RepoStates.SYNCHRONIZING,
           'Starting Repository Sync'
         );
-        CacheManager.sendMessageToWorker('connect', localStorage.getItem('auth-token'),
+        CacheManager.sendMessageToWorker('connect', AuthenticationService.getToken().getValue(),
           true).then(async () => {
           this.sync();
         });
+      } else {
+        // TODO: Need to disconnect cache-worker
+        console.log('*** Need to disconnect cache-worker');
       }
     });
   }

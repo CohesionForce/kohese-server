@@ -4,7 +4,7 @@ export enum ValueInputType {
 
 export class FilterableProperty {
   public static readonly PROPERTIES: string = '<PROPERTIES>';
-  
+
   public constructor(public displayText: string, public propertyPath:
     Array<string>, public valueInputType: ValueInputType, public values:
     Array<string>) {
@@ -17,12 +17,12 @@ export class Filter {
   get rootElement() {
     return this._rootElement;
   }
-  
+
   private _filterableProperties: Array<FilterableProperty> = [];
   get filterableProperties() {
     return this._filterableProperties;
   }
-  
+
   public constructor() {
     this._filterableProperties.push(new FilterableProperty('Any property', [],
       ValueInputType.STRING, []));
@@ -39,7 +39,7 @@ export class Filter {
 
     return matchingObjects;
   }
-  
+
   public isElementPresent(element: FilterElement): boolean {
     let connectionStack: Array<FilterCriteriaConnection> = [this._rootElement];
     while (connectionStack.length > 0) {
@@ -60,10 +60,10 @@ export class Filter {
         }
       }
     }
-    
+
     return false;
   }
-  
+
   public removeElement(element: FilterElement): boolean {
     let removed: boolean = false;
     let connectionStack: Array<FilterCriteriaConnection> = [this._rootElement];
@@ -86,10 +86,10 @@ export class Filter {
           }
         }
       }
-      
+
       connectionStack.push(...connection.connections);
     }
-    
+
     return removed;
   }
 
@@ -133,22 +133,23 @@ export class FilterElement {
 }
 
 enum FilterCriterionCondition {
-  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equals', CONTAINS =
-    'contains', MATCHES_REGULAR_EXPRESSION = 'matches regular expression',
-    ENDS_WITH = 'ends with', BEGINS_WITH = 'begins with',
-    GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>'
+  LESS_THAN = '<', LESS_THAN_OR_EQUAL_TO = '<=', EQUALS = 'equals',
+  CONTAINS = 'contains', MATCHES_REGULAR_EXPRESSION = 'matches regular expression',
+  ENDS_WITH = 'ends with', BEGINS_WITH = 'begins with',
+  GREATER_THAN_OR_EQUAL_TO = '>=', GREATER_THAN = '>',
+  IS_EMPTY = 'is empty', IS_MISSING = 'is missing', IS_EMPTY_OR_MISSING = 'is empty or missing'
 }
 
 export class FilterCriterion extends FilterElement {
   public static readonly CONDITIONS: any = FilterCriterionCondition;
-  
+
   get property() {
     return this._property;
   }
   set property(property: FilterableProperty) {
     this._property = property;
   }
-  
+
   get condition() {
     return this._condition;
   }
@@ -162,6 +163,19 @@ export class FilterCriterion extends FilterElement {
   set value(value: string) {
     this._value = value;
     this.convertValueToRegularExpression();
+  }
+
+  isValueShown(): Boolean {
+    switch (this._condition) {
+      case FilterCriterionCondition.IS_EMPTY:
+      case FilterCriterionCondition.IS_MISSING:
+      case FilterCriterionCondition.IS_EMPTY_OR_MISSING:
+        return false;
+        break;
+      default:
+        return true;
+
+    }
   }
 
   private _negate: boolean = false;
@@ -180,7 +194,7 @@ export class FilterCriterion extends FilterElement {
     this._ignoreCase = ignoreCase;
     this.convertValueToRegularExpression();
   }
-  
+
   private _external: boolean = false;
   get external() {
     return this._external;
@@ -190,7 +204,7 @@ export class FilterCriterion extends FilterElement {
   }
 
   protected matcher: RegExp;
-  
+
   public constructor(private _property: FilterableProperty, private _condition:
     FilterCriterionCondition, private _value: string) {
     super();
@@ -211,7 +225,7 @@ export class FilterCriterion extends FilterElement {
       this.matcher = new RegExp(this._value, flags);
     }
   }
-  
+
   public evaluate(candidate: any): boolean {
     let result: boolean = true;
     if (this._property.propertyPath.length > 0) {
@@ -220,19 +234,18 @@ export class FilterCriterion extends FilterElement {
       for (let j: number = 0; j < propertyPath.length - 1; j++) {
         property = property[propertyPath[j]];
       }
-      
+
       let lastPropertyPathSegment: string = propertyPath[propertyPath.length -
         1];
+      let validMatchingProperties = Object.keys(property).indexOf(this.value);
       if (lastPropertyPathSegment === FilterableProperty.PROPERTIES) {
-        result = (-1 !== Object.keys(property).indexOf(this.value));
+        result = (-1 !== validMatchingProperties);
       } else {
-        result = this.doesValueMatch(String(property[
-          lastPropertyPathSegment]));
+        result = this.doesValueMatch(String(property[lastPropertyPathSegment]));
       }
     } else {
       for (let propertyName in candidate) {
-        result = this.doesValueMatch(String(candidate[propertyName]));
-        
+          result = this.doesValueMatch(String(candidate[propertyName]));
         if (result) {
           break;
         }
@@ -251,7 +264,8 @@ export class FilterCriterion extends FilterElement {
       'does ') + (this._ignoreCase ? 'case-insensitively ' :
       'case-sensitively ') + this._condition + ' ' + this._value;
   }
-  
+
+  // TODO: Should convert propertyValue to any
   private doesValueMatch(propertyValue: string): boolean {
     let matches: boolean = false;
     switch (this._condition) {
@@ -291,8 +305,17 @@ export class FilterCriterion extends FilterElement {
       case FilterCriterionCondition.GREATER_THAN:
         matches = (+propertyValue > +this._value);
         break;
+      case FilterCriterionCondition.IS_EMPTY:
+        matches = (propertyValue === '') || (propertyValue === '[]');
+        break
+      case FilterCriterionCondition.IS_MISSING:
+        matches = (propertyValue === 'undefined') || (propertyValue === 'null');
+        break;
+      case FilterCriterionCondition.IS_EMPTY_OR_MISSING:
+        matches = (propertyValue === 'undefined') || (propertyValue === 'null') || (propertyValue === '') || (propertyValue === '[]');
+        break;
     }
-    
+
     return matches;
   }
 }
