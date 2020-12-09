@@ -19,6 +19,7 @@ describe('ItemRepository', () => {
   jasmine.createSpyObj(['']),
   jasmine.createSpyObj(['']),
   jasmine.createSpyObj(['']),
+  jasmine.createSpyObj(['']),
   jasmine.createSpyObj(['getComponentId', 'getEventId','log']),
   jasmine.createSpyObj(['']));
 
