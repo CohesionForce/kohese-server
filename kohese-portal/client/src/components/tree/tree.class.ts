@@ -235,7 +235,11 @@ export abstract class Tree {
     protected _dialogService: DialogService) {
     this._rootSubscription = this._rootSubject.subscribe((root: any) => {
       if (root) {
-        this._rowMap.get(this.getId(root)).depth = 0;
+        let rowId = this.getId(root);
+        let rootRow = this._rowMap.get(rowId);
+        if (rootRow) {
+          rootRow.depth = 0;
+        }
         this.showRows();
       }
     });
