@@ -123,7 +123,7 @@ function process(koheseUserName, file, parent, addedIds) {
         parentId: parent,
         itemIds: []
       };
-      var added = mdToKohese(processedFile.outputPath, mdRoot,
+      var added = mdToKohese.mdToKohese(processedFile.outputPath, mdRoot,
         preambleRequired);
       for (var j = 0; j < added.length; j++) {
         addedIds.push(added[j]);

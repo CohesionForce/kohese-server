@@ -6,7 +6,6 @@ import { HttpClient } from '@angular/common/http';
 
 
 import { BehaviorSubject } from 'rxjs';
-import { SocketService } from '../socket/socket.service';
 import { CurrentUserService } from '../user/current-user.service';
 
 @Injectable()
@@ -15,9 +14,8 @@ export class AuthenticationService {
   private readonly UNDEFINED_LOCAL_STORAGE_VALUE = 'undefined';
   private token: BehaviorSubject<string> = new BehaviorSubject(localStorage.getItem(this.TOKEN_KEY));
   private jwtHelper: JwtHelperService = new JwtHelperService();
-  
+
   constructor(private httpClient: HttpClient,
-    private socketService: SocketService,
     private CurrentUserService : CurrentUserService) {
     let t: any = this.token.getValue();
     if (!((this.UNDEFINED_LOCAL_STORAGE_VALUE === t) || (null == t))) {
@@ -33,18 +31,9 @@ export class AuthenticationService {
           this.logout();
         }
       }
-    })
-    
-    this.socketService.getSocket().on('connect', () => {
-      let t: any = this.token.getValue();
-      if (!((this.UNDEFINED_LOCAL_STORAGE_VALUE === t) || (null == t))) {
-        this.socketService.getSocket().emit('authenticate', {
-          token: t
-        });
-      }
     });
   }
-  
+
   login(credentials: any) : BehaviorSubject<any> {
     return this.httpClient.post('/authenticate', {
       username: credentials.username,
@@ -56,19 +45,14 @@ export class AuthenticationService {
       let t: any = httpResponse.body;
       localStorage.setItem(this.TOKEN_KEY, t);
       this.token.next(t);
-      this.socketService.connect();
-      this.socketService.getSocket().emit('authenticate', {
-        token: t
-      });
       return this.CurrentUserService.setCurrentUser(this.jwtHelper.decodeToken(t));
     })) as BehaviorSubject<any>;
   }
-  
+
   logout(): void {
     this.token.next('');
     localStorage.removeItem(this.TOKEN_KEY);
     this.CurrentUserService.setCurrentUser(undefined);
-    this.socketService.disconnect();
   }
   getToken(): BehaviorSubject<string> {
     return this.token;
