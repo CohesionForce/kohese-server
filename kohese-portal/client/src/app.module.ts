@@ -13,7 +13,6 @@ import { DocumentViewModule } from './components/document-view/document-view.mod
 import { ActionTableModule } from './components/action-table/action-table.module';
 import { TypeEditorModule } from './components/type-editor/type-editor.module';
 import { CreateWizardModule } from './components/create-wizard/create-wizard.module';
-import { UploadImageModule } from './components/upload-image/upload-image.module';
 import { PipesModule } from './pipes/pipes.module';
 import { AppFrameModule } from './components/app-frame/app-frame.module';
 import { ServicesModule } from './services/services.module';
@@ -96,7 +95,6 @@ import { CategoryBoardModule } from './components/category-board/category-board.
     TypeEditorModule,
     TreeModule.forRoot(),
     CreateWizardModule,
-    UploadImageModule,
     AppFrameModule,
     AuthenticationModule,
     LoginModule,

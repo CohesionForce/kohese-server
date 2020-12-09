@@ -45,7 +45,7 @@
         </mat-form-field>
         <ng-container *ngIf="treeRow.object.property.values.length > 0">
           <mat-form-field style="padding-right: 20px;">
-            <mat-select placeholder="Value" [(ngModel)]="treeRow.object.value">
+            <mat-select placeholder="Value" [(ngModel)]="treeRow.object.value" [disabled]="!treeRow.object.isValueShown()">
               <mat-option *ngFor="let value of treeRow.object.property.values"
                 [value]="value">
                 {{value}}
@@ -55,10 +55,10 @@
         </ng-container>
         <ng-container *ngIf="0 === treeRow.object.property.values.length">
           <mat-form-field style="padding-right: 20px;">
-            <input matInput type="text" placeholder="Value"
+            <input matInput type="text" placeholder="Value" [disabled]="!treeRow.object.isValueShown()"
               [(ngModel)]="treeRow.object.value"/>
           </mat-form-field>
-          <mat-checkbox [(ngModel)]="treeRow.object.ignoreCase"
+          <mat-checkbox [(ngModel)]="treeRow.object.ignoreCase" [disabled]="!treeRow.object.isValueShown()"
             style="padding-right: 20px;">
             Ignore Case
           </mat-checkbox>
