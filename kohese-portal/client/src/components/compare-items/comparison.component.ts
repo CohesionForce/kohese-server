@@ -20,7 +20,7 @@ export class ComparisonComponent {
     this._comparison = comparison;
 
     // Check to see if the comparison has been deferred
-    if (comparison.propertyDiffPending) {
+    if (comparison && comparison.propertyDiffPending) {
       // Since this detection may occur more than once, only request the detail diff
       // if it is not already in progess
       if(!comparison.propertyDiffInProgress){
