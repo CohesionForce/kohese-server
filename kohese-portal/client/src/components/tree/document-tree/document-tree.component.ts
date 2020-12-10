@@ -104,10 +104,10 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
               this.refresh();
             }
             break;
-          case 'update': 
-          case 'dirty': 
+          case 'update':
+          case 'dirty':
               this.refresh();
-              break;    
+              break;
           case 'delete': {
               this.deleteRow(notification.id);
               this.refresh();
@@ -212,8 +212,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     return super.filter(item);
   }
 
-  protected target(target: any, targetingObject: any, targetPosition:
-    TargetPosition): void {
+  protected async target(target: any, targetingObject: any, targetPosition: TargetPosition): Promise<void> {
     let targetProxy: ItemProxy = (target as ItemProxy);
     let targetingProxy: ItemProxy = (targetingObject as ItemProxy);
     if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
@@ -225,7 +224,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         this.itemRepository.upsertItem(targetingProxy.kind, targetingProxy.
           item);
       }
-      
+
       parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
         1);
       let targetIndex: number = parentProxy.children.indexOf(targetProxy);
@@ -243,7 +242,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       this.itemRepository.upsertItem(targetingProxy.kind, targetingProxy.item);
     }
   }
-  
+
   protected mayMove(object: any): boolean {
     return super.mayMove(object) && !(object as ItemProxy).internal;
   }

@@ -12,7 +12,7 @@ import { ComponentDialogComponent, ComponentDialogConfiguration,
 export class DialogService {
   public constructor(private dialog: MatDialog) {
   }
-  
+
   public openConfirmDialog(title: string, text: string): Promise<any> {
     return this.openSimpleDialog(title, text, undefined);
   }
@@ -28,7 +28,7 @@ export class DialogService {
     return this.openSimpleDialog(title, text, { cancelLabel: 'Close' });
   }
 
-  private async openSimpleDialog(title: string, text: string, buttonLabels:
+  public async openSimpleDialog(title: string, text: string, buttonLabels:
     ButtonLabels): Promise<any> {
     let results: Array<any> = await this.openComponentsDialog([{
       component: SimpleDialogComponent,
@@ -56,13 +56,13 @@ export class DialogService {
       validate: validate,
       inputDialogKind: inputDialogKind
     };
-    
+
     let results: Array<any> = await this.openComponentsDialog([{
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: kindInputDialogConfiguration
       }
-    }], { data: {} }).updateSize('40%', '250px').afterClosed().toPromise(); 
+    }], { data: {} }).updateSize('40%', '250px').afterClosed().toPromise();
     if (results) {
       return results[0];
     } else {
@@ -77,7 +77,7 @@ export class DialogService {
     if (defaultValue == null) {
       defaultValue = Object.values(options)[0];
     }
-    
+
     let dropdownDialogConfiguration: DropdownDialogConfiguration = {
       title: title,
       text: text,
@@ -86,7 +86,7 @@ export class DialogService {
       validate: validate,
       options: options
     };
-    
+
     let results: Array<any> = await this.openComponentsDialog([{
       component: InputDialogComponent,
       matDialogData: {
@@ -99,7 +99,7 @@ export class DialogService {
       return undefined;
     }
   }
-  
+
   public openComponentDialog<T>(component: ComponentType<T>,
     dialogConfiguration: any): MatDialogRef<T> {
     dialogConfiguration.disableClose = true;

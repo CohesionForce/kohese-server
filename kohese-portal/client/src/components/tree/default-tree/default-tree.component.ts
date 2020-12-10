@@ -127,7 +127,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(deleteAction);
     this.menuActions.unshift(deleteAction);
-    
+
     let produceReportAction: Action = new Action('Produce Report', 'Produce ' +
       'a report from this Item and its descendants', 'fa fa-file-text-o',
       (object: any) => {
@@ -150,7 +150,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
                 getDepthFromAncestor(object as ItemProxy),
                 reportSpecifications.addLinks);
             };
-            
+
             if (reportSpecifications.includeDescendants) {
               let itemProxyStack: Array<ItemProxy> = [(object as ItemProxy)];
               while (itemProxyStack.length > 0) {
@@ -161,7 +161,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             } else {
               processItemProxy((object as ItemProxy));
             }
-            
+
             return initialContent;
           }
         }
@@ -169,7 +169,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(produceReportAction);
     this.menuActions.unshift(produceReportAction);
-    
+
     let analyzeAction: Action = new Action('Analyze...', 'Analyze content ' +
       'from this Item and its descendants', 'fa fa-search', (object: any) => {
       return true;
@@ -179,7 +179,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(analyzeAction);
     this.menuActions.unshift(analyzeAction);
-    
+
     let importAction: Action = new Action('Import...', 'Import one or more ' +
       'files as children of this Item', 'fa fa-file-o', (object: any) => {
       return !(object as ItemProxy).internal || (object === this.
@@ -193,7 +193,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     });
     this.rootMenuActions.unshift(importAction);
     this.menuActions.unshift(importAction);
-    
+
     let addChildAction: Action = new Action('Add Child', 'Add a child to ' +
       'this Item', 'fa fa-plus add-button', (object: any) => {
       return !(object as ItemProxy).internal || (object === this.
@@ -267,10 +267,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
                 this.refresh();
               }
               break;
-            case 'update': 
-            case 'dirty': 
+            case 'update':
+            case 'dirty':
               this.refresh();
-              break;    
+              break;
             case 'delete': {
                 this.deleteRow(notification.id);
                 this.refresh();
@@ -370,7 +370,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
   protected getText(object: any): string {
     return (object as ItemProxy).item.name;
   }
-  
+
   protected getTags(object: any): Array<string> {
     let item: any = (object as ItemProxy).item;
     return (item.tags ? item.tags.split(',') : []);
@@ -440,42 +440,61 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
       this._filterDelayIdentifier = undefined;
     }, 1000);
   }
-  
+
   protected hasError(object: any): boolean {
     return !!(object as ItemProxy).validationError;
   }
 
-  protected target(target: any, targetingObject: any, targetPosition:
-    TargetPosition): void {
+  protected async target(target: any, targetingObject: any, targetPosition: TargetPosition): Promise<void> {
     let targetProxy: ItemProxy = (target as ItemProxy);
     let targetingProxy: ItemProxy = (targetingObject as ItemProxy);
-    if ((targetPosition === TargetPosition.BEFORE) || (targetPosition ===
-      TargetPosition.AFTER)) {
-      let parentProxy: ItemProxy = targetProxy.parentProxy;
-      if (targetingProxy.item.parentId !== parentProxy.item.id) {
-        targetingProxy.item.parentId = parentProxy.item.id;
+    let targetProxyRepo = targetProxy.getRepositoryProxy();
+    let targetingProxyRepo = targetingProxy.getRepositoryProxy();
+    let moveItem = true;
+
+    // Determine if user wants to move the selected item to a different repository.
+    if (targetingProxyRepo !== targetProxyRepo) {
+      console.log('!!! This will move %s items to the selected repository', targetingProxy.descendantCount + 1);
+      moveItem = await this._dialogService.openSimpleDialog(
+        'Moving ' + targetingProxy.item.name,
+        'Do you want to move ' + (targetingProxy.descendantCount + 1) + ' item(s) from the ' + targetingProxyRepo.item.name +
+        ' repository to the ' + targetProxyRepo.item.name + ' repository?',
+        {
+          acceptLabel: 'Move',
+          cancelLabel: 'Skip'
+        });
+    }
+
+    // If user selects move...
+    if (moveItem) {
+      if ((targetPosition === TargetPosition.BEFORE) || (targetPosition === TargetPosition.AFTER)) {
+        let parentProxy: ItemProxy = targetProxy.parentProxy;
+        if (targetingProxy.item.parentId !== parentProxy.item.id) {
+          targetingProxy.item.parentId = parentProxy.item.id;
+          targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
+          this._itemRepository.upsertItem(targetingProxy.kind, targetingProxy.
+            item);
+        }
+
+        parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
+          1);
+        let targetIndex: number = parentProxy.children.indexOf(targetProxy);
+        if (targetPosition === TargetPosition.BEFORE) {
+          parentProxy.children.splice(targetIndex, 0, targetingProxy);
+        } else {
+          parentProxy.children.splice(targetIndex + 1, 0, targetingProxy);
+        }
+
+        parentProxy.updateChildrenManualOrder();
+        this._itemRepository.upsertItem(parentProxy.kind, parentProxy.item);
+      } else {
+        targetingProxy.item.parentId = targetProxy.item.id;
         targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
         this._itemRepository.upsertItem(targetingProxy.kind, targetingProxy.
           item);
       }
-
-      parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
-        1);
-      let targetIndex: number = parentProxy.children.indexOf(targetProxy);
-      if (targetPosition === TargetPosition.BEFORE) {
-        parentProxy.children.splice(targetIndex, 0, targetingProxy);
-      } else {
-        parentProxy.children.splice(targetIndex + 1, 0, targetingProxy);
-      }
-
-      parentProxy.updateChildrenManualOrder();
-      this._itemRepository.upsertItem(parentProxy.kind, parentProxy.item);
-    } else {
-      targetingProxy.item.parentId = targetProxy.item.id;
-      targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
-      this._itemRepository.upsertItem(targetingProxy.kind, targetingProxy.
-        item);
     }
+
   }
 
   protected mayMove(object: any): boolean {

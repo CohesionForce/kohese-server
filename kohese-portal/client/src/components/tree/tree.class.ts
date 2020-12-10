@@ -29,7 +29,7 @@ export abstract class Tree {
   get rootSubject() {
     return this._rootSubject;
   }
-  
+
   private _anchorAction: Action = new Action('Anchor', 'Set the object of ' +
     'this row as the root', 'fa fa-anchor', (object: any) => {
     return (object !== this._rootSubject.getValue() && !this.
@@ -53,7 +53,7 @@ export abstract class Tree {
       this._rowActions.push(this._anchorAction);
     }
   }
-  
+
   private _canMoveRows: boolean = false;
   get canMoveRows() {
     return this._canMoveRows;
@@ -61,14 +61,14 @@ export abstract class Tree {
   set canMoveRows(canMoveRows: boolean) {
     this._canMoveRows = canMoveRows;
   }
-  
+
   private _expandDescendantsAction: Action = new Action('Expand Descendants',
     'Expands all descendants', 'fa fa-caret-down', (object: any) => {
     return (this.getChildren(object).length > 0);
     }, (object: any) => {
     this.expandDescendants(this._rowMap.get(this.getId(object)));
   });
-  
+
   private _collapseDescendantsAction: Action = new Action('Collapse ' +
     'Descendants', 'Collapses all descendants', 'fa fa-caret-right', (object:
     any) => {
@@ -76,17 +76,16 @@ export abstract class Tree {
     }, (object: any) => {
     this.collapseDescendants(this._rowMap.get(this.getId(object)));
   });
-  
+
   private _targetBeforeAction: Action = new Action(TargetPosition.BEFORE,
     'Place the targeting object or objects under this object', 'fa ' +
     'fa-crosshairs', (object: any) => {
     return true;
-    }, (object: any) => {
-    let selectedObjects: Array<any> = this._selectedObjectsSubject.
-      getValue();
+    }, async (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let targetingObject: any = selectedObjects[j];
-      this.target(object, targetingObject, TargetPosition.BEFORE);
+      await this.target(object, targetingObject, TargetPosition.BEFORE);
     }
 
     this.exitTargetingMode();
@@ -95,12 +94,11 @@ export abstract class Tree {
     'Place the targeting object or objects after this object', 'fa ' +
     'fa-crosshairs', (object: any) => {
     return true;
-    }, (object: any) => {
-    let selectedObjects: Array<any> = this._selectedObjectsSubject.
-      getValue();
+    }, async (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let targetingObject: any = selectedObjects[j];
-      this.target(object, targetingObject, TargetPosition.AFTER);
+      await this.target(object, targetingObject, TargetPosition.AFTER);
     }
 
     this.exitTargetingMode();
@@ -109,17 +107,16 @@ export abstract class Tree {
     'Place the targeting object or objects under this object', 'fa ' +
     'fa-crosshairs', (object: any) => {
     return true;
-    }, (object: any) => {
-    let selectedObjects: Array<any> = this._selectedObjectsSubject.
-      getValue();
+    }, async (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let targetingObject: any = selectedObjects[j];
-      this.target(object, targetingObject, TargetPosition.CHILD);
+      await this.target(object, targetingObject, TargetPosition.CHILD);
     }
 
     this.exitTargetingMode();
   });
-  
+
   private _targetActionGroup: ActionGroup = new ActionGroup('Target', 'Target ' +
     'this object for the current action', 'fa fa-crosshairs', (object:
     any) => {
@@ -129,7 +126,7 @@ export abstract class Tree {
       isAncestorSelected(this._selectedObjectsSubject.getValue(), object));
     }, [this._targetBeforeAction, this._targetAfterAction, this.
     _targetChildAction]);
-  
+
   private _exitTargetingModeAction: Action = new Action('Exit ' +
     'Targeting Mode', 'Exit Targeting Mode', 'fa fa-times', (object: any) => {
     return this._inTargetingMode;
@@ -172,7 +169,7 @@ export abstract class Tree {
     this._collapseDescendantsAction,
     new Action('Move', 'Move this object', 'fa fa-arrow-circle-o-right',
       (object: any) => {
-      return this.mayMove(object);  
+      return this.mayMove(object);
     }, (object: any) => {
       let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
       selectedObjects.push(object);
@@ -192,7 +189,7 @@ export abstract class Tree {
   get selectedObjectsSubject() {
     return this._selectedObjectsSubject;
   }
-  
+
   private _inTargetingMode: boolean = false;
   get inTargetingMode() {
     return this._inTargetingMode;
@@ -267,7 +264,7 @@ export abstract class Tree {
       }
 
       this._selectedObjectsSubject.next(selectedObjects);
-      
+
       if (this._canMoveRows) {
         let descendantTreeRowStack: Array<TreeRow> = [row];
         while (descendantTreeRowStack.length > 0) {
@@ -538,7 +535,7 @@ export abstract class Tree {
   protected abstract getText(object: any): string;
 
   protected abstract getIcon(object: any): string;
-  
+
   protected getTags(object: any): Array<string> {
     return [];
   }
@@ -575,16 +572,15 @@ export abstract class Tree {
   protected isMultiselectEnabled(object: any): boolean {
     return this._canMoveRows && this._inTargetingMode;
   }
-  
+
   protected hasError(object: any): boolean {
     return false;
   }
-  
-  protected target(target: any, targetingObject: any, targetPosition:
-    TargetPosition): void {
+
+  protected async target(target: any, targetingObject: any, targetPosition: TargetPosition): Promise<void> {
     // Subclasses may override this function
   }
-  
+
   protected clear(): void {
     for (let id in this._updateVisibleRowsSubscriptionMap) {
       delete this._updateVisibleRowsSubscriptionMap[id];
@@ -658,7 +654,7 @@ export abstract class Tree {
       }
     }
   }
-  
+
   protected isAncestorSelected(selectedObjects: Array<any>, object: any):
     boolean {
     let isAncestorSelected: boolean = false;
@@ -668,17 +664,17 @@ export abstract class Tree {
         isAncestorSelected = true;
         break;
       }
-      
+
       parent = this.getParent(parent);
     }
-  
+
     return isAncestorSelected;
   }
-  
+
   protected mayMove(object: any): boolean {
     return this._canMoveRows && !this._inTargetingMode;
   }
-  
+
   private exitTargetingMode(): void {
     let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     selectedObjects.length = 0;
