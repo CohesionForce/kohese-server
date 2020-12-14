@@ -109,8 +109,8 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
 
-        let root: Array<string> = [this._selectedTreeConfiguration.
-          getRootProxy().item.id];
+        let root: Array<string> = [this._selectedTreeConfiguration.getRootProxy().item.id];
+        this.absoluteRoot = [this._selectedTreeConfiguration.getRootProxy().item.id];
         this.buildRows(root);
         this.rootSubject.next(root);
 
@@ -137,6 +137,17 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
       this._treeConfigurationSubscription.unsubscribe();
     }
     this._itemRepositorySubscription.unsubscribe();
+  }
+
+  protected preTreeTraversalActivity() {
+    // Check to see if the rootRow is in the map
+    let root = this.rootSubject.getValue();
+    let rowId = this.getId(root);
+    let rootRow = this.getRow(rowId);
+    if (!rootRow) {
+      // rootRow is not in the map, so build the required rows
+      this.buildRows(root);
+    }
   }
 
   private buildRows(root: Array<string>): void {

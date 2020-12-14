@@ -20,12 +20,6 @@
     class="flex-right-align">
     <mat-icon class="fa fa-exchange"></mat-icon>
   </button>
-  <button mat-icon-button
-    (click)="rootSubject.next(absoluteRoot)"
-    [disabled]="(rootSubject | async) === absoluteRoot"
-    matTooltip="Changes the root to be the absolute root">
-    <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
-  </button>
 </div>
 <div style="height: 11%; width: 100%;">
   <div class="kt-head kth-cell">
