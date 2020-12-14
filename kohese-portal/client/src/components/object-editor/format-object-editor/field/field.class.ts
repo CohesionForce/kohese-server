@@ -296,8 +296,47 @@ export class Field {
         } else {
           let id: string = selection[0].item.id;
           if (attributeName === 'parentId') {
-            this._koheseObject[this._isVariantField ? 'value' :
-              attributeName] = id;
+
+            let changeParentId: boolean = true;
+            if (this._koheseObject.$proxy) {
+              let currentObjectProxy = this._koheseObject.$proxy
+              let newParentProxy: ItemProxy = treeConfiguration.getProxyFor(id);
+              let oldParentProxyRepo = currentObjectProxy.parentProxy.getRepositoryProxy();
+              let newParentProxyRepo = newParentProxy.getRepositoryProxy();
+
+              if (oldParentProxyRepo !== newParentProxyRepo) {
+                // The targetingName is the name of the item being moved
+                // The targetName is the repository name selected in which to move targetingName.
+                let newParentRepoName = newParentProxyRepo.item.name;
+                let oldParentRepoName = oldParentProxyRepo.item.name;
+                let currentObjectName = currentObjectProxy.item.name;
+
+                // Truncate, trim, and add ellipses if any names are too long.
+                if (currentObjectName.length >= 40) {
+                  currentObjectName = currentObjectName.slice(0, 40).trim() + '...';
+                }
+                if (oldParentRepoName.length >= 40) {
+                  oldParentRepoName = oldParentRepoName.slice(0, 40).trim() + '...';
+                }
+                if (newParentRepoName.length >= 40) {
+                  newParentRepoName = newParentRepoName.slice(0, 40).trim() + '...';
+                }
+
+                console.log('!!! This will move %s items to the selected repository', currentObjectProxy.getDescendantCountInSameRepo() + 1);
+                changeParentId = await this._dialogService.openSimpleDialog(
+                  'Moving ' + currentObjectName,
+                  'Do you want to move ' + (currentObjectProxy.getDescendantCountInSameRepo() + 1) + ' item(s) from the ' + oldParentRepoName +
+                  ' repository to the ' + newParentRepoName + ' repository?',
+                  {
+                    acceptLabel: 'Allow',
+                    cancelLabel: 'Cancel'
+                  });
+              }
+            }
+
+            if (changeParentId) {
+              this._koheseObject[this._isVariantField ? 'value' : attributeName] = id;
+            }
           } else {
             this._koheseObject[this._isVariantField ? 'value' :
               attributeName] = { id: id };
