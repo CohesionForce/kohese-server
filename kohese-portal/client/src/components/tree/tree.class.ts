@@ -38,6 +38,26 @@ export abstract class Tree {
     this.setRoot(object);
   });
 
+  private _absoluteRoot: any;
+  get absoluteRoot() {
+    return this._absoluteRoot;
+  }
+  set absoluteRoot(absoluteRoot: any) {
+    this._absoluteRoot = absoluteRoot;
+  }
+
+  private absoluteRootAction: Action = new Action('AbsoluteRoot', 'return to the absolute root of this object',
+    'fa fa-arrow-circle-o-up', (object: any) => {
+      return (object !== this._absoluteRoot && !this._inTargetingMode);
+    }, (object: any) => {
+      if (this._absoluteRoot) {
+        this.setRoot(this._absoluteRoot);
+      } else {
+        console.log('*** No Absolute Root Available');
+      }
+    }
+  )
+
   private _showRootWithDescendants: boolean = false;
   get showRootWithDescendants() {
     return this._showRootWithDescendants;
@@ -143,6 +163,7 @@ export abstract class Tree {
       }, (object: any) => {
       this.setRoot(this.getParent(object));
     }),
+    this.absoluteRootAction,
     this._targetActionGroup,
     this._exitTargetingModeAction
   ];
@@ -211,7 +232,11 @@ export abstract class Tree {
     protected _dialogService: DialogService) {
     this._rootSubscription = this._rootSubject.subscribe((root: any) => {
       if (root) {
-        this._rowMap.get(this.getId(root)).depth = 0;
+        let rowId = this.getId(root);
+        let rootRow = this._rowMap.get(rowId);
+        if (rootRow) {
+          rootRow.depth = 0;
+        }
         this.showRows();
       }
     });

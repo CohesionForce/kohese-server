@@ -52,15 +52,21 @@ function Server(httpsServer, options){
             numberOfConnections: 0
           };
           global['app'].emit('newSession', socket);
-          socket.on('connectionAdded', (data: any, sendResponse:
-            () => void) => {
-            kio.sessions[data.id].numberOfConnections++;
-            console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
+          socket.on('connectionAdded', (data: any, sendResponse: () => void) => {
+            if (kio.sessions[data.id]) {
+              kio.sessions[data.id].numberOfConnections++;
+              console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
+            } else {
+              console.log('*** session %s for user %s attempted to increment connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
+            }
           });
-          socket.on('connectionRemoved', (data: any, sendResponse:
-            () => void) => {
+          socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
+            if (kio.sessions[data.id]) {
               kio.sessions[data.id].numberOfConnections--;
               console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
+            } else {
+              console.log('*** session %s for user %s attempted to decrement connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
+            }
           });
           socket.on('getSessionMap', (data: any, sendResponse: (data:
             any) => void) => {

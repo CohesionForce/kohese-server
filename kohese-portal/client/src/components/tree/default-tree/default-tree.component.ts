@@ -35,10 +35,6 @@ import { ImportComponent } from '../../import/import.component';
   //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
-  private _absoluteRoot: ItemProxy;
-  get absoluteRoot() {
-    return this._absoluteRoot;
-  }
 
   private _synchronizeWithSelection: boolean = true;
   get synchronizeWithSelection() {
@@ -182,8 +178,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
     let importAction: Action = new Action('Import...', 'Import one or more ' +
       'files as children of this Item', 'fa fa-file-o', (object: any) => {
-      return !(object as ItemProxy).internal || (object === this.
-        _absoluteRoot);
+      return !(object as ItemProxy).internal || (object === this.absoluteRoot);
     }, (object: any) => {
       this._dialogService.openComponentDialog(ImportComponent, {
         data: {
@@ -196,8 +191,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
     let addChildAction: Action = new Action('Add Child', 'Add a child to ' +
       'this Item', 'fa fa-plus add-button', (object: any) => {
-      return !(object as ItemProxy).internal || (object === this.
-        _absoluteRoot);
+      return !(object as ItemProxy).internal || (object === this.absoluteRoot);
     }, (object: any) => {
       this._dialogService.openComponentDialog(CreateWizardComponent, {
         data: {
@@ -244,8 +238,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this._itemRepositorySubscription = this._itemRepository.getTreeConfig()
       .subscribe((treeConfigurationObject: any) => {
       if (treeConfigurationObject) {
-        this._absoluteRoot = treeConfigurationObject.config.getRootProxy();
-        this._absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
+        this.absoluteRoot = treeConfigurationObject.config.getRootProxy();
+        this.absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
           ItemProxy) => {
           this.buildRow(proxy);
         });
@@ -277,7 +271,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
               }
               break;
             case 'loaded': {
-                this._absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
+                this.absoluteRoot.visitTree({ includeOrigin: true }, (proxy:
                   ItemProxy) => {
                   this.buildRow(proxy);
                 });
@@ -298,7 +292,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           }
         });
 
-        this.rootSubject.next(this._absoluteRoot);
+        this.rootSubject.next(this.absoluteRoot);
 
         this.refresh();
 
