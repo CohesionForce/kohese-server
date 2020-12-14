@@ -447,18 +447,47 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
   protected async target(target: any, targetingObject: any, targetPosition: TargetPosition): Promise<void> {
     let targetProxy: ItemProxy = (target as ItemProxy);
+    let parentProxy: ItemProxy = targetProxy.parentProxy;
     let targetingProxy: ItemProxy = (targetingObject as ItemProxy);
     let targetProxyRepo = targetProxy.getRepositoryProxy();
     let targetingProxyRepo = targetingProxy.getRepositoryProxy();
     let moveItem = true;
 
+    // The targetingName is the name of the item being moved
+    // The targetName is the repository name selected in which to move targetingName.
+    let targetName = targetProxy.item.name;
+    let targetRepoName = targetProxyRepo.item.name;
+    let targetingName = targetingProxy.item.name;
+    let targetingRepoName = targetingProxyRepo.item.name;
+
+    // Selects the correct name when a user chooses BEFORE/AFTER/CHILD on Move
+    if ((targetRepoName !== parentProxy.item.name) &&
+        (targetPosition === TargetPosition.BEFORE || targetPosition === TargetPosition.AFTER)) {
+      targetRepoName = parentProxy.item.name;
+    }
+
+    // Truncate, trim, and add ellipses if any names are too long.
+    if (targetingName.length >= 40) {
+      targetingName = targetingName.slice(0, 40).trim() + '...';
+    }
+    if (targetingRepoName.length >= 40) {
+      targetingRepoName = targetingRepoName.slice(0, 40).trim() + '...';
+    }
+    if (targetName.length >= 40) {
+      targetName = targetName.slice(0, 40).trim() + '...';
+    }
+    if (targetRepoName.length >= 40) {
+      targetRepoName = targetRepoName.slice(0, 40).trim() + '...';
+    }
+
+
     // Determine if user wants to move the selected item to a different repository.
     if (targetingProxyRepo !== targetProxyRepo) {
       console.log('!!! This will move %s items to the selected repository', targetingProxy.descendantCount + 1);
       moveItem = await this._dialogService.openSimpleDialog(
-        'Moving ' + targetingProxy.item.name,
-        'Do you want to move ' + (targetingProxy.descendantCount + 1) + ' item(s) from the ' + targetingProxyRepo.item.name +
-        ' repository to the ' + targetProxyRepo.item.name + ' repository?',
+        'Moving ' + targetingName,
+        'Do you want to move ' + (targetingProxy.descendantCount + 1) + ' item(s) from the ' + targetingRepoName +
+        ' repository to the ' + targetRepoName + ' repository?',
         {
           acceptLabel: 'Move',
           cancelLabel: 'Skip'
@@ -468,7 +497,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     // If user selects move...
     if (moveItem) {
       if ((targetPosition === TargetPosition.BEFORE) || (targetPosition === TargetPosition.AFTER)) {
-        let parentProxy: ItemProxy = targetProxy.parentProxy;
+        parentProxy = targetProxy.parentProxy;
         if (targetingProxy.item.parentId !== parentProxy.item.id) {
           targetingProxy.item.parentId = parentProxy.item.id;
           targetingProxy.updateItem(targetingProxy.kind, targetingProxy.item);
@@ -477,7 +506,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         }
 
         parentProxy.children.splice(parentProxy.children.indexOf(targetingProxy),
-          1);
+        1);
         let targetIndex: number = parentProxy.children.indexOf(targetProxy);
         if (targetPosition === TargetPosition.BEFORE) {
           parentProxy.children.splice(targetIndex, 0, targetingProxy);
