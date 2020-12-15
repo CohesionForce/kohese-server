@@ -101,12 +101,11 @@ export abstract class Tree {
     'Place the targeting object or objects under this object', 'fa ' +
     'fa-crosshairs', (object: any) => {
     return true;
-    }, (object: any) => {
-    let selectedObjects: Array<any> = this._selectedObjectsSubject.
-      getValue();
+    }, async (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let targetingObject: any = selectedObjects[j];
-      this.target(object, targetingObject, TargetPosition.BEFORE);
+      await this.target(object, targetingObject, TargetPosition.BEFORE);
     }
 
     this.exitTargetingMode();
@@ -115,12 +114,11 @@ export abstract class Tree {
     'Place the targeting object or objects after this object', 'fa ' +
     'fa-crosshairs', (object: any) => {
     return true;
-    }, (object: any) => {
-    let selectedObjects: Array<any> = this._selectedObjectsSubject.
-      getValue();
+    }, async (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let targetingObject: any = selectedObjects[j];
-      this.target(object, targetingObject, TargetPosition.AFTER);
+      await this.target(object, targetingObject, TargetPosition.AFTER);
     }
 
     this.exitTargetingMode();
@@ -129,12 +127,11 @@ export abstract class Tree {
     'Place the targeting object or objects under this object', 'fa ' +
     'fa-crosshairs', (object: any) => {
     return true;
-    }, (object: any) => {
-    let selectedObjects: Array<any> = this._selectedObjectsSubject.
-      getValue();
+    }, async (object: any) => {
+    let selectedObjects: Array<any> = this._selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
       let targetingObject: any = selectedObjects[j];
-      this.target(object, targetingObject, TargetPosition.CHILD);
+      await this.target(object, targetingObject, TargetPosition.CHILD);
     }
 
     this.exitTargetingMode();
@@ -605,8 +602,7 @@ export abstract class Tree {
     return false;
   }
 
-  protected target(target: any, targetingObject: any, targetPosition:
-    TargetPosition): void {
+  protected async target(target: any, targetingObject: any, targetPosition: TargetPosition): Promise<void> {
     // Subclasses may override this function
   }
 
