@@ -322,7 +322,6 @@ export class Field {
                   newParentRepoName = newParentRepoName.slice(0, 40).trim() + '...';
                 }
 
-                console.log('!!! This will move %s items to the selected repository', currentObjectProxy.getDescendantCountInSameRepo() + 1);
                 changeParentId = await this._dialogService.openSimpleDialog(
                   'Changing parent for ' + currentObjectName,
                   'Upon save, this will move ' + (currentObjectProxy.getDescendantCountInSameRepo() + 1) + ' item(s) from the ' + oldParentRepoName +
