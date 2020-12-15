@@ -223,17 +223,16 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     // Determine if user wants to move the selected item to a different repository.
     if (targetingProxyRepo !== targetProxyRepo) {
 
+      // Selects the correct name when a user chooses BEFORE/AFTER/CHILD on Move
+      if (targetPosition === TargetPosition.BEFORE || targetPosition === TargetPosition.AFTER) {
+        targetProxyRepo = parentProxy.getRepositoryProxy();
+      }
+
       // The targetingName is the name of the item being moved
       // The targetName is the repository name selected in which to move targetingName.
       let targetRepoName = targetProxyRepo.item.name;
       let targetingName = targetingProxy.item.name;
       let targetingRepoName = targetingProxyRepo.item.name;
-
-      // Selects the correct name when a user chooses BEFORE/AFTER/CHILD on Move
-      if ((targetRepoName !== parentProxy.item.name) &&
-          (targetPosition === TargetPosition.BEFORE || targetPosition === TargetPosition.AFTER)) {
-        targetRepoName = parentProxy.item.name;
-      }
 
       // Truncate, trim, and add ellipses if any names are too long.
       if (targetingName.length >= 40) {
@@ -246,7 +245,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         targetRepoName = targetRepoName.slice(0, 40).trim() + '...';
       }
 
-      console.log('!!! This will move %s items to the selected repository', targetingProxy.getDescendantCountInSameRepo() + 1);
       moveItem = await this._dialogService.openSimpleDialog(
         'Moving ' + targetingName,
         'Do you want to move ' + (targetingProxy.getDescendantCountInSameRepo() + 1) + ' item(s) from the ' + targetingRepoName +
