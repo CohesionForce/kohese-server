@@ -88,6 +88,10 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
           return true;
         }
 
+        if (property === '$proxy') {
+          return proxy;
+        }
+
         if (property === '$typeDecl') {
           return typeDecl;
         }
