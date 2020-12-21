@@ -24,6 +24,10 @@ export class KoheseView extends ItemProxy {
 
     // Associate view with the model
     let modelProxy = KoheseModel.getModelProxyFor(koheseView.modelName);
-    modelProxy.view = this;
+    if (modelProxy) {
+      modelProxy.view = this;
+    } else {
+      console.log('*** Could not find model for view: ' + koheseView.name + ' - ' + koheseView.id);
+    }
   }
 }
