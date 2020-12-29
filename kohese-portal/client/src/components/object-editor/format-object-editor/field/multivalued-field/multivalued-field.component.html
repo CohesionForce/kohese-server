@@ -326,6 +326,24 @@
                     (click)="openObjectSelector(j)" style="margin-left: auto;">
                     <mat-icon class="fa fa-ellipsis-h"></mat-icon>
                   </button>
+                  <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(j)">
+                    <mat-icon class="fa fa-clone"></mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu">
+                    <mat-icon class="fa fa-bars"></mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu" [overlapTrigger]="false">
+                    <button mat-menu-item
+                      (click)="navigationService.navigate('Explore', { id: getReferenceId(j) })">
+                      <mat-icon class="fa fa-arrow-right"></mat-icon>
+                      Navigate in Explorer
+                    </button>
+                    <button mat-menu-item
+                      (click)="navigationService.addTab('Explore', { id: getReferenceId(j) })">
+                      <mat-icon class="fa fa-external-link"></mat-icon>
+                      Navigate in New Tab
+                    </button>
+                  </mat-menu>
                 </ng-template>
               </div>
             </ng-container>
