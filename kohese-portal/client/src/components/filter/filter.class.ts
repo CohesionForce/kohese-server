@@ -226,34 +226,55 @@ export class FilterCriterion extends FilterElement {
     }
   }
 
-  public evaluate(candidate: any): boolean {
-    let result: boolean = true;
-    if (this._property.propertyPath.length > 0) {
+  public evaluate(candidate: any, nested: boolean = false): boolean {
+    let result: boolean = false;
+    if (!nested && this._property.propertyPath.length > 0) {
+      // Evaluate the specified property path
       let propertyPath: Array<string> = this._property.propertyPath.slice(0);
       let property: any = candidate;
       for (let j: number = 0; j < propertyPath.length - 1; j++) {
         property = property[propertyPath[j]];
       }
 
-      let lastPropertyPathSegment: string = propertyPath[propertyPath.length -
-        1];
-      let validMatchingProperties = Object.keys(property).indexOf(this.value);
+      let lastPropertyPathSegment: string = propertyPath[propertyPath.length - 1];
+      let validMatchingPropertiesIndex = Object.keys(property).indexOf(this.value);
       if (lastPropertyPathSegment === FilterableProperty.PROPERTIES) {
-        result = (-1 !== validMatchingProperties);
+        result = (-1 !== validMatchingPropertiesIndex);
       } else {
-        result = this.doesValueMatch(String(property[lastPropertyPathSegment]));
+        result = this.evaluateAProperty(property, lastPropertyPathSegment)
       }
     } else {
+      // Evaluate any properties
       for (let propertyName in candidate) {
-          result = this.doesValueMatch(String(candidate[propertyName]));
+        result = this.evaluateAProperty(candidate, propertyName);
         if (result) {
           break;
         }
       }
     }
 
-    if (this._negate) {
+    if (!nested && this._negate) {
       result = !result;
+    }
+
+    return result;
+  }
+
+  private evaluateAProperty(candidate, propertyName): boolean {
+    let result: boolean = false;
+    let propertyValue = candidate[propertyName];
+    if (typeof propertyValue === 'object') {
+      // propertyValue is an object or an array
+      if (propertyValue && Object.keys(propertyValue).length) {
+        // Evaluate if the object has nested properties (recursive)
+        result = this.evaluate(propertyValue, true);
+      } else {
+        // Object does not have nested properties
+        result = false;
+      }
+    } else {
+      // propertyValue is a simple value
+      result = this.doesValueMatch(String(propertyValue));
     }
 
     return result;
@@ -305,6 +326,8 @@ export class FilterCriterion extends FilterElement {
       case FilterCriterionCondition.GREATER_THAN:
         matches = (+propertyValue > +this._value);
         break;
+
+      // TODO: Need to prevent returning true for strings containing [], undefined, and null
       case FilterCriterionCondition.IS_EMPTY:
         matches = (propertyValue === '') || (propertyValue === '[]');
         break
