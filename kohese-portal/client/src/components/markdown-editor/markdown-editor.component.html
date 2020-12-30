@@ -17,12 +17,25 @@
 </div>
 <mat-form-field style="width: 100%;">
   <textarea matInput #textArea placeholder="Markdown" columns="80"
-    cdkTextareaAutosize style="padding: unset;" [ngModel]="formattedValue"
+    cdkTextareaAutosize cdkAutosizeMaxRows=28 style="padding: unset;" [ngModel]="formattedValue"
     (ngModelChange)="updateValue($event)" (paste)="addImagesToMarkdown(
     textArea.selectionStart, $event.clipboardData.files)">
   </textarea>
 </mat-form-field>
 <div style="width: 100%;">
-  Preview:
-  <markdown [data]="value"></markdown>
+  <div class="preview">
+    <div class="previewTitle">
+      <h3>
+        Preview
+      </h3>
+    </div>
+    <div class="hidePreviewCheckbox">
+      <mat-checkbox [(ngModel)]="hidePreview" style="margin-left: auto">
+        Hide Preview
+      </mat-checkbox>
+    </div>
+  </div>
+  <ng-container *ngIf="!hidePreview">
+    <markdown [data]="value"></markdown>
+  </ng-container>
 </div>
