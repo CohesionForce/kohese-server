@@ -40,7 +40,8 @@ export class SinglevaluedFieldComponent extends Field {
 
   public getReferenceId(): string {
     let referenceId = undefined;
-    if (this.propertyDefinition.kind === 'proxy-selector') {
+    // TODO: Need to remove matching of kind with single quotes ('') when viewModels are updated.
+    if (this.propertyDefinition.kind === 'proxy-selector' || this.propertyDefinition.kind === '') {
       let reference = this.koheseObject[this.propertyDefinition.propertyName];
       if (reference.id) {
         referenceId = reference.id;

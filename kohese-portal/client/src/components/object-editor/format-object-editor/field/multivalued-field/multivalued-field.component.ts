@@ -404,7 +404,8 @@ export class MultivaluedFieldComponent extends Field {
 
   public getReferenceId(index: number): string {
     let referenceId = undefined;
-    if (this.propertyDefinition.kind === 'proxy-selector') {
+    // TODO: Need to remove matching of kind with single quotes ('') when viewModels are updated.
+    if (this.propertyDefinition.kind === 'proxy-selector' || this.propertyDefinition.kind === '') {
       let reference = this.koheseObject[this.propertyDefinition.propertyName][index];
       if (reference.id) {
         referenceId = reference.id;
@@ -425,7 +426,7 @@ export class MultivaluedFieldComponent extends Field {
         'Item not Found',
         'Item not found for: ' +
           this.itemRepository.getStringRepresentation(this.koheseObject,
-            this.propertyDefinition.propertyName, undefined, (this.enclosingDataModel ? this.enclosingDataModel : this.dataModel),
+            this.propertyDefinition.propertyName, index, (this.enclosingDataModel ? this.enclosingDataModel : this.dataModel),
             this.dataModel, this.viewModel,this.formatDefinitionType) + '.'
       );
     }
