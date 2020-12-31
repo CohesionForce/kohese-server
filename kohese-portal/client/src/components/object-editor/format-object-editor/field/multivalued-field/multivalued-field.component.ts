@@ -9,6 +9,8 @@ import { KoheseDataModel } from '../../../../../../../common/src/KoheseModel.int
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../../../../components/tree/tree.component';
 import { DialogService } from '../../../../../services/dialog/dialog.service';
+import { NavigationService } from '../../../../../services/navigation/navigation.service';
+import { DetailsComponent } from '../../../../details/details.component';
 import { ItemRepository } from '../../../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../../../services/user/session.service';
 import { Field } from '../field.class';
@@ -33,7 +35,7 @@ export class MultivaluedFieldComponent extends Field {
 
   public constructor(changeDetectorRef: ChangeDetectorRef, itemRepository:
     ItemRepository, dialogService: DialogService, sessionService:
-    SessionService) {
+    SessionService, private navigationService: NavigationService) {
     super(changeDetectorRef, itemRepository, dialogService, sessionService);
   }
 
@@ -398,5 +400,36 @@ export class MultivaluedFieldComponent extends Field {
     for (let j: number = 0; j < expansionPanels.length; j++) {
       expansionPanels[j].close();
     }
+  }
+
+  public getReferenceId(index: number): string {
+    let referenceId = undefined;
+    // TODO: Need to remove matching of kind with single quotes ('') when viewModels are updated.
+    if (this.propertyDefinition.kind === 'proxy-selector' || this.propertyDefinition.kind === '') {
+      let reference = this.koheseObject[this.propertyDefinition.propertyName][index];
+      if (reference.id) {
+        referenceId = reference.id;
+      } else {
+        referenceId = reference;
+      }
+    }
+
+    return referenceId;
+  }
+
+  public displayInformation(index: number): void {
+    let itemProxy = this.itemRepository.getTreeConfig().getValue().config.getProxyFor(this.getReferenceId(index));
+    if (itemProxy) {
+      this._dialogService.openComponentDialog(DetailsComponent, { data: { itemProxy: itemProxy } }).updateSize('90%', '90%');
+    } else {
+      this._dialogService.openInformationDialog(
+        'Item not Found',
+        'Item not found for: ' +
+          this.itemRepository.getStringRepresentation(this.koheseObject,
+            this.propertyDefinition.propertyName, index, (this.enclosingDataModel ? this.enclosingDataModel : this.dataModel),
+            this.dataModel, this.viewModel,this.formatDefinitionType) + '.'
+      );
+    }
+
   }
 }
