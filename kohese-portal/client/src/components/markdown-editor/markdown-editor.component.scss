@@ -1,1 +1,15 @@
 @import '../../app.component';
+
+.preview {
+  display: grid;
+  grid-template-columns: auto auto;
+
+  .previewTitle {
+    margin-right: auto;
+  }
+
+  .hidePreviewCheckbox {
+    margin-left: auto;
+    font-weight: bold;
+  }
+}

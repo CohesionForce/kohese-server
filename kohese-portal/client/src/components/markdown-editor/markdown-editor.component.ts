@@ -20,12 +20,12 @@ export class MarkdownEditorComponent implements OnInit {
     this._value = value;
     this.formatValue();
   }
-  
+
   private _formattedValue: string;
   get formattedValue() {
     return this._formattedValue;
   }
-  
+
   private _valueIdentifier: string;
   get valueIdentifier() {
     return this._valueIdentifier;
@@ -34,25 +34,33 @@ export class MarkdownEditorComponent implements OnInit {
   set valueIdentifier(valueIdentifier: string) {
     this._valueIdentifier = valueIdentifier;
   }
-  
+
   private _valueChangedEmitter: EventEmitter<string> =
     new EventEmitter<string>();
   @Output('valueChanged')
   get valueChangedEmitter() {
     return this._valueChangedEmitter;
   }
-  
+
+  private _hidePreview: boolean = false
+  get hidePreview() {
+    return this._hidePreview
+  }
+  set hidePreview(hide: boolean) {
+    this._hidePreview = hide;
+  }
+
   private _images: Array<string> = [];
   private static readonly _IMAGE_REGEXP: RegExp = /!\[.*?\]\((.+?)\)/g;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dialogService: DialogService) {
   }
-  
+
   public ngOnInit(): void {
     this.formatValue();
   }
-  
+
   public updateValue(input: string): void {
     this._value = (input ? input.replace(
       MarkdownEditorComponent._IMAGE_REGEXP, (matchedSubstring: string,
@@ -75,7 +83,7 @@ export class MarkdownEditorComponent implements OnInit {
     this.formatValue();
     this._valueChangedEmitter.emit(this._value);
   }
-  
+
   public addImagesToMarkdown(insertionIndex: number, images: Array<File>):
     void {
     for (let j: number = images.length - 1; j >= 0; j--) {
@@ -96,12 +104,12 @@ export class MarkdownEditorComponent implements OnInit {
       }
     }
   }
-  
+
   public openMarkdownInformationDialog(): void {
     this._dialogService.openComponentDialog(MarkdownCheatSheetComponent, {}).
       updateSize('60%', '60%');
   }
-  
+
   private formatValue(): void {
     this._formattedValue = (this._value ? this._value.replace(
       MarkdownEditorComponent._IMAGE_REGEXP, (matchedSubstring: string,
@@ -112,7 +120,7 @@ export class MarkdownEditorComponent implements OnInit {
           this._images.push(captureGroup);
           imageIndex = this._images.length - 1;
         }
-        
+
         let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
           indexOf(captureGroup);
         return matchedSubstring.substring(0,
@@ -122,7 +130,7 @@ export class MarkdownEditorComponent implements OnInit {
         return matchedSubstring;
       }
     }) : this._value);
-    
+
     this._changeDetectorRef.markForCheck();
   }
 }
