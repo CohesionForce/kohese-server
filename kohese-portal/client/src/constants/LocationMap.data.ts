@@ -69,9 +69,9 @@ export var LocationMap = {
     'params' : [],
     'route' : '/devtools'
   },
-  'FullscreenDocument': {
+  'Outline': {
     params: ['id'],
-    route: 'fullscreendocument'
+    route: 'outline'
   },
   'Document' : {
     'params' : ['id'],

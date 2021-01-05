@@ -28,7 +28,7 @@ module.exports = function (app) {
       /^\/analysis.*/,
       /^\/typeeditor.*/,
       /^\/devtools.*/,
-      /^\/fullscreendocument.*/,
+      /^\/outline.*/,
       /^\/document.*/,
       /^\/report-gen.*/,
       /^\/reports.*/

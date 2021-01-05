@@ -1,7 +1,7 @@
 <div class="panel right-zone" [ngClass]="{'details-doc' : incrementalLoad}">
   <div class="panel-heading">
-    <ng-container *ngIf="!fullscreen">
-      <button mat-icon-button (click)="navigate('FullscreenDocument',
+    <ng-container *ngIf="!outline">
+      <button mat-icon-button (click)="navigate('Outline',
         { id: itemProxy.item.id })">
         <mat-icon class="fa fa-list"></mat-icon>
       </button>
