@@ -13,8 +13,7 @@
   "properties": {
     "restrictInstanceEditing": {
       "name": "restrictInstanceEditing",
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
     "namespace": {
       "name": "namespace",
