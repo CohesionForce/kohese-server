@@ -300,4 +300,8 @@ implements OnInit, OnDestroy {
       }
     }
   }
+
+  selectRow(proxy: ItemProxy) {
+    this.proxySelected.emit(proxy);
+  }
 }
