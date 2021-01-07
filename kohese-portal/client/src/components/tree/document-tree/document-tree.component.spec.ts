@@ -14,6 +14,8 @@ import { MockItemRepository } from '../../../../mocks/services/MockItemRepositor
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DocumentTreeComponent } from './document-tree.component';
 import { Filter } from '../../filter/filter.class';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 
 describe('DocumentTreeComponent', () => {
   let component: DocumentTreeComponent;
@@ -38,23 +40,24 @@ describe('DocumentTreeComponent', () => {
         },
         { provide: DialogService, useClass: MockDialogService },
         DynamicTypesService,
+        { provide: NavigationService, useClass: MockNavigationService },
         { provide: ItemRepository, useClass: MockItemRepository }
       ],
       schemas: [ NO_ERRORS_SCHEMA ]
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(DocumentTreeComponent);
     component = fixture.componentInstance;
     component.selectedProxyStream = ObservableOf(TreeConfiguration.
       getWorkingTree().getProxyFor('test-uuid5'));
-    
+
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  
+
   it('filters after a search string is entered', (done: Function) => {
     expect(component.filterSubject.getValue()).not.toBeDefined();
     component.searchStringChanged('Search String');
