@@ -37,7 +37,7 @@
     </tree-row>
   </ng-container>
 </div>
-<div class="outline-body">
+<div class="outline-tree">
   <virtual-scroll #tree [items]="visibleRows">
     <tree-row *ngFor="let row of tree.viewPortItems"
       [treeRow]="row" [rowActions]="rowActions"
