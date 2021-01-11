@@ -154,6 +154,16 @@ export abstract class Tree {
     this.exitTargetingMode();
   });
 
+  private _moveAction: Action = new Action('Move', 'Move this object', 'fa fa-arrow-circle-o-right', (object: any) => {
+    return this.mayMove(object);
+  }, (object: any) => {
+    let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
+    selectedObjects.push(object);
+    this.selectedObjectsSubject.next(selectedObjects);
+    this._inTargetingMode = true;
+    this.refresh();
+  });
+
   private _rootRowActions: Array<DisplayableEntity> = [
     this._expandDescendantsAction,
     this._collapseDescendantsAction,
@@ -167,6 +177,7 @@ export abstract class Tree {
     this._targetActionGroup,
     this._exitTargetingModeAction
   ];
+
   get rootRowActions() {
     return this._rootRowActions;
   }
@@ -188,16 +199,8 @@ export abstract class Tree {
   private _menuActions: Array<Action> = [
     this._expandDescendantsAction,
     this._collapseDescendantsAction,
-    new Action('Move', 'Move this object', 'fa fa-arrow-circle-o-right',
-      (object: any) => {
-      return this.mayMove(object);
-    }, (object: any) => {
-      let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
-      selectedObjects.push(object);
-      this.selectedObjectsSubject.next(selectedObjects);
-      this._inTargetingMode = true;
-      this.refresh();
-    })
+    this._moveAction
+
   ];
   get menuActions() {
     return this._menuActions;

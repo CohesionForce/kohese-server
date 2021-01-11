@@ -5,15 +5,15 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
-import { FullscreenDocumentComponent } from './fullscreen-document.component';
+import { DocumentOutlineComponent } from './document-outline.component';
 
-describe('FullscreenDocumentComponent', () => {
-  let component: FullscreenDocumentComponent;
-  let fixture: ComponentFixture<FullscreenDocumentComponent>;
+describe('DocumentOutlineComponent', () => {
+  let component: DocumentOutlineComponent;
+  let fixture: ComponentFixture<DocumentOutlineComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FullscreenDocumentComponent ],
+      declarations: [ DocumentOutlineComponent ],
       providers: [ {
         provide: ActivatedRoute,
         useValue: { params: new BehaviorSubject<any>({ id: 'test-uuid2' }) }
@@ -24,7 +24,7 @@ describe('FullscreenDocumentComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FullscreenDocumentComponent);
+    fixture = TestBed.createComponent(DocumentOutlineComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

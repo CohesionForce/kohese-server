@@ -18,7 +18,7 @@ import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeEditorComponent } from './components/type-editor/type-editor.component';
 import { DevToolsComponent } from './components/admin/dev-tools/dev-tools.component';
-import { FullscreenDocumentComponent } from './components/document-view/fullscreen-document/fullscreen-document.component';
+import { DocumentOutlineComponent } from './components/document-view/document-outline/document-outline.component';
 import { ReportGeneratorComponent } from './components/report-generator/report-generator.component';
 import { ReportsComponent } from './components/reports/reports.component';
 
@@ -35,13 +35,13 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
   get documentConfiguration() {
     return this._documentConfiguration;
   }
-  
+
   private _treeConfigurationSubscription: Subscription;
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _route: ActivatedRoute, private _itemRepository: ItemRepository) {
   }
-  
+
   public ngOnInit(): void {
     this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
       subscribe((treeConfigurationObject: any) => {
@@ -63,9 +63,9 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
                   parentId: proxy.item.parentId,
                   childIds: []
                 };
-                
+
                 components[proxy.item.id] = documentComponent;
-                
+
                 for (let j: number = 0; j < proxy.children.length; j++) {
                   let child: ItemProxy = proxy.children[j];
                   process(child);
@@ -74,7 +74,7 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
               };
               process(itemProxy);
               components[itemProxy.item.id].parentId = null;
-              
+
               this._documentConfiguration = {
                 name: itemProxy.item.name,
                 description: 'Document Configuration for ' + itemProxy.item.
@@ -88,13 +88,13 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
           } else {
             this._documentConfiguration = undefined;
           }
-          
+
           this._changeDetectorRef.markForCheck();
         });
       }
     });
   }
-  
+
   public ngOnDestroy(): void {
     this._treeConfigurationSubscription.unsubscribe();
   }
@@ -114,7 +114,7 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
       { path: 'analysis', component: AnalysisComponent },
       { path: 'typeeditor', component: TypeEditorComponent},
       { path: 'devtools', component: DevToolsComponent},
-      { path: 'fullscreendocument', component: FullscreenDocumentComponent },
+      { path: 'outline', component: DocumentOutlineComponent },
       { path: 'document', component: DocumentRouteComponent },
       { path: 'report-gen', component: ReportGeneratorComponent},
       { path: 'reports', component: ReportsComponent }
