@@ -2,7 +2,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { ActivatedRoute } from '@angular/router';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'document-outline',
@@ -17,6 +17,8 @@ export class DocumentOutlineComponent implements OnInit {
   treeConfigSubscription : Subscription;
   documentRootId : string;
   documentRoot
+
+  @Output() outline: boolean = true;
 
   constructor(private router : ActivatedRoute, private itemRepository: ItemRepository) { }
 

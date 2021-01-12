@@ -11,6 +11,7 @@
 
     <split-area id="document-container" [size]="70">
       <document-view class="right-content"
+        [outline] = true
         [selectedProxyStream]="selectedProxyStream"
         [proxyStream]="proxyStream"
         (proxySelected)="documentProxyStream.next($event);"

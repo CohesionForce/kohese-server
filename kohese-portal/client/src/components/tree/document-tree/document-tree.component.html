@@ -14,18 +14,19 @@
     (click)="removeFilter()" matTooltip="Remove filter">
     <mat-icon class="fa fa-eraser"></mat-icon>
   </button>
-  <button mat-icon-button (click)="toggleDocumentSync()"
-    matTooltip="Toggle selection synchronization for the tree"
-    [ngClass]="{ 'highlight': sync }"
-    class="flex-right-align">
-    <mat-icon class="fa fa-exchange"></mat-icon>
-  </button>
-  <button mat-icon-button
-    (click)="setRowAsRoot(documentRoot)"
-    [disabled]="(rootSubject | async) === documentRoot"
-    matTooltip="Changes the root to be the document root">
-    <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
-  </button>
+  <span style="margin-left: auto">
+    <button mat-icon-button style="outline: none"
+      matTooltip="Go back to Explorer View"
+      (click)="navigationService.navigate('Explore', { id: absoluteRoot.item.id })">
+      <mat-icon class="fa fa-arrow-right"></mat-icon>
+    </button>
+    <button mat-icon-button (click)="toggleDocumentSync()"
+      matTooltip="Toggle selection synchronization for the tree"
+      [ngClass]="{ 'highlight': sync }">
+      <mat-icon class="fa fa-exchange"></mat-icon>
+    </button>
+  </span>
+
 </div>
 <div style="height: 12%; width: 100%;">
   <div class="kt-head kth-cell">
