@@ -764,7 +764,7 @@ export class ItemRepository {
         REVERSE_REFERENCE_TABLE) {
         representation += '### Reverse References For ' + formatContainer.
           contents.map((propertyDefinition: PropertyDefinition) => {
-          return '* ' + propertyDefinition.propertyName.kind + '\'s ' +
+          return propertyDefinition.propertyName.kind + '\'s ' +
             propertyDefinition.propertyName.attribute;
         }).join('\n');
 
