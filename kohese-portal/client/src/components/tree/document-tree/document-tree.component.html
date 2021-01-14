@@ -14,17 +14,10 @@
     (click)="removeFilter()" matTooltip="Remove filter">
     <mat-icon class="fa fa-eraser"></mat-icon>
   </button>
-  <button mat-icon-button (click)="toggleDocumentSync()"
+  <button mat-icon-button (click)="toggleDocumentSync()" style="margin-left: auto"
     matTooltip="Toggle selection synchronization for the tree"
-    [ngClass]="{ 'highlight': sync }"
-    class="flex-right-align">
+    [ngClass]="{ 'highlight': sync }">
     <mat-icon class="fa fa-exchange"></mat-icon>
-  </button>
-  <button mat-icon-button
-    (click)="setRowAsRoot(documentRoot)"
-    [disabled]="(rootSubject | async) === documentRoot"
-    matTooltip="Changes the root to be the document root">
-    <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
   </button>
 </div>
 <div style="height: 12%; width: 100%;">

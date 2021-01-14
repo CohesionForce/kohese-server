@@ -164,15 +164,17 @@ export abstract class Tree {
     this.refresh();
   });
 
+  private focusParentAction: Action = new Action('Set Parent As Root', 'Set the parent of this row\'s ' +
+      'object as the root', 'fa fa-level-up', (object: any) => {
+      return (object !== this._absoluteRoot && !this._inTargetingMode && !!this.getParent(object));
+      }, (object: any) => {
+      this.setRoot(this.getParent(object));
+    });
+
   private _rootRowActions: Array<DisplayableEntity> = [
     this._expandDescendantsAction,
     this._collapseDescendantsAction,
-    new Action('Set Parent As Root', 'Set the parent of this row\'s ' +
-      'object as the root', 'fa fa-level-up', (object: any) => {
-      return !!this.getParent(object);
-      }, (object: any) => {
-      this.setRoot(this.getParent(object));
-    }),
+    this.focusParentAction,
     this.absoluteRootAction,
     this._targetActionGroup,
     this._exitTargetingModeAction

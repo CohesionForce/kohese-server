@@ -241,6 +241,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     this.treeConfig = treeConfigurationObject;
     if (this.treeConfig) {
       this.documentRoot = this.treeConfig.config.getProxyFor(this.documentRootId);
+      this.absoluteRoot = this.documentRoot;
       this.documentRoot.visitTree({ includeOrigin: true }, (proxy:ItemProxy) => {
         this.buildRow(proxy);
       });
