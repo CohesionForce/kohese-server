@@ -14,12 +14,12 @@ interface CategoryItems {
 }
 
 @Component({
-  selector: 'category-board',
-  templateUrl: './category-board.component.html',
-  styleUrls: ['./category-board.component.scss'],
+  selector: 'item-board',
+  templateUrl: './item-board.component.html',
+  styleUrls: ['./item-board.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CategoryBoardComponent {
+export class ItemBoardComponent {
   private _project: any;
   get project() {
     return this._project;
