@@ -47,8 +47,8 @@
   </mat-tab>
   <mat-tab label="Board">
     <ng-template matTabContent>
-      <category-board [project]="(projectStream | async)?.proxy.item">
-      </category-board>
+      <item-board [project]="(projectStream | async)?.proxy.item">
+      </item-board>
     </ng-template>
   </mat-tab>
 </mat-tab-group>

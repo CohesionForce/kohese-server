@@ -47,7 +47,7 @@ import { EditorModule } from '@tinymce/tinymce-angular';
 import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
 import { LensModule } from './components/lens/lens.module';
-import { CategoryBoardModule } from './components/category-board/category-board.module';
+import { ItemBoardModule } from './components/item-board/item-board.module';
 
 @NgModule({
   declarations: [
@@ -73,10 +73,10 @@ import { CategoryBoardModule } from './components/category-board/category-board.
             imageHtml = imageHtml.substring(0, 5) +
               'style="max-height: 100%; max-width: 100%;" ' + imageHtml.
               substring(5);
-            
+
             return imageHtml;
           };
-          
+
           let markedOptions: MarkedOptions = new MarkedOptions();
           markedOptions.renderer = markedRenderer;
           return markedOptions;
@@ -116,7 +116,7 @@ import { CategoryBoardModule } from './components/category-board/category-board.
     TextEditorModule,
     DocumentModule,
     CopyModule,
-    CategoryBoardModule
+    ItemBoardModule
   ],
   bootstrap: [AppComponent]
 })
