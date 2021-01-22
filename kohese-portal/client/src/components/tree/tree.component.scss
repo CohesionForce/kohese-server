@@ -36,6 +36,11 @@ virtual-scroll {
   overflow: auto;
 }
 
+.kt-tree {
+  height: calc(100% - 30px);
+  overflow: auto;
+}
+
 :host {
   height: 100%;
   width: 100%;
