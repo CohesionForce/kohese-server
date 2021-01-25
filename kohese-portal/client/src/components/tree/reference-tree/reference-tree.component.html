@@ -5,7 +5,7 @@
     Root
   </div>
   <ng-container *ngIf="rootSubject.getValue()">
-    <div class="kt-body">
+    <div>
       <tree-row [treeRow]="getRootRow()"
         [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
       </tree-row>
@@ -16,7 +16,7 @@
   <div class="kt-head kth-cell">
     Descendants
   </div>
-  <div class="kt-body">
+  <div class="kt-tree">
     <virtual-scroll #tree [items]="visibleRows">
       <tree-row *ngFor="let row of tree.viewPortItems"
         [treeRow]="row" [rowActions]="rowActions"

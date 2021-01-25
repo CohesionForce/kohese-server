@@ -36,6 +36,9 @@ virtual-scroll {
   overflow: auto;
 }
 
+
+// 30px was chosen to remove 1px of whitespace below the scrollbar,
+// as opposed to 31px in .kt-body above.
 .kt-tree {
   height: calc(100% - 30px);
   overflow: auto;
