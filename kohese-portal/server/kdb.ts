@@ -7,6 +7,7 @@ let path = require('path');
 console.log('::: Begin KDB File Load');
 
 var kdbFS = require('./kdb-fs');
+var Fs = require('fs');
 
 var kdbModel = require('./kdb-model');
 
@@ -62,7 +63,7 @@ function loadKoheseModelsAndViews() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-async function initialize (koheseKdbPath, indexAndExit) {
+async function initialize (koheseKdbPath, repositoryList, indexAndExit) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
@@ -73,6 +74,17 @@ async function initialize (koheseKdbPath, indexAndExit) {
 
   // TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
   checkAndCreateDir(koheseKDBDirPath);
+
+ // Get all repositories and add to Roots.json file
+  let configurationPath: string = path.resolve(kdbDirPath, 'AvailableRepositories.json');
+  let availableRepositories: any = [];
+  for (let n: number = 0; n < repositoryList.length; n++) {
+    var tmppath = path.join(kdbDirPath, repositoryList[n]);
+    getAvailableRepositories(path.join(tmppath,'Repository'), availableRepositories);
+  }
+  kdbFS.storeJSONDoc(configurationPath, availableRepositories);
+
+
 
   TreeConfiguration.getWorkingTree().getRootProxy().repoPath = path.join(koheseKDBDirPath, 'Root.json');
 
@@ -121,6 +133,26 @@ async function initialize (koheseKdbPath, indexAndExit) {
   }
 }
 module.exports.initialize = initialize;
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function getAvailableRepositories(dir, availableRepositories) {
+  Fs.readdirSync(dir).forEach(file => {
+    let fullPath = path.join(dir, file);
+    if (Fs.lstatSync(fullPath).isDirectory()) {
+       getAvailableRepositories(fullPath, availableRepositories);
+     } else {
+      if (file === 'Root.json') {
+        var repositories = kdbFS.loadJSONDoc(fullPath);
+        availableRepositories.push({
+          id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
+        });
+      }
+     }
+  });
+}
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -482,7 +514,7 @@ function migrate(itemProxy: ItemProxy, typeName: string): void {
       migrated = true;
     }
   }
-  
+
   if (migrated) {
     storeModelInstance(itemProxy, false);
   }
@@ -518,6 +550,7 @@ function validateRepositoryStructure (repoDirPath) {
 
     switch(modelName) {
       case 'Repository':
+        // GAYLE - Need to update to look at Configuration File????
         fileList = kdbFS.getRepositoryFileList(modelDirPath, /\.mount$/);
         for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
             var itemPath = modelDirPath + '/' + fileList[fileIdx];
@@ -583,6 +616,7 @@ async function openRepositories(indexAndExit) {
 	}
 
   let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
+  // TODO: Need to ensure that KDB Cache initialization has knowledge of mounted roots
   let kdbCache = new KDBCache(koheseKDBDirPath);
   KDBCache.setItemCache(kdbCache);
 

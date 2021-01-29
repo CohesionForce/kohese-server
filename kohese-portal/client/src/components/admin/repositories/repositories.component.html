@@ -30,22 +30,27 @@
     <h4>Repositories:</h4>
   </div>
   <div class="repo-list">
-    <mat-table [dataSource] = "repositories"
+    <mat-table [dataSource] = "repoList"
       class="mat-elevation-z8" style="width: 100%;">
 
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-        <mat-cell *matCellDef="let repository">{{repository.item.name}}</mat-cell>
+        <mat-cell *matCellDef="let repoList">{{repoList.name}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="count">
         <mat-header-cell *matHeaderCellDef> Items </mat-header-cell>
-        <mat-cell *matCellDef="let repository">{{repository.descendantCount}}</mat-cell>
+        <mat-cell *matCellDef="let repoList">{{repoList.descendantCount}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="description">
         <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-        <mat-cell *matCellDef="let repository"> {{repository.item.description | truncate : 120}}</mat-cell>
+        <mat-cell *matCellDef="let repoList"> {{repoList.description | truncate: 120}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="mounted">
+        <mat-header-cell *matHeaderCellDef> Mounted </mat-header-cell>
+        <mat-cell *matCellDef="let repoList"> {{repoList.mounted}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="nav">

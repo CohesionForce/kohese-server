@@ -1,8 +1,12 @@
+
+
 process.title = "kohese-server";
+var Fs = require('fs');
 
 var express = require('express');
 var morgan = require('morgan');
 var https = require('https');
+let path = require('path');
 
 const KohesePort = 3010;
 
@@ -17,20 +21,22 @@ if (require.main === module) {
 
   //Paths may be provided via arguments when starting via -kdb=PATH
   var baseRepoPath = 'kohese-kdb';
-  for (var i = 2; i < process.argv.length; i++) {
-    var arg = process.argv[i].split('=');
-    if ((arg[0] === '-kdb') && (arg[1] !== '')) {
-      baseRepoPath = arg[1];
-      break;
+  var repositoryList = Fs.readdirSync('./kdb').filter(function (file) {
+    return Fs.statSync(path.join('./kdb', file)).isDirectory();
+  });
+    for (var i = 2; i < process.argv.length; i++) {
+      var arg = process.argv[i].split('=');
+      if ((arg[0] === '-kdb') && (arg[1] !== '')) {
+        baseRepoPath = arg[1];
+        break;
+      }
     }
-  }
 
   // Load the KDB
   var kdb = require('./kdb');
   global['koheseKDB'] = kdb;
-  kdb.initialize(baseRepoPath).then(function () {
+  kdb.initialize(baseRepoPath, repositoryList).then(function () {
     try {
-
       // Establish routes
       var routes = require('./boot/routes');
       routes(app);
@@ -40,10 +46,9 @@ if (require.main === module) {
       var enableAuth = require('./server-enableAuth');
 
       // Establish HTTPS Server
-      var fs = require('fs');
       var options = {
-        key: fs.readFileSync('./cert/serverkey.pem'),
-        cert: fs.readFileSync('./cert/servercert.pem')
+        key: Fs.readFileSync('./cert/serverkey.pem'),
+        cert: Fs.readFileSync('./cert/servercert.pem')
       };
 
 

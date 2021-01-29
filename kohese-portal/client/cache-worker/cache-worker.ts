@@ -420,6 +420,17 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         });
         break;
 
+      case 'Repository/getAvailableRepositories':
+        console.log('made it here 5')
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (availableRepositories: Array<any>) => void, reject:
+          () => void) => {
+          socket.emit('Repository/getAvailableRepositories', {}, (availableRepositories: Array<any>) => {
+            resolve(availableRepositories);
+          });
+        }) });
+        break;
+
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);

@@ -1040,6 +1040,19 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/getAvailableRepositories', (request: any, respond: Function) => {
+    var kdbDirPath = 'kdb';
+    console.log('::: session %s: Received getAvailableRepositories for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    let repositoryData = kdbFS.loadJSONDoc(Path.join(kdbDirPath, 'AvailableRepositories.json'))
+    respond(repositoryData);
+  });
+
+
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('renameReport', (request: any, respond: Function) => {
     console.log('::: session %s: Received renameReport from %s to %s for user %s at %s',
         socket.id, request.oldReportName, request.newReportName, socket.koheseUser.username, socket.handshake.address);
