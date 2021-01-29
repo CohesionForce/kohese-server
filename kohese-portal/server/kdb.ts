@@ -80,7 +80,7 @@ async function initialize (koheseKdbPath, repositoryList, indexAndExit) {
   let availableRepositories: any = [];
   for (let n: number = 0; n < repositoryList.length; n++) {
     var tmppath = path.join(kdbDirPath, repositoryList[n]);
-    getAvailableRepositories(path.join(tmppath,'Repository'), availableRepositories);
+    getAvailableRepositories(tmppath, availableRepositories);
   }
   kdbFS.storeJSONDoc(configurationPath, availableRepositories);
 

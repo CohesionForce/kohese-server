@@ -73,7 +73,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
             if (this.repositories.some(y => y.item.name === this.repoList[x].name)) {
               let index = this.repositories.findIndex(t => t.item.name ===this.repoList[x].name);
               this.repoList[x].mounted = true;
-              this.repoList[x].descendantCount = this.repositories[x].descendantCount;
+              this.repoList[x].descendantCount = this.repositories[index].descendantCount;
             }
           }
         }
