@@ -1,7 +1,7 @@
 import { UserInputModule } from './../user-input/user-input.module';
 import { DocumentRowComponent } from './document-row/document-row.component';
 import { TreeViewModule } from '../tree/tree.module';
-import { FullscreenDocumentComponent } from './fullscreen-document/fullscreen-document.component';
+import { DocumentOutlineComponent } from './document-outline/document-outline.component';
 import { CreationRowComponent } from './document-row/creation-row/creation-row.component';
 import { MaterialModule } from '../../material.module';
 import { BrowserModule } from '@angular/platform-browser';
@@ -12,6 +12,7 @@ import { CommonModule } from "@angular/common";
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MarkdownModule } from 'ngx-markdown';
+import { AngularSplitModule} from 'angular-split';
 
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
@@ -20,7 +21,7 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     DocumentViewComponent,
     CreationRowComponent,
     DocumentRowComponent,
-    FullscreenDocumentComponent
+    DocumentOutlineComponent
   ],
   imports : [
     CommonModule,
@@ -33,7 +34,8 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     MarkdownModule.forChild(),
     TreeViewModule,
     UserInputModule,
-    ObjectEditorModule
+    ObjectEditorModule,
+    AngularSplitModule
   ],
   exports : [
     DocumentViewComponent,

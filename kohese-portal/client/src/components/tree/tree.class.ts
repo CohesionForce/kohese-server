@@ -154,19 +154,32 @@ export abstract class Tree {
     this.exitTargetingMode();
   });
 
+  private _moveAction: Action = new Action('Move', 'Move this object', 'fa fa-arrow-circle-o-right', (object: any) => {
+    return this.mayMove(object);
+  }, (object: any) => {
+    let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
+    selectedObjects.push(object);
+    this.selectedObjectsSubject.next(selectedObjects);
+    this._inTargetingMode = true;
+    this.refresh();
+  });
+
+  private focusParentAction: Action = new Action('Set Parent As Root', 'Set the parent of this row\'s ' +
+      'object as the root', 'fa fa-level-up', (object: any) => {
+      return (object !== this._absoluteRoot && !this._inTargetingMode && !!this.getParent(object));
+      }, (object: any) => {
+      this.setRoot(this.getParent(object));
+    });
+
   private _rootRowActions: Array<DisplayableEntity> = [
     this._expandDescendantsAction,
     this._collapseDescendantsAction,
-    new Action('Set Parent As Root', 'Set the parent of this row\'s ' +
-      'object as the root', 'fa fa-level-up', (object: any) => {
-      return !!this.getParent(object);
-      }, (object: any) => {
-      this.setRoot(this.getParent(object));
-    }),
+    this.focusParentAction,
     this.absoluteRootAction,
     this._targetActionGroup,
     this._exitTargetingModeAction
   ];
+
   get rootRowActions() {
     return this._rootRowActions;
   }
@@ -188,16 +201,8 @@ export abstract class Tree {
   private _menuActions: Array<Action> = [
     this._expandDescendantsAction,
     this._collapseDescendantsAction,
-    new Action('Move', 'Move this object', 'fa fa-arrow-circle-o-right',
-      (object: any) => {
-      return this.mayMove(object);
-    }, (object: any) => {
-      let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
-      selectedObjects.push(object);
-      this.selectedObjectsSubject.next(selectedObjects);
-      this._inTargetingMode = true;
-      this.refresh();
-    })
+    this._moveAction
+
   ];
   get menuActions() {
     return this._menuActions;

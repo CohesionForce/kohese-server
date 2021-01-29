@@ -95,7 +95,7 @@ implements OnInit, OnDestroy {
   @Input()
   incrementalLoad: boolean;
   @Input()
-  fullscreen = false;
+  outline: boolean = false;
   @Input()
   selectedProxyStream: Observable<ItemProxy>;
   @Output()
@@ -299,5 +299,9 @@ implements OnInit, OnDestroy {
         this.invalidFilterRegex = false;
       }
     }
+  }
+
+  selectRow(proxy: ItemProxy) {
+    this.proxySelected.emit(proxy);
   }
 }

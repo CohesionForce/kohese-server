@@ -2,14 +2,14 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { ActivatedRoute } from '@angular/router';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 
 @Component({
-  selector: 'fullscreen-document',
-  templateUrl: './fullscreen-document.component.html',
-  styleUrls: ['./fullscreen-document.component.scss']
+  selector: 'document-outline',
+  templateUrl: './document-outline.component.html',
+  styleUrls: ['./document-outline.component.scss']
 })
-export class FullscreenDocumentComponent implements OnInit {
+export class DocumentOutlineComponent implements OnInit {
   proxyStream : BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined)
   selectedProxyStream : BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined)
   documentProxyStream : BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined)
@@ -17,6 +17,8 @@ export class FullscreenDocumentComponent implements OnInit {
   treeConfigSubscription : Subscription;
   documentRootId : string;
   documentRoot
+
+  @Output() outline: boolean = true;
 
   constructor(private router : ActivatedRoute, private itemRepository: ItemRepository) { }
 

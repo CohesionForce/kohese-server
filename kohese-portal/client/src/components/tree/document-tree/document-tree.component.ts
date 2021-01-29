@@ -5,8 +5,13 @@ import { ChangeDetectorRef } from '@angular/core';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { Observable ,  Subscription } from 'rxjs';
 import { TreeRow } from '../tree-row/tree-row.class';
-import { DisplayableEntity, Action,
-  ActionGroup } from '../tree-row/tree-row.component';
+import { Image, DisplayableEntity, Action, ActionGroup } from '../tree-row/tree-row.component';
+import { ReportSpecificationComponent, ReportSpecifications } from '../../reports/report-specification/report-specification.component';
+import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { CompareItemsComponent, VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
+import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
+import { ImportComponent } from '../../import/import.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
@@ -22,6 +27,8 @@ import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
   templateUrl: './document-tree.component.html',
   styleUrls: ['./document-tree.component.scss', '../tree.component.scss']
 })
+
+// Controls the tree in outline view
 export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   treeConfigSubscription : Subscription;
   treeConfig : any;
@@ -40,7 +47,28 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   private _filterDelayIdentifier: any;
 
-  images = [];
+  private _images: Array<Image> = [
+    new Image('assets/icons/versioncontrol/dirty.ico', (object: any) => {
+      return 'Unsaved Changes';
+    }, false, (object: any) => {
+      return (object as ItemProxy).dirty;
+    }),
+    new Image('assets/icons/versioncontrol/unstaged.ico', (object: any) => {
+      return 'Unstaged' + ((object as ItemProxy).vcStatus.isNew() ? ' - New' :
+        '');
+    }, false, (object: any) => {
+      return ((object as ItemProxy).vcStatus.isUnstaged());
+    }),
+    new Image('assets/icons/versioncontrol/index-mod.ico', (object: any) => {
+      return 'Staged' + ((object as ItemProxy).vcStatus.isNew() ? ' - New' :
+        '');
+    }, false, (object: any) => {
+      return ((object as ItemProxy).vcStatus.isStaged());
+    })
+  ];
+  get images() {
+    return this._images;
+  }
 
   @Output()
   rootSelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
@@ -50,10 +78,12 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   selectedProxyStream : Observable<ItemProxy>;
   selectedProxyStreamSubscription : Subscription;
 
-  constructor(router: ActivatedRoute, dialogService : DialogService,
+  constructor(
+    router: ActivatedRoute, dialogService : DialogService,
     private _dynamicTypesService: DynamicTypesService,
     private itemRepository : ItemRepository,
-    private changeRef : ChangeDetectorRef) {
+    private changeRef : ChangeDetectorRef,
+    private navigationService: NavigationService) {
     super(router, dialogService);
     this.canMoveRows = true;
   }
@@ -64,11 +94,9 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     for (let j: number = 0; j < this.rowActions.length; j++) {
       let displayableEntity: DisplayableEntity = this.rowActions[j];
       if (displayableEntity instanceof ActionGroup) {
-        for (let k: number = 0; k < (displayableEntity as ActionGroup).actions.
-          length; k++) {
+        for (let k: number = 0; k < (displayableEntity as ActionGroup).actions.length; k++) {
           let action: Action = (displayableEntity as ActionGroup).actions[k];
-          if ((action.text === TargetPosition.BEFORE) || (action.text ===
-            TargetPosition.AFTER)) {
+          if ((action.text === TargetPosition.BEFORE) || (action.text === TargetPosition.AFTER)) {
             action.canActivate = (object: any) => {
               let parentProxy: ItemProxy = (object as ItemProxy).parentProxy;
               return (parentProxy && parentProxy.childrenAreManuallyOrdered());
@@ -77,6 +105,130 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         }
       }
     }
+
+    let deleteAction: Action = new Action('Delete',
+      'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
+      return !(object as ItemProxy).internal;
+    }, async (object: any) => {
+      let result: any = await this._dialogService.openDropdownDialog('Remove ' +
+        'Descendants', 'Do you also want to remove all descendants of ' +
+        (object as ItemProxy).item.name + '?', '', 'No', (value: any) => {
+        return true;
+      }, { Yes: 'Yes', No: 'No' });
+      if (result) {
+        if (object === this.rootSubject.getValue()) {
+          this.rootSubject.next(this.getParent(object));
+        }
+        this.rowFocused(object);
+        this.itemRepository.deleteItem((object as ItemProxy), (result === 'Yes'));
+      }
+    });
+    this.rootMenuActions.unshift(deleteAction);
+    this.menuActions.unshift(deleteAction);
+
+    let produceReportAction: Action = new Action('Produce Report', 'Produce ' +
+      'a report from this Item and its descendants', 'fa fa-file-text-o',
+      (object: any) => {
+      return !(object as ItemProxy).internal;
+    }, (object: any) => {
+      this._dialogService.openComponentDialog(
+        ReportSpecificationComponent, {
+        data: {
+          defaultName: (object as ItemProxy).item.name + '_' + new Date().toISOString(),
+          allowDescendantInclusionSpecification: true,
+          allowLinkSpecification: true,
+          getReportContent: (initialContent: string, reportSpecifications: ReportSpecifications) => {
+            let processItemProxy: (itemProxy: ItemProxy) => void = (itemProxy: ItemProxy) => {
+              initialContent += this.itemRepository.getMarkdownRepresentation(
+                itemProxy.item, undefined, itemProxy.model.item, itemProxy.model.view.item, FormatDefinitionType.DOCUMENT,
+                itemProxy.getDepthFromAncestor(object as ItemProxy), reportSpecifications.addLinks);
+            };
+
+            if (reportSpecifications.includeDescendants) {
+              let itemProxyStack: Array<ItemProxy> = [(object as ItemProxy)];
+              while (itemProxyStack.length > 0) {
+                let itemProxy: ItemProxy = itemProxyStack.shift();
+                processItemProxy(itemProxy);
+                itemProxyStack.unshift(...itemProxy.children);
+              }
+            } else {
+              processItemProxy((object as ItemProxy));
+            }
+
+            return initialContent;
+          }
+        }
+      }).updateSize('40%', '40%');
+    });
+    this.rootMenuActions.unshift(produceReportAction);
+    this.menuActions.unshift(produceReportAction);
+
+    let analyzeAction: Action = new Action('Analyze...', 'Analyze content ' +
+      'from this Item and its descendants', 'fa fa-search', (object: any) => {
+      return true;
+    }, (object: any) => {
+      this.navigationService.navigate('Analysis',
+        { id: (object as ItemProxy).item.id });
+    });
+    this.rootMenuActions.unshift(analyzeAction);
+    this.menuActions.unshift(analyzeAction);
+
+    let importAction: Action = new Action('Import...', 'Import one or more ' +
+      'files as children of this Item', 'fa fa-file-o', (object: any) => {
+      return !(object as ItemProxy).internal || (object === this.absoluteRoot);
+    }, (object: any) => {
+      this._dialogService.openComponentDialog(ImportComponent, {
+        data: {
+          parentId: (object as ItemProxy).item.id
+        }
+      }).updateSize('90%', '90%');
+    });
+    this.rootMenuActions.unshift(importAction);
+    this.menuActions.unshift(importAction);
+
+    let addChildAction: Action = new Action('Add Child', 'Add a child to ' +
+      'this Item', 'fa fa-plus add-button', (object: any) => {
+      return !(object as ItemProxy).internal || (object === this.absoluteRoot);
+    }, (object: any) => {
+      this._dialogService.openComponentDialog(CreateWizardComponent, {
+        data: {
+          parentId: (object as ItemProxy).item.id
+        }
+      }).updateSize('90%', '90%');
+    });
+    this.rootMenuActions.unshift(addChildAction);
+    this.menuActions.unshift(addChildAction);
+
+    let stagedVersionComparisonAction: Action = new Action('Compare ' +
+      'Against Staged Version', 'Compare this Item against the staged ' +
+      'version of this Item', 'fa fa-exchange', (object: any) => {
+      return ((object as ItemProxy).vcStatus.isStaged());
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), VersionDesignator.STAGED_VERSION);
+    });
+    this.rootMenuActions.push(stagedVersionComparisonAction);
+    this.menuActions.push(stagedVersionComparisonAction);
+
+    let lastCommittedVersionComparisonAction: Action = new Action(
+      'Compare Against Last Committed Version', 'Compares this Item against ' +
+      'the last committed version of this Item', 'fa fa-exchange', (object:
+      any) => {
+      return (!(object as ItemProxy).vcStatus.isNew());
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), VersionDesignator.LAST_COMMITTED_VERSION);
+    });
+    this.rootMenuActions.push(lastCommittedVersionComparisonAction);
+    this.menuActions.push(lastCommittedVersionComparisonAction);
+
+    let itemComparisonAction: Action = new Action('Compare Against...',
+      'Compare this Item against another Item', 'fa fa-exchange', (object:
+      any) => {
+      return true;
+      }, (object: any) => {
+      this.openComparisonDialog((object as ItemProxy), undefined);
+    });
+    this.rootMenuActions.push(itemComparisonAction);
+    this.menuActions.push(itemComparisonAction);
 
     this.paramSubscription = this._route.params.subscribe(params => {
       if (params['id']) {
@@ -89,6 +241,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     this.treeConfig = treeConfigurationObject;
     if (this.treeConfig) {
       this.documentRoot = this.treeConfig.config.getProxyFor(this.documentRootId);
+      this.absoluteRoot = this.documentRoot;
       this.documentRoot.visitTree({ includeOrigin: true }, (proxy:ItemProxy) => {
         this.buildRow(proxy);
       });
@@ -342,6 +495,23 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   public setRowAsRoot(proxy: ItemProxy) {
     this.rootSubject.next(proxy);
     this.rootSelected.emit(proxy);
+  }
+
+  private openComparisonDialog(proxy: ItemProxy, changeVersionDesignator:
+    VersionDesignator): void {
+    let compareItemsDialogParameters: any = {
+      baseProxy: proxy,
+      editable: true
+    };
+
+    if (null != changeVersionDesignator) {
+      compareItemsDialogParameters['changeProxy'] = proxy;
+      compareItemsDialogParameters['baseVersion'] = changeVersionDesignator;
+    }
+
+    this._dialogService.openComponentDialog(CompareItemsComponent, {
+      data: compareItemsDialogParameters
+    }).updateSize('90%', '90%');
   }
 }
 

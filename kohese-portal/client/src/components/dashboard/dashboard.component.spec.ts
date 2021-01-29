@@ -14,7 +14,7 @@ import { ItemRepository } from '../../services/item-repository/item-repository.s
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { CurrentUserService } from '../../services/user/current-user.service';
 import { SessionService } from '../../services/user/session.service';
-import { CategoryBoardModule } from '../category-board/category-board.module';
+import { ItemBoardModule } from '../item-board/item-board.module';
 import { LensModule } from '../lens/lens.module';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 import { ReportGeneratorModule } from '../report-generator/report-generator.module';
@@ -57,7 +57,7 @@ describe('Component: Dashboard', ()=>{
         LensModule,
         ObjectEditorModule,
         ReportGeneratorModule,
-        CategoryBoardModule
+        ItemBoardModule
       ],
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},

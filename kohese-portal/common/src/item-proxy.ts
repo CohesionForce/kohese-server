@@ -1143,7 +1143,8 @@ export class ItemProxy {
         let relationList = relationsForKind[relationKey];
         if (Array.isArray(relationList)){
           if (kindKey !== 'Item' && relationKey !== 'children'){
-            for(let index = 0; index < relationList.length; index++){
+            // Iterate the list in reverse to ensure all items are removed
+            for(let index = relationList.length -1; index >= 0; index--){
               console.log('>>> Remove reference:  ' + relationList[index]._item.id);
               this.removeReference(relationList[index], relationKey, false);
             }

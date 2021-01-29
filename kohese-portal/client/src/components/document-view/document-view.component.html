@@ -1,11 +1,15 @@
 <div class="panel right-zone" [ngClass]="{'details-doc' : incrementalLoad}">
   <div class="panel-heading">
-    <ng-container *ngIf="!fullscreen">
-      <button mat-icon-button (click)="navigate('FullscreenDocument',
-        { id: itemProxy.item.id })">
+    <ng-container *ngIf="!outline else outlineView">
+      <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })">
         <mat-icon class="fa fa-list"></mat-icon>
       </button>
     </ng-container>
+    <ng-template #outlineView>
+      <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })">
+        <mat-icon class="fa fa-arrow-left"></mat-icon>
+      </button>
+    </ng-template>
     Document View
     <span class="pull-right">({{itemsLoaded}}/{{itemLength}}) </span>
   </div>
@@ -13,7 +17,7 @@
     <div data-infinite-scroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
       [scrollWindow]="false" [immediateCheck]="true" class="panel-body doc-view" #docView>
       <document-row #row id="docInfo.proxy.item.id" *ngFor="let docInfo of loadedProxies"
-        #row [docInfo]="docInfo" [row]="row"
+        [docInfo]="docInfo" [row]="row" (mouseenter)="selectRow(docInfo.proxy)"
         (viewInitialized)="rowMap[docInfo.proxy.item.id] = $event">
       </document-row>
     </div>

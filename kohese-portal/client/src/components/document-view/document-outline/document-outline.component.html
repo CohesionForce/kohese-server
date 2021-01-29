@@ -1,0 +1,24 @@
+<div id="outline-container">
+  <split direction="horizontal">
+
+    <split-area id="tree-container" [size]="30">
+      <document-tree class="left-content"
+        [selectedProxyStream]="documentProxyStream"
+        (onSelect)="selectedProxyStream.next($event)"
+        (rootSelected)="setRoot($event);">
+      </document-tree>
+    </split-area>
+
+    <split-area id="document-container" [size]="70">
+      <document-view class="right-content"
+        [outline] = true
+        [selectedProxyStream]="selectedProxyStream"
+        [proxyStream]="proxyStream"
+        (proxySelected)="documentProxyStream.next($event);"
+        [outline]="true"
+        [incrementalLoad]="false">
+      </document-view>
+    </split-area>
+
+  </split>
+</div>
