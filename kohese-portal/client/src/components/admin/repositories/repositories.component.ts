@@ -150,9 +150,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
       });
   }
 
-  public displayInformation(itemProxy: ItemProxy): void {
+  public displayInformation(id: string): void {
+    let index = this.repositories.findIndex(t => t.item.id === id);
     this.dialogueService.openComponentDialog(DetailsComponent, {
-      data: { itemProxy: itemProxy }
+      data: { itemProxy:  this.repositories[index]}
     }).updateSize('90%', '90%');
   }
 
