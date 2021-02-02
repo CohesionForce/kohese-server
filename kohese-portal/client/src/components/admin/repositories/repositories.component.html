@@ -53,11 +53,11 @@
       </ng-container>
 
       <ng-container matColumnDef="nav">
-        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-header-cell *matHeaderCellDef> Nav </mat-header-cell>
         <mat-cell *matCellDef="let repoList" style="display: flex; justify-content: flex-end;">
-          <ng-container *ngIf="repoList.mounted">
-            <div class="hidden-buttons">
-              <!-- For SCSS styling -->
+          <div class="hidden-buttons">
+            <!-- For SCSS styling -->
+            <ng-container *ngIf="repoList.mounted">
               <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(repoList.id)">
                 <mat-icon class="fa fa-clone"></mat-icon>
               </button>
@@ -74,8 +74,8 @@
                   Navigate in New Tab
                 </button>
               </mat-menu>
-            </div>
-          </ng-container>
+            </ng-container>
+          </div>
         </mat-cell>
       </ng-container>
 
