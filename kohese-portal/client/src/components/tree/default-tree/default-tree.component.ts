@@ -264,6 +264,8 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
             case 'update':
             case 'dirty':
               this.refresh();
+              // TODO: Find reason change detection is broken on refresh
+              this.buildRow(notification.proxy);
               break;
             case 'delete': {
                 this.deleteRow(notification.id);
