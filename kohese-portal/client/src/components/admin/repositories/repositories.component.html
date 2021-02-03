@@ -3,71 +3,78 @@
     <h4>Version Control:</h4>
     <button class="btn btn-primary" (click)="getRemotes()">Refresh Remotes</button>
 
-      <div class="remote-container">
-        <div *ngFor="let repo of remotes">{{repo}}</div>
-      </div>
+    <div class="remote-container">
+      <div *ngFor="let repo of remotes">{{repo}}</div>
+    </div>
 
     <div class="remote-options">
       <label for="add-remote-input">Remote Name: </label>
-      <input id="add-remote-input" type="text" [(ngModel)]="remoteNameInput"/>
+      <input id="add-remote-input" type="text" [(ngModel)]="remoteNameInput" />
       <label for="push-remote-url">Push URL:</label>
-      <input id="add-remote-url" type="text" [(ngModel)]="remoteUrlInput"/>
+      <input id="add-remote-url" type="text" [(ngModel)]="remoteUrlInput" />
       <button class="btn btn-primary" (click)="addRemote()">Add Remote</button>
     </div>
 
     <div class="commit-options">
       <h4>Commit/Push Item Changes</h4>
       <label for="commit-message-input">Commit Message: </label>
-      <input id="commit-message-input" type="text" [(ngModel)]="commitMessageInput"/>
+      <input id="commit-message-input" type="text" [(ngModel)]="commitMessageInput" />
       <button class="btn btn-primary" (click)="commit()">Commit Staged Items</button>
-      <br/>
+      <br />
       <label for="push-remote-name">Push to :</label>
-      <input id="push-remote-name" type="text" [(ngModel)]="pushRemoteNameInput"/>
+      <input id="push-remote-name" type="text" [(ngModel)]="pushRemoteNameInput" />
       <button class="btn btn-primary" (click)="push()">Push</button>
     </div>
 
-    <hr/>
+    <hr />
     <h4>Repositories:</h4>
   </div>
   <div class="repo-list">
-    <mat-table [dataSource] = "repositories"
-      class="mat-elevation-z8" style="width: 100%;">
+    <mat-table [dataSource]="repoList" class="mat-elevation-z8" style="width: 100%;">
 
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-        <mat-cell *matCellDef="let repository">{{repository.item.name}}</mat-cell>
+        <mat-cell *matCellDef="let repoList">{{repoList.name}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="count">
         <mat-header-cell *matHeaderCellDef> Items </mat-header-cell>
-        <mat-cell *matCellDef="let repository">{{repository.descendantCount}}</mat-cell>
+        <mat-cell *matCellDef="let repoList">{{repoList.descendantCount}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="description">
         <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-        <mat-cell *matCellDef="let repository"> {{repository.item.description | truncate : 120}}</mat-cell>
+        <mat-cell *matCellDef="let repoList"> {{repoList.description | truncate: 120}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="mounted">
+        <mat-header-cell *matHeaderCellDef> Mounted </mat-header-cell>
+        <mat-cell *matCellDef="let repoList"> {{repoList.mounted}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="nav">
-        <mat-header-cell *matHeaderCellDef></mat-header-cell>
-        <mat-cell *matCellDef="let repository" style="display: flex; justify-content: flex-end;">
-          <div class="hidden-buttons"> <!-- For SCSS styling -->
-            <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(repository)">
-              <mat-icon class="fa fa-clone"></mat-icon>
-            </button>
-            <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu">
-              <mat-icon class="fa fa-bars"></mat-icon>
-            </button>
-            <mat-menu #menu="matMenu" [overlapTrigger]="false">
-              <button mat-menu-item (click)="navigationService.navigate('Explore', { id: repository.item.id })">
-                <mat-icon class="fa fa-arrow-right"></mat-icon>
-                Navigate in Explorer
+        <mat-header-cell *matHeaderCellDef> Nav </mat-header-cell>
+        <mat-cell *matCellDef="let repoList" style="display: flex; justify-content: flex-end;">
+          <div class="hidden-buttons">
+            <!-- For SCSS styling -->
+            <ng-container *ngIf="repoList.mounted">
+              <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(repoList.id)">
+                <mat-icon class="fa fa-clone"></mat-icon>
               </button>
-              <button mat-menu-item (click)="navigationService.addTab('Explore', { id: repository.item.id })">
-                <mat-icon class="fa fa-external-link"></mat-icon>
-                Navigate in New Tab
+              <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu">
+                <mat-icon class="fa fa-bars"></mat-icon>
               </button>
-            </mat-menu>
+              <mat-menu #menu="matMenu" [overlapTrigger]="false">
+                <button mat-menu-item (click)="navigationService.navigate('Explore', { id: repoList.id })">
+                  <mat-icon class="fa fa-arrow-right"></mat-icon>
+                  Navigate in Explorer
+                </button>
+                <button mat-menu-item (click)="navigationService.addTab('Explore', { id: repoList.id })">
+                  <mat-icon class="fa fa-external-link"></mat-icon>
+                  Navigate in New Tab
+                </button>
+              </mat-menu>
+            </ng-container>
           </div>
         </mat-cell>
       </ng-container>

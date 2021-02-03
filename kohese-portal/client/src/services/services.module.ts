@@ -9,6 +9,7 @@ import { CacheManager } from '../../cache-worker/CacheManager';
 import { ItemRepository } from './item-repository/item-repository.service';
 import { SessionService } from './user/session.service';
 import { VersionControlService } from './version-control/version-control.service';
+import { RepositoryService } from './repository/repository.service';
 import { NavigationService } from './navigation/navigation.service';
 import { AnalysisService } from './analysis/analysis.service';
 import { DynamicTypesService } from './dynamic-types/dynamic-types.service';
@@ -37,6 +38,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
     ItemRepository,
     SessionService,
     VersionControlService,
+    RepositoryService,
     NavigationService,
     AnalysisService,
     DataProcessingService,

@@ -11,6 +11,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { NotificationService } from '../../../services/notifications/notification.service';
 import { SessionService } from '../../../services/user/session.service';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
+import { RepositoryService } from '../../../services/repository/repository.service';
 
 
 @Component({
@@ -27,11 +28,12 @@ export class RepositoriesComponent extends NavigatableComponent implements
   commitMessageInput: string;
   pushRemoteNameInput: string;
   repositories: Array<any>;
+  repoList: Array<any>;
   rootProxy: ItemProxy;
 
   @Input()
   routingStrategy: string;
-  rowDef: Array<string> = ["name", "count", "description", "nav"];
+  rowDef: Array<string> = ["name", "count", "description", "mounted", "nav"];
 
   get navigationService() {
     return this._navigationService;
@@ -44,6 +46,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
   constructor(
     private _navigationService: NavigationService,
     private versionControlService: VersionControlService,
+    private repositoryService: RepositoryService,
     private itemRepository: ItemRepository,
     private _toastrService: ToastrService,
     private _notificationService: NotificationService,
@@ -56,13 +59,23 @@ export class RepositoriesComponent extends NavigatableComponent implements
 
   public ngOnInit(): void {
     this.repositoryStatusSubscription = this.itemRepository.
-      getRepoStatusSubject().subscribe((status: any) => {
+      getRepoStatusSubject().subscribe(async (status: any) => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
           this.treeConfigSubscription =
             this.itemRepository.getTreeConfig().subscribe((newConfig) => {
               this.repositories = newConfig.config.getRepositories();
               this.rootProxy = newConfig.config.getRootProxy();
             })
+          this.repoList = await this.repositoryService.getAvailableRepositories();
+          for (let x: number = 0; x< this.repoList.length; x++) {
+            this.repoList[x].mounted = false;
+            this.repoList[x].descendantCount = 0;
+            if (this.repositories.some(y => y.item.name === this.repoList[x].name)) {
+              let index = this.repositories.findIndex(t => t.item.name ===this.repoList[x].name);
+              this.repoList[x].mounted = true;
+              this.repoList[x].descendantCount = this.repositories[index].descendantCount;
+            }
+          }
         }
       });
   }
@@ -137,9 +150,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
       });
   }
 
-  public displayInformation(itemProxy: ItemProxy): void {
+  public displayInformation(id: string): void {
+    let index = this.repositories.findIndex(t => t.item.id === id);
     this.dialogueService.openComponentDialog(DetailsComponent, {
-      data: { itemProxy: itemProxy }
+      data: { itemProxy:  this.repositories[index]}
     }).updateSize('90%', '90%');
   }
 
