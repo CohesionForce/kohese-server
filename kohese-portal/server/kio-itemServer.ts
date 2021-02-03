@@ -1041,10 +1041,9 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Repository/getAvailableRepositories', (request: any, respond: Function) => {
-    var kdbDirPath = 'kdb';
     console.log('::: session %s: Received getAvailableRepositories for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
-    let repositoryData = kdbFS.loadJSONDoc(Path.join(kdbDirPath, 'AvailableRepositories.json'))
+    let repositoryData = kdb.getAvailableRepositories();
     respond(repositoryData);
   });
 

@@ -7,7 +7,7 @@ let path = require('path');
 console.log('::: Begin KDB File Load');
 
 var kdbFS = require('./kdb-fs');
-var Fs = require('fs');
+var fs = require('fs');
 
 var kdbModel = require('./kdb-model');
 
@@ -24,6 +24,8 @@ module.exports.ItemProxy = ItemProxy;
 
 var mountList = {};
 var kdbDirPath = 'kdb';
+
+let availableRepositories: any = [];
 
 var koheseKDBDirPath;
 var mountFilePath;
@@ -63,7 +65,7 @@ function loadKoheseModelsAndViews() {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-async function initialize (koheseKdbPath, repositoryList, indexAndExit) {
+async function initialize (koheseKdbPath, indexAndExit) {
   koheseKDBDirPath = path.join(kdbDirPath, koheseKdbPath);
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
@@ -76,11 +78,15 @@ async function initialize (koheseKdbPath, repositoryList, indexAndExit) {
   checkAndCreateDir(koheseKDBDirPath);
 
  // Get all repositories and add to Roots.json file
+  var repositoryList = fs.readdirSync('./kdb').filter(function (file) {
+    return fs.statSync(path.join('./kdb', file)).isDirectory();
+  });
   let configurationPath: string = path.resolve(kdbDirPath, 'AvailableRepositories.json');
-  let availableRepositories: any = [];
   for (let n: number = 0; n < repositoryList.length; n++) {
-    var tmppath = path.join(kdbDirPath, repositoryList[n]);
-    getAvailableRepositories(tmppath, availableRepositories);
+    var tmppath = path.join(kdbDirPath, path.join(repositoryList[n], 'Repository'));
+    if (fs.existsSync(tmppath)) {
+      setAvailableRepositories(tmppath, availableRepositories);
+    }
   }
   kdbFS.storeJSONDoc(configurationPath, availableRepositories);
 
@@ -138,19 +144,27 @@ module.exports.initialize = initialize;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function getAvailableRepositories(dir, availableRepositories) {
-  Fs.readdirSync(dir).forEach(file => {
+function getAvailableRepositories(): any {
+  return availableRepositories;
+}
+module.exports.getAvailableRepositories = getAvailableRepositories;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function setAvailableRepositories(dir, availableRepositories) {
+  fs.readdirSync(dir).forEach(file => {
     let fullPath = path.join(dir, file);
-    if (Fs.lstatSync(fullPath).isDirectory()) {
-       getAvailableRepositories(fullPath, availableRepositories);
-     } else {
+    if (fs.lstatSync(fullPath).isDirectory()) {
+      setAvailableRepositories(fullPath, availableRepositories);
+    } else {
       if (file === 'Root.json') {
         var repositories = kdbFS.loadJSONDoc(fullPath);
         availableRepositories.push({
           id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
         });
       }
-     }
+    }
   });
 }
 
@@ -550,7 +564,7 @@ function validateRepositoryStructure (repoDirPath) {
 
     switch(modelName) {
       case 'Repository':
-        // GAYLE - Need to update to look at Configuration File????
+        // TODO: Need to update to look at Configuration File????
         fileList = kdbFS.getRepositoryFileList(modelDirPath, /\.mount$/);
         for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
             var itemPath = modelDirPath + '/' + fileList[fileIdx];
