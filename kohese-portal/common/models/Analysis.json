@@ -2,19 +2,23 @@
   "id": "Analysis",
   "name": "Analysis",
   "parentId": "Model-Definitions",
-  "base": "PersistedModel",
+  "preventModification": true,
+  "restrictInstanceEditing": true,
   "namespace": {
-    "id": "com.kohese"
+    "id": "com.kohese.metamodel"
   },
+  "base": "PersistedModel",
   "idInjection": true,
   "invertItemOrder": true,
   "properties": {
     "id": {
       "type": "string",
-      "required": true
+      "required": true,
+      "name": "id"
     },
     "raw": {
-      "type": "object"
+      "type": "object",
+      "name": "raw"
     }
   },
   "validations": [],
