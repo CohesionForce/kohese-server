@@ -23,7 +23,8 @@ export enum ChangeType {
   CONTENT_CHANGED    = 'Content Changed',   TYPE_CHANGED  = 'Type Changed',
   PARENT_CHANGED     = 'Parent Changed',    CHILD_ADDED   = 'Child Added',
   CHILD_MODIFIED     = 'Child Modified',    CHILD_REMOVED = 'Child Removed',
-  CHILDREN_REORDERED = 'Children Reordered'
+  CHILDREN_REORDERED = 'Children Reordered', ITEM_ADDED = 'Item Added',
+  ITEM_REMOVED = 'Item Removed'
 }
 
 export class Comparison {
@@ -167,17 +168,22 @@ export class Comparison {
         iconClass = 'fa fa-arrow-up';
         break;
       case ChangeType.CHILD_ADDED:
-        iconClass = 'fa fa-plus';
+        iconClass = 'fa fa-plus-square';
         break;
       case ChangeType.CHILD_MODIFIED:
         iconClass = 'fa fa-arrow-down';
         break;
       case ChangeType.CHILD_REMOVED:
-        iconClass = 'fa fa-minus';
+        iconClass = 'fa fa-minus-square';
         break;
       case ChangeType.CHILDREN_REORDERED:
         iconClass = 'fa fa-exchange';
         break;
+      case ChangeType.ITEM_ADDED:
+        iconClass = 'fa fa-plus';
+        break;
+      case ChangeType.ITEM_REMOVED:
+        iconClass = 'fa fa-minus'
     }
 
     return iconClass;

@@ -69,6 +69,14 @@ export class Compare {
           }
           comparisons.push(comparison);
 
+          if (diff.summary.itemAdded[itemId]) {
+            comparison.changeTypes.push(ChangeType.ITEM_ADDED);
+          }
+
+          if (diff.summary.itemDeleted[itemId]) {
+            comparison.changeTypes.push(ChangeType.ITEM_REMOVED);
+          }
+
           if (diffEntry.contentChanged) {
             comparison.changeTypes.push(ChangeType.CONTENT_CHANGED);
           }

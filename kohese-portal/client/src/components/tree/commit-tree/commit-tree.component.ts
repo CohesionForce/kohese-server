@@ -32,57 +32,27 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   @Output('rowSelected')
   public rowSelectedEmitter: EventEmitter<any> = new EventEmitter<any>();
 
+  private createImage(changeType: ChangeType): Image {
+    return new Image(Comparison.getChangeIconString(changeType),
+    (object: any) => {
+    return changeType;
+  }, true, (object: any) => {
+    return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
+      changeTypes.indexOf(changeType)));
+    })
+  }
+
   private _images: Array<Image> = [
-    new Image(Comparison.getChangeIconString(ChangeType.CONTENT_CHANGED),
-      (object: any) => {
-      return ChangeType.CONTENT_CHANGED;
-    }, true, (object: any) => {
-      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
-        changeTypes.indexOf(ChangeType.CONTENT_CHANGED)));
-      }),
-    new Image(Comparison.getChangeIconString(ChangeType.TYPE_CHANGED),
-      (object: any) => {
-      return ChangeType.TYPE_CHANGED;
-    }, true, (object: any) => {
-      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
-        changeTypes.indexOf(ChangeType.TYPE_CHANGED)));
-      }),
-    new Image(Comparison.getChangeIconString(ChangeType.PARENT_CHANGED),
-      (object: any) => {
-      return ChangeType.PARENT_CHANGED;
-    }, true, (object: any) => {
-      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
-        changeTypes.indexOf(ChangeType.PARENT_CHANGED)));
-      }),
-    new Image(Comparison.getChangeIconString(ChangeType.CHILD_ADDED),
-      (object: any) => {
-      return ChangeType.CHILD_ADDED;
-    }, true, (object: any) => {
-      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
-        changeTypes.indexOf(ChangeType.CHILD_ADDED)));
-      }),
-    new Image(Comparison.getChangeIconString(ChangeType.CHILD_MODIFIED),
-      (object: any) => {
-      return ChangeType.CHILD_MODIFIED;
-    }, true, (object: any) => {
-      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
-        changeTypes.indexOf(ChangeType.CHILD_MODIFIED)));
-      }),
-    new Image(Comparison.getChangeIconString(ChangeType.CHILD_REMOVED),
-      (object: any) => {
-      return ChangeType.CHILD_REMOVED;
-    }, true, (object: any) => {
-      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
-        changeTypes.indexOf(ChangeType.CHILD_REMOVED)));
-      }),
-    new Image(Comparison.getChangeIconString(ChangeType.CHILDREN_REORDERED),
-      (object: any) => {
-      return ChangeType.CHILDREN_REORDERED;
-    }, true, (object: any) => {
-      return ((object instanceof Comparison) && (-1 !== (<Comparison> object).
-        changeTypes.indexOf(ChangeType.CHILDREN_REORDERED)));
-      })
-    ];
+    this.createImage(ChangeType.ITEM_ADDED),
+    this.createImage(ChangeType.ITEM_REMOVED),
+    this.createImage(ChangeType.PARENT_CHANGED),
+    this.createImage(ChangeType.CHILD_ADDED),
+    this.createImage(ChangeType.CHILD_REMOVED),
+    this.createImage(ChangeType.CHILDREN_REORDERED),
+    this.createImage(ChangeType.CHILD_MODIFIED),
+    this.createImage(ChangeType.TYPE_CHANGED),
+    this.createImage(ChangeType.CONTENT_CHANGED)
+  ];
   get images() {
     return this._images;
   }
