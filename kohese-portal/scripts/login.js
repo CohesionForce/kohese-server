@@ -3,7 +3,8 @@
  */
 
 
- // TODO: Determine if there is an https change required
+// TODO: Determine if there is an https change required
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0; /* <--- only use for testing purposes */
 var prompt = require('prompt');
 var https = require('https');
 var fs = require('fs');
@@ -63,8 +64,9 @@ function  beginLogin() {
 
 		var loginData = '{"username":"' + result.username + '","password":"' + result.password + '"}';
 		var options = {
-				host: 'localhost',
-				port: 3000,
+        host: 'localhost',
+        port: 3010,
+        cert: fs.readFileSync('./cert/servercert.pem'),
 				path: '/login',
 				method: 'POST',
 				headers: {

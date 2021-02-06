@@ -36,7 +36,7 @@ export class DialogService {
         title: title,
         text: text
       }
-    }], { data: { buttonLabels: buttonLabels } }).updateSize('40%', 'auto').
+    }], { data: { buttonLabels: buttonLabels } }).updateSize('50%', 'auto').
       afterClosed().toPromise();
     if (results) {
       return results[0];

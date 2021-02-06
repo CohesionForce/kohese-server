@@ -125,6 +125,27 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id });
         break;
 
+      case 'Admin/lockoutUser':
+        console.log('::: Locking out user: ' + request.data.username);
+        socket.emit(request.type, request.data, (response) => {
+          port.postMessage({ id: request.id, data: response});
+        });
+        break;
+
+      case 'Admin/reinstateUser':
+        console.log('::: Locking out user: ' + request.data.username);
+        socket.emit(request.type, request.data, (response) => {
+          port.postMessage({ id: request.id, data: response});
+        });
+        break;
+
+      case 'Admin/getUserLockoutList':
+        console.log('::: Locking out user: ' + request.data.username);
+        socket.emit(request.type, request.data, (response) => {
+          port.postMessage({ id: request.id, data: response});
+        });
+        break;
+
       case 'tabIsClosing':
         console.log('::: Client tab is closing: ' + clientId);
         tabDisconnected(clientId);

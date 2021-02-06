@@ -13,10 +13,9 @@ import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DetailsComponent } from '../details/details.component';
+import { CacheManager } from '../../../../client/cache-worker/CacheManager';
 
-
-
-import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
+import { MatExpansionPanel } from '@angular/material'
 
 
 @Component({
@@ -78,12 +77,32 @@ export class AdminComponent implements OnInit, OnDestroy {
   private expansionPanels: QueryList<MatExpansionPanel>;
 
   public constructor(
+    private cacheManager : CacheManager,
     private _changeDetectorRef: ChangeDetectorRef,
     private _sessionService: SessionService,
     private _itemRepository:ItemRepository,
     private _lensService: LensService,
     private _dialogService: DialogService,
     private _navigationService: NavigationService) {
+
+      // Subscribe to messages from the CacheManager for user-lockout function
+
+      this.cacheManager.subscribe('Admin/lockoutUser', (repsonse) => {
+        console.log('::: ' + repsonse.username + 'has been locked out.');
+      });
+
+      this.cacheManager.subscribe('Admin/reinstateUser', (response) => {
+        console.log('::: ' + response.username + 'has been reinstated.');
+      });
+
+      cacheManager.subscribe('userLockedOut', (response) => {
+        console.log('::: Session user locked out');
+      });
+
+      cacheManager.subscribe('Admin/getUserLockoutList', (response) => {
+        _dialogService.openInformationDialog('Users Locked:', response.userLockoutList);
+        console.log('::: User lockout list retrieved');
+      });
   }
 
   public ngOnInit(): void {
@@ -177,6 +196,29 @@ export class AdminComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       });
     }
+  }
+
+  private async lockUser(user: any): Promise<void> {
+    let response: any = await this._dialogService.openYesNoDialog('Lock ' +
+      user.name, 'Lock ' + user.name + ' out of Kohese?');
+    if (response) {
+      this.cacheManager.sendMessageToWorker('Admin/lockoutUser', user.name, true);
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+
+  private async reinstateUser(user: any): Promise<void> {
+    let response: any = await this._dialogService.openYesNoDialog('Reinstate ' + user.name + '?\n',
+      'Reinstate ' + user.name + '?');
+    if (response) {
+      this.cacheManager.sendMessageToWorker('Admin/reinstateUser', user.name, true);
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+
+  private async getUserLockoutList(user: any): Promise<void> {
+    this.cacheManager.sendMessageToWorker('Admin/getUserLockoutList', undefined, true);
+    this._changeDetectorRef.markForCheck();
   }
 
   isModified(user: any): boolean {
