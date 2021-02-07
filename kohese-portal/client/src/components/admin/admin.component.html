@@ -1,16 +1,16 @@
-<div class="users-page-wrapper">
+<div class="users-page-wrapper"
+[ngStyle]="{ 'height': ((lens === ApplicationLens.DEFAULT) ? 'calc(100% - 34px)' : 'calc(100% - 84px)') }">
   <ng-container *ngIf="sessionMap else initializing">
     <lens></lens>
     <div class="panel-heading">Admin</div>
-
     <split direction="horizontal">
 
       <split-area id="session-split" [size]="40">
-        <div [ngStyle]="{ 'height': ((lens === ApplicationLens.DEFAULT) ? '35%' : 'calc(35% - 50px)') }">
-          <div style="height: 70px;">
-            <h2>Sessions</h2>
+        <div class="session-container">
+          <div class="session-banner">
+            <h2>Connections Active</h2>
           </div>
-          <div style="height: calc(100% - 70px); overflow: auto;">
+          <div class="session-content">
             <ng-container *ngFor="let session of Object.keys(sessionMap)">
               <div style="width: 100%;">
                 {{sessionMap[session].username}} - {{sessionMap[session].address}}
@@ -23,7 +23,6 @@
           </div>
         </div>
       </split-area>
-
 
       <split-area id="user-split" [size]="60">
         <div class="user-container">
@@ -130,7 +129,6 @@
       </split-area>
 
     </split>
-
   </ng-container>
   <ng-template #initializing>
     <div class="initialize-spinner">
