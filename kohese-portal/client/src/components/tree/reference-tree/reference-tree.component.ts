@@ -103,9 +103,22 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
           getChangeSubject().subscribe((notification: any) => {
           let path: Array<string> = (<Array<string>> this.rootSubject.
             getValue());
-          if (notification.proxy && ((path[path.length - 1] === notification.
-            proxy.item.id) || this.isRootReferencedBy(notification.proxy))) {
-            this.buildRows(path);
+          switch (notification.type) {
+            case 'delete': {
+                // Root Row is deleted so reset to default of Root Proxy
+                if (this.rootSubject.getValue()[0] === notification.id) {
+                  let root: Array<string> = [this._selectedTreeConfiguration.getRootProxy().item.id];
+                  this.absoluteRoot = [this._selectedTreeConfiguration.getRootProxy().item.id];
+                  this.buildRows(root);
+                  this.rootSubject.next(root);
+                }
+              }
+              break;
+            default:
+              if (notification.proxy && ((path[path.length - 1] === notification.proxy.item.id) ||
+                this.isRootReferencedBy(notification.proxy))) {
+                this.buildRows(path);
+              }
           }
         });
 
