@@ -8,7 +8,7 @@
       <split-area id="session-split" [size]="40">
         <div class="session-container">
           <div class="session-banner">
-            <h2>Connections Active</h2>
+            <h2>Sessions</h2>
           </div>
           <div class="session-content">
             <ng-container *ngFor="let session of Object.keys(sessionMap)">
@@ -42,17 +42,18 @@
               <mat-icon class="fa fa-plus"></mat-icon>
             </button>
             <button mat-icon-button matTooltip="User Lockout List"
-              (click)="getUserLockoutList(user)">
+              (click)="displayUserLockoutList()">
               <mat-icon class="fa fa-lock"></mat-icon>
             </button>
           </h2>
-          <div class="user-panels">
+          <div class="user-panel">
             <ng-container *ngFor="let user of sessionService.users">
               <mat-expansion-panel #panel>
                 <mat-expansion-panel-header [ngStyle]="{ 'background-color': koheseUserViewModel.color }">
                   <mat-panel-title>
                     <mat-icon class="{{koheseUserViewModel.icon}}" style="margin-right: 3px;"></mat-icon>
                     {{user.name}}
+                    <ng-container *ngIf="(lockoutList.indexOf(user.username) > -1)"><mat-icon class="fa fa-lock"></mat-icon></ng-container>
                   </mat-panel-title>
                   <mat-panel-description>
                     <ng-container *ngIf="isModified(user)">
@@ -99,18 +100,26 @@
                         Navigate in New Tab
                       </button>
                       <mat-divider></mat-divider>
-                      <button mat-menu-item (click)="lockUser(user)">
-                        <mat-icon class="fa fa-lock"></mat-icon>
-                        Lock User
-                      </button>
-                      <button mat-menu-item (click)="reinstateUser(user)">
-                        <mat-icon class="fa fa-unlock"></mat-icon>
-                        Unlock User
-                      </button>
-                      <button mat-menu-item (click)="remove(user)">
-                        <mat-icon class="fa fa-trash"></mat-icon>
-                        Remove This User
-                      </button>
+                      <ng-container *ngIf="!(lockoutList.indexOf(user.username) > -1) else reinstate">
+                        <button mat-menu-item (click)="lockUser(user)">
+                          <mat-icon class="fa fa-lock"></mat-icon>
+                          Lock User
+                        </button>
+                      </ng-container>
+                      <ng-template #reinstate>
+                        <button mat-menu-item (click)="reinstateUser(user)">
+                          <mat-icon class="fa fa-unlock"></mat-icon>
+                          Unlock User
+                        </button>
+                      </ng-template>
+                      <!-- div to display tooltip on disabled button -->
+                      <div matTooltip="Unlock User First" [matTooltipDisabled]="(lockoutList.indexOf(user.username) === -1)">
+                        <button mat-menu-item (click)="remove(user)"
+                          [disabled]="lockoutList.indexOf(user.username) > -1">
+                          <mat-icon class="fa fa-trash"></mat-icon>
+                          Remove This User
+                        </button>
+                      </div>
                     </mat-menu>
                   </mat-panel-description>
                 </mat-expansion-panel-header>
@@ -130,10 +139,10 @@
 
     </split>
   </ng-container>
+
   <ng-template #initializing>
     <div class="initialize-spinner">
       <mat-spinner mode="indeterminate"></mat-spinner>
     </div>
   </ng-template>
-
 </div>

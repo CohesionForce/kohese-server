@@ -133,14 +133,14 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         break;
 
       case 'Admin/reinstateUser':
-        console.log('::: Locking out user: ' + request.data.username);
+        console.log('::: Reinstating user: ' + request.data.username);
         socket.emit(request.type, request.data, (response) => {
           port.postMessage({ id: request.id, data: response});
         });
         break;
 
       case 'Admin/getUserLockoutList':
-        console.log('::: Locking out user: ' + request.data.username);
+        console.log('::: Sending user lockout list: ' + request.data.username);
         socket.emit(request.type, request.data, (response) => {
           port.postMessage({ id: request.id, data: response});
         });

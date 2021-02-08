@@ -25,6 +25,10 @@ import { MatExpansionPanel } from '@angular/material'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminComponent implements OnInit, OnDestroy {
+  // Data
+  private lockoutList: Array<string>;
+
+  // Getters
   private _lens: ApplicationLens;
   get lens() {
     return this._lens;
@@ -83,27 +87,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     private _itemRepository:ItemRepository,
     private _lensService: LensService,
     private _dialogService: DialogService,
-    private _navigationService: NavigationService) {
-
-      // Subscribe to messages from the CacheManager for user-lockout function
-
-      this.cacheManager.subscribe('Admin/lockoutUser', (repsonse) => {
-        console.log('::: ' + repsonse.username + 'has been locked out.');
-      });
-
-      this.cacheManager.subscribe('Admin/reinstateUser', (response) => {
-        console.log('::: ' + response.username + 'has been reinstated.');
-      });
-
-      cacheManager.subscribe('userLockedOut', (response) => {
-        console.log('::: Session user locked out');
-      });
-
-      cacheManager.subscribe('Admin/getUserLockoutList', (response) => {
-        _dialogService.openInformationDialog('Users Locked:', response.userLockoutList);
-        console.log('::: User lockout list retrieved');
-      });
-  }
+    private _navigationService: NavigationService) { }
 
   public ngOnInit(): void {
     this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
@@ -122,6 +106,9 @@ export class AdminComponent implements OnInit, OnDestroy {
       this._lens = lens;
       this._changeDetectorRef.markForCheck();
     });
+
+    // Loads user lockout list for lock/reinstate panel buttons
+    this.getUserLockoutList();
   }
 
   public ngOnDestroy(): void {
@@ -198,26 +185,51 @@ export class AdminComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async lockUser(user: any): Promise<void> {
-    let response: any = await this._dialogService.openYesNoDialog('Lock ' +
+  //////////////////////////////////////////////////////////
+  // Provides the option to lock a current user
+  //////////////////////////////////////////////////////////
+  private async lockUser(user: any) {
+    let lock: any = await this._dialogService.openYesNoDialog('Lock ' +
       user.name, 'Lock ' + user.name + ' out of Kohese?');
-    if (response) {
-      this.cacheManager.sendMessageToWorker('Admin/lockoutUser', user.name, true);
+    if (lock) {
+      let response = await this.cacheManager.sendMessageToWorker('Admin/lockoutUser', {username: user.username}, true);
+      console.log('::: ' + response.username + 'has been locked out.');
+      this.getUserLockoutList();
       this._changeDetectorRef.markForCheck();
     }
   }
-
-  private async reinstateUser(user: any): Promise<void> {
-    let response: any = await this._dialogService.openYesNoDialog('Reinstate ' + user.name + '?\n',
+  //////////////////////////////////////////////////////////
+  // Provides the option to reinstate a locked user
+  //////////////////////////////////////////////////////////
+  private async reinstateUser(user: any) {
+    let reinstate: any = await this._dialogService.openYesNoDialog('Reinstate ' + user.name + '?\n',
       'Reinstate ' + user.name + '?');
-    if (response) {
-      this.cacheManager.sendMessageToWorker('Admin/reinstateUser', user.name, true);
+    if (reinstate) {
+      let response = await this.cacheManager.sendMessageToWorker('Admin/reinstateUser', {username: user.username}, true);
+      console.log('::: ' + response.username + 'has been reinstated.');
+      this.getUserLockoutList();
       this._changeDetectorRef.markForCheck();
     }
   }
 
-  private async getUserLockoutList(user: any): Promise<void> {
-    this.cacheManager.sendMessageToWorker('Admin/getUserLockoutList', undefined, true);
+  //////////////////////////////////////////////////////////
+  // Retrieve the locked users without initially
+  // displaying a dialog.
+  //////////////////////////////////////////////////////////
+  private async getUserLockoutList() {
+    let response = await this.cacheManager.sendMessageToWorker('Admin/getUserLockoutList', {}, true);
+    this.lockoutList = response.userLockoutList;
+  }
+
+  //////////////////////////////////////////////////////////
+  // Displays users currently locked out of the system
+  //////////////////////////////////////////////////////////
+  private async displayUserLockoutList() {
+    await this.getUserLockoutList();
+    // TODO: Find a way to display as a list, and not just comma separated.
+    let listedUsers: string = this.lockoutList.join(', ');
+    this._dialogService.openInformationDialog('Users Locked:', listedUsers);
+    console.log('::: User lockout list retrieved');
     this._changeDetectorRef.markForCheck();
   }
 
