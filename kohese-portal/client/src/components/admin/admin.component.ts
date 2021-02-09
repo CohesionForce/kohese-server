@@ -26,7 +26,7 @@ import { MatExpansionPanel } from '@angular/material'
 })
 export class AdminComponent implements OnInit, OnDestroy {
   // Data
-  private lockoutList: Array<string>;
+  private lockoutList: Array<string> = [];
 
   // Getters
   private _lens: ApplicationLens;
