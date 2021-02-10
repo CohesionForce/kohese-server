@@ -13,10 +13,9 @@ import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DetailsComponent } from '../details/details.component';
+import { CacheManager } from '../../../../client/cache-worker/CacheManager';
 
-
-
-import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
+import { MatExpansionPanel } from '@angular/material'
 
 
 @Component({
@@ -26,6 +25,10 @@ import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminComponent implements OnInit, OnDestroy {
+  // Data
+  private lockoutList: Array<string> = [];
+
+  // Getters
   private _lens: ApplicationLens;
   get lens() {
     return this._lens;
@@ -78,13 +81,13 @@ export class AdminComponent implements OnInit, OnDestroy {
   private expansionPanels: QueryList<MatExpansionPanel>;
 
   public constructor(
+    private cacheManager : CacheManager,
     private _changeDetectorRef: ChangeDetectorRef,
     private _sessionService: SessionService,
     private _itemRepository:ItemRepository,
     private _lensService: LensService,
     private _dialogService: DialogService,
-    private _navigationService: NavigationService) {
-  }
+    private _navigationService: NavigationService) { }
 
   public ngOnInit(): void {
     this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
@@ -103,6 +106,9 @@ export class AdminComponent implements OnInit, OnDestroy {
       this._lens = lens;
       this._changeDetectorRef.markForCheck();
     });
+
+    // Loads user lockout list for lock/reinstate panel buttons
+    this.getUserLockoutList();
   }
 
   public ngOnDestroy(): void {
@@ -177,6 +183,54 @@ export class AdminComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
       });
     }
+  }
+
+  //////////////////////////////////////////////////////////
+  // Provides the option to lock a current user
+  //////////////////////////////////////////////////////////
+  private async lockUser(user: any) {
+    let lock: any = await this._dialogService.openYesNoDialog('Lock ' +
+      user.name, 'Lock ' + user.name + ' out of Kohese?');
+    if (lock) {
+      let response = await this.cacheManager.sendMessageToWorker('Admin/lockoutUser', {username: user.username}, true);
+      console.log('::: ' + response.username + 'has been locked out.');
+      this.getUserLockoutList();
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+  //////////////////////////////////////////////////////////
+  // Provides the option to reinstate a locked user
+  //////////////////////////////////////////////////////////
+  private async reinstateUser(user: any) {
+    let reinstate: any = await this._dialogService.openYesNoDialog('Reinstate ' + user.name + '?\n',
+      'Reinstate ' + user.name + '?');
+    if (reinstate) {
+      let response = await this.cacheManager.sendMessageToWorker('Admin/reinstateUser', {username: user.username}, true);
+      console.log('::: ' + response.username + 'has been reinstated.');
+      this.getUserLockoutList();
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+
+  //////////////////////////////////////////////////////////
+  // Retrieve the locked users without initially
+  // displaying a dialog.
+  //////////////////////////////////////////////////////////
+  private async getUserLockoutList() {
+    let response = await this.cacheManager.sendMessageToWorker('Admin/getUserLockoutList', {}, true);
+    this.lockoutList = response.userLockoutList;
+  }
+
+  //////////////////////////////////////////////////////////
+  // Displays users currently locked out of the system
+  //////////////////////////////////////////////////////////
+  private async displayUserLockoutList() {
+    await this.getUserLockoutList();
+    // TODO: Find a way to display as a list, and not just comma separated.
+    let listedUsers: string = this.lockoutList.join(', ');
+    this._dialogService.openInformationDialog('Users Locked:', listedUsers);
+    console.log('::: User lockout list retrieved');
+    this._changeDetectorRef.markForCheck();
   }
 
   isModified(user: any): boolean {

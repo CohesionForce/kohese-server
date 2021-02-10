@@ -1,115 +1,148 @@
-<ng-container *ngIf="sessionMap else initializing">
-  <lens></lens>
-  <div class="panel-heading">Admin</div>
-  <div [ngStyle]="{ 'height': ((lens === ApplicationLens.DEFAULT) ? '35%' : 'calc(35% - 50px)') }">
-    <div style="height: 70px;">
-      <h2>Sessions</h2>
-    </div>
-    <div style="height: calc(100% - 70px); overflow: auto;">
-      <ng-container *ngFor="let session of Object.keys(sessionMap)">
-        <div style="width: 100%;">
-          {{sessionMap[session].username}} - {{sessionMap[session].address}}
-          <ng-container *ngIf="sessionMap[session].numberOfConnections">
-            - {{sessionMap[session].numberOfConnections}} Connection{{
-            (sessionMap[session].numberOfConnections > 1) ? 's' : ''}}
-          </ng-container>
-        </div>
-      </ng-container>
-    </div>
-  </div>
-  <div style="height: calc(65% - 34px);">
-    <h2
-      style="height: 2.4em; background-color: white; color: black; display: flex; flex-direction: row; align-items: center">
-      Users
-      <button mat-icon-button matTooltip="Expand all Users" (click)="expandAll()" style="margin-left: auto;">
-        <mat-icon class="fa fa-chevron-down"></mat-icon>
-      </button>
-      <button mat-icon-button matTooltip="Collapse all Users" (click)="collapseAll()">
-        <mat-icon class="fa fa-chevron-up"></mat-icon>
-      </button>
-      <button mat-icon-button matTooltip="Add a user" (click)="add()">
-        <mat-icon class="fa fa-plus"></mat-icon>
-      </button>
-    </h2>
-    <!-- Height of 5.3em was chosen based on the minimum height for entire scroll bar to show. It is unclear
-         from where the extra space we are not taking to account is located. See comments on
-         assignment-dashboard.component.html or activity-feed.component.html for further explanation.  -->
-    <div style="height: calc(100% - 5.33em); overflow: auto;">
-      <ng-container *ngFor="let user of sessionService.users">
-        <mat-expansion-panel
-          style="width: 100%;
-          box-shadow: 0 3px 1px -2px rgba(250,250,250,.8), 0 2px 2px 0 rgba(250,250,250,.64), 0 1px 5px 0 rgba(250,250,250,.62);" #panel>
-          <mat-expansion-panel-header [ngStyle]="{ 'background-color': koheseUserViewModel.color }"
-            style="color: whitesmoke;">
-            <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 68%;
-              display: block; white-space: nowrap; overflow: auto; text-overflow: ellipsis;">
-              <mat-icon class="{{koheseUserViewModel.icon}}" style="margin-right: 3px;"></mat-icon>
-              {{user.name}}
-            </mat-panel-title>
-            <mat-panel-description style="color:whitesmoke; width: 32%;">
-              <ng-container *ngIf="isModified(user)">
-                <button mat-icon-button [disabled]="true" style="margin-left: auto;">
-                  <img src="assets/icons/versioncontrol/dirty.ico" />
-                </button>
-              </ng-container>
-              <ng-container *ngIf="(editableSet.indexOf(user.id) === -1) else editableBlock">
-                <button mat-icon-button matTooltip="Edit this user"
-                  [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
-                  (click)="$event.stopPropagation(); panel.open(); editableSet.push(user.id)">
-                  <mat-icon class="fa fa-edit"></mat-icon>
-                </button>
-              </ng-container>
-              <ng-template #editableBlock>
-                <button mat-icon-button matTooltip="Save this user"
-                  [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
-                  (click)="$event.stopPropagation(); save(user)">
-                  <mat-icon class="fa fa-save"></mat-icon>
-                </button>
-                <button mat-icon-button matTooltip="Discard unsaved changes to this user"
-                  (click)="$event.stopPropagation(); discardChanges(user)">
-                  <mat-icon class="fa fa-times"></mat-icon>
-                </button>
-              </ng-template>
+<div class="users-page-wrapper"
+[ngStyle]="{ 'height': ((lens === ApplicationLens.DEFAULT) ? 'calc(100% - 34px)' : 'calc(100% - 84px)') }">
+  <ng-container *ngIf="sessionMap else initializing">
+    <lens></lens>
+    <div class="panel-heading">Admin</div>
+    <split direction="horizontal">
 
-              <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
-                (click)="$event.stopPropagation();">
-                <mat-icon class="fa fa-bars"></mat-icon>
-              </button>
-              <mat-menu #menu="matMenu" [overlapTrigger]="false">
-                <button mat-menu-item (click)="displayInformation(user)">
-                  <mat-icon class="fa fa-clone"></mat-icon>
-                  Display Item information
-                </button>
-                <button mat-menu-item
-                  (click)="$event.stopPropagation(); navigationService.navigate('Explore', { id: user.id })">
-                  <mat-icon class="fa fa-arrow-right"></mat-icon>
-                  Navigate in Explorer
-                </button>
-                <button mat-menu-item
-                  (click)="$event.stopPropagation(); navigationService.addTab('Explore', { id: user.id })">
-                  <mat-icon class="fa fa-external-link"></mat-icon>
-                  Navigate in New Tab
-                </button>
-                <mat-divider></mat-divider>
-                <button mat-menu-item (click)="remove(user)">
-                  <mat-icon class="fa fa-trash"></mat-icon>
-                  Remove This User
-                </button>
-              </mat-menu>
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
-            <format-object-editor [type]="koheseUserDataModel" [object]="user" [formatDefinitionType]="FormatDefinitionType.
-              DEFAULT" [disabled]="(editableSet.indexOf(user.id) === -1)">
-            </format-object-editor>
-          </ng-template>
-        </mat-expansion-panel>
-      </ng-container>
+      <split-area id="session-split" [size]="40">
+        <div class="session-container">
+          <div class="session-banner">
+            <h2>Sessions</h2>
+          </div>
+          <div class="session-content">
+            <ng-container *ngFor="let session of Object.keys(sessionMap)">
+              <div style="width: 100%;">
+                {{sessionMap[session].username}} - {{sessionMap[session].address}}
+                <ng-container *ngIf="sessionMap[session].numberOfConnections">
+                  - {{sessionMap[session].numberOfConnections}} Connection{{
+                  (sessionMap[session].numberOfConnections > 1) ? 's' : ''}}
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </split-area>
+
+      <split-area id="user-split" [size]="60">
+        <div class="user-container">
+          <h2 class="user-banner">
+            Users
+            <button mat-icon-button matTooltip="Expand all Users"
+              style="margin-left: auto;"
+              (click)="expandAll()">
+              <mat-icon class="fa fa-chevron-down"></mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Collapse all Users"
+              (click)="collapseAll()">
+              <mat-icon class="fa fa-chevron-up"></mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Add a user"
+              (click)="add()">
+              <mat-icon class="fa fa-plus"></mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="User Lockout List"
+              (click)="displayUserLockoutList()">
+              <mat-icon class="fa fa-lock"></mat-icon>
+            </button>
+          </h2>
+          <div class="user-panel">
+            <ng-container *ngFor="let user of sessionService.users">
+              <mat-expansion-panel #panel>
+                <mat-expansion-panel-header [ngStyle]="{ 'background-color': koheseUserViewModel.color }">
+                  <mat-panel-title>
+                    <mat-icon class="{{koheseUserViewModel.icon}}" style="margin-right: 3px;"></mat-icon>
+                    {{user.name}}
+                    <ng-container *ngIf="(lockoutList.indexOf(user.username) > -1)"><mat-icon class="fa fa-lock"></mat-icon></ng-container>
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    <ng-container *ngIf="isModified(user)">
+                      <button mat-icon-button [disabled]="true" style="margin-left: auto;">
+                        <img src="assets/icons/versioncontrol/dirty.ico" />
+                      </button>
+                    </ng-container>
+                    <ng-container *ngIf="(editableSet.indexOf(user.id) === -1) else editableBlock">
+                      <button mat-icon-button matTooltip="Edit this user"
+                        [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
+                        (click)="$event.stopPropagation(); panel.open(); editableSet.push(user.id)">
+                        <mat-icon class="fa fa-edit"></mat-icon>
+                      </button>
+                    </ng-container>
+                    <ng-template #editableBlock>
+                      <button mat-icon-button matTooltip="Save this user"
+                        [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
+                        (click)="$event.stopPropagation(); save(user)">
+                        <mat-icon class="fa fa-save"></mat-icon>
+                      </button>
+                      <button mat-icon-button matTooltip="Discard unsaved changes to this user"
+                        (click)="$event.stopPropagation(); discardChanges(user)">
+                        <mat-icon class="fa fa-times"></mat-icon>
+                      </button>
+                    </ng-template>
+
+                    <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
+                      (click)="$event.stopPropagation();">
+                      <mat-icon class="fa fa-bars"></mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu" [overlapTrigger]="false">
+                      <button mat-menu-item (click)="displayInformation(user)">
+                        <mat-icon class="fa fa-clone"></mat-icon>
+                        Display Item information
+                      </button>
+                      <button mat-menu-item
+                        (click)="$event.stopPropagation(); navigationService.navigate('Explore', { id: user.id })">
+                        <mat-icon class="fa fa-arrow-right"></mat-icon>
+                        Navigate in Explorer
+                      </button>
+                      <button mat-menu-item
+                        (click)="$event.stopPropagation(); navigationService.addTab('Explore', { id: user.id })">
+                        <mat-icon class="fa fa-external-link"></mat-icon>
+                        Navigate in New Tab
+                      </button>
+                      <mat-divider></mat-divider>
+                      <ng-container *ngIf="!(lockoutList.indexOf(user.username) > -1) else reinstate">
+                        <button mat-menu-item (click)="lockUser(user)">
+                          <mat-icon class="fa fa-lock"></mat-icon>
+                          Lock User
+                        </button>
+                      </ng-container>
+                      <ng-template #reinstate>
+                        <button mat-menu-item (click)="reinstateUser(user)">
+                          <mat-icon class="fa fa-unlock"></mat-icon>
+                          Unlock User
+                        </button>
+                      </ng-template>
+                      <!-- div to display tooltip on disabled button -->
+                      <div matTooltip="Unlock User First" [matTooltipDisabled]="(lockoutList.indexOf(user.username) === -1)">
+                        <button mat-menu-item (click)="remove(user)"
+                          [disabled]="lockoutList.indexOf(user.username) > -1">
+                          <mat-icon class="fa fa-trash"></mat-icon>
+                          Remove This User
+                        </button>
+                      </div>
+                    </mat-menu>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <ng-template matExpansionPanelContent>
+                  <format-object-editor
+                    [type]="koheseUserDataModel"
+                    [object]="user"
+                    [formatDefinitionType]="FormatDefinitionType.DEFAULT"
+                    [disabled]="(editableSet.indexOf(user.id) === -1)">
+                  </format-object-editor>
+                </ng-template>
+              </mat-expansion-panel>
+            </ng-container>
+          </div>
+        </div>
+      </split-area>
+
+    </split>
+  </ng-container>
+
+  <ng-template #initializing>
+    <div class="initialize-spinner">
+      <mat-spinner mode="indeterminate"></mat-spinner>
     </div>
-  </div>
-</ng-container>
-<ng-template #initializing>
-  <div style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center;">
-    <mat-spinner mode="indeterminate"></mat-spinner>
-  </div>
-</ng-template>
+  </ng-template>
+</div>

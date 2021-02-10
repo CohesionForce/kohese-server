@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core/";
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from "../../material.module";
+import { AngularSplitModule} from 'angular-split';
 
 import { AdminComponent} from './admin.component';
 import { RepositoriesComponent } from './repositories/repositories.component'
@@ -30,7 +31,8 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     ReactiveFormsModule,
     PipesModule,
     LensModule,
-    ObjectEditorModule
+    ObjectEditorModule,
+    AngularSplitModule
   ],
   exports : [
     AdminComponent,
