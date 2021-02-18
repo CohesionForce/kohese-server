@@ -1,24 +1,59 @@
 .version-control-admin {
-  padding: 5px;
+  // overall page styling
   height: 100%;
   width: 100%;
   overflow: hidden;
 
-  .repository-panel {
-    margin: 5px;
+  // version control and repositories title styling
+  h4 {
+    padding-left: 5px;
+    font-weight: bold;
+    color: rgb(75, 75, 75); /* charcoal text */
   }
 
+  // remote repositories table container
   .remote-container {
-    height: 80px;
+    height: 11.33em;
+    width: 100%;
     overflow: auto;
-    border: 1px solid black;
+  }
+
+  // repositories table container
+  .repo-list {
+    height: calc(100% - 22.8em);
+    overflow: auto;
   }
 }
 
-.repo-list {
-  height: calc(100% - 365.7px);
-  overflow: auto;
+//////////////////////////////////
+// same row buttons using
+// flex and float
+//////////////////////////////////
+
+// This display spec pushes the button to the right
+.version-control-admin #refresh-button {
+  display: flex;
 }
+
+.float-container {
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+
+  // remote name and push url
+  .float-child-1 {
+    float: left;
+  }
+
+  // refresh button
+  .float-child-2 {
+    float: right;
+  }
+}
+
+//////////////////////////////////
+// mat-table
+//////////////////////////////////
 
 // Every other row is colored
 mat-row:nth-child(even) {

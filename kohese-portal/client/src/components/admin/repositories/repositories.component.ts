@@ -33,6 +33,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
 
   @Input()
   routingStrategy: string;
+  remoteRowDef: Array<string> = ['remote'];
   rowDef: Array<string> = ["name", "count", "description", "mounted", "nav"];
 
   get navigationService() {
