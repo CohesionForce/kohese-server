@@ -4,8 +4,8 @@
 
     <div class=float-container>
       <div class=float-child-1>
-        <input id="add-remote-input" type="text" [(ngModel)]="remoteNameInput" placeholder='remote name'/>
-        <input id="add-remote-url" type="text" [(ngModel)]="remoteUrlInput" placeholder='push URL' />
+        <input style="margin-right: 1em" id="add-remote-input" type="text" [(ngModel)]="remoteNameInput" placeholder='remote name'/>
+        <input style="margin-right: 1em" id="add-remote-url" type="text" [(ngModel)]="remoteUrlInput" placeholder='push URL' />
         <button class="btn btn-primary" (click)="addRemote()">Add Remote</button>
       </div>
       <div class=float-child-2>
@@ -26,13 +26,14 @@
     </div>
     <hr />
 
-    <h4>Repositories:</h4>
     <div class="commit-options">
-      <input id="commit-message-input" type="text" [(ngModel)]="commitMessageInput" placeholder='commit message'/>
-      <button class="btn btn-primary" (click)="commit()">Commit Staged Items</button>
-      <input id="push-remote-name" type="text" [(ngModel)]="pushRemoteNameInput" placeholder='push to'/>
+      <input style="margin-left: 1em; margin-right: 1em"
+        id="commit-message-input" type="text" [(ngModel)]="commitMessageInput" placeholder='commit message'/>
+      <button style="margin-right: 5em" class="btn btn-primary" (click)="commit()">Commit Staged Items</button>
+      <input style="margin-right: 1em" id="push-remote-name" type="text" [(ngModel)]="pushRemoteNameInput" placeholder='push to'/>
       <button class="btn btn-primary" (click)="push()">Push</button>
     </div>
+    <h4>Repositories:</h4>
   </div>
 
   <div class="repo-list">
