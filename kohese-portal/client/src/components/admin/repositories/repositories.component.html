@@ -73,6 +73,14 @@
                   <mat-icon class="fa fa-external-link"></mat-icon>
                   Navigate in New Tab
                 </button>
+                <button mat-menu-item (click)="unmountRepo(repoList.id); $event.
+                stopPropagation()">
+                  UnMount
+                </button>
+                <button mat-menu-item (click)="disableRepo(repoList.id); $event.
+                stopPropagation()">
+                   disable
+                </button>
               </mat-menu>
             </ng-container>
           </div>

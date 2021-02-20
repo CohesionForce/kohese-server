@@ -10,6 +10,16 @@ export class RepositoryService {
       return (await this.CacheManager.sendMessageToWorker('Repository/getAvailableRepositories', {}, true));
     }
 
+    public async unMountRepository(id: string): Promise<any> {
+      console.log('^^^ unMount Repository in repoService ', id)
+      return (await this.CacheManager.sendMessageToWorker('Repository/unMountRepository', {id}, true));
+    }
+
+    public async disableRepository(id: string, disable: boolean): Promise<any> {
+      console.log('^^^ disableRepository in repoService ', id)
+      return (await this.CacheManager.sendMessageToWorker('Repository/disableRepository', {id, disable}, true));
+    }
+
     /* mountRepository = function (mountTarget, mountData, callback) {
       var data = {
         mountTarget : mountTarget,

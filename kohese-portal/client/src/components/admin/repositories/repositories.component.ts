@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ChangeDetectorRef } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Observable ,  Subscription } from 'rxjs';
 
@@ -51,6 +51,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
     private _toastrService: ToastrService,
     private _notificationService: NotificationService,
     private _sessionService: SessionService,
+    private _changeDetectorRef: ChangeDetectorRef,
     private dialogueService: DialogService) {
     super(_navigationService);
     // TODO update this file to do the repo status sequence
@@ -156,5 +157,20 @@ export class RepositoriesComponent extends NavigatableComponent implements
       data: { itemProxy:  this.repositories[index]}
     }).updateSize('90%', '90%');
   }
+
+  public unmountRepo(id: string): void {
+   this.repositoryService.unMountRepository(id);
+   let index = this.repositories.findIndex(t => t.item.id === id);
+   this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (false));
+   let index1 = this.repoList.findIndex(t => t.id === id);
+   this.repoList[index1].mounted = false;
+   this.repoList[index1].descendantCount = 0;
+   this._changeDetectorRef.markForCheck();
+  }
+
+  public disableRepo(id: string): void {
+    this.repositoryService.disableRepository(id, true);
+    this._changeDetectorRef.markForCheck();
+   }
 
 }

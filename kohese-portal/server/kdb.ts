@@ -152,6 +152,17 @@ module.exports.getAvailableRepositories = getAvailableRepositories;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function unMountRepository(proxy: any) {
+  mountList = kdbFS.loadJSONDoc(mountFilePath);
+  kdbFS.removeFile(mountList[proxy.item.id].repoStoragePath + '.json.mount');
+  delete mountList[proxy.item.id];
+  updateMountFile();
+}
+module.exports.unMountRepository = unMountRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function setAvailableRepositories(dir, availableRepositories) {
   fs.readdirSync(dir).forEach(file => {
     let fullPath = path.join(dir, file);

@@ -430,6 +430,26 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
+        case 'Repository/unMountRepository':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject:
+          () => void) => {
+          socket.emit('Repository/unMountRepository', { repoID: request.data.id }, () => {
+            resolve();
+          });
+        }) });
+        break;
+
+        case 'Repository/disableRepository':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject:
+          () => void) => {
+          socket.emit('Repository/disableRepository', { repoID: request.data.id, disable: request.data.disable }, () => {
+            resolve();
+          });
+        }) });
+        break;
+
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);

@@ -53,44 +53,56 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
   }
 
   // Ignore internal instances
-  if (!change.proxy.internal){
-    switch (change.type){
-      case 'create':
-      case 'update':
-        kdb.storeModelInstance(change.proxy, change.type === 'create')
-        .then(function (status) {
-          let proxy : ItemProxy = change.proxy;
-          proxy.updateVCStatus(status, false);
-          let createNotification = {
-              type: change.type,
-              kind: change.kind,
-              id: proxy.item.id,
-              item: proxy.cloneItemAndStripDerived(),
-              status: status
-          };
-          kio.server.emit('Item/' + change.type, createNotification);
-        });
-        break;
-      case 'delete':
-        let deleteNotification = {
+  if (!change.proxy.internal) {
+    if (change.kind === 'Repository') {
+      if (change.proxy.item.mounted) {
+        let unMountNotification = {
           type: change.type,
           kind: change.kind,
           id: change.proxy.item.id
         };
-        kdb.removeModelInstance(change.proxy);
-        kio.server.emit('Item/' + change.type, deleteNotification);
-        break;
-      case 'loading':
-      case 'loaded':
-      case 'dirty':
-      case 'reference-added':
-      case 'reference-removed':
-      case 'reference-reordered':
-        // Ignore
-        break;
-      default:
-        console.log('*** Not processing change notification: ' + change.type);
+        kio.server.emit('Item/' + change.type, unMountNotification);
       }
+    }
+    else {
+      switch (change.type) {
+        case 'create':
+        case 'update':
+          kdb.storeModelInstance(change.proxy, change.type === 'create')
+            .then(function (status) {
+              let proxy: ItemProxy = change.proxy;
+              proxy.updateVCStatus(status, false);
+              let createNotification = {
+                type: change.type,
+                kind: change.kind,
+                id: proxy.item.id,
+                item: proxy.cloneItemAndStripDerived(),
+                status: status
+              };
+              kio.server.emit('Item/' + change.type, createNotification);
+            });
+          break;
+        case 'delete':
+          let deleteNotification = {
+            type: change.type,
+            kind: change.kind,
+            id: change.proxy.item.id
+          };
+          kdb.removeModelInstance(change.proxy);
+          kio.server.emit('Item/' + change.type, deleteNotification);
+          break;
+        case 'loading':
+        case 'loaded':
+        case 'dirty':
+        case 'reference-added':
+        case 'reference-removed':
+        case 'reference-reordered':
+          // Ignore
+          break;
+        default:
+          console.log('*** Not processing change notification: ' + change.type);
+      }
+    }
   }
 
 });
@@ -1045,6 +1057,25 @@ function KIOItemServer(socket){
       socket.id, socket.koheseUser.username, socket.handshake.address);
     let repositoryData = kdb.getAvailableRepositories();
     respond(repositoryData);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/unMountRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received UnMountRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.repoID);
+    kdb.unMountRepository(proxy)
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/disableRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received disableRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('^^^ Received Disable Mount request ', request)
   });
 
 
