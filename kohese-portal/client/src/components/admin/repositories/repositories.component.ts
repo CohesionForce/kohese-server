@@ -161,7 +161,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
     }).updateSize('90%', '90%');
   }
 
-  private displayRepositories(): void {
+  public displayRepositories(): void {
     // Provides additional dialog configuration options
     const dialogConfig = new MatDialogConfig();
 
