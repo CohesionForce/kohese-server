@@ -4,6 +4,7 @@ import { Observable ,  Subscription } from 'rxjs';
 
 import { DetailsComponent } from '../../details/details.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
@@ -33,6 +34,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
 
   @Input()
   routingStrategy: string;
+  remoteRowDef: Array<string> = ['remote'];
   rowDef: Array<string> = ["name", "count", "description", "mounted", "nav"];
 
   get navigationService() {
@@ -51,7 +53,9 @@ export class RepositoriesComponent extends NavigatableComponent implements
     private _toastrService: ToastrService,
     private _notificationService: NotificationService,
     private _sessionService: SessionService,
-    private dialogueService: DialogService) {
+    private dialogueService: DialogService,
+    private dialog: MatDialog
+    ) {
     super(_navigationService);
     // TODO update this file to do the repo status sequence
     // leaving it out since it is currently in flux on another branch
@@ -157,4 +161,98 @@ export class RepositoriesComponent extends NavigatableComponent implements
     }).updateSize('90%', '90%');
   }
 
+  public displayRepositories(): void {
+    // Provides additional dialog configuration options
+    const dialogConfig = new MatDialogConfig();
+
+    let dialogRef = this.dialog.open(RepositoryContentDialog, {});
+
+    // Used to Pass Data back from the RepositoryContentComponent dialog
+    // Typically used with the data: {} handler.
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+}
+
+/**Component Used to Display Only the Repositories Section
+ * of the repositories page. This component uses the same
+ * scss file, but references a different templateURL.
+ * Unused constructions left for future implementation if desired.
+ */
+@Component({
+  selector: 'repository-content-dialog',
+  templateUrl: 'repository-content-dialog.html',
+  styleUrls: ['./repositories.component.scss']
+})
+export class RepositoryContentDialog implements OnInit, OnDestroy {
+  repositories: Array<any>;
+  repoList: Array<any>;
+  rootProxy: ItemProxy;
+
+  @Input()
+  routingStrategy: string;
+  rowDef: Array<string> = ["name", "count", "description", "mounted", "nav"];
+
+  get navigationService() {
+    return this._navigationService;
+  }
+
+  /* Subscriptions */
+  repositoryStatusSubscription: Subscription;
+  treeConfigSubscription: Subscription;
+
+  constructor(
+    private _navigationService: NavigationService,
+    private versionControlService: VersionControlService,
+    private repositoryService: RepositoryService,
+    private itemRepository: ItemRepository,
+    private _toastrService: ToastrService,
+    private _notificationService: NotificationService,
+    private _sessionService: SessionService,
+    private dialogueService: DialogService,
+    private dialog: MatDialog,
+    private dialogRef: MatDialogRef<RepositoryContentDialog>
+    ) {}
+
+  public ngOnInit(): void {
+    this.repositoryStatusSubscription = this.itemRepository.
+      getRepoStatusSubject().subscribe(async (status: any) => {
+        if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
+          this.treeConfigSubscription =
+            this.itemRepository.getTreeConfig().subscribe((newConfig) => {
+              this.repositories = newConfig.config.getRepositories();
+              this.rootProxy = newConfig.config.getRootProxy();
+            })
+          this.repoList = await this.repositoryService.getAvailableRepositories();
+          for (let x: number = 0; x< this.repoList.length; x++) {
+            this.repoList[x].mounted = false;
+            this.repoList[x].descendantCount = 0;
+            if (this.repositories.some(y => y.item.name === this.repoList[x].name)) {
+              let index = this.repositories.findIndex(t => t.item.name ===this.repoList[x].name);
+              this.repoList[x].mounted = true;
+              this.repoList[x].descendantCount = this.repositories[index].descendantCount;
+            }
+          }
+        }
+      });
+  }
+
+  public ngOnDestroy(): void {
+    this.repositoryStatusSubscription.unsubscribe();
+    if (this.treeConfigSubscription) {
+      this.treeConfigSubscription.unsubscribe();
+    }
+  }
+
+  public displayInformation(id: string): void {
+    let index = this.repositories.findIndex(t => t.item.id === id);
+    this.dialogueService.openComponentDialog(DetailsComponent, {
+      data: { itemProxy:  this.repositories[index]}
+    }).updateSize('90%', '90%');
+  }
+
+  close() {
+    this.dialogRef.close();
+  }
 }
