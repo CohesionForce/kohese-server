@@ -20,8 +20,17 @@
 
   // repositories table container
   .repo-list {
-    height: calc(100% - 22.8em);
+    height: calc(100% - 25.43em);
     overflow: auto;
+  }
+
+  // repositories-dialog table container
+  .repo-list-dialog {
+    overflow: auto;
+  }
+
+  .commit-item-group {
+    margin-bottom: 1em;
   }
 }
 
@@ -73,4 +82,12 @@ mat-row:hover {
 // Buttons become visible when mouse hovers over row
 mat-row:hover button {
   visibility: visible;
+}
+
+//////////////////////////////////
+// mat-dialog
+//////////////////////////////////
+mat-dialog-actions {
+  display: flex;
+  float: right;
 }
