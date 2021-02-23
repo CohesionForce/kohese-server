@@ -26,20 +26,9 @@ function Server(httpsServer, options){
         console.log('>>>> session %s is user %s', socket.id, socket.koheseUser.username);
 
         let username = socket.koheseUser.username;
-        let userLockoutList;
-        let userIsLockedOut : boolean = false;
-        try {
-          userLockoutList = kdbFS.loadJSONDocIfItExists(userLockoutFile)
-          if (userLockoutList && userLockoutList.length){
-            console.log("::: Found User Lockout List: " + userLockoutList);
-            userIsLockedOut = userLockoutList.indexOf(username) > -1;
-          }
-        } catch (error) {
-          console.log('*** Error: ' + error);
-        }
+        let userLocked : boolean = userIsLockedOut(username);
 
-        if (userIsLockedOut) {
-          console.log('*** User is locked out: ' + username);
+        if (userLocked) {
           socket.emit('userLockedOut');
         } else {
 
@@ -84,6 +73,36 @@ function Server(httpsServer, options){
           delete kio.sessions[socket.id];
         }
       });
+
+      socket.on('Admin/lockoutUser', function(request, sendResponse) {
+        console.log('::: session %s: Received lockoutUser for %s for user %s at %s',
+          socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        console.log(request);
+        let userLockoutAdded = lockoutUser(request.username);
+        sendResponse({
+          username: request.username,
+          userLockoutAdded: userLockoutAdded
+        });
+      });
+
+      socket.on('Admin/reinstateUser', function(request, sendResponse) {
+        console.log('::: session %s: Received reinstateUser for %s for user %s at %s',
+          socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        console.log(request);
+        let userLockoutRemoved = reinstateUser(request.username);
+        sendResponse({
+          username: request.username,
+          userLockoutRemoved: userLockoutRemoved
+        });
+      });
+
+      socket.on('Admin/getUserLockoutList', function(request, sendResponse) {
+        console.log('::: session %s: Received getUserLockoutList for %s for user %s at %s',
+          socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        sendResponse({
+          userLockoutList: userLockoutList
+        });
+      });
   });
 
   return kio.server;
@@ -92,3 +111,41 @@ function Server(httpsServer, options){
 
 module.exports = kio;
 module.exports.Server = Server;
+
+let userLockoutList: Array<string> = kdbFS.loadJSONDocIfItExists(userLockoutFile) || [];
+function userIsLockedOut(username: string): boolean {
+  let userLocked : boolean = false;
+  userLocked = (userLockoutList.indexOf(username) !== -1);
+  if (userLocked) {
+    console.log('*** User %s is locked out.', username);
+  }
+
+  return userLocked;
+}
+
+function lockoutUser(username: string): boolean {
+  let lockoutListUpdated: boolean = false;
+  if (!userIsLockedOut(username)) {
+    userLockoutList.push(username);
+    kdbFS.storeJSONDoc(userLockoutFile, userLockoutList);
+    lockoutListUpdated = true;
+  }
+
+  return lockoutListUpdated;
+}
+
+function reinstateUser(username: string): boolean {
+  let lockoutListUpdated: boolean = false;
+  if (userIsLockedOut(username)) {
+    let userIndex = userLockoutList.indexOf(username);
+    userLockoutList.splice(userIndex,1);
+    kdbFS.storeJSONDoc(userLockoutFile, userLockoutList);
+    lockoutListUpdated = true;
+  }
+
+  return lockoutListUpdated;
+}
+
+// lockoutUser('test');
+
+// reinstateUser('test');

@@ -1,5 +1,88 @@
 @import '../../app.component';
 
-/deep/ .mat-expansion-indicator:after {
+.users-page-wrapper {
+  height: calc(100% - 34px);
+
+  .session-container {
+    height: calc(100% - 84px);
+    padding-left: 1.5%;
+    overflow: none;
+
+    .session-banner {
+      height: 4.5em;
+      background-color: white;
+      color: black;
+      display: flex;
+      flex-direction: row;
+      align-items: center
+    }
+
+    .session-content {
+      height: calc(100% - 70px);
+      font-size: large;
+      overflow: auto;
+    }
+  }
+
+  .user-container {
+    // height calculated to work while lens is active
+    height: calc(100% - 2.5em);
+    overflow: none;
+
+    .user-banner {
+      height: 2em;
+      padding-left: 1.5%;
+      overflow: inherit;
+      background-color: white;
+      color: black;
+      display: flex;
+      flex-direction: row;
+      align-items: center
+    }
+
+    // height calculated to make <h2> Users header sticky.
+    .user-panel {
+      height: calc(100% - 2em);
+      overflow: auto;
+    }
+  }
+}
+
+::ng-deep .mat-expansion-indicator:after {
   color: whitesmoke;
+}
+
+mat-expansion-panel {
+  width: 100%;
+  box-shadow: 0 3px 1px -2px rgba(250,250,250,.8),
+              0 2px 2px  0 rgba(250,250,250,.64),
+              0 1px 5px  0 rgba(250,250,250,.62);
+
+  mat-expansion-panel-header {
+    color: whitesmoke;
+  }
+
+  mat-panel-title {
+    align-items:center;
+    color: whitesmoke;
+    font-size: x-large;
+    width: 68%;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  mat-panel-description {
+    color:whitesmoke;
+    width: 32%;
+  }
+}
+
+.initialize-spinner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

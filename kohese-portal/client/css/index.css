@@ -525,20 +525,6 @@ body #layout-bottom {
         .admin-screen .users-screen .user-container #admin-user-form * {
           margin: 5px; }
 
-.version-control-admin {
-  border: 1px solid black;
-  border-radius: 10px;
-  padding: 5px;
-  height: calc(100% - 90px);
-  width: calc(100% - 65px);
-  overflow: auto; }
-  .version-control-admin .repository-panel {
-    margin: 5px; }
-  .version-control-admin .remote-container {
-    height: 20%;
-    overflow: auto;
-    border: 1px solid black; }
-
 #login-form {
   height: 100%;
   width: 100%;

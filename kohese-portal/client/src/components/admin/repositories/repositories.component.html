@@ -1,34 +1,53 @@
 <div class="version-control-admin">
   <div>
     <h4>Version Control:</h4>
-    <button class="btn btn-primary" (click)="getRemotes()">Refresh Remotes</button>
 
-    <div class="remote-container">
-      <div *ngFor="let repo of remotes">{{repo}}</div>
+    <div class=float-container>
+      <div class=float-child-1>
+        <input style="margin-right: 1em" id="add-remote-input" type="text" [(ngModel)]="remoteNameInput" placeholder='remote name'/>
+        <input style="margin-right: 1em" id="add-remote-url" type="text" [(ngModel)]="remoteUrlInput" placeholder='push URL' />
+        <button class="btn btn-primary" (click)="addRemote()">Add Remote</button>
+      </div>
+      <div class=float-child-2>
+        <button id=refresh-button class="btn btn-primary" (click)="getRemotes()">Refresh Remotes</button>
+      </div>
     </div>
 
-    <div class="remote-options">
-      <label for="add-remote-input">Remote Name: </label>
-      <input id="add-remote-input" type="text" [(ngModel)]="remoteNameInput" />
-      <label for="push-remote-url">Push URL:</label>
-      <input id="add-remote-url" type="text" [(ngModel)]="remoteUrlInput" />
-      <button class="btn btn-primary" (click)="addRemote()">Add Remote</button>
-    </div>
 
-    <div class="commit-options">
-      <h4>Commit/Push Item Changes</h4>
-      <label for="commit-message-input">Commit Message: </label>
-      <input id="commit-message-input" type="text" [(ngModel)]="commitMessageInput" />
-      <button class="btn btn-primary" (click)="commit()">Commit Staged Items</button>
-      <br />
-      <label for="push-remote-name">Push to :</label>
-      <input id="push-remote-name" type="text" [(ngModel)]="pushRemoteNameInput" />
-      <button class="btn btn-primary" (click)="push()">Push</button>
+    <div class=remote-container>
+      <mat-table [dataSource]=remotes class=mat-elevation-z8>
+        <ng-container matColumnDef=remote>
+          <mat-header-cell *matHeaderCellDef>Remote Repository</mat-header-cell>
+          <mat-cell *matCellDef="let repo">{{repo}}</mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="remoteRowDef; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let proxy; columns: remoteRowDef; let j=index;" tabindex="{{j}}"></mat-row>
+      </mat-table>
     </div>
 
     <hr />
-    <h4>Repositories:</h4>
+    <div class=commit-item-group>
+        <input style="margin-left: 1em; margin-right: 1em"
+          id="commit-message-input" type="text" [(ngModel)]="commitMessageInput" placeholder='commit message'/>
+        <button style="margin-right: 5em" class="btn btn-primary" (click)="commit()">Commit Staged Items</button>
+        <input style="margin-right: 1em" id="push-remote-name" type="text" [(ngModel)]="pushRemoteNameInput" placeholder='push to'/>
+        <button class="btn btn-primary" (click)="push()">Push</button>
+    </div>
+    <hr>
+
   </div>
+
+  <div class=float-container style="margin-bottom: 2em">
+    <div class=float-child-1>
+      <h4>Repositories:</h4>
+    </div>
+    <div class=float-child-2>
+      <div class=float-child-2>
+        <button class="btn btn-primary" (click)=displayRepositories()>Display Repositories</button>
+      </div>
+    </div>
+  </div>
+
   <div class="repo-list">
     <mat-table [dataSource]="repoList" class="mat-elevation-z8" style="width: 100%;">
 

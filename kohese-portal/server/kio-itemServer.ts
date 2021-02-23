@@ -560,7 +560,7 @@ function KIOItemServer(socket){
         // TODO need to move user password processing based on model definition
         if (proxy.kind === 'KoheseUser'){
           if (item.password){
-            // Request has a password
+            // Encrypt the password
             serverAuthentication.setPassword(item, item.password);
           } else {
             // Password was not supplied, so use the old value
@@ -570,12 +570,23 @@ function KIOItemServer(socket){
 
         proxy.updateItem(kind, item);
       } else {
-        if (kind === 'KoheseModel') {
-          proxy = new KoheseModel(item);
-        } else if (kind === 'KoheseView') {
-          proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
-        } else {
-          proxy = new ItemProxy(kind, item);
+        // Creating a new item
+        switch (kind) {
+          case 'KoheseModel':
+            proxy = new KoheseModel(item);
+            break;
+          case 'KoheseView':
+            proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
+            break;
+          case 'KoheseUser':
+            if (item.password){
+              // Encrypt the password
+              serverAuthentication.setPassword(item, item.password);
+            }
+            proxy = new ItemProxy(kind, item);
+            break;
+          default:
+            proxy = new ItemProxy(kind, item);
         }
       }
 

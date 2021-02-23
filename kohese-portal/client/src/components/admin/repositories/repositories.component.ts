@@ -4,6 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 
 import { DetailsComponent } from '../../details/details.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
@@ -33,6 +34,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
 
   @Input()
   routingStrategy: string;
+  remoteRowDef: Array<string> = ['remote'];
   rowDef: Array<string> = ["name", "count", "description", "mounted", "nav"];
 
   get navigationService() {
