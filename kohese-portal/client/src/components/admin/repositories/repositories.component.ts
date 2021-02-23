@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, ChangeDetectorRef } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Observable ,  Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { DetailsComponent } from '../../details/details.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -68,11 +68,11 @@ export class RepositoriesComponent extends NavigatableComponent implements
               this.rootProxy = newConfig.config.getRootProxy();
             })
           this.repoList = await this.repositoryService.getAvailableRepositories();
-          for (let x: number = 0; x< this.repoList.length; x++) {
+          for (let x: number = 0; x < this.repoList.length; x++) {
             this.repoList[x].mounted = false;
             this.repoList[x].descendantCount = 0;
             if (this.repositories.some(y => y.item.name === this.repoList[x].name)) {
-              let index = this.repositories.findIndex(t => t.item.name ===this.repoList[x].name);
+              let index = this.repositories.findIndex(t => t.item.name === this.repoList[x].name);
               this.repoList[x].mounted = true;
               this.repoList[x].descendantCount = this.repositories[index].descendantCount;
             }
@@ -126,7 +126,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
 
     this.versionControlService.commitItems([this.rootProxy], this.
       _sessionService.user, this.commitMessageInput).subscribe((statusMap:
-      any) => {
+        any) => {
         if (statusMap.error) {
           this._toastrService.error('Commit Failed', 'Version Control');
           this._notificationService.addNotifications('ERROR: Version Control - Commit Failed');
@@ -141,36 +141,40 @@ export class RepositoriesComponent extends NavigatableComponent implements
     this.versionControlService.push(
       [this.rootProxy.item.id], this.pushRemoteNameInput).subscribe(
         (pushStatusMap: any) => {
-        if (pushStatusMap.error) {
-          this._toastrService.error('Push Failed', 'Version Control');
-          this._notificationService.addNotifications('ERROR: Version Control - Push Failed');
-        } else {
-          this._toastrService.success('Push Succeeded', 'Version Control');
-          this._notificationService.addNotifications('COMPLETED: Version Control - Push Succeeded');
-        }
-      });
+          if (pushStatusMap.error) {
+            this._toastrService.error('Push Failed', 'Version Control');
+            this._notificationService.addNotifications('ERROR: Version Control - Push Failed');
+          } else {
+            this._toastrService.success('Push Succeeded', 'Version Control');
+            this._notificationService.addNotifications('COMPLETED: Version Control - Push Succeeded');
+          }
+        });
   }
 
   public displayInformation(id: string): void {
     let index = this.repositories.findIndex(t => t.item.id === id);
     this.dialogueService.openComponentDialog(DetailsComponent, {
-      data: { itemProxy:  this.repositories[index]}
+      data: { itemProxy: this.repositories[index] }
     }).updateSize('90%', '90%');
   }
 
   public unmountRepo(id: string): void {
-   this.repositoryService.unMountRepository(id);
-   let index = this.repositories.findIndex(t => t.item.id === id);
-   this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (false));
-   let index1 = this.repoList.findIndex(t => t.id === id);
-   this.repoList[index1].mounted = false;
-   this.repoList[index1].descendantCount = 0;
-   this._changeDetectorRef.markForCheck();
+    this.repositoryService.unMountRepository(id);
+    let index = this.repositories.findIndex(t => t.item.id === id);
+    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (false));
+    let index1 = this.repoList.findIndex(t => t.id === id);
+    this.repoList[index1].mounted = false;
+    this.repoList[index1].descendantCount = 0;
+    this._changeDetectorRef.markForCheck();
   }
 
   public disableRepo(id: string): void {
-    this.repositoryService.disableRepository(id, true);
+    this.repositoryService.disableRepository(id);
+    let index = this.repositories.findIndex(t => t.item.id === id);
+    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (true));
+    let index1 = this.repoList.findIndex(t => t.id === id);
+    this.repoList[index1].mounted = false;
+    this.repoList[index1].descendantCount = 0;
     this._changeDetectorRef.markForCheck();
-   }
-
+  }
 }

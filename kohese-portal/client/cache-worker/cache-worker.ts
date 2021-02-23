@@ -444,7 +444,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
           () => void) => {
-          socket.emit('Repository/disableRepository', { repoID: request.data.id, disable: request.data.disable }, () => {
+          socket.emit('Repository/disableRepository', { repoID: request.data.id }, () => {
             resolve();
           });
         }) });

@@ -60,7 +60,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
           type: change.type,
           kind: change.kind,
           id: change.proxy.item.id
-        };
+        }
         kio.server.emit('Item/' + change.type, unMountNotification);
       }
     }
@@ -1076,6 +1076,8 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received disableRepository for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
     console.log('^^^ Received Disable Mount request ', request)
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.repoID)
+    kdb.disableRepository(proxy)
   });
 
 

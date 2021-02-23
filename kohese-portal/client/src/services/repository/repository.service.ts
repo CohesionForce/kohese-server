@@ -15,9 +15,9 @@ export class RepositoryService {
       return (await this.CacheManager.sendMessageToWorker('Repository/unMountRepository', {id}, true));
     }
 
-    public async disableRepository(id: string, disable: boolean): Promise<any> {
+    public async disableRepository(id: string): Promise<any> {
       console.log('^^^ disableRepository in repoService ', id)
-      return (await this.CacheManager.sendMessageToWorker('Repository/disableRepository', {id, disable}, true));
+      return (await this.CacheManager.sendMessageToWorker('Repository/disableRepository', {id}, true));
     }
 
     /* mountRepository = function (mountTarget, mountData, callback) {

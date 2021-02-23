@@ -163,6 +163,16 @@ module.exports.unMountRepository = unMountRepository;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function disableRepository(proxy: any) {
+  mountList = kdbFS.loadJSONDoc(mountFilePath);
+  mountList[proxy.item.id].disabled = true;
+  updateMountFile();
+}
+module.exports.disableRepository = disableRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function setAvailableRepositories(dir, availableRepositories) {
   fs.readdirSync(dir).forEach(file => {
     let fullPath = path.join(dir, file);
@@ -660,7 +670,7 @@ async function openRepositories(indexAndExit) {
   // Validate the repositories listed inside the mount file
   console.log('>>> Mounting and Validating External Repos');
   for(let id in mountList) {
-    if(!mountList[id].mounted && mountList[id].repoStoragePath) {
+    if(!mountList[id].mounted && mountList[id].repoStoragePath && !mountList[id].disabled) {
         mountRepository({'id': id, name: mountList[id].name, parentId: '',
                         repoStoragePath: mountList[id].repoStoragePath});
     }
