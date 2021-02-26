@@ -593,7 +593,7 @@ function validateRepositoryStructure (repoDirPath) {
             var subRepoDirPath;
 
             // Check mountFile for the mount path or use a .mount file if necessary
-            if(mountList[repoMount.id]) {
+            if(mountList[repoMount.id] && !mountList[repoMount.id].disabled) {
                 console.log('==> in mount list');
                 subRepoDirPath = mountList[repoMount.id].repoStoragePath;
                 if(!mountList[repoMount.id].name) {
@@ -601,14 +601,24 @@ function validateRepositoryStructure (repoDirPath) {
                     updateMountFile();
                 }
             }
+            else {
+              console.log('::: in mount list but disabled do not process', mountList[repoMount.id].name)
+            }
 
-            console.log('==> sRDP: ' + subRepoDirPath);
+            if (!mountList[repoMount.id].disabled) {
+              console.log("==> sRDP: " + subRepoDirPath);
 
-            var mountData = {id: repoMount.id,
-                             name: repoMount.name,
-                             parentId: repoMount.parentId,
-                             repoStoragePath: subRepoDirPath};
-            mountRepository(mountData);
+              var mountData = {
+                id: repoMount.id,
+                name: repoMount.name,
+                parentId: repoMount.parentId,
+                repoStoragePath: subRepoDirPath,
+              };
+              mountRepository(mountData);
+            }
+            else {
+              console.log('::: not mounted - disabled ', mountList[repoMount.id].name)
+            }
         }
         break;
       case 'Analysis':

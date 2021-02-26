@@ -21,11 +21,12 @@ export class TreeConfiguration {
   public treeId;
   public proxyMap;
   public idMap;
-  public repoMap;
+  private repoMap;
   public loading : boolean = true;
   public treehashCalculated : boolean = false;
   public proxyHasDeferredModelAssociation;
   public changeSubject : Subject<any>;
+  public repoChangeSubject : Subject<any>;
 
   public root : ItemProxy;
   public lostAndFound : ItemProxy;
@@ -53,6 +54,7 @@ export class TreeConfiguration {
     this.proxyHasDeferredModelAssociation = {};
 
     this.changeSubject = new Subject<any>();
+    this.repoChangeSubject = new Subject<any>();
 
     // console.log('$$$ Checking IP');
     // console.log(ItemProxy);
@@ -198,6 +200,26 @@ export class TreeConfiguration {
     {
       delete this.idMap[kind][idProperty][idValue];
     }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  deleteRepoMap(id: string) {
+    delete this.repoMap[id];
+    this.repoChangeSubject.next({
+      type: 'deleted'
+    });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  addRepoMap(id: string, proxy: ItemProxy) {
+    this.repoMap[id] = proxy;
+    this.repoChangeSubject.next({
+      type: 'added'
+    });
   }
 
   //////////////////////////////////////////////////////////////////////////

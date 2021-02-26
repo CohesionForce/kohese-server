@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, Input,  ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ChangeDetectorRef } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Observable ,  Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { DetailsComponent } from '../../details/details.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -35,7 +35,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
   @Input()
   routingStrategy: string;
   remoteRowDef: Array<string> = ['remote'];
-  rowDef: Array<string> = ["name", "count", "description", "mounted", "nav"];
+  rowDef: Array<string> = ['name', 'count', 'description', 'nav'];
 
   get navigationService() {
     return this._navigationService;
@@ -44,6 +44,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
   /* Subscriptions */
   repositoryStatusSubscription: Subscription;
   treeConfigSubscription: Subscription;
+  repoChangeSubscription: Subscription;
 
   constructor(
     private _navigationService: NavigationService,
@@ -55,8 +56,8 @@ export class RepositoriesComponent extends NavigatableComponent implements
     private _sessionService: SessionService,
     private dialogueService: DialogService,
     private dialog: MatDialog,
-    private _changeDetectorRef: ChangeDetectorRef,
-    ) {
+    private _changeDetectorRef: ChangeDetectorRef
+  ) {
     super(_navigationService);
     // TODO update this file to do the repo status sequence
     // leaving it out since it is currently in flux on another branch
@@ -66,21 +67,23 @@ export class RepositoriesComponent extends NavigatableComponent implements
     this.repositoryStatusSubscription = this.itemRepository.
       getRepoStatusSubject().subscribe(async (status: any) => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
+          let treeConfig = this.itemRepository.getTreeConfig();
           this.treeConfigSubscription =
-            this.itemRepository.getTreeConfig().subscribe((newConfig) => {
-              this.repositories = newConfig.config.getRepositories();
+            treeConfig.subscribe((newConfig) => {
               this.rootProxy = newConfig.config.getRootProxy();
-            })
-          this.repoList = await this.repositoryService.getAvailableRepositories();
-          for (let x: number = 0; x< this.repoList.length; x++) {
-            this.repoList[x].mounted = false;
-            this.repoList[x].descendantCount = 0;
-            if (this.repositories.some(y => y.item.name === this.repoList[x].name)) {
-              let index = this.repositories.findIndex(t => t.item.name ===this.repoList[x].name);
-              this.repoList[x].mounted = true;
-              this.repoList[x].descendantCount = this.repositories[index].descendantCount;
-            }
-          }
+
+              // TODO: remove once change subject is working remove this
+              this.repositories = newConfig.config.getRepositories();
+              // Replace the repo change subscription
+              if (this.repoChangeSubscription) {
+                this.repoChangeSubscription.unsubscribe();
+              }
+              this.repoChangeSubscription = newConfig.config.repoChangeSubject.subscribe((repoChange) => {
+                console.log('::: Repo Change Occurred :', repoChange)
+                this.repositories = newConfig.config.getRepositories();
+                this._changeDetectorRef.markForCheck();
+              });
+            });
         }
       });
   }
@@ -89,6 +92,9 @@ export class RepositoriesComponent extends NavigatableComponent implements
     this.repositoryStatusSubscription.unsubscribe();
     if (this.treeConfigSubscription) {
       this.treeConfigSubscription.unsubscribe();
+    }
+    if (this.repoChangeSubscription) {
+      this.repoChangeSubscription.unsubscribe();
     }
   }
 
@@ -130,7 +136,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
 
     this.versionControlService.commitItems([this.rootProxy], this.
       _sessionService.user, this.commitMessageInput).subscribe((statusMap:
-      any) => {
+        any) => {
         if (statusMap.error) {
           this._toastrService.error('Commit Failed', 'Version Control');
           this._notificationService.addNotifications('ERROR: Version Control - Commit Failed');
@@ -145,20 +151,20 @@ export class RepositoriesComponent extends NavigatableComponent implements
     this.versionControlService.push(
       [this.rootProxy.item.id], this.pushRemoteNameInput).subscribe(
         (pushStatusMap: any) => {
-        if (pushStatusMap.error) {
-          this._toastrService.error('Push Failed', 'Version Control');
-          this._notificationService.addNotifications('ERROR: Version Control - Push Failed');
-        } else {
-          this._toastrService.success('Push Succeeded', 'Version Control');
-          this._notificationService.addNotifications('COMPLETED: Version Control - Push Succeeded');
-        }
-      });
+          if (pushStatusMap.error) {
+            this._toastrService.error('Push Failed', 'Version Control');
+            this._notificationService.addNotifications('ERROR: Version Control - Push Failed');
+          } else {
+            this._toastrService.success('Push Succeeded', 'Version Control');
+            this._notificationService.addNotifications('COMPLETED: Version Control - Push Succeeded');
+          }
+        });
   }
 
   public displayInformation(id: string): void {
     let index = this.repositories.findIndex(t => t.item.id === id);
     this.dialogueService.openComponentDialog(DetailsComponent, {
-      data: { itemProxy:  this.repositories[index]}
+      data: { itemProxy: this.repositories[index] }
     }).updateSize('90%', '90%');
   }
 
@@ -166,32 +172,24 @@ export class RepositoriesComponent extends NavigatableComponent implements
     // Provides additional dialog configuration options
     const dialogConfig = new MatDialogConfig();
 
-    let dialogRef = this.dialog.open(RepositoryContentDialog, {});
+    let dialogRef = this.dialog.open(RepositoryContentDialog, {}).updateSize('90%', '50%');
 
     // Used to Pass Data back from the RepositoryContentComponent dialog
     // Typically used with the data: {} handler.
     dialogRef.afterClosed().subscribe(result => {
-    });
+    })
   }
 
-  public unmountRepo(id: string): void {
+  public unmountRepo(id: string) {
     this.repositoryService.unMountRepository(id);
     let index = this.repositories.findIndex(t => t.item.id === id);
-    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (false));
-    let index1 = this.repoList.findIndex(t => t.id === id);
-    this.repoList[index1].mounted = false;
-    this.repoList[index1].descendantCount = 0;
-    this._changeDetectorRef.markForCheck();
+    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (false))
   }
 
-  public disableRepo(id: string): void {
+  public disableRepo(id: string) {
     this.repositoryService.disableRepository(id);
     let index = this.repositories.findIndex(t => t.item.id === id);
-    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (true));
-    let index1 = this.repoList.findIndex(t => t.id === id);
-    this.repoList[index1].mounted = false;
-    this.repoList[index1].descendantCount = 0;
-    this._changeDetectorRef.markForCheck();
+    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (false));
   }
 }
 
@@ -208,12 +206,14 @@ export class RepositoriesComponent extends NavigatableComponent implements
 })
 export class RepositoryContentDialog implements OnInit, OnDestroy {
   repositories: Array<any>;
-  repoList: Array<any>;
+  availablerepoList: Array<any>;
+  repoList: Array<any> = [];
   rootProxy: ItemProxy;
+  isLoaded: boolean = false;
 
   @Input()
   routingStrategy: string;
-  rowDef: Array<string> = ["name", "count", "description", "mounted", "nav"];
+  rowDef: Array<string> = ['name', 'description', 'options'];
 
   get navigationService() {
     return this._navigationService;
@@ -233,8 +233,9 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
     private _sessionService: SessionService,
     private dialogueService: DialogService,
     private dialog: MatDialog,
-    private dialogRef: MatDialogRef<RepositoryContentDialog>
-    ) {}
+    private dialogRef: MatDialogRef<RepositoryContentDialog>,
+    private _changeDetectorRef: ChangeDetectorRef
+  ) { }
 
   public ngOnInit(): void {
     this.repositoryStatusSubscription = this.itemRepository.
@@ -245,16 +246,17 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
               this.repositories = newConfig.config.getRepositories();
               this.rootProxy = newConfig.config.getRootProxy();
             })
-          this.repoList = await this.repositoryService.getAvailableRepositories();
-          for (let x: number = 0; x< this.repoList.length; x++) {
-            this.repoList[x].mounted = false;
-            this.repoList[x].descendantCount = 0;
-            if (this.repositories.some(y => y.item.name === this.repoList[x].name)) {
-              let index = this.repositories.findIndex(t => t.item.name ===this.repoList[x].name);
-              this.repoList[x].mounted = true;
-              this.repoList[x].descendantCount = this.repositories[index].descendantCount;
+          this.availablerepoList = await this.repositoryService.getAvailableRepositories();
+          let index:number = 0;
+          for (let x: number = 0; x < this.availablerepoList.length; x++) {
+            if (!(this.repositories.some(y => y.item.name === this.availablerepoList[x].name))) {
+              this.repoList[index] = this.availablerepoList[x];
+              this.repoList[index].mounted = false;
+              this.repoList[index].descendantCount = 0;
+              index++
             }
           }
+          this.isLoaded = true;
         }
       });
   }
@@ -269,11 +271,21 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
   public displayInformation(id: string): void {
     let index = this.repositories.findIndex(t => t.item.id === id);
     this.dialogueService.openComponentDialog(DetailsComponent, {
-      data: { itemProxy:  this.repositories[index]}
+      data: { itemProxy: this.repositories[index] }
     }).updateSize('90%', '90%');
   }
 
   close() {
     this.dialogRef.close();
+  }
+
+  public mountRepo(id: string): void {
+    console.log('mount selected ')
+    this._changeDetectorRef.markForCheck();
+  }
+
+  public enableRepo(id: string): void {
+    console.log('enable selected')
+    this._changeDetectorRef.markForCheck();
   }
 }

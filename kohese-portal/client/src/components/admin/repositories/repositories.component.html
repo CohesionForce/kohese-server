@@ -39,69 +39,60 @@
 
   <div class=float-container style="margin-bottom: 2em">
     <div class=float-child-1>
-      <h4>Repositories:</h4>
+      <h4>Mounted Repositories:</h4>
     </div>
     <div class=float-child-2>
       <div class=float-child-2>
-        <button class="btn btn-primary" (click)=displayRepositories()>Display Repositories</button>
+        <button class="btn btn-primary" (click)=displayRepositories()>Mount Repositories</button>
       </div>
     </div>
   </div>
 
   <div class="repo-list">
-    <mat-table [dataSource]="repoList" class="mat-elevation-z8" style="width: 100%;">
+    <mat-table [dataSource]="repositories" class="mat-elevation-z8" style="width: 100%;">
 
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-        <mat-cell *matCellDef="let repoList">{{repoList.name}}</mat-cell>
+        <mat-cell *matCellDef="let repositories">{{repositories.item.name}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="count">
         <mat-header-cell *matHeaderCellDef> Items </mat-header-cell>
-        <mat-cell *matCellDef="let repoList">{{repoList.descendantCount}}</mat-cell>
+        <mat-cell *matCellDef="let repositories">{{repositories.descendantCount}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="description">
         <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-        <mat-cell *matCellDef="let repoList"> {{repoList.description | truncate: 120}}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="mounted">
-        <mat-header-cell *matHeaderCellDef> Mounted </mat-header-cell>
-        <mat-cell *matCellDef="let repoList"> {{repoList.mounted}}</mat-cell>
+        <mat-cell *matCellDef="let repositories"> {{repositories.item.description | truncate: 120}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="nav">
         <mat-header-cell *matHeaderCellDef> Nav </mat-header-cell>
-        <mat-cell *matCellDef="let repoList" style="display: flex; justify-content: flex-end;">
+        <mat-cell *matCellDef="let repositories" style="display: flex; justify-content: flex-end;">
           <div class="hidden-buttons">
             <!-- For SCSS styling -->
-            <ng-container *ngIf="repoList.mounted">
-              <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(repoList.id)">
+              <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(repositories.item.id)">
                 <mat-icon class="fa fa-clone"></mat-icon>
               </button>
               <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu">
                 <mat-icon class="fa fa-bars"></mat-icon>
               </button>
               <mat-menu #menu="matMenu" [overlapTrigger]="false">
-                <button mat-menu-item (click)="navigationService.navigate('Explore', { id: repoList.id })">
+                <button mat-menu-item (click)="navigationService.navigate('Explore', { id: repositories.item.id })">
                   <mat-icon class="fa fa-arrow-right"></mat-icon>
                   Navigate in Explorer
                 </button>
-                <button mat-menu-item (click)="navigationService.addTab('Explore', { id: repoList.id })">
+                <button mat-menu-item (click)="navigationService.addTab('Explore', { id: repositories.item.id })">
                   <mat-icon class="fa fa-external-link"></mat-icon>
                   Navigate in New Tab
                 </button>
-                <button mat-menu-item (click)="unmountRepo(repoList.id); $event.
-                stopPropagation()">
+                <button mat-menu-item (click)="unmountRepo(repositories.item.id)">
                   UnMount
                 </button>
-                <button mat-menu-item (click)="disableRepo(repoList.id); $event.
-                stopPropagation()">
+                <button mat-menu-item (click)="disableRepo(repositories.item.id)">
                    disable
                 </button>
               </mat-menu>
-            </ng-container>
           </div>
         </mat-cell>
       </ng-container>
