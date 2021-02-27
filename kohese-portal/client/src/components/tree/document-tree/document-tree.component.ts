@@ -108,7 +108,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
     let deleteAction: Action = new Action('Delete',
       'Deletes this Item', 'fa fa-times delete-button', (object: any) => {
-      return !(object as ItemProxy).internal;
+      return !(object as ItemProxy).internal && ((object as ItemProxy).item.kind !== 'Repository');
     }, async (object: any) => {
       let result: any = await this._dialogService.openDropdownDialog('Remove ' +
         'Descendants', 'Do you also want to remove all descendants of ' +
