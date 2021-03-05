@@ -32,9 +32,8 @@
     </button>
     <mat-menu #optionsMenu="matMenu" [overlapTrigger]="false">
       <button mat-menu-item (click)="toggleShowPOS()">
-        <mat-icon *ngIf="showPOS" class="fa fa-check"></mat-icon>
-        <mat-icon *ngIf="!showPOS" class="fa fa-uncheck"></mat-icon>
-        Show POS
+        <mat-checkbox [(ngModel)]=showPOS></mat-checkbox>
+        Show Parts of Speech
       </button>
     </mat-menu>
   </div>
@@ -103,7 +102,7 @@
         </ng-container>
 
         <ng-container matColumnDef="posCount">
-          <mat-header-cell *matHeaderCellDef> POS Occurrences </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef> Parts of Speech </mat-header-cell>
           <mat-cell *matCellDef="let summary">
             {{summary.posCount | json}}
           </mat-cell>
