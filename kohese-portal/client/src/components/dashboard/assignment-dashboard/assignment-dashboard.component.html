@@ -19,7 +19,8 @@
           <mat-expansion-panel-header [ngStyle]="{ 'background-color': (getViewModel(assignment).color ?
           getViewModel(assignment).color : '#000000') }">
             <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 68%;
-            display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+              matTooltip="{{assignment}}">
               <mat-icon class="{{getViewModel(assignment).icon}}" style="margin-right: 3px;"></mat-icon>
               {{ assignment.item[getHeader(assignment)] }}
             </mat-panel-title>

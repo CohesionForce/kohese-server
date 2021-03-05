@@ -14,7 +14,8 @@
       <mat-expansion-panel-header [ngStyle]="{ 'background-color': (getViewModel(row).color ?
         getViewModel(row).color : '#000000') }">
         <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 72%;
-          display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+          matTooltip="{{row}}">
           <mat-icon class="{{getViewModel(row).icon}}" style="margin-right: 3px;"></mat-icon>
           {{ row.item[getHeader(row)] }}
         </mat-panel-title>

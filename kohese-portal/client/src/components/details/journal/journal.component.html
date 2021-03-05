@@ -27,7 +27,8 @@
           (observationItemProxy.model.view.item.color ? observationItemProxy.model.view.item.color : '#000000') }"
           style="color: whitesmoke;">
         <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 100%;
-            display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+            matTooltip="{{observationItemProxy}}">
           <mat-icon class="{{observationItemProxy.model.view.item.icon}}"></mat-icon>
           {{observationItemProxy.item.name}}
         </mat-panel-title>

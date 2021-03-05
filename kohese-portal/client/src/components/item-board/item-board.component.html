@@ -54,7 +54,8 @@
               changeDetectorRef.markForCheck();" [ngStyle]="{ 'background-color': viewModel.color }"
               style="color: whitesmoke">
               <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 68%;
-                display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                matTooltip="{{item.name}}">
                 <mat-icon class="{{viewModel.icon}}"></mat-icon>
                 {{item.name}}
               </mat-panel-title>
