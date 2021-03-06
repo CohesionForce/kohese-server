@@ -13,6 +13,7 @@ import { NotificationService } from '../../../services/notifications/notificatio
 import { SessionService } from '../../../services/user/session.service';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { RepositoryService } from '../../../services/repository/repository.service';
+import { async } from '@angular/core/testing';
 
 
 @Component({
@@ -71,8 +72,6 @@ export class RepositoriesComponent extends NavigatableComponent implements
           this.treeConfigSubscription =
             treeConfig.subscribe((newConfig) => {
               this.rootProxy = newConfig.config.getRootProxy();
-
-              // TODO: remove once change subject is working remove this
               this.repositories = newConfig.config.getRepositories();
               // Replace the repo change subscription
               if (this.repoChangeSubscription) {
@@ -189,7 +188,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
   public disableRepo(id: string) {
     this.repositoryService.disableRepository(id);
     let index = this.repositories.findIndex(t => t.item.id === id);
-    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (false));
+    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (true));
   }
 }
 
@@ -210,6 +209,7 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
   repoList: Array<any> = [];
   rootProxy: ItemProxy;
   isLoaded: boolean = false;
+  disabledRepos: Array<any>;
 
   @Input()
   routingStrategy: string;
@@ -222,6 +222,7 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
   /* Subscriptions */
   repositoryStatusSubscription: Subscription;
   treeConfigSubscription: Subscription;
+  repoChangeSubscription: Subscription;
 
   constructor(
     private _navigationService: NavigationService,
@@ -243,11 +244,29 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
           this.treeConfigSubscription =
             this.itemRepository.getTreeConfig().subscribe((newConfig) => {
-              this.repositories = newConfig.config.getRepositories();
               this.rootProxy = newConfig.config.getRootProxy();
+              this.repositories = newConfig.config.getRepositories();
+              if (this.repoChangeSubscription) {
+                this.repoChangeSubscription.unsubscribe();
+              }
+              this.repoChangeSubscription = newConfig.config.repoChangeSubject.subscribe(async(repoChange) => {
+                this.repositories = newConfig.config.getRepositories();
+                this._changeDetectorRef.markForCheck();
+                this.availablerepoList = await this.repositoryService.getAvailableRepositories();
+                let index: number = 0;
+                for (let x: number = 0; x < this.availablerepoList.length; x++) {
+                  if (!(this.repositories.some(y => y.item.name === this.availablerepoList[x].name))) {
+                    this.repoList[index] = this.availablerepoList[x];
+                    this.repoList[index].mounted = false;
+                    this.repoList[index].descendantCount = 0;
+                    index++
+                  }
+                }
+                this.isLoaded = true;
+              });
             })
           this.availablerepoList = await this.repositoryService.getAvailableRepositories();
-          let index:number = 0;
+          let index: number = 0;
           for (let x: number = 0; x < this.availablerepoList.length; x++) {
             if (!(this.repositories.some(y => y.item.name === this.availablerepoList[x].name))) {
               this.repoList[index] = this.availablerepoList[x];
@@ -279,13 +298,15 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
-  public mountRepo(id: string): void {
-    console.log('mount selected ')
-    this._changeDetectorRef.markForCheck();
-  }
-
-  public enableRepo(id: string): void {
-    console.log('enable selected')
-    this._changeDetectorRef.markForCheck();
+  async mountRepo(id: string) {
+    this.disabledRepos = await this.repositoryService.getDisabledRepositories();
+    for (let x: number = 0; x < this.disabledRepos.length; x++) {
+      if (this.disabledRepos[x].id === id) {
+        this.repositoryService.enableRepository(id);
+        this.repositoryService.mountRepository(this.disabledRepos[x] as ItemProxy);
+        break;
+      }
+    }
+    console.log('::: end Mount Repo', id)
   }
 }

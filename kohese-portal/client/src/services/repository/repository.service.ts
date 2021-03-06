@@ -20,6 +20,19 @@ export class RepositoryService {
       return (await this.CacheManager.sendMessageToWorker('Repository/disableRepository', {id}, true));
     }
 
+    public async getDisabledRepositories(): Promise<any> {
+      return (await this.CacheManager.sendMessageToWorker('Repository/getDisabledRepositories', {}, true));
+    }
+
+    public async enableRepository(id: string): Promise<any> {
+      return (await this.CacheManager.sendMessageToWorker('Repository/enableRepository', {id}, true));
+    }
+
+    public async mountRepository(proxy): Promise<void> {
+      return (await this.CacheManager.sendMessageToWorker('Repository/mountRepository', {
+          kind: proxy.kind,
+          id: proxy.id}, true));}
+
     /* mountRepository = function (mountTarget, mountData, callback) {
       var data = {
         mountTarget : mountTarget,

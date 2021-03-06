@@ -497,7 +497,6 @@ export class ItemProxy {
     proxy.setItemKind(kind);
 
     if (kind === 'Repository') {
-      // proxy.treeConfig.repoMap[itemId] = proxy;
       proxy.treeConfig.addRepoMap(itemId, proxy)
     }
 
@@ -2073,112 +2072,131 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  updateItem(modelKind, withItem) {
+  updateItem(modelKind, withItem, mounting: boolean = false) {
     //    console.log('!!! Updating ' + modelKind + ' - ' + this._item.id);
 
-    let validationResult = ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
-
-    if (!validationResult.valid) {
-      // Store the validationResult if there is an erro
-      this.validationError = validationResult;
-    } else {
-      // Remove any prior validationError
-      delete this.validationError;
-    }
-
-    // Determine if item kind changed
-    var newKind = modelKind;
-
-    if (newKind !== this.kind) {
-      if (this.kind === 'Internal-Lost') {
-        // Update is really the new item that was created due to order of arrival
-        let newItem = new ItemProxy(newKind, withItem);
-        return;
-      }
-      console.log('::: Proxy kind changed from ' + this.kind + ' to ' + newKind);
-      this.setItemKind(newKind);
-    }
-
-    // Determine if itemIds array changed
-    var itemIdsChanged = (withItem.itemIds !== this._item.itemIds);
-
-    if (withItem.parentId && withItem.parentId.hasOwnProperty('id')) {
-      // parentId supplied as a reference object
-      withItem.parentId = withItem.parentId.id;
-    }
-
-    // Copy the withItem into the current proxy
-    let modifications = this.copyAttributes(withItem);
-    this.clearDirtyFlags();
-
-    // console.log('%%% Modifications');
-    // console.log(modifications);
-
-    this.calculateDerivedProperties();
-    this.updateReferences();
-
-
-    // Ensure sort order is maintained
-    if (this.parentProxy) {
-      this.parentProxy.sortChildren();
-    }
-
-    if (itemIdsChanged) {
-      this.sortChildren();
-    }
-
-
-    if (this.children.length === 0) {
-      this._item.children = [];
-    }
-
-    // Determine if the parent changed
-    var oldParentId = '';
-    if (this.parentProxy) {
-      oldParentId = this.parentProxy._item.id;
-    }
-
-    var newParentId = withItem.parentId || 'ROOT';
-
-    if (newParentId === 'ROOT' && this._item.id === 'ROOT') {
-      // Prevent infinite loop when the ROOT is passed as part of sync
-      newParentId = oldParentId;
-    }
-
-    if (oldParentId !== newParentId) {
-      console.log('::: Parent Id changed from ' + oldParentId + ' to ' +
-        newParentId);
-
-      var newParentProxy;
-      if (newParentId === '') {
-        newParentProxy = this.treeConfig.root;
+    if (mounting) {
+      let validationResult = ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
+      if (!validationResult.valid) {
+        // Store the validationResult if there is an erro
+        this.validationError = validationResult;
       } else {
-        newParentProxy = this.treeConfig.proxyMap[newParentId];
+        // Remove any prior validationError
+        delete this.validationError;
       }
-
-      if (!newParentProxy) {
-        newParentProxy = ItemProxy.createMissingProxy('Item', 'id', newParentId, this.treeConfig);
-      }
-
-      newParentProxy.addChild(this);
-    }
-
-    this.calculateTreeHash();
-
-    if (this.analysis) {
-      // delete the analysis in case some of the requisite data was updated
-      delete this.analysis;
-    }
-
-    if (!this.treeConfig.loading) {
+      this.calculateTreeHash();
       this.treeConfig.changeSubject.next({
         type: 'update',
         kind: this.kind,
         id: this._item.id,
-        proxy: this
+        proxy: this,
+        enableRepo: true
       });
     }
+    else {
+      let validationResult = ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
 
+      if (!validationResult.valid) {
+        // Store the validationResult if there is an erro
+        this.validationError = validationResult;
+      } else {
+        // Remove any prior validationError
+        delete this.validationError;
+      }
+
+      // Determine if item kind changed
+      var newKind = modelKind;
+
+      if (newKind !== this.kind) {
+        if (this.kind === 'Internal-Lost') {
+          // Update is really the new item that was created due to order of arrival
+          let newItem = new ItemProxy(newKind, withItem);
+          return;
+        }
+        console.log('::: Proxy kind changed from ' + this.kind + ' to ' + newKind);
+        this.setItemKind(newKind);
+      }
+
+      // Determine if itemIds array changed
+      var itemIdsChanged = (withItem.itemIds !== this._item.itemIds);
+
+      if (withItem.parentId && withItem.parentId.hasOwnProperty('id')) {
+        // parentId supplied as a reference object
+        withItem.parentId = withItem.parentId.id;
+      }
+
+      // Copy the withItem into the current proxy
+      let modifications = this.copyAttributes(withItem);
+      this.clearDirtyFlags();
+
+      // console.log('%%% Modifications');
+      // console.log(modifications);
+
+      this.calculateDerivedProperties();
+      this.updateReferences();
+
+
+      // Ensure sort order is maintained
+      if (this.parentProxy) {
+        this.parentProxy.sortChildren();
+      }
+
+      if (itemIdsChanged) {
+        this.sortChildren();
+      }
+
+
+      if (this.children.length === 0) {
+        this._item.children = [];
+      }
+
+      // Determine if the parent changed
+      var oldParentId = '';
+      if (this.parentProxy) {
+        oldParentId = this.parentProxy._item.id;
+      }
+
+      var newParentId = withItem.parentId || 'ROOT';
+
+      if (newParentId === 'ROOT' && this._item.id === 'ROOT') {
+        // Prevent infinite loop when the ROOT is passed as part of sync
+        newParentId = oldParentId;
+      }
+
+      if (oldParentId !== newParentId) {
+        console.log('::: Parent Id changed from ' + oldParentId + ' to ' +
+          newParentId);
+
+        var newParentProxy;
+        if (newParentId === '') {
+          newParentProxy = this.treeConfig.root;
+        } else {
+          newParentProxy = this.treeConfig.proxyMap[newParentId];
+        }
+
+        if (!newParentProxy) {
+          newParentProxy = ItemProxy.createMissingProxy('Item', 'id', newParentId, this.treeConfig);
+        }
+
+        newParentProxy.addChild(this);
+      }
+
+      this.calculateTreeHash();
+
+      if (this.analysis) {
+        // delete the analysis in case some of the requisite data was updated
+        delete this.analysis;
+      }
+
+      if (!this.treeConfig.loading) {
+        this.treeConfig.changeSubject.next({
+          type: 'update',
+          kind: this.kind,
+          id: this._item.id,
+          proxy: this
+        });
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -2204,10 +2222,63 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  mountRepository(repoId, kind) {
+    this.updateItem(kind,this,true)
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  unMountRepository() {
+    var byId = this._item.id;
+    var attemptToDeleteRestrictedNode = (
+      (this._item.id === this.treeConfig.lostAndFound._item.id) ||
+      (this._item.id === this.treeConfig.root._item.id));
+
+    // Unlink from parent
+    if (this.parentProxy && !attemptToDeleteRestrictedNode) {
+      this.parentProxy.removeChild(this);
+    }
+
+    // Unlink from all referred items
+    this.removeAllReferences();
+
+
+    // Remove from RepoMap since it is unmounted
+
+    if (this.kind === 'Repository') {
+      this.treeConfig.deleteRepoMap(byId);
+    }
+
+    // Delete children depth first (after visit)
+    this.visitChildren(null, null, (childProxy) => {
+      childProxy.unMountRepository();
+    });
+    if (attemptToDeleteRestrictedNode) {
+      // console.log('::: -> Not removing restricted node:' + this._item.name);
+    }
+    delete this.treeConfig.proxyMap[byId];
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   deleteItem(deleteDescendants: boolean = false) {
     var byId = this._item.id;
 
     // console.log('::: Deleting proxy for ' + byId);
+
+    if (this.kind === 'Repository') {
+      this.unMountRepository();
+      this.treeConfig.changeSubject.next({
+        type: 'delete',
+        kind: this.kind,
+        id: this._item.id,
+        proxy: this,
+        unmounting: true,
+      });
+      return;
+    }
 
     var attemptToDeleteRestrictedNode = (
       (this._item.id === this.treeConfig.lostAndFound._item.id) ||
@@ -2221,13 +2292,6 @@ export class ItemProxy {
     // Unlink from all referred items
     this.removeAllReferences();
 
-    // Remove from RepoMap since it is unmounted
-    if (this.kind === 'Repository') {
-        console.log('deleting repoMap',)
-        // delete this.treeConfig.repoMap[byId];
-        this.treeConfig.deleteRepoMap(byId);
-    }
-
     if (deleteDescendants) {
       // Delete children depth first (after visit)
       this.visitChildren(null, null, (childProxy) => {
@@ -2236,15 +2300,15 @@ export class ItemProxy {
       if (attemptToDeleteRestrictedNode) {
         // console.log('::: -> Not removing restricted node:' + this._item.name);
       } else {
-        // console.log('::: -> Removing all references');
-        if (!this.treeConfig.loading) {
-          this.treeConfig.changeSubject.next({
-            type: 'delete',
-            kind: this.kind,
-            id: this._item.id,
-            proxy: this
-          });
-        }
+          // console.log('::: -> Removing all references');
+          if (!this.treeConfig.loading) {
+            this.treeConfig.changeSubject.next({
+              type: 'delete',
+              kind: this.kind,
+              id: this._item.id,
+              proxy: this
+            });
+          }
         delete this.treeConfig.proxyMap[byId];
       }
     } else {
@@ -2260,12 +2324,7 @@ export class ItemProxy {
               proxy: this
             });
           }
-          if (this.kind !== 'Repository') {
-            ItemProxy.createMissingProxy('Item', 'id', byId, this.treeConfig);
-          }
-          else {
             delete this.treeConfig.proxyMap[byId];
-          }
         }
       } else {
         if (attemptToDeleteRestrictedNode) {

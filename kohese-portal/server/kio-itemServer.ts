@@ -57,6 +57,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
     switch (change.type) {
       case 'create':
       case 'update':
+        if (!change.enableRepo) {
         kdb.storeModelInstance(change.proxy, change.type === 'create')
           .then(function (status) {
             let proxy: ItemProxy = change.proxy;
@@ -70,6 +71,18 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
             };
             kio.server.emit('Item/' + change.type, createNotification);
           });
+        }
+        else {
+          let proxy: ItemProxy = change.proxy;
+          let createNotification = {
+            type: change.type,
+            kind: change.kind,
+            id: proxy.item.id,
+            item: proxy.cloneItemAndStripDerived(),
+            status: []
+          };
+          kio.server.emit('Item/' + change.type, createNotification);
+        }
         break;
       case 'delete':
         let deleteNotification = {
@@ -77,7 +90,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
           kind: change.kind,
           id: change.proxy.item.id
         };
-        if (change.kind !== 'Repository') {
+        if (!change.unmounting) {
           kdb.removeModelInstance(change.proxy);
         }
         kio.server.emit('Item/' + change.type, deleteNotification);
@@ -1064,6 +1077,16 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/getDisabledRepositories', (request: any, respond: Function) => {
+    console.log('::: session %s: Received getDisabledRepositories for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    let repositoryData = kdb.getDisabledRepositories();
+    respond(repositoryData);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('Repository/unMountRepository', (request: any, respond: Function) => {
     console.log('::: session %s: Received UnMountRepository for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
@@ -1082,7 +1105,25 @@ function KIOItemServer(socket) {
     kdb.disableRepository(proxy)
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/enableRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received enableRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('^^^ Received Enabled Mount request ', request)
+    kdb.enableRepository(request.repoID)
+  });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/mountRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received mountRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('^^^ Received Mount Repository request ', request)
+    kdb.openRepository(request.id)
+  });
 
   //////////////////////////////////////////////////////////////////////////
   //
