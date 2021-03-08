@@ -31,7 +31,7 @@
     <div class="search-options">
       <div class="pos-and-checkbox-options" style="padding-left: 10px;">
         <mat-form-field>
-          <mat-select placeholder="POS Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processTerms()">
+          <mat-select placeholder="Part of Speech Filter" [(ngModel)]="analysisPOSFilterName" (ngModelChange)="processTerms()">
             <mat-option *ngFor="let filterCriteria of termPOSFilterCriteriaList" [value]="filterCriteria">
               {{filterCriteria}}
             </mat-option>
