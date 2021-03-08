@@ -112,7 +112,7 @@ export class AnalysisViewComponent extends NavigatableComponent {
     } else {
       // Limit total width to 80 characters
       content = 'Element                   Number Of Occurrences' +
-        (includePartsOfSpeech ? '     Parts Of Speech' : '') + '\n\n';
+        (includePartsOfSpeech ? '     Parts of Speech' : '') + '\n\n';
 
       for (let j: number = 0; j < elements.length; j++) {
         let element: any = elements[j];
