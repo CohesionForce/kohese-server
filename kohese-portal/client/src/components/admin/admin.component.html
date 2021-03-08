@@ -50,7 +50,7 @@
             <ng-container *ngFor="let user of sessionService.users">
               <mat-expansion-panel #panel>
                 <mat-expansion-panel-header [ngStyle]="{ 'background-color': koheseUserViewModel.color }">
-                  <mat-panel-title matTooltip="{{user.description}}">
+                  <mat-panel-title>
                     <mat-icon class="{{koheseUserViewModel.icon}}" style="margin-right: 3px;"></mat-icon>
                     {{user.name}}
                     <ng-container *ngIf="(lockoutList.indexOf(user.username) > -1)"><mat-icon class="fa fa-lock"></mat-icon></ng-container>
