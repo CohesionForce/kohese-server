@@ -1,13 +1,4 @@
 <div class="col user-dash" style="height : 100%;">
-  <h4>
-    <span *ngIf="user">
-      {{user.item.name}}
-    </span>
-    <span *ngIf="!user">
-      Loading
-      <mat-spinner [diameter]="50"></mat-spinner>
-    </span>
-  </h4>
   <h4 class="dashboard-section"
       (click)="selectDashType(DashboardTypes.ASSIGNMENT)"
       [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PERSONAL}">
