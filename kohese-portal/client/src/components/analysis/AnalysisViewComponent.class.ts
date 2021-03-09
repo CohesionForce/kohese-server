@@ -21,11 +21,11 @@ export class AnalysisViewComponent extends NavigatableComponent {
   termPOSFilterCriteriaList: Array<any>;
   phrasePOSFilterCriteriaList: Array<any>;
   analysisPOSFilterName: string = 'Standard';
-  
+
   get DataFormat() {
     return DataFormat;
   }
-  
+
   get Object() {
     return Object;
   }
@@ -67,43 +67,43 @@ export class AnalysisViewComponent extends NavigatableComponent {
       }
     }
   }
-  
+
   public copy(elements: Array<any>, includePartsOfSpeech: boolean): void {
     let copyEventListener: (clipboardEvent: ClipboardEvent) => void =
       (clipboardEvent: ClipboardEvent) => {
       clipboardEvent.preventDefault();
-      
+
       clipboardEvent.clipboardData.setData('text/html', this.getTableContent(
         elements, includePartsOfSpeech, DataFormat.HTML));
       clipboardEvent.clipboardData.setData('text/plain', this.getTableContent(
         elements, includePartsOfSpeech, DataFormat.TXT));
-      
+
       document.removeEventListener('copy', copyEventListener);
     };
-    
+
     document.addEventListener('copy', copyEventListener);
     document.execCommand('copy');
   }
-  
+
   private getTableContent(elements: Array<any>, includePartsOfSpeech: boolean,
     dataFormat: DataFormat): string {
     let content: string;
     if (dataFormat === DataFormat.HTML) {
       content = '<table><tr><th>Element</th><th>Number Of ' +
         'Occurrences</th>' + (includePartsOfSpeech ?
-        '<th>Parts Of Speech</th>' : '') + '</tr>';
-      
+        '<th>Parts of Speech</th>' : '') + '</tr>';
+
       for (let j: number = 0; j < elements.length; j++) {
         content += ('<tr><td>' + elements[j].text + '</td><td>' + elements[
           j].count + '</td>' + (includePartsOfSpeech ? ('<td>' + JSON.
           stringify(elements[j].posCount) + '</td>') : '') + '</tr>');
       }
-      
+
       content += '</table>';
     } else if (dataFormat === DataFormat.CSV) {
       content = 'Element,Number Of Occurrences' + (includePartsOfSpeech ?
-        ',Parts Of Speech' : '') + '\n';
-      
+        ',Parts of Speech' : '') + '\n';
+
       for (let j: number = 0; j < elements.length; j++) {
         content += (elements[j].text + ',' + elements[j].count +
           (includePartsOfSpeech ? (',\"' + JSON.stringify(elements[j].
@@ -112,8 +112,8 @@ export class AnalysisViewComponent extends NavigatableComponent {
     } else {
       // Limit total width to 80 characters
       content = 'Element                   Number Of Occurrences' +
-        (includePartsOfSpeech ? '     Parts Of Speech' : '') + '\n\n';
-      
+        (includePartsOfSpeech ? '     Parts of Speech' : '') + '\n\n';
+
       for (let j: number = 0; j < elements.length; j++) {
         let element: any = elements[j];
         let elementRemainder: string = element.text;
@@ -126,21 +126,21 @@ export class AnalysisViewComponent extends NavigatableComponent {
               elementRemainder += ' ';
             }
           }
-          
+
           content += elementRemainder.substring(0, 23) + '   ';
           elementRemainder = elementRemainder.substring(23);
-          
+
           if (numberOfOccurrencesRemainder.length < 23) {
             for (let k: number = numberOfOccurrencesRemainder.length; k < 23;
               k++) {
               numberOfOccurrencesRemainder += ' ';
             }
           }
-          
+
           content += numberOfOccurrencesRemainder.substring(0, 23);
           numberOfOccurrencesRemainder = numberOfOccurrencesRemainder.
             substring(23);
-          
+
           if (includePartsOfSpeech) {
             if (partsOfSpeechRemainder.length < 26) {
               for (let k: number = partsOfSpeechRemainder.length; k < 26;
@@ -148,21 +148,21 @@ export class AnalysisViewComponent extends NavigatableComponent {
                 partsOfSpeechRemainder += ' ';
               }
             }
-            
+
             content += ('   ' + partsOfSpeechRemainder.substring(0, 26));
             partsOfSpeechRemainder = partsOfSpeechRemainder.substring(26);
           }
-          
+
           content += '\n';
         }
-        
+
         content += '\n';
       }
     }
-    
+
     return content;
   }
-  
+
   public async export(elements: Array<any>, includePartsOfSpeech: boolean,
     baseItemName: string, dataFormat: DataFormat): Promise<void> {
     let name: any = await this.dialogService.openInputDialog('Export', '',
