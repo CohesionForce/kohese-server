@@ -300,18 +300,20 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     var parentRepo = proxy.parentProxy.getRepositoryProxy();
     var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
     var repoMountFilePath = parentRepoStoragePath + '/Repository/' + modelInstance.id + '.json.mount';
+
     var repoMountData = {
       id: modelInstance.id,
       name: modelInstance.name,
-      parentId: modelInstance.parentId,
+      parentId: modelInstance.parentId
     };
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData);
     if (enable === false) {
+      kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
       kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     }
-    mountList[repoMountData.id] = { 'repoStoragePath': repoStoragePath, name: repoMountData.name };
+    mountList[repoMountData.id] = { 'repoStoragePath': repoStoragePath, name: repoMountData.name, parentId: repoMountData.parentId };
     updateMountFile();
 
     repoStoragePath = determineRepoStoragePath(proxy);
@@ -343,12 +345,12 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
   return promise.then(function () {
     // TODO:  This needs to be replaced with a uniform directory approach that does not include Model Kinds
+      kdbFS.createDirIfMissing(path.dirname(filePath));
       if (enable === false) {
-        kdbFS.createDirIfMissing(path.dirname(filePath));
-        kdbFS.storeJSONDoc(filePath, proxy.cloneItemAndStripDerived());
+          kdbFS.storeJSONDoc(filePath, proxy.cloneItemAndStripDerived());
       }
       if (isNewItem && (modelName === 'Repository')) {
-        mountRepository({ id: modelInstance.id, parentId: modelInstance.parentId, 'repoStoragePath': repoStoragePath });
+        mountRepository({'repoStoragePath': repoStoragePath, name: repoMountData.name, id: repoMountData.id, parentId: repoMountData.parentId});
       }
       var repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
       repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
