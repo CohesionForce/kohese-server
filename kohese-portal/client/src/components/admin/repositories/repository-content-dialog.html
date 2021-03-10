@@ -9,9 +9,9 @@
           <mat-cell *matCellDef="let repoList">{{repoList.name}}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="clone">
-          <mat-header-cell *matHeaderCellDef> Clone </mat-header-cell>
-          <mat-cell *matCellDef="let repoList">{{repoList.clone}}</mat-cell>
+        <ng-container matColumnDef="duplicated">
+          <mat-header-cell *matHeaderCellDef> Duplicated </mat-header-cell>
+          <mat-cell *matCellDef="let repoList">{{repoList.duplicated}}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="description">
@@ -28,7 +28,7 @@
                 <mat-icon class="fa fa-bars"></mat-icon>
               </button>
               <mat-menu #menu="matMenu" [overlapTrigger]="false">
-                <button mat-menu-item [disabled]="repoList.clone" (click)="mountRepo(repoList.id)">
+                <button mat-menu-item [disabled]="repoList.duplicated" (click)="mountRepo(repoList.id)">
                   mount
                 </button>
               </mat-menu>

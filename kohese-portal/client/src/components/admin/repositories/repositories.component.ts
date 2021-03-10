@@ -211,11 +211,11 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
   rootProxy: ItemProxy;
   isLoaded: boolean = false;
   disabledRepos: Array<any>;
-  parentId: any;
+  parentId = '';
 
   @Input()
   routingStrategy: string;
-  rowDef: Array<string> = ['name', 'clone', 'description', 'options'];
+  rowDef: Array<string> = ['name', 'duplicated', 'description', 'options'];
 
   get navigationService() {
     return this._navigationService;
@@ -262,10 +262,10 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
                     this.repoList[index].mounted = false;
                     this.repoList[index].descendantCount = 0;
                     if (this.repositories.some(y => y.item.id === this.repoList[index].id)) {
-                      this.repoList[index].clone = true;
+                      this.repoList[index].duplicated = true;
                     }
                     else {
-                      this.repoList[index].clone = false;
+                      this.repoList[index].duplicated = false;
                     }
                     index++
                   }
@@ -281,10 +281,10 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
               this.repoList[index].mounted = false;
               this.repoList[index].descendantCount = 0;
               if (this.repositories.some(y => y.item.id === this.repoList[index].id)) {
-                this.repoList[index].clone = true;
+                this.repoList[index].duplicated = true;
               }
               else {
-                this.repoList[index].clone = false;
+                this.repoList[index].duplicated = false;
               }
               index++
             }
@@ -347,11 +347,13 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
           }
         }).updateSize('80%', '80%').afterClosed().subscribe((selection:
           Array<any>) => {
-          this.parentId = selection[0].item.id;
-          this._changeDetectorRef.markForCheck();
-          this.repositoryService.addRepository(id, this.parentId);
-          var index = this.availablerepoList.findIndex(y => y.id === id)
-          this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);
+          if (selection) {
+            this.parentId = selection[0].item.id;
+            this._changeDetectorRef.markForCheck();
+            this.repositoryService.addRepository(id, this.parentId);
+            var index = this.availablerepoList.findIndex(y => y.id === id)
+            this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);
+          }
         });
     }
     console.log('::: end Mount Repo', id)
