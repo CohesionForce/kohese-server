@@ -13,7 +13,8 @@ import { NotificationService } from '../../../services/notifications/notificatio
 import { SessionService } from '../../../services/user/session.service';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { RepositoryService } from '../../../services/repository/repository.service';
-import { async } from '@angular/core/testing';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { TreeComponent } from '../../tree/tree.component';
 
 
 @Component({
@@ -182,7 +183,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
   public unmountRepo(id: string) {
     this.repositoryService.unMountRepository(id);
     let index = this.repositories.findIndex(t => t.item.id === id);
-    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (false))
+    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (true))
   }
 
   public disableRepo(id: string) {
@@ -210,6 +211,7 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
   rootProxy: ItemProxy;
   isLoaded: boolean = false;
   disabledRepos: Array<any>;
+  parentId: any;
 
   @Input()
   routingStrategy: string;
@@ -299,13 +301,46 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
   }
 
   async mountRepo(id: string) {
+    var repoDisabled: boolean = false;
+    var parentId: any;
     this.disabledRepos = await this.repositoryService.getDisabledRepositories();
-    for (let x: number = 0; x < this.disabledRepos.length; x++) {
+    for (var x: number = 0; x < this.disabledRepos.length; x++) {
       if (this.disabledRepos[x].id === id) {
-        this.repositoryService.enableRepository(id);
-        this.repositoryService.mountRepository(this.disabledRepos[x] as ItemProxy);
+        var repoDisabled = true;
         break;
       }
+    }
+    if (repoDisabled) {
+        console.log('::: Mounting a disabled Repository')
+        this.repositoryService.enableRepository(id);
+        this.repositoryService.mountRepository(this.disabledRepos[x] as ItemProxy);
+    }
+    else {
+        // this.field.openObjectSelector;
+        console.log('::: Mounting Unmounted Respository')
+        this.dialogueService.openComponentDialog(TreeComponent, {
+          data: {
+            root: TreeConfiguration.getWorkingTree().getRootProxy(),
+            getChildren: (element: any) => {
+              return (element as ItemProxy).children;
+            },
+            getText: (element: any) => {
+              return (element as ItemProxy).item.name;
+            },
+            getIcon: (element: any) => {
+              return (element as ItemProxy).model.view.item.icon;
+            },
+            selection: (this.parentId ? [TreeConfiguration.getWorkingTree().
+              getProxyFor(this.parentId)] : [])
+          }
+        }).updateSize('80%', '80%').afterClosed().subscribe((selection:
+          Array<any>) => {
+          this.parentId = selection[0].item.id;
+          this._changeDetectorRef.markForCheck();
+          this.repositoryService.addRepository(id, this.parentId);
+          var index = this.availablerepoList.findIndex(y => y.id === id)
+          this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);
+        });
     }
     console.log('::: end Mount Repo', id)
   }

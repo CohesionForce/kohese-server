@@ -501,6 +501,16 @@ let _workingTree = TreeConfiguration.getWorkingTree();
           }) });
           break;
 
+          case 'Repository/addRepository':
+            port.postMessage({ id: request.id, data: await new Promise<any>(
+              (resolve: () => void, reject:
+              () => void) => {
+              socket.emit('Repository/addRepository', {repoID: request.data.id, parentId: request.data.parentId}, () => {
+                resolve();
+              });
+            }) });
+            break;
+
       default:
         console.log('$$$ Received unexpected event:' + request.type);
         console.log(event);

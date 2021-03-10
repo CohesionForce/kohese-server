@@ -203,6 +203,40 @@ module.exports.enableRepository = enableRepository;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function addRepository(id: string, parentId: string) {
+  for (var x: number = 0; x<availableRepositories.length; x++) {
+    if (availableRepositories[x].id === id) {
+      var repoMount = availableRepositories[x];
+      break;
+    }
+  }
+  mountList = kdbFS.loadJSONDoc(mountFilePath);
+  mountList[repoMount.id] = {
+    name: repoMount.name,
+    repoStoragePath: repoMount.repoStoragePath,
+    parentId: parentId
+  }
+  mountList[repoMount.id].mounted = true;
+  updateMountFile();
+
+  let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
+  var repoMountFilePath = path + '/' + repoMount.id + '.json.mount';
+
+  var repoMountData = {
+    id: repoMount.id,
+    name: repoMount.name,
+    parentId: parentId
+  };
+
+  console.log('::: Repo Mount Information');
+  console.log(repoMountData)
+  kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
+}
+module.exports.addRepository = addRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function setAvailableRepositories(dir, availableRepositories) {
   fs.readdirSync(dir).forEach(file => {
     let fullPath = path.join(dir, file);
@@ -211,6 +245,7 @@ function setAvailableRepositories(dir, availableRepositories) {
     } else {
       if (file === 'Root.json') {
         var repositories = kdbFS.loadJSONDoc(fullPath);
+        fullPath = path.parse(fullPath).dir
         availableRepositories.push({
           id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
         });
@@ -300,6 +335,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     var parentRepo = proxy.parentProxy.getRepositoryProxy();
     var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
     var repoMountFilePath = parentRepoStoragePath + '/Repository/' + modelInstance.id + '.json.mount';
+    console.log('here is the repoMountFilePath', repoMountFilePath)
 
     var repoMountData = {
       id: modelInstance.id,

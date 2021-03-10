@@ -1128,6 +1128,16 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/addRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received addRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('^^^ Received Add Mount request ', request)
+    kdb.addRepository(request.repoID, request.parentId)
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('renameReport', (request: any, respond: Function) => {
     console.log('::: session %s: Received renameReport from %s to %s for user %s at %s',
       socket.id, request.oldReportName, request.newReportName, socket.koheseUser.username, socket.handshake.address);
