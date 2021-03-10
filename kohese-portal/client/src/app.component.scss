@@ -18,6 +18,10 @@ $baseBorderRadius : 10px;
 //font
 $fontColor: black;
 
+::ng-deep .mat-tooltip {
+  font-size: 13px;
+}
+
 :host {
   height : 100%;
 }
