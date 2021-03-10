@@ -215,7 +215,7 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
 
   @Input()
   routingStrategy: string;
-  rowDef: Array<string> = ['name', 'description', 'options'];
+  rowDef: Array<string> = ['name', 'clone', 'description', 'options'];
 
   get navigationService() {
     return this._navigationService;
@@ -261,6 +261,12 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
                     this.repoList[index] = this.availablerepoList[x];
                     this.repoList[index].mounted = false;
                     this.repoList[index].descendantCount = 0;
+                    if (this.repositories.some(y => y.item.id === this.repoList[index].id)) {
+                      this.repoList[index].clone = true;
+                    }
+                    else {
+                      this.repoList[index].clone = false;
+                    }
                     index++
                   }
                 }
@@ -274,6 +280,12 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
               this.repoList[index] = this.availablerepoList[x];
               this.repoList[index].mounted = false;
               this.repoList[index].descendantCount = 0;
+              if (this.repositories.some(y => y.item.id === this.repoList[index].id)) {
+                this.repoList[index].clone = true;
+              }
+              else {
+                this.repoList[index].clone = false;
+              }
               index++
             }
           }
