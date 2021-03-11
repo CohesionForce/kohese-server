@@ -173,6 +173,12 @@ function unMountRepository(proxy: any) {
   mountList = kdbFS.loadJSONDoc(mountFilePath);
   kdbFS.removeFile(mountList[proxy.item.id].repoStoragePath + '.json.mount');
   delete mountList[proxy.item.id];
+  for(let id in mountList) {
+    if (mountList[id].parentId === proxy.item.id) {
+      kdbFS.removeFile(mountList[id].repoStoragePath + '.json.mount');
+      delete mountList[id];
+    }
+  }
   updateMountFile();
 }
 module.exports.unMountRepository = unMountRepository;
@@ -184,6 +190,12 @@ function disableRepository(proxy: any) {
   mountList = kdbFS.loadJSONDoc(mountFilePath);
   mountList[proxy.item.id].disabled = true;
   mountList[proxy.item.id].mounted = false;
+  for(let id in mountList) {
+    if (mountList[id].parentId === proxy.item.id) {
+      mountList[id].disabled = true;
+      mountList[id].mounted = false;
+    }
+  }
   updateMountFile();
 }
 module.exports.disableRepository = disableRepository;
