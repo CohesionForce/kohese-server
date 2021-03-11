@@ -235,10 +235,10 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
           }
 
           proxy.dirtyFields[path] =
-          {
-            from: clonedOriginalValue,
-            to: clonedValue
-          }
+            {
+              from: clonedOriginalValue,
+              to: clonedValue
+            }
         } else {
           // Update to the new value
           proxy.dirtyFields[path].to = clonedValue;
@@ -324,14 +324,14 @@ const ItemChangeHandler = (typeDecl, target, proxy: ItemProxy, propertyPath?, ty
 // Create ItemProxy from an existing Item
 //////////////////////////////////////////////////////////////////////////
 interface ValidationResultType {
-  valid: boolean,
-  kind: string,
-  itemId: string,
-  missingProperties?: Array<string>,
-  malformedArray?: Array<string>,
-  malformedNumber?: Array<string>,
-  malformedTimestamp?: Array<string>,
-  invalidData?: {}
+    valid: boolean,
+    kind: string,
+    itemId: string,
+    missingProperties?: Array<string>,
+    malformedArray?: Array<string>,
+    malformedNumber?: Array<string>,
+    malformedTimestamp?: Array<string>,
+    invalidData?: {}
 }
 
 export interface KoheseModelInterface {
@@ -469,14 +469,14 @@ export class ItemProxy {
         proxy.internal = true;
         break;
       default:
-      // Do Nothing
-    }
+        // Do Nothing
+      }
 
     if (proxy._item &&
-      (!proxy._item.loadPending) &&
-      (proxy.kind !== 'Internal') &&
-      (proxy.kind !== 'Internal-Lost') &&
-      (proxy.kind !== 'Internal-Model')){
+        (!proxy._item.loadPending) &&
+        (proxy.kind !== 'Internal') &&
+        (proxy.kind !== 'Internal-Lost') &&
+        (proxy.kind !== 'Internal-Model')){
       // Item already exists, so update it instead
       proxy.updateItem(kind, forItem);
       return proxy;
@@ -528,7 +528,7 @@ export class ItemProxy {
 
     if (loadPending && (proxy._item.parentId !== 'LOST+FOUND') && (this.kind !==
       'Internal') && (this.kind !== 'Internal-Model') && (this.kind !==
-        'Internal-View-Model')) {
+      'Internal-View-Model')) {
       // Remove load pending since the item has now been loaded
       delete proxy._item.loadPending;
       this.internal = false;
@@ -887,9 +887,9 @@ export class ItemProxy {
         let oldRelationIds = [];
         let newRelationIds = [];
         if (oldReferences &&
-          oldReferences[thisProxy.kind] &&
-          oldReferences[thisProxy.kind][prefixedRelationProperty])
-          {
+            oldReferences[thisProxy.kind] &&
+            oldReferences[thisProxy.kind][prefixedRelationProperty])
+        {
           oldRelationIds = oldReferences[thisProxy.kind][prefixedRelationProperty];
         }
 
@@ -1167,7 +1167,7 @@ export class ItemProxy {
     this.kind = kind;
     this.internal = ((this.kind === 'Internal') || (this.kind ===
       'Internal-Lost') || (this.kind === 'Internal-Model') || (this.kind ===
-        'Internal-View-Model'));
+      'Internal-View-Model'));
 
     if (TreeConfiguration.koheseModelDefn){
       this.model = TreeConfiguration.koheseModelDefn.getModelProxyFor(kind);
@@ -1201,10 +1201,10 @@ export class ItemProxy {
           deletedKeys.forEach(key => {
             console.log('>>> ' + key + ' = ' + JSON.stringify(this._item[key]));
           });
-          // } else {
-          //   console.log('!!! Warning: Properties are in a different order: ');
-          //   console.log('>>> Old Keys: ' + oldKeys);
-          //   console.log('>>> New Keys: ' + newKeys);
+        // } else {
+        //   console.log('!!! Warning: Properties are in a different order: ');
+        //   console.log('>>> Old Keys: ' + oldKeys);
+        //   console.log('>>> New Keys: ' + newKeys);
         }
         this._item = newItem;
         this.item = ItemChangeHandler(this.kind, this._item, this);
@@ -1312,10 +1312,10 @@ export class ItemProxy {
     }
 
     let treeHashEntry : TreeHashEntry = {
-      kind: this.kind,
-      oid: this.oid,
-      childTreeHashes: {},
-      treeHash : undefined
+        kind: this.kind,
+        oid: this.oid,
+        childTreeHashes: {},
+        treeHash : undefined
     };
 
     for (var childIdx in this.children){
@@ -1592,7 +1592,7 @@ export class ItemProxy {
     var excludeChildKind = {};
     excludeKind.forEach((kind)=>{
       excludeChildKind[kind] = true;
-    });
+      });
 
     function visitChild(proxy){
       if (!excludeChildKind[proxy.kind]){
@@ -1661,7 +1661,7 @@ export class ItemProxy {
 
     excludeKind.forEach((kind)=>{
       excludeChildKind[kind] = true;
-    });
+      });
 
     function* visitChild(proxy){
       if (!excludeChildKind[proxy.kind]){
@@ -1709,7 +1709,7 @@ export class ItemProxy {
     }
 
     console.log('=== ' + thisIndent + this._item.id + ' - ' + this._item.name +
-      ' - ' + this.kind + ' <' + this.constructor.name + '>');
+        ' - ' + this.kind + ' <' + this.constructor.name + '>');
 
     for ( var childIdx in this.children) {
       var childProxy = this.children[childIdx];
@@ -1797,10 +1797,10 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   addChild(childProxy) {
     if (childProxy.parentProxy === this) {
-      //      console.log('::: IP: Child ' + childProxy._item.name + ' already associated with ' + this._item.name);
+//      console.log('::: IP: Child ' + childProxy._item.name + ' already associated with ' + this._item.name);
       return;
     }
-    //    console.log('::: IP: Adding child ' + childProxy._item.name + ' to ' + this._item.name);
+//    console.log('::: IP: Adding child ' + childProxy._item.name + ' to ' + this._item.name);
 
     if (this.hasAncestor(childProxy)) {
       let oldParentId;
@@ -1989,7 +1989,7 @@ export class ItemProxy {
     } else {
       this.makeChildrenManualOrdered();
     }
-  }
+}
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -2304,15 +2304,15 @@ export class ItemProxy {
       if (attemptToDeleteRestrictedNode){
         // console.log('::: -> Not removing restricted node:' + this._item.name);
       } else {
-          // console.log('::: -> Removing all references');
-          if (!this.treeConfig.loading){
-            this.treeConfig.changeSubject.next({
-              type: 'delete',
-              kind: this.kind,
-              id: this._item.id,
-              proxy: this
-            });
-          }
+        // console.log('::: -> Removing all references');
+        if (!this.treeConfig.loading){
+          this.treeConfig.changeSubject.next({
+            type: 'delete',
+            kind: this.kind,
+            id: this._item.id,
+            proxy: this
+           });
+        }
         delete this.treeConfig.proxyMap[byId];
       }
     } else {
@@ -2383,7 +2383,7 @@ export class ItemProxy {
     // Copy attributes proxy
     for ( var fromKey in fromItem) {
       if (fromItem.hasOwnProperty(fromKey) && (fromKey.charAt(0) !== '$') &&
-        !_.isEqual(fromItem[fromKey], this._item[fromKey])) {
+          !_.isEqual(fromItem[fromKey], this._item[fromKey])) {
         // console.log('!!! Updating ' + fromKey);
         modifications[fromKey] = {
           from: this._item[fromKey],
@@ -2400,9 +2400,9 @@ export class ItemProxy {
       let isDerivedAttribute = (dataModel && dataModel._item.classProperties && dataModel._item.classProperties[toKey]
         && dataModel._item.classProperties[toKey].definition.derived);
       if (!isDerivedAttribute && toKey !== '__deletedProperty' && (toKey.charAt(0) !== '$')
-        && this._item.hasOwnProperty(toKey)
-        && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey)))
-        {
+          && this._item.hasOwnProperty(toKey)
+          && (fromItem[toKey] === null || !fromItem.hasOwnProperty(toKey)))
+      {
         // console.log('!!! Deleted Property: ' + toKey + ' in ' + this._item.name);
         if (!this._item.__deletedProperty) {
           this._item.__deletedProperty = {};
