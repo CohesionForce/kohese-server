@@ -48,12 +48,10 @@ import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
 import { LensModule } from './components/lens/lens.module';
 import { ItemBoardModule } from './components/item-board/item-board.module';
-import { ShowIfTruncatedDirective } from './Directives/show-if-truncated.directive';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    ShowIfTruncatedDirective
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -120,8 +118,6 @@ import { ShowIfTruncatedDirective } from './Directives/show-if-truncated.directi
     CopyModule,
     ItemBoardModule
   ],
-  providers : [ShowIfTruncatedDirective],
-  exports : [ShowIfTruncatedDirective],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

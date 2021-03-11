@@ -33,6 +33,7 @@ import { ReportDashboardComponent } from './report-dashboard/report-dashboard.co
 import { ReportGeneratorModule } from '../report-generator/report-generator.module';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 import { ItemBoardModule } from '../item-board/item-board.module';
+import { directivesModule } from '../../Directives/directives.module'
 
 @NgModule({
   declarations: [
@@ -77,7 +78,8 @@ import { ItemBoardModule } from '../item-board/item-board.module';
     NgxDatatableModule,
     ReportGeneratorModule,
     ObjectEditorModule,
-    ItemBoardModule
+    ItemBoardModule,
+    directivesModule
   ],
   exports : [
     DashboardComponent
