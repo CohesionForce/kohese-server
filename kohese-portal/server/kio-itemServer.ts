@@ -1218,12 +1218,12 @@ function KIOItemServer(socket){
       });
 
       if (fs.existsSync(mediaDirectoryPath)) {
-       let directoryContents: Array<string> = fs.readdirSync(
-         mediaDirectoryPath);
-       for (let j: number = 0; j < directoryContents.length; j++) {
-         fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[j]));
-       }
-       fs.rmdirSync(mediaDirectoryPath);
+        let directoryContents: Array<string> = fs.readdirSync(
+          mediaDirectoryPath);
+        for (let j: number = 0; j < directoryContents.length; j++) {
+          fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[j]));
+        }
+        fs.rmdirSync(mediaDirectoryPath);
       }
 
       if (intermediateFilePath && fs.existsSync(intermediateFilePath)) {
@@ -1325,7 +1325,7 @@ function KIOItemServer(socket){
     }).catch(function (err) {
       console.log(err.stack);
       sendResponse({
-         error: err
+        error: err
       });
     });
   });
