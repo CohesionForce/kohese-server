@@ -105,7 +105,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
         break;
       default:
         console.log('*** Not processing change notification: ' + change.type);
-    }
+      }
   }
 
 });
@@ -145,14 +145,14 @@ retrieveVCStatus.then((status) => {
 function KIOItemServer(socket){
 
   console.log('>>> KIO Item Server: session %s connected from %s for %s',
-    socket.id, socket.handshake.address, socket.koheseUser.username);
+      socket.id, socket.handshake.address, socket.koheseUser.username);
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/findById', function(request, sendResponse){
     console.log('::: session %s: Received findById for %s for user %s at %s',
-      socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     var proxy = ItemProxy.getWorkingTree().getProxyFor(request.id);
     sendResponse({
@@ -183,7 +183,7 @@ function KIOItemServer(socket){
     }
 
     console.log('::: session %s: Received getMetamodel for user %s at %s for repo %s',
-      socket.id, username, socket.handshake.address, request.forRepoId);
+                socket.id, username, socket.handshake.address, request.forRepoId);
 
     let response = {
       timestamp: {
@@ -246,7 +246,7 @@ function KIOItemServer(socket){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getItemCache for user %s at %s', socket.id, username,
-      socket.handshake.address);
+                socket.handshake.address);
 
     consoleLogObject('$$$ Request', request);
 
@@ -306,7 +306,7 @@ function KIOItemServer(socket){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getMissingCacheInfo for user %s at %s', socket.id, username,
-      socket.handshake.address);
+                socket.handshake.address);
 
     consoleLogObject('$$$ Request', request);
 
@@ -369,7 +369,7 @@ function KIOItemServer(socket){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getRepoHashmap for user %s at %s', socket.id, username,
-      socket.handshake.address);
+                socket.handshake.address);
 
     let working : TreeConfiguration = ItemProxy.getWorkingTree();
     await working.saveToCache();
@@ -393,7 +393,7 @@ function KIOItemServer(socket){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getAll for user %s at %s for repo %s',
-      socket.id, username, socket.handshake.address, request.forRepoId);
+                socket.id, username, socket.handshake.address, request.forRepoId);
 
     var repoTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes();
     if (!request.forRepoId){
@@ -411,12 +411,12 @@ function KIOItemServer(socket){
         console.log('--- KDB Does Not Match: Full response will be sent');
 
         response = {
-          repoTreeHashes: repoTreeHashes,
-          cache: {
-            KoheseModel: {},
-            KoheseView: {},
-            KoheseUser: {}},
-          sentAll: true
+            repoTreeHashes: repoTreeHashes,
+            cache: {
+              KoheseModel: {},
+              KoheseView: {},
+              KoheseUser: {}},
+            sentAll: true
         };
 
         let repoProxy;
@@ -441,10 +441,10 @@ function KIOItemServer(socket){
         let thmDiff = TreeHashMap.diff(request.repoTreeHashes, repoTreeHashes);
 
         response = {
-          repoTreeHashes: repoTreeHashes,
-          addItems: [],
-          changeItems: [],
-          deleteItems: []
+            repoTreeHashes: repoTreeHashes,
+            addItems: [],
+            changeItems: [],
+            deleteItems: []
         };
 
         for (let itemId in thmDiff.summary.itemAdded) {
@@ -538,7 +538,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/upsert', function(request, sendResponse){
     console.log('::: session %s: Received upsert for id %s for user %s at %s',
-      socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
 
     var koheseUserName = socket.koheseUser.username;
@@ -618,7 +618,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/deleteById', function(request, sendResponse){
     console.log('::: session %s: Received deleteById for %s for user %s at %s',
-      socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
 
     var proxy = ItemProxy.getWorkingTree().getProxyFor(request.id);
@@ -654,7 +654,7 @@ function KIOItemServer(socket){
   socket.on('Item/performAnalysis', function(request, sendResponse) {
 
     console.log('::: session %s: Received performAnalysis for %s for user %s at %s',
-      socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
 
     itemAnalysis.performAnalysis(request.kind, request.id, sendResponse);
@@ -681,12 +681,12 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('convertToMarkdown', async (request: any, respond: Function) => {
     console.log('::: session %s: Received convertToMarkdown for %s for user %s at %s',
-      socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
     let beforeTime = Date.now();
     let parameterlessType: string = ((request.contentType.indexOf(';') !==
       -1) ? request.contentType.substring(0, request.contentType.indexOf(
-        ';')) : request.contentType);
+      ';')) : request.contentType);
     if (parameterlessType === 'application/pdf') {
       let parameters: Array<string> = ['-jar', Path.resolve(Path.dirname(Path.
         dirname(fs.realpathSync(__dirname))), 'external', 'PdfConverter',
@@ -773,8 +773,8 @@ function KIOItemServer(socket){
             return;
           }
 
-        // Fall through to '.odt' case
-        // tslint:disable-next-line:no-switch-case-fall-through
+          // Fall through to '.odt' case
+          // tslint:disable-next-line:no-switch-case-fall-through
         case 'application/vnd.oasis.opendocument.text':
           mediaDirectoryPath = Path.resolve(temporaryDirectoryPath,
             'Pictures');
@@ -886,7 +886,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('importMarkdown', (request: any, respond: Function) => {
     console.log('::: session %s: Received importMarkdown for %s for user %s at %s',
-      socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     // console.log(request);
     let timestamp: number = Date.now();
     MdToKohese.convertMarkdownToItems(request.markdown, {
@@ -906,7 +906,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('Item/generateReport', async (request, sendResponse) => {
     console.log('::: session %s: Received generateReport for %s for user %s at %s',
-      socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
 
     let metaDataString: Array<string> = request.content.split('\n\n', 3);
     fs.writeFileSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
@@ -944,7 +944,7 @@ function KIOItemServer(socket){
         reportName);
       if ((request.format === 'application/vnd.oasis.opendocument.' +
         'text') || (request.format === 'application/vnd.openxmlformats-' +
-          'officedocument.wordprocessingml.document')) {
+        'officedocument.wordprocessingml.document')) {
         pandocProcess = child.spawn('pandoc', ['-f', 'html', '-t', 'odt',
           '-s', '-o', reportPath], undefined);
         pandocProcess.stdin.write(reportContent);
@@ -1046,7 +1046,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('getReportMetaData', (request: any, respond: Function) => {
     console.log('::: session %s: Received getReportMetaData for user %s at %s',
-      socket.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, socket.koheseUser.username, socket.handshake.address);
     respond(fs.readdirSync(_REPORTS_DIRECTORY_PATH).filter((fileName: string) => {
       // Filter for files that contain report data, by excluding metadata files that start with '.'
       return (!fileName.startsWith('.'));
@@ -1139,13 +1139,13 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('renameReport', (request: any, respond: Function) => {
     console.log('::: session %s: Received renameReport from %s to %s for user %s at %s',
-      socket.id, request.oldReportName, request.newReportName, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.oldReportName, request.newReportName, socket.koheseUser.username, socket.handshake.address);
 
     fs.renameSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.oldReportName),
       Path.resolve(_REPORTS_DIRECTORY_PATH, request.newReportName));
     fs.renameSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
       oldReportName), Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
-        newReportName));
+      newReportName));
     respond();
   });
 
@@ -1154,7 +1154,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('getReportPreview', (request: any, respond: Function) => {
     console.log('::: session %s: Received getReportPreview for %s for user %s at %s',
-      socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
     let reportPreview: string;
     let reportName: string = request.reportName;
     let format: string;
@@ -1175,7 +1175,7 @@ function KIOItemServer(socket){
         case '.rtf':
           child.spawnSync('soffice', ['--headless', '--convert-to', 'odt',
             '--outdir', _REPORTS_DIRECTORY_PATH, Path.resolve(
-              _REPORTS_DIRECTORY_PATH, reportName)], undefined);
+            _REPORTS_DIRECTORY_PATH, reportName)], undefined);
           reportName = reportName.substring(0, reportName.lastIndexOf('.')) +
             '.odt';
           intermediateFilePath = Path.resolve(_REPORTS_DIRECTORY_PATH,
@@ -1188,42 +1188,42 @@ function KIOItemServer(socket){
 
       let pandocProcess: any = child.spawnSync('pandoc', ['-f', format, '-t',
         'commonmark', '--atx-headers', '--extract-media', __dirname, '-s', Path.
-          resolve(_REPORTS_DIRECTORY_PATH, reportName)], undefined);
+        resolve(_REPORTS_DIRECTORY_PATH, reportName)], undefined);
 
       reportPreview = pandocProcess.stdout.toString();
       let mediaDirectoryPath: string = Path.resolve(__dirname, 'media');
       reportPreview = reportPreview.replace(/!\[.*?\]\((.+?)\)/g,
         (matchedSubstring: string, captureGroup: string, index: number,
-          originalString: string) => {
-          let imagePath: string = Path.resolve(mediaDirectoryPath, captureGroup);
-          if (fs.existsSync(imagePath)) {
-            let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
-              indexOf(captureGroup);
-            let dataUrl: string = 'data:image/';
-            if (captureGroup.endsWith('.png')) {
-              dataUrl += 'png';
-            } else if (captureGroup.endsWith('.jpg') || captureGroup.endsWith(
-              '.jpeg')) {
-              dataUrl += 'jpeg';
-            }
-
-            dataUrl += ';base64,';
-            dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
-            return matchedSubstring.substring(0,
-              matchedSubstringCaptureGroupIndex) + dataUrl + matchedSubstring.
-                substring(matchedSubstringCaptureGroupIndex + captureGroup.length);
-          } else {
-            return matchedSubstring;
+        originalString: string) => {
+        let imagePath: string = Path.resolve(mediaDirectoryPath, captureGroup);
+        if (fs.existsSync(imagePath)) {
+          let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+            indexOf(captureGroup);
+          let dataUrl: string = 'data:image/';
+          if (captureGroup.endsWith('.png')) {
+            dataUrl += 'png';
+          } else if (captureGroup.endsWith('.jpg') || captureGroup.endsWith(
+            '.jpeg')) {
+            dataUrl += 'jpeg';
           }
-        });
+
+          dataUrl += ';base64,';
+          dataUrl += fs.readFileSync(imagePath, { encoding: 'base64' });
+          return matchedSubstring.substring(0,
+            matchedSubstringCaptureGroupIndex) + dataUrl + matchedSubstring.
+            substring(matchedSubstringCaptureGroupIndex + captureGroup.length);
+        } else {
+          return matchedSubstring;
+        }
+      });
 
       if (fs.existsSync(mediaDirectoryPath)) {
-        let directoryContents: Array<string> = fs.readdirSync(
-          mediaDirectoryPath);
-        for (let j: number = 0; j < directoryContents.length; j++) {
-          fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[j]));
-        }
-        fs.rmdirSync(mediaDirectoryPath);
+       let directoryContents: Array<string> = fs.readdirSync(
+         mediaDirectoryPath);
+       for (let j: number = 0; j < directoryContents.length; j++) {
+         fs.unlinkSync(Path.resolve(mediaDirectoryPath, directoryContents[j]));
+       }
+       fs.rmdirSync(mediaDirectoryPath);
       }
 
       if (intermediateFilePath && fs.existsSync(intermediateFilePath)) {
@@ -1239,7 +1239,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('removeReport', (request: any, respond: Function) => {
     console.log('::: session %s: Received removeReport for %s for user %s at %s',
-      socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.reportName, socket.koheseUser.username, socket.handshake.address);
     fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, request.reportName));
     fs.unlinkSync(Path.resolve(_REPORTS_DIRECTORY_PATH, '.' + request.
       reportName));
@@ -1251,7 +1251,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('VersionControl/stage', async function (request, sendResponse) {
     console.log('::: session %s: Received VersionControl/stage for %s for user %s at %s',
-      socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     var idsArray = Array.from(request.proxyIds);
     let errorMap: any = {};
     var proxies = [];
@@ -1322,12 +1322,12 @@ function KIOItemServer(socket){
             console.log('::: Updated Cache for commit');
           });
         });
-      }).catch(function (err) {
-        console.log(err.stack);
-        sendResponse({
-          error: err
-        });
+    }).catch(function (err) {
+      console.log(err.stack);
+      sendResponse({
+         error: err
       });
+    });
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -1337,13 +1337,13 @@ function KIOItemServer(socket){
     var idsArray = Array.from(request.proxyIds);
     KDBRepo.push(idsArray, request.remoteName, socket.koheseUser.username).
       then(function (pushStatusMap) {
-        sendResponse(pushStatusMap);
-      }).catch(function (err) {
-        console.log(err.stack);
-        sendResponse({
-          error: err
-        });
+      sendResponse(pushStatusMap);
+    }).catch(function (err) {
+      console.log(err.stack);
+      sendResponse({
+        error: err
       });
+    });
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -1352,13 +1352,13 @@ function KIOItemServer(socket){
   socket.on('VersionControl/addRemote', function (request, sendResponse) {
     KDBRepo.addRemote(request.proxyId, request.remoteName, request.url).
       then(function (remoteName) {
-        sendResponse(remoteName);
-      }).catch(function (err) {
-        console.log(err.stack);
-        sendResponse({
-          error: err
-        });
+      sendResponse(remoteName);
+    }).catch(function (err) {
+      console.log(err.stack);
+      sendResponse({
+        error: err
       });
+    });
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -1451,7 +1451,7 @@ function KIOItemServer(socket){
                 then((statusAfterUnstage) => {
                   resolve(statusAfterUnstage);
                 }
-                );
+              );
             });
           } else {
             resolve(status);
@@ -1501,26 +1501,26 @@ function KIOItemServer(socket){
 
       // Send response
       Promise.all(pendingCheckoutProxies)
-        .then(function () {
-          // Update content based on reverted files
-          for (let j = 0; j < proxies.length; j++) {
-            let proxy = proxies[j];
-            var item = kdbFS.loadJSONDoc(proxy.repoPath);
-            if (proxy.kind === 'Repository') {
-              item.parentId = proxy.item.parentId;
-            }
-            proxy.updateItem(proxy.kind, item);
+      .then(function () {
+        // Update content based on reverted files
+        for (let j = 0; j < proxies.length; j++) {
+          let proxy = proxies[j];
+          var item = kdbFS.loadJSONDoc(proxy.repoPath);
+          if (proxy.kind === 'Repository') {
+            item.parentId = proxy.item.parentId;
           }
+          proxy.updateItem(proxy.kind, item);
+        }
 
-          updateStatus(proxies).then((statusMap) => {
-            sendResponse(statusMap);
-          });
-        }).catch(function (err) {
-          console.log(err.stack);
-          sendResponse({
-            error: err
-          });
+        updateStatus(proxies).then((statusMap) => {
+          sendResponse(statusMap);
         });
+      }).catch(function (err) {
+        console.log(err.stack);
+        sendResponse({
+          error: err
+        });
+      });
 
     });
 
@@ -1531,7 +1531,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('ImportDocuments', function (request, sendResponse) {
     console.log('::: session %s: Received ImportDocuments for user %s at %s',
-      socket.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, socket.koheseUser.username, socket.handshake.address);
 
     try {
       var absolutes = [];
@@ -1554,7 +1554,7 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('UploadImages', function (request, sendResponse) {
     console.log('::: session %s: Received UploadImages for user %s at %s',
-      socket.id, socket.koheseUser.username, socket.handshake.address);
+        socket.id, socket.koheseUser.username, socket.handshake.address);
 
     try {
       var absolutes = [];
@@ -1602,7 +1602,7 @@ async function embedImage(matchSource: string, match: string, pathBase:
           replacement = matchSource.substring(0, matchSourceIndex) + dataUrl +
             type.substring(type.indexOf('/') + 1) + ';base64,' +
             (await response.buffer()).toString('base64') + matchSource.
-              substring(matchSourceIndex + imagePath.length);
+            substring(matchSourceIndex + imagePath.length);
         }
       } catch (error) {
         console.log(error);
@@ -1638,7 +1638,7 @@ function updateStatus(proxies) {
   for (let i = 0; i < proxies.length; i++) {
     var repositoryInformation = getRepositoryInformation(proxies[i]);
     let promise = KDBRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
-      repositoryInformation.relativeFilePath);
+        repositoryInformation.relativeFilePath);
     promises.push(promise.then((status) => {
       statusMap[proxies[i].item.id] = status;
       proxies[i].updateVCStatus(status, false);
