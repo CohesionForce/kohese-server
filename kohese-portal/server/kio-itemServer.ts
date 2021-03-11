@@ -30,7 +30,7 @@ const _REPORTS_DIRECTORY_PATH = Path.resolve(fs.realpathSync(__dirname), '..',
 
 console.log('::: Initializing KIO Item Server');
 
-if (global['app']) {
+if(global['app']){
   global['app'].on('newSession', KIOItemServer);
 }
 
@@ -47,20 +47,20 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
     return;
   }
 
-  if (change.proxy) {
+  if(change.proxy){
     console.log(change.kind);
     console.log(change.proxy.item);
   }
 
   // Ignore internal instances
-  if (!change.proxy.internal) {
-    switch (change.type) {
+  if (!change.proxy.internal){
+    switch (change.type){
       case 'create':
       case 'update':
         if (!change.enableRepo) {
         kdb.storeModelInstance(change.proxy, change.type === 'create')
           .then(function (status) {
-            let proxy: ItemProxy = change.proxy;
+            let proxy : ItemProxy = change.proxy;
             proxy.updateVCStatus(status, false);
             let createNotification = {
               type: change.type,
@@ -117,11 +117,11 @@ let retrieveVCStatus = KDBRepo.getStatus('ROOT');
 retrieveVCStatus.then((status) => {
   console.log('::: Processing repo status');
   var idStatusArray = [];
-  let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
+  let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
   for (var j = 0; j < status.length; j++) {
     let statusRecord = status[j];
 
-    if (statusRecord.itemId) {
+    if (statusRecord.itemId){
       idStatusArray.push({
         id: statusRecord.itemId,
         status: statusRecord.status
@@ -131,7 +131,7 @@ retrieveVCStatus.then((status) => {
       let proxy = workingTree.getProxyFor(statusRecord.itemId);
       if (!proxy) {
         // TODO: Need to evaluate and remove the creation of missing proxies from this location
-        proxy = ItemProxy.createMissingProxy('Item', 'id', statusRecord.itemId, workingTree);
+        proxy = ItemProxy.createMissingProxy('Item','id', statusRecord.itemId, workingTree);
       }
       proxy.updateVCStatus(statusRecord.status, false);
     }
@@ -142,7 +142,7 @@ retrieveVCStatus.then((status) => {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function KIOItemServer(socket) {
+function KIOItemServer(socket){
 
   console.log('>>> KIO Item Server: session %s connected from %s for %s',
     socket.id, socket.handshake.address, socket.koheseUser.username);
@@ -150,7 +150,7 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/findById', function (request, sendResponse) {
+  socket.on('Item/findById', function(request, sendResponse){
     console.log('::: session %s: Received findById for %s for user %s at %s',
       socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
@@ -165,8 +165,8 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  function consoleLogObject(message, object) {
-    if (message) {
+  function consoleLogObject(message, object){
+    if (message){
       console.log(message);
     }
     console.log(JSON.stringify(object, null, '  '));
@@ -175,10 +175,10 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getMetamodel', function (request, sendResponse) {
+  socket.on('Item/getMetamodel', function(request, sendResponse){
     let requestReceiptTime = Date.now();
     var username = 'Unknown';
-    if (socket.koheseUser) {
+    if (socket.koheseUser){
       username = socket.koheseUser.username;
     }
 
@@ -202,8 +202,8 @@ function KIOItemServer(socket) {
     let repoProxy;
     repoProxy = ItemProxy.getWorkingTree().getRootProxy();
 
-    function addItemToResponse(proxy) {
-      if (!response.cache[proxy.kind]) {
+    function addItemToResponse(proxy){
+      if (!response.cache[proxy.kind]){
         response.cache[proxy.kind] = {};
       }
       var kindCache = response.cache[proxy.kind];
@@ -231,9 +231,9 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getItemCache', async function (request, sendResponse) {
+  socket.on('Item/getItemCache', async function(request, sendResponse){
 
-    function sendBulkCacheUpdate(key, value) {
+    function sendBulkCacheUpdate(key, value){
       console.log('### Sending BulkCacheUpdate for key: ' + key);
       let bulkUpdateMessage = {};
       bulkUpdateMessage[key] = value;
@@ -242,7 +242,7 @@ function KIOItemServer(socket) {
 
     let username = 'Unknown';
     let requestReceiptTime = Date.now();
-    if (socket.koheseUser) {
+    if (socket.koheseUser){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getItemCache for user %s at %s', socket.id, username,
@@ -254,7 +254,7 @@ function KIOItemServer(socket) {
     let headCommit = await itemCache.getRef('HEAD');
     let incrementalDataToLoad;
 
-    if (headCommit !== request.headCommit) {
+    if (headCommit !== request.headCommit){
       if (request.incrementalCacheLoad && request.headCommit) {
         console.log('### Providing incrementalDataToLoad: ' + request.headCommit + ' -> ' + headCommit);
         incrementalDataToLoad = {
@@ -279,7 +279,7 @@ function KIOItemServer(socket) {
       console.log('### Item Cache is already in sync');
     }
 
-    let response: any = {
+    let response : any = {
       timestamp: {
         requestTime: request.timestamp.requestTime,
         requestReceiptTime: requestReceiptTime,
@@ -287,7 +287,7 @@ function KIOItemServer(socket) {
       }
     };
 
-    if (incrementalDataToLoad) {
+    if (incrementalDataToLoad){
       response.incrementalDataToLoad = incrementalDataToLoad;
     }
 
@@ -298,11 +298,11 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getMissingCacheInfo', async function (request, sendResponse) {
+  socket.on('Item/getMissingCacheInfo', async function(request, sendResponse){
 
     let username = 'Unknown';
     let requestReceiptTime = Date.now();
-    if (socket.koheseUser) {
+    if (socket.koheseUser){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getMissingCacheInfo for user %s at %s', socket.id, username,
@@ -312,36 +312,36 @@ function KIOItemServer(socket) {
 
     let itemCache = ItemCache.getItemCache();
     let missingCacheData = request.missingCacheData;
-    let cacheData: any = {};
+    let cacheData : any = {};
 
     // Retrieve missing data
-    if (missingCacheData.blob) {
+    if(missingCacheData.blob){
       cacheData.blob = {};
-      for (let oid in missingCacheData.blob) {
+      for(let oid in missingCacheData.blob){
         let blob = await itemCache.getBlob(oid);
         cacheData.blob[oid] = blob;
       }
     }
 
-    if (missingCacheData.tree) {
+    if(missingCacheData.tree){
       cacheData.tree = {};
-      for (let treehash in missingCacheData.tree) {
+      for(let treehash in missingCacheData.tree){
         let tree = await itemCache.getTree(treehash);
         cacheData.tree[treehash] = tree;
       }
     }
 
-    if (missingCacheData.root) {
+    if(missingCacheData.root){
       cacheData.root = {};
-      for (let rootTreehash in missingCacheData.root) {
+      for(let rootTreehash in missingCacheData.root){
         let root = await itemCache.getTree(rootTreehash);
         cacheData.root[rootTreehash] = root;
       }
     }
 
-    if (missingCacheData.commit) {
+    if(missingCacheData.commit){
       cacheData.commit = {};
-      for (let commitId in missingCacheData.commit) {
+      for(let commitId in missingCacheData.commit){
         let commit = await itemCache.getCommit(commitId);
         cacheData.commit[commitId] = commit;
       }
@@ -363,15 +363,15 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getRepoHashmap', async function (request, sendResponse) {
+  socket.on('Item/getRepoHashmap', async function(request, sendResponse){
     var username = 'Unknown';
-    if (socket.koheseUser) {
+    if (socket.koheseUser){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getRepoHashmap for user %s at %s', socket.id, username,
       socket.handshake.address);
 
-    let working: TreeConfiguration = ItemProxy.getWorkingTree();
+    let working : TreeConfiguration = ItemProxy.getWorkingTree();
     await working.saveToCache();
     var repoTreeHashes = working.getRepoTreeHashes();
 
@@ -386,28 +386,28 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getAll', function (request, sendResponse) {
+  socket.on('Item/getAll', function(request, sendResponse){
     let requestTime = Date.now();
     var username = 'Unknown';
-    if (socket.koheseUser) {
+    if (socket.koheseUser){
       username = socket.koheseUser.username;
     }
     console.log('::: session %s: Received getAll for user %s at %s for repo %s',
       socket.id, username, socket.handshake.address, request.forRepoId);
 
     var repoTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes();
-    if (!request.forRepoId) {
+    if (!request.forRepoId){
       repoTreeHashes = ItemProxy.getWorkingTree().getAllTreeHashes();
     } else {
       let repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.forRepoId);
-      if (repoProxy) {
+      if (repoProxy){
         repoTreeHashes = repoProxy.getTreeHashMap();
       }
     }
 
-    var response: any = {};
-    if (!_.isEqual(request.repoTreeHashes, repoTreeHashes)) {
-      if (_.size(request.repoTreeHashes) === 0) {
+    var response : any = {};
+    if(!_.isEqual(request.repoTreeHashes, repoTreeHashes)){
+      if (_.size(request.repoTreeHashes) === 0){
         console.log('--- KDB Does Not Match: Full response will be sent');
 
         response = {
@@ -415,20 +415,19 @@ function KIOItemServer(socket) {
           cache: {
             KoheseModel: {},
             KoheseView: {},
-            KoheseUser: {}
-          },
+            KoheseUser: {}},
           sentAll: true
         };
 
         let repoProxy;
-        if (request.forRepoId) {
+        if (request.forRepoId){
           repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.forRepoId);
         } else {
           repoProxy = ItemProxy.getWorkingTree().getRootProxy();
         }
 
         repoProxy.visitChildren(null, (proxy) => {
-          if (!response.cache[proxy.kind]) {
+          if (!response.cache[proxy.kind]){
             response.cache[proxy.kind] = {};
           }
           var kindCache = response.cache[proxy.kind];
@@ -450,15 +449,15 @@ function KIOItemServer(socket) {
 
         for (let itemId in thmDiff.summary.itemAdded) {
           var proxy = ItemProxy.getWorkingTree().getProxyFor(itemId);
-          response.addItems.push({ kind: proxy.kind, item: proxy.cloneItemAndStripDerived() });
+          response.addItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
         }
 
         for (let itemId in thmDiff.summary.contentChanged) {
           var proxy = ItemProxy.getWorkingTree().getProxyFor(itemId);
-          response.changeItems.push({ kind: proxy.kind, item: proxy.cloneItemAndStripDerived() });
+          response.changeItems.push({kind: proxy.kind, item: proxy.cloneItemAndStripDerived()});
         }
 
-        for (let itemId in thmDiff.summary.itemDeleted) {
+        for (let itemId in thmDiff.summary.itemDeleted){
           response.deleteItems.push(itemId);
         }
 
@@ -472,35 +471,35 @@ function KIOItemServer(socket) {
     sendResponse(response);
     let responseTransmitTime = Date.now();
     console.log('::: Sent getAll response for repo: ' + request.forRepoId);
-    for (let key in response) {
+    for(let key in response){
       console.log(' --> ' + key + ': ' + _.size(response[key]));
     }
-    console.log('$$$ Elapsed time: ' + (responseTransmitTime - requestTime) / 1000);
+    console.log('$$$ Elapsed time: ' + (responseTransmitTime - requestTime)/1000);
   });
 
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/getStatus', async function (request, sendResponse) {
+  socket.on('Item/getStatus', async function(request, sendResponse){
 
     let requestTime = Date.now();
     var repoProxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
     var username = 'Unknown';
-    if (socket.koheseUser) {
+    if (socket.koheseUser){
       username = socket.koheseUser.username;
     }
 
     console.log('::: session %s: Received getStatus for %s for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId, socket.id, username);
-    let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
+    let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
 
     let status = await retrieveVCStatus; //await KDBRepo.getStatus(request.repoId);
     if (status) {
       var idStatusArray = [];
 
       let rootProxy = workingTree.getRootProxy();
-      rootProxy.visitTree(null, (proxy: ItemProxy) => {
+      rootProxy.visitTree(null,(proxy: ItemProxy) => {
         let statusArray = proxy.vcStatus.statusArray;
-        if (statusArray.length) {
+        if (statusArray.length){
           idStatusArray.push({
             id: proxy.item.id,
             status: statusArray
@@ -514,12 +513,12 @@ function KIOItemServer(socket) {
 
       sendResponse(idStatusArray);
       console.log('::: Status length: ' + idStatusArray.length);
-      console.log('$$$ Elapsed time: ' + (responseTransmitTime - requestTime) / 1000);
+      console.log('$$$ Elapsed time: ' + (responseTransmitTime - requestTime)/1000);
 
     } else {
       console.log('*** Error (Returned from getStatus)');
       console.log(status);
-      sendResponse({ error: 'status error' });
+      sendResponse({error: 'status error'});
     }
   });
 
@@ -537,7 +536,7 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/upsert', function (request, sendResponse) {
+  socket.on('Item/upsert', function(request, sendResponse){
     console.log('::: session %s: Received upsert for id %s for user %s at %s',
       socket.id, request.item.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
@@ -550,7 +549,7 @@ function KIOItemServer(socket) {
       item.modifiedBy = koheseUserName;
       item.modifiedOn = Date.now();
 
-      if (!item.createdBy) {
+      if(!item.createdBy){
         console.log('::: Updating created fields (instance) - ' + kind);
         item.createdBy = item.modifiedBy;
         item.createdOn = item.modifiedOn;
@@ -558,12 +557,12 @@ function KIOItemServer(socket) {
 
       var proxy;
 
-      if (item.id) {
+      if (item.id){
         proxy = ItemProxy.getWorkingTree().getProxyFor(item.id);
 
         // TODO need to move user password processing based on model definition
-        if (proxy.kind === 'KoheseUser') {
-          if (item.password) {
+        if (proxy.kind === 'KoheseUser'){
+          if (item.password){
             // Encrypt the password
             serverAuthentication.setPassword(item, item.password);
           } else {
@@ -583,7 +582,7 @@ function KIOItemServer(socket) {
             proxy = new KoheseView(item, TreeConfiguration.getWorkingTree());
             break;
           case 'KoheseUser':
-            if (item.password) {
+            if (item.password){
               // Encrypt the password
               serverAuthentication.setPassword(item, item.password);
             }
@@ -601,15 +600,15 @@ function KIOItemServer(socket) {
 
       console.log('::: Sent Item/upsert response');
 
-    } catch (err) {
-      if (err.error) {
+    } catch (err){
+      if (err.error){
         console.log('*** Error: ' + err.error);
         console.log(err);
       } else {
         console.log('*** Error: ' + err);
         console.log(err.stack);
       }
-      sendResponse({ error: err });
+      sendResponse({error: err});
       console.log('::: Sent Item/upsert error');
     }
   });
@@ -617,14 +616,14 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/deleteById', function (request, sendResponse) {
+  socket.on('Item/deleteById', function(request, sendResponse){
     console.log('::: session %s: Received deleteById for %s for user %s at %s',
       socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     console.log(request);
 
     var proxy = ItemProxy.getWorkingTree().getProxyFor(request.id);
 
-    if (proxy) {
+    if (proxy){
       proxy.deleteItem(request.recursive);
 
       console.log('::: Deleted %s #%s#', request.kind, request.id);
@@ -652,7 +651,7 @@ function KIOItemServer(socket) {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Item/performAnalysis', function (request, sendResponse) {
+  socket.on('Item/performAnalysis', function(request, sendResponse) {
 
     console.log('::: session %s: Received performAnalysis for %s for user %s at %s',
       socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
@@ -739,7 +738,7 @@ function KIOItemServer(socket) {
       });
       pdfConversionProcess.on('close', (exitCode: number) => {
         let afterTime = Date.now();
-        console.log('::: Sending response for convertToMarkdown (pdf): ' + (afterTime - beforeTime) / 1000);
+        console.log('::: Sending response for convertToMarkdown (pdf): ' + (afterTime-beforeTime)/1000);
         respond(output);
       });
       pdfConversionProcess.on('error', (error: any) => {
@@ -877,7 +876,7 @@ function KIOItemServer(socket) {
       fs.rmdirSync(temporaryDirectoryPath);
 
       let afterTime = Date.now();
-      console.log('::: Sending response for convertToMarkdown (not pdf): ' + (afterTime - beforeTime) / 1000);
+      console.log('::: Sending response for convertToMarkdown (not pdf): ' + (afterTime-beforeTime)/1000);
       respond(preview);
     }
   });
@@ -1288,7 +1287,7 @@ function KIOItemServer(socket) {
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('VersionControl/commit', function (request, sendResponse) {
-    var idsArray: Array<string> = Array.from(request.proxyIds);
+    var idsArray : Array<string> = Array.from(request.proxyIds);
 
     KDBRepo.commit(idsArray, request.username, request.email,
       request.message).then(function (commitIdMap) {
@@ -1318,7 +1317,7 @@ function KIOItemServer(socket) {
         updateStatus(proxies).then((statusMap) => {
           sendResponse(statusMap);
         }).then(() => {
-          let kdbCache: KDBCache = <KDBCache>KDBCache.getItemCache();
+          let kdbCache : KDBCache = <KDBCache>KDBCache.getItemCache();
           kdbCache.updateCache().then(() => {
             console.log('::: Updated Cache for commit');
           });
@@ -1444,7 +1443,7 @@ function KIOItemServer(socket) {
           }
 
           // Unstage if the item is staged without additional changes
-          if (isStaged && !hasUnstagedChanges) {
+          if(isStaged && !hasUnstagedChanges){
             // Item is staged, but does not have changes, so it needs to be unstaged to revert it
             KDBRepo.reset(repositoryId, [repositoryInformation.relativeFilePath]).then(() => {
               // file has been unstaged, need to retrieve updated status
@@ -1465,7 +1464,7 @@ function KIOItemServer(socket) {
 
 
     // Wait for any pending unstage requests to complete
-    Promise.all(pendingEvaluationPromises).then(function (statusArray) {
+    Promise.all(pendingEvaluationPromises).then(function(statusArray){
       // Determine if items need to be checked out or deleted
       for (let i = 0; i < idsArray.length; i++) {
         let proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
@@ -1546,7 +1545,7 @@ function KIOItemServer(socket) {
     } catch (err) {
       console.log(err);
       console.log(err.stack);
-      sendResponse({ err: err });
+      sendResponse({err:err});
     }
   });
 
@@ -1571,7 +1570,7 @@ function KIOItemServer(socket) {
     } catch (err) {
       console.log(err);
       console.log(err.stack);
-      sendResponse({ err: err });
+      sendResponse({err:err});
     }
   });
 }
@@ -1657,7 +1656,7 @@ function updateStatus(proxies) {
 //////////////////////////////////////////////////////////////////////////
 function getRepositoryInformation(proxy) {
   var repositoryProxy = proxy.getRepositoryProxy();
-  while (repositoryProxy.parentProxy) {
+  while(repositoryProxy.parentProxy) {
     repositoryProxy = repositoryProxy.parentProxy.getRepositoryProxy();
   }
 

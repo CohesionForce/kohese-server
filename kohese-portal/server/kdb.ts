@@ -155,7 +155,6 @@ module.exports.getAvailableRepositories = getAvailableRepositories;
 function getDisabledRepositories(): any {
   mountList = kdbFS.loadJSONDoc(mountFilePath);
   let disabledRepositories: any = [];
-  console.log('here is the mountList ', mountList)
   for (var id in mountList) {
     if (mountList[id].disabled) {
       mountList[id].kind = 'Repository';
