@@ -326,7 +326,6 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     var parentRepo = proxy.parentProxy.getRepositoryProxy();
     var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
     var repoMountFilePath = parentRepoStoragePath + '/Repository/' + modelInstance.id + '.json.mount';
-    console.log('here is the repoMountFilePath', repoMountFilePath)
 
     var repoMountData = {
       id: modelInstance.id,
