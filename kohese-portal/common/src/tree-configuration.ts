@@ -225,6 +225,7 @@ export class TreeConfiguration {
   deleteRepoMap(id: string) {
     delete this.repoMap[id];
     this.repoChangeSubject.next({
+      id: id,
       type: 'deleted'
     });
   }
@@ -235,6 +236,7 @@ export class TreeConfiguration {
   addRepoMap(id: string, proxy: ItemProxy) {
     this.repoMap[id] = proxy;
     this.repoChangeSubject.next({
+      id: id,
       type: 'added'
     });
   }

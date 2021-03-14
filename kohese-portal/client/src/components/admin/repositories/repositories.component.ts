@@ -67,7 +67,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
 
   public ngOnInit(): void {
     this.repositoryStatusSubscription = this.itemRepository.
-      getRepoStatusSubject().subscribe(async (status: any) => {
+      getRepoStatusSubject().subscribe((status: any) => {
         if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
           let treeConfig = this.itemRepository.getTreeConfig();
           this.treeConfigSubscription =
@@ -251,47 +251,39 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
               if (this.repoChangeSubscription) {
                 this.repoChangeSubscription.unsubscribe();
               }
-              this.repoChangeSubscription = newConfig.config.repoChangeSubject.subscribe(async(repoChange) => {
+              this.repoChangeSubscription = newConfig.config.repoChangeSubject.subscribe(async (repoChange) => {
                 this.repositories = newConfig.config.getRepositories();
-                this._changeDetectorRef.markForCheck();
+                console.log('****   an update occurred', repoChange)
                 this.availablerepoList = await this.repositoryService.getAvailableRepositories();
-                let index: number = 0;
-                for (let x: number = 0; x < this.availablerepoList.length; x++) {
-                  if (!(this.repositories.some(y => y.item.name === this.availablerepoList[x].name))) {
-                    this.repoList[index] = this.availablerepoList[x];
-                    this.repoList[index].mounted = false;
-                    this.repoList[index].descendantCount = 0;
-                    if (this.repositories.some(y => y.item.id === this.repoList[index].id)) {
-                      this.repoList[index].duplicated = true;
-                    }
-                    else {
-                      this.repoList[index].duplicated = false;
-                    }
-                    index++
-                  }
-                }
-                this.isLoaded = true;
+                this.repoList = [];
+                this.repoList = this.setData()
+                this._changeDetectorRef.markForCheck();
               });
             })
           this.availablerepoList = await this.repositoryService.getAvailableRepositories();
-          let index: number = 0;
-          for (let x: number = 0; x < this.availablerepoList.length; x++) {
-            if (!(this.repositories.some(y => y.item.name === this.availablerepoList[x].name))) {
-              this.repoList[index] = this.availablerepoList[x];
-              this.repoList[index].mounted = false;
-              this.repoList[index].descendantCount = 0;
-              if (this.repositories.some(y => y.item.id === this.repoList[index].id)) {
-                this.repoList[index].duplicated = true;
-              }
-              else {
-                this.repoList[index].duplicated = false;
-              }
-              index++
-            }
-          }
+          this.repoList = [];
+          this.repoList = this.setData();
           this.isLoaded = true;
         }
       });
+  }
+
+  setData(): any{
+    let index: number = 0;
+    for (let x: number = 0; x < this.availablerepoList.length; x++) {
+      if (!(this.repositories.some(y => y.item.name === this.availablerepoList[x].name))) {
+        this.repoList[index] = this.availablerepoList[x];
+        this.repoList[index].mounted = false;
+        this.repoList[index].descendantCount = 0;
+        if (this.repositories.some(y => y.item.id === this.repoList[index].id)) {
+          this.repoList[index].duplicated = true;
+        } else {
+          this.repoList[index].duplicated = false;
+        }
+        index++
+      }
+    }
+    return this.repoList;
   }
 
   public ngOnDestroy(): void {
@@ -326,8 +318,7 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
         console.log('::: Mounting a disabled Repository')
         this.repositoryService.enableRepository(id);
         this.repositoryService.mountRepository(this.disabledRepos[x] as ItemProxy);
-    }
-    else {
+    } else {
         // this.field.openObjectSelector;
         console.log('::: Mounting Unmounted Respository')
         this.dialogueService.openComponentDialog(TreeComponent, {
@@ -349,7 +340,6 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
           Array<any>) => {
           if (selection) {
             this.parentId = selection[0].item.id;
-            this._changeDetectorRef.markForCheck();
             this.repositoryService.addRepository(id, this.parentId);
             var index = this.availablerepoList.findIndex(y => y.id === id)
             this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);

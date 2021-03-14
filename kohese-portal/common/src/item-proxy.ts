@@ -2096,8 +2096,7 @@ export class ItemProxy {
         proxy: this,
         enableRepo: true
       });
-    }
-    else {
+    } else {
       let validationResult = ItemProxy.validateItemContent(modelKind, withItem, this.treeConfig);
 
       if (!validationResult.valid) {
@@ -2247,21 +2246,40 @@ export class ItemProxy {
     // Unlink from all referred items
     this.removeAllReferences();
 
-
     // Remove from RepoMap since it is unmounted
-
     if (this.kind === 'Repository') {
-      this.treeConfig.deleteRepoMap(byId);
+       this.treeConfig.deleteRepoMap(byId);
     }
 
     // Delete children depth first (after visit)
     this.visitChildren(null, null, (childProxy) => {
-      childProxy.unMountRepository();
+      if (childProxy.item.kind !== 'Repository') {
+        childProxy.unMountRepository();
+      } else {
+        console.log('::: Not removing Child Repo ', childProxy.item.id)
+        this.treeConfig.changeSubject.next({
+          type: 'delete',
+          kind: this.kind,
+          id: this._item.id,
+          proxy: this,
+          unmounting: true
+        });
+        let proxy : ItemProxy = this.treeConfig.proxyMap[childProxy.item.id];
+        ItemProxy.createMissingProxy('Item', 'id', childProxy.item.id, proxy.treeConfig);
+      }
     });
     if (attemptToDeleteRestrictedNode) {
       // console.log('::: -> Not removing restricted node:' + this._item.name);
+    } else {
+      this.treeConfig.changeSubject.next({
+        type: 'delete',
+        kind: this.kind,
+        id: this._item.id,
+        proxy: this,
+        unmounting: true
+      });
+      delete this.treeConfig.proxyMap[byId];
     }
-    delete this.treeConfig.proxyMap[byId];
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -2274,13 +2292,6 @@ export class ItemProxy {
 
     if (this.kind === 'Repository') {
       this.unMountRepository();
-      this.treeConfig.changeSubject.next({
-        type: 'delete',
-        kind: this.kind,
-        id: this._item.id,
-        proxy: this,
-        unmounting: true,
-      });
       return;
     }
 

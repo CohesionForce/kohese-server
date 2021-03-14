@@ -153,13 +153,10 @@ module.exports.getAvailableRepositories = getAvailableRepositories;
 //
 //////////////////////////////////////////////////////////////////////////
 function getDisabledRepositories(): any {
-  mountList = kdbFS.loadJSONDoc(mountFilePath);
   let disabledRepositories: any = [];
   for (var id in mountList) {
     if (mountList[id].disabled) {
-      mountList[id].kind = 'Repository';
-      mountList[id].id = id;
-      disabledRepositories.push(mountList[id])
+      disabledRepositories.push({id: id, kind: 'Repository'})
     }
   }
   return disabledRepositories;
@@ -170,15 +167,8 @@ module.exports.getDisabledRepositories = getDisabledRepositories;
 //
 //////////////////////////////////////////////////////////////////////////
 function unMountRepository(proxy: any) {
-  mountList = kdbFS.loadJSONDoc(mountFilePath);
   kdbFS.removeFile(mountList[proxy.item.id].repoStoragePath + '.json.mount');
   delete mountList[proxy.item.id];
-  for(let id in mountList) {
-    if (mountList[id].parentId === proxy.item.id) {
-      kdbFS.removeFile(mountList[id].repoStoragePath + '.json.mount');
-      delete mountList[id];
-    }
-  }
   updateMountFile();
 }
 module.exports.unMountRepository = unMountRepository;
@@ -187,15 +177,8 @@ module.exports.unMountRepository = unMountRepository;
 //
 //////////////////////////////////////////////////////////////////////////
 function disableRepository(proxy: any) {
-  mountList = kdbFS.loadJSONDoc(mountFilePath);
   mountList[proxy.item.id].disabled = true;
   mountList[proxy.item.id].mounted = false;
-  for(let id in mountList) {
-    if (mountList[id].parentId === proxy.item.id) {
-      mountList[id].disabled = true;
-      mountList[id].mounted = false;
-    }
-  }
   updateMountFile();
 }
 module.exports.disableRepository = disableRepository;
@@ -204,8 +187,6 @@ module.exports.disableRepository = disableRepository;
 //
 //////////////////////////////////////////////////////////////////////////
 function enableRepository(id: string) {
-  mountList = kdbFS.loadJSONDoc(mountFilePath);
-  let indexAndExit: any
   delete mountList[id].disabled
   updateMountFile();
 }
@@ -221,13 +202,12 @@ function addRepository(id: string, parentId: string) {
       break;
     }
   }
-  mountList = kdbFS.loadJSONDoc(mountFilePath);
   mountList[repoMount.id] = {
     name: repoMount.name,
     repoStoragePath: repoMount.repoStoragePath,
     parentId: parentId
   }
-  mountList[repoMount.id].mounted = true;
+
   updateMountFile();
 
   let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
@@ -361,6 +341,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     }
     mountList[repoMountData.id] = { 'repoStoragePath': repoStoragePath, name: repoMountData.name, parentId: repoMountData.parentId };
+    mountList[repoMountData.id].mounted = true;
     updateMountFile();
 
     repoStoragePath = determineRepoStoragePath(proxy);
@@ -539,6 +520,7 @@ async function mountRepository(mountData, enable: boolean = false) {
     if(repoCanBeMounted) {
         let proxy;
         repoRoot.parentId = mountData.parentId;
+        repoRoot.name = mountData.name;
 
         // Check to see if the repo has already been mounted. If so, then update it.
         if(mountList[mountData.id].mounted) {
@@ -685,8 +667,7 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
                     mountList[repoMount.id].name = repoMount.name;
                     updateMountFile();
                 }
-            }
-            else {
+            } else {
               console.log('::: in mount list but disabled do not process', mountList[repoMount.id].name)
             }
 
@@ -700,8 +681,7 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
                 repoStoragePath: subRepoDirPath,
               };
                mountRepository(mountData, enable);
-            }
-            else {
+            } else {
               console.log('::: not mounted - disabled ', mountList[repoMount.id].name)
             }
         }
@@ -766,7 +746,7 @@ async function openRepositories(indexAndExit) {
   console.log('>>> Mounting and Validating External Repos');
   for(let id in mountList) {
     if(!mountList[id].mounted && mountList[id].repoStoragePath && !mountList[id].disabled) {
-        mountRepository({'id': id, name: mountList[id].name, parentId: '',
+        mountRepository({'id': id, name: mountList[id].name, parentId: mountList[id].parentId,
                         repoStoragePath: mountList[id].repoStoragePath});
     }
   }
@@ -808,18 +788,11 @@ async function openRepositories(indexAndExit) {
 //
 //////////////////////////////////////////////////////////////////////////
 async function openRepository(id, indexAndExit){
-	// Check and process mounts.json
-	// TODO Check for file existence prior to loading
-	try {
-	    mountList = kdbFS.loadJSONDoc(mountFilePath);
-	} catch(err) {
-	    // Do nothing; the mount list will get written when validating if necessary
-	}
+
 
   let workingTree = ItemProxy.getWorkingTree();
   workingTree.setLoading();
   let enable : boolean = true;
-  let status: boolean = true;
 
   // TODO: What do do here???
   /* let kdbCache = new KDBCache(koheseKDBDirPath);
