@@ -314,6 +314,18 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
         break;
       }
     }
+
+    if (repoDisabled) {
+      var parentIndex = this.repoList.findIndex(y => y.id === this.disabledRepos[x].parentId)
+      if (parentIndex > -1) {
+        let response: boolean = await this.dialogueService.openYesNoDialog("Parent Not Mounted", "Parent Repo " +
+          this.repoList[parentIndex].name + " is not Mounted. " + "Do You Want To Pick A New Mount Point? " +
+          "If not, " + this.disabledRepos[x].name + " will go to Lost and Found ");
+        if (response) {
+          repoDisabled = false;
+        }
+      }
+    }
     if (repoDisabled) {
         console.log('::: Mounting a disabled Repository')
         this.repositoryService.enableRepository(id);
@@ -336,7 +348,7 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
             selection: (this.parentId ? [TreeConfiguration.getWorkingTree().
               getProxyFor(this.parentId)] : [])
           }
-        }).updateSize('80%', '80%').afterClosed().subscribe((selection:
+        }).updateSize('90%', '90%').afterClosed().subscribe((selection:
           Array<any>) => {
           if (selection) {
             this.parentId = selection[0].item.id;

@@ -156,7 +156,7 @@ function getDisabledRepositories(): any {
   let disabledRepositories: any = [];
   for (var id in mountList) {
     if (mountList[id].disabled) {
-      disabledRepositories.push({id: id, kind: 'Repository'})
+      disabledRepositories.push({id: id, kind: 'Repository', parentId: mountList[id].parentId, name: mountList[id].name})
     }
   }
   return disabledRepositories;
@@ -211,26 +211,31 @@ function addRepository(id: string, parentId: string) {
       break;
     }
   }
-  mountList[repoMount.id] = {
-    name: repoMount.name,
-    repoStoragePath: repoMount.repoStoragePath,
-    parentId: parentId
+  if (!mountList[id]) {
+    mountList[repoMount.id] = {
+      name: repoMount.name,
+      repoStoragePath: repoMount.repoStoragePath,
+      parentId: parentId
+    }
+
+    updateMountFile();
+
+    let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
+    var repoMountFilePath = path + '/' + repoMount.id + '.json.mount';
+
+    var repoMountData = {
+      id: repoMount.id,
+      name: repoMount.name,
+      parentId: parentId
+    };
+
+    console.log('::: Repo Mount Information');
+    console.log(repoMountData)
+    kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
+  } else {
+    delete mountList[id].disabled;
+    updateMountFile();
   }
-
-  updateMountFile();
-
-  let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
-  var repoMountFilePath = path + '/' + repoMount.id + '.json.mount';
-
-  var repoMountData = {
-    id: repoMount.id,
-    name: repoMount.name,
-    parentId: parentId
-  };
-
-  console.log('::: Repo Mount Information');
-  console.log(repoMountData)
-  kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
 }
 module.exports.addRepository = addRepository;
 
