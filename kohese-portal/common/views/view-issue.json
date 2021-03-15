@@ -138,7 +138,7 @@
             },
             {
               "propertyName": "parentId",
-              "customLabel": "Work Context",
+              "customLabel": "Parent",
               "labelOrientation": "Top",
               "kind": "proxy-selector",
               "visible": true,
