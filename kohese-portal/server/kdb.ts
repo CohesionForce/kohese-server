@@ -166,9 +166,9 @@ module.exports.getDisabledRepositories = getDisabledRepositories;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function unMountRepository(proxy: any) {
-  kdbFS.removeFile(mountList[proxy.item.id].repoStoragePath + '.json.mount');
-  delete mountList[proxy.item.id];
+function unMountRepository(id) {
+  kdbFS.removeFile(mountList[id].repoStoragePath + '.json.mount');
+  delete mountList[id];
   updateMountFile();
 }
 module.exports.unMountRepository = unMountRepository;
@@ -176,12 +176,21 @@ module.exports.unMountRepository = unMountRepository;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function disableRepository(proxy: any) {
-  mountList[proxy.item.id].disabled = true;
-  mountList[proxy.item.id].mounted = false;
+function disableRepository(id) {
+  mountList[id].disabled = true;
+  mountList[id].mounted = false;
   updateMountFile();
 }
 module.exports.disableRepository = disableRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function refreshRepo(id) {
+  mountList[id].mounted = false;
+  updateMountFile();
+}
+module.exports.refreshRepo = refreshRepo;
 
 //////////////////////////////////////////////////////////////////////////
 //

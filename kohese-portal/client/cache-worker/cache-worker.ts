@@ -455,7 +455,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
           () => void) => {
-          socket.emit('Repository/unMountRepository', { repoID: request.data.id }, () => {
+          socket.emit('Repository/unMountRepository', { repoId: request.data.id }, () => {
             resolve();
           });
         }) });
@@ -465,7 +465,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
           () => void) => {
-          socket.emit('Repository/disableRepository', { repoID: request.data.id }, () => {
+          socket.emit('Repository/disableRepository', { repoId: request.data.id }, () => {
             resolve();
           });
         }) });
@@ -485,7 +485,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
           () => void) => {
-          socket.emit('Repository/enableRepository', {repoID: request.data.id}, () => {
+          socket.emit('Repository/enableRepository', {repoId: request.data.id}, () => {
             resolve();
           });
         }) });
@@ -505,7 +505,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             port.postMessage({ id: request.id, data: await new Promise<any>(
               (resolve: () => void, reject:
               () => void) => {
-              socket.emit('Repository/addRepository', {repoID: request.data.id, parentId: request.data.parentId}, () => {
+              socket.emit('Repository/addRepository', {repoId: request.data.id, parentId: request.data.parentId}, () => {
                 resolve();
               });
             }) });

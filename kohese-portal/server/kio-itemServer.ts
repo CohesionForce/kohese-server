@@ -93,6 +93,14 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
         if (!change.unmounting) {
           kdb.removeModelInstance(change.proxy);
         }
+        if (change.childRepoList) {
+          console.log('here is the embedded repo list ', change.childRepoList)
+          // Refresh Child Repositories after Parent Unmount
+          for (let x: number =0; x<change.childRepoList.length; x++) {
+            kdb.refreshRepo(change.childRepoList[x].id)
+            kdb.openRepository(change.childRepoList[x].id)
+          }
+        }
         kio.server.emit('Item/' + change.type, deleteNotification);
         break;
       case 'loading':
@@ -1089,8 +1097,8 @@ function KIOItemServer(socket){
   socket.on('Repository/unMountRepository', (request: any, respond: Function) => {
     console.log('::: session %s: Received UnMountRepository for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.repoID);
-    kdb.unMountRepository(proxy)
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
+    kdb.unMountRepository(request.repoId)
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -1100,8 +1108,8 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received disableRepository for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
     console.log('^^^ Received Disable Mount request ', request)
-    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.repoID)
-    kdb.disableRepository(proxy)
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId)
+    kdb.disableRepository(request.repoId)
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -1111,7 +1119,7 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received enableRepository for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
     console.log('^^^ Received Enabled Mount request ', request)
-    kdb.enableRepository(request.repoID)
+    kdb.enableRepository(request.repoId)
   });
 
   //////////////////////////////////////////////////////////////////////////
@@ -1131,7 +1139,7 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received addRepository for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
     console.log('^^^ Received Add Mount request ', request)
-    kdb.addRepository(request.repoID, request.parentId)
+    kdb.addRepository(request.repoId, request.parentId)
   });
 
   //////////////////////////////////////////////////////////////////////////

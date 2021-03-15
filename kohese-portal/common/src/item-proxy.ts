@@ -2232,7 +2232,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  unMountRepository() {
+  unMountRepository(childRepoList) {
     var byId = this._item.id;
     var attemptToDeleteRestrictedNode = (
       (this._item.id === this.treeConfig.lostAndFound._item.id) ||
@@ -2253,10 +2253,8 @@ export class ItemProxy {
 
     // Delete children depth first (after visit)
     this.visitChildren(null, null, (childProxy) => {
-      if (childProxy.item.kind !== 'Repository') {
-        childProxy.unMountRepository();
-      } else {
-        console.log('::: Not removing Child Repo ', childProxy.item.id)
+      if (childProxy.item.kind === 'Repository') {
+        childRepoList.push(childProxy.item);
         this.treeConfig.changeSubject.next({
           type: 'delete',
           kind: this.kind,
@@ -2264,22 +2262,13 @@ export class ItemProxy {
           proxy: this,
           unmounting: true
         });
-        let proxy : ItemProxy = this.treeConfig.proxyMap[childProxy.item.id];
-        ItemProxy.createMissingProxy('Item', 'id', childProxy.item.id, proxy.treeConfig);
       }
+      childProxy.unMountRepository();
     });
     if (attemptToDeleteRestrictedNode) {
       // console.log('::: -> Not removing restricted node:' + this._item.name);
-    } else {
-      this.treeConfig.changeSubject.next({
-        type: 'delete',
-        kind: this.kind,
-        id: this._item.id,
-        proxy: this,
-        unmounting: true
-      });
-      delete this.treeConfig.proxyMap[byId];
     }
+    delete this.treeConfig.proxyMap[byId];
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -2291,7 +2280,16 @@ export class ItemProxy {
     // console.log('::: Deleting proxy for ' + byId);
 
     if (this.kind === 'Repository') {
-      this.unMountRepository();
+      let childRepoList: Array<any> = [];
+      this.unMountRepository(childRepoList);
+      this.treeConfig.changeSubject.next({
+        type: 'delete',
+        kind: this.kind,
+        id: this._item.id,
+        proxy: this,
+        unmounting: true,
+        childRepoList: childRepoList
+      });
       return;
     }
 
