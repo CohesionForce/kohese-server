@@ -7,7 +7,7 @@ import { MatSelectModule, MatCheckboxModule, MatCardModule, MatButtonModule,
 import { ItemBoardComponent } from './item-board.component';
 import { DetailsModule } from '../details/details.module';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
-import { directivesModule } from '../../Directives/directives.module'
+import { DirectivesModule } from '../../directives/directives.module'
 @NgModule({
   declarations: [ItemBoardComponent],
   imports: [
@@ -23,7 +23,7 @@ import { directivesModule } from '../../Directives/directives.module'
     DetailsModule,
     ObjectEditorModule,
     MatExpansionModule,
-    directivesModule
+    DirectivesModule
   ],
   exports: [ItemBoardComponent]
 })
