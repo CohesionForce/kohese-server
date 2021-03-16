@@ -9,7 +9,7 @@
         </div>
         <div class="panel-heading-right">
           <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
-          <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })">
+          <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })" matTooltip="go to outline">
             <mat-icon class="fa fa-list"></mat-icon>
           </button>
         </div>
@@ -22,7 +22,7 @@
         </div>
         <div class="panel-heading-right">
           <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
-          <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })">
+          <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })" matTooltip="go to explorer">
             <mat-icon class="fa fa-arrow-left"></mat-icon>
           </button>
         </div>
