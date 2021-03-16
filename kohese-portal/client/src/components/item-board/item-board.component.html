@@ -45,16 +45,15 @@
       </div>
       <div style="height: calc(100% - 50px); overflow: auto; display: flex; flex-direction: column;">
         <ng-container *ngFor="let item of categoryItems.items">
-          <mat-expansion-panel #panel style="width: 100%;
-            box-shadow: 0 3px 1px -2px rgba(0,0,0,.8), 0 2px 2px 0 rgba(0,0,0,.64), 0 1px 5px 0 rgba(0,0,0,.62);">
+          <mat-expansion-panel #panel>
             <mat-expansion-panel-header draggable="{{mayDrag(item)}}"
               (dragstart)="$event.dataTransfer.setData(item[selectedAttribute.name], item.id);
               $event.dataTransfer.dropEffect = 'move';
               changeDetectorRef.detach();" (dragend)="changeDetectorRef.reattach();
               changeDetectorRef.markForCheck();" [ngStyle]="{ 'background-color': viewModel.color }"
               style="color: whitesmoke">
-              <mat-panel-title style="align-items:center; color: whitesmoke; font-size: x-large; width: 68%;
-                display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <mat-panel-title [attr.id]=item showIfTruncated
+                matTooltip="{{item.name}}">
                 <mat-icon class="{{viewModel.icon}}"></mat-icon>
                 {{item.name}}
               </mat-panel-title>
