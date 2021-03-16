@@ -1,29 +1,30 @@
 <div class="panel right-zone" [ngClass]="{'details-doc' : incrementalLoad}">
   <div class="panel-heading">
 
-    <div class="panel-heading-left" style="margin-right:auto">
-      <ng-container *ngIf="!outline else outlineView">
+    <ng-container *ngIf="!outline else outlineView">
+      <div class="panel-heading-left">
         <span>Document View</span>
-      </ng-container>
-      <ng-template #outlineView>
-        <span>Outline View</span>
-      </ng-template>
-    </div>
-
-    <div class="panel-heading-right" style="margin-left: auto">
-      <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
-      <ng-container *ngIf="!outline else outlineView">
+      </div>
+      <div class="panel-heading-right">
+        <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
         <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })">
           <mat-icon class="fa fa-list"></mat-icon>
         </button>
-      </ng-container>
-      <ng-template #outlineView>
+      </div>
+    </ng-container>
+
+
+    <ng-template #outlineView>
+      <div class="panel-heading-left">
+        <span>Outline View</span>
+      </div>
+      <div class="panel-heading-right">
+        <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
         <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })">
           <mat-icon class="fa fa-arrow-left"></mat-icon>
         </button>
-      </ng-template>
-    </div>
-
+      </div>
+    </ng-template>
 
   </div>
   <div class="body-container">
