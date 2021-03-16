@@ -14,7 +14,7 @@ export function MockItem () {
   };
 }
 
-export function MockRoot () { 
+export function MockRoot () {
   return {
   "id": "",
   "name": "Test item",
