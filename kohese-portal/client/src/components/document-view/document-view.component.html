@@ -1,28 +1,40 @@
 <div class="panel right-zone" [ngClass]="{'details-doc' : incrementalLoad}">
   <div class="panel-heading">
 
-    <ng-container *ngIf="!outline else outlineView">
-      <div class="panel-heading-left">
-        <span>Document View</span>
-      </div>
-      <div class="panel-heading-right">
-        <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
-        <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })">
-          <mat-icon class="fa fa-list"></mat-icon>
-        </button>
-      </div>
+    <ng-container *ngIf="!analysisView else analysisMode">
+
+      <ng-container *ngIf="!outlineView else documentOutline">
+        <div class="panel-heading-left">
+          <span><b>Document View</b></span>
+        </div>
+        <div class="panel-heading-right">
+          <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
+          <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })">
+            <mat-icon class="fa fa-list"></mat-icon>
+          </button>
+        </div>
+      </ng-container>
+
+
+      <ng-template #documentOutline>
+        <div class="panel-heading-left">
+          <span><b>Outline View</b></span>
+        </div>
+        <div class="panel-heading-right">
+          <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
+          <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })">
+            <mat-icon class="fa fa-arrow-left"></mat-icon>
+          </button>
+        </div>
+      </ng-template>
     </ng-container>
 
-
-    <ng-template #outlineView>
+    <ng-template #analysisMode>
       <div class="panel-heading-left">
-        <span>Outline View</span>
+        <span><b>Document View</b></span>
       </div>
       <div class="panel-heading-right">
         <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
-        <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })">
-          <mat-icon class="fa fa-arrow-left"></mat-icon>
-        </button>
       </div>
     </ng-template>
 

@@ -95,7 +95,9 @@ implements OnInit, OnDestroy {
   @Input()
   incrementalLoad: boolean;
   @Input()
-  outline: boolean = false;
+  outlineView: boolean = false;
+  @Input()
+  analysisView: boolean = false;
   @Input()
   selectedProxyStream: Observable<ItemProxy>;
   @Output()

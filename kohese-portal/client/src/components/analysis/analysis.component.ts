@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
@@ -21,6 +21,7 @@ export class AnalysisComponent extends NavigatableComponent
 
   /* UI Toggles */
   analysisLoaded: boolean;
+  @Output() analysisView: boolean = true;
 
   /* Data */
   itemProxyId: string;

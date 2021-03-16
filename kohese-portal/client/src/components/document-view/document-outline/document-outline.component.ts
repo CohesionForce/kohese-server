@@ -18,7 +18,7 @@ export class DocumentOutlineComponent implements OnInit {
   documentRootId : string;
   documentRoot
 
-  @Output() outline: boolean = true;
+  @Output() outlineView: boolean = true;
 
   constructor(private router : ActivatedRoute, private itemRepository: ItemRepository) { }
 
