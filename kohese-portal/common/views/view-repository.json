@@ -9,7 +9,24 @@
   "icon": "fa fa-database",
   "color": "#660000",
   "localTypes": {},
-  "viewProperties": {},
+  "viewProperties": {
+    "origin": {
+       "displayName": "Origin",
+       "inputType": {
+         "type": "text",
+         "options":{}
+       },
+       "name": "origin"
+    },
+    "mounted": {
+      "displayeName": "Mounted",
+      "inputType": {
+        "type": "",
+        "options": {}
+      },
+      "name": "mounted"
+    }
+  },
   "formatDefinitions": {
     "d1bec610-5d7c-11ea-9d2a-81904e0f9ce1": {
       "id": "d1bec610-5d7c-11ea-9d2a-81904e0f9ce1",

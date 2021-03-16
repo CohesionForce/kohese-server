@@ -23,6 +23,7 @@ import { CompareItemsModule } from '../compare-items/compare-items.module';
 import { TreeViewModule } from '../tree/tree.module';
 import { MarkdownEditorModule } from '../markdown-editor/markdown-editor.module';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
+import { DirectivesModule } from '../../directives/directives.module';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     TreeViewModule,
     MarkdownEditorModule,
     ObjectEditorModule,
+    DirectivesModule
   ],
   exports : [
     DetailsComponent,

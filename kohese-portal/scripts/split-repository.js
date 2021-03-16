@@ -15,7 +15,7 @@ function start() {
     recurse(f, function (file, isDirectory) {
       files.push(file);
     });
-    
+
     recurse(f, function (file, isDirectory) {
       if (!isDirectory) {
         var name = Path.basename(file);
@@ -75,7 +75,7 @@ function recurse(file, execute) {
       recurse(Path.join(file, f[i]), execute);
     }
   }
-  
+
   execute(file, isDirectory);
 }
 
@@ -100,12 +100,12 @@ function moveTo(ids, sourceRepo, destinationRepo) {
         };
       }
     }
-    
+
     if (Object.keys(mapping.contents).length > 0) {
       commits.push(mapping);
     }
   }
-  
+
   commits.sort(function (m1, m2) {
     return m1.time - m2.time;
   });
@@ -125,12 +125,12 @@ function moveTo(ids, sourceRepo, destinationRepo) {
           lastContents[key] = JSON.parse(JSON.stringify(contents[key]));
         }
       }
-      
+
       if (Object.keys(contents).length > 0) {
         filteredCommits.push(commits[j]);
       }
     }
-    
+
     return processCommits(filteredCommits, sourceRepo, destinationRepo);
   }
 }
@@ -165,7 +165,7 @@ function processEntries(contentKeys, contents, sourceRepo, destinationRepo) {
     var key = contentKeys.shift();
     var content = contents[key];
     return sourceRepo.getBlob(content.oid).then(function (obj) {
-      //console.log("Found, praise the Lord Jesus Christ!");
+      //console.log("Found");
       // TODO New structure
       var writePath = Path.join(destination, content.kind, key + ".json");
       fs.writeFileSync(writePath, JSON.stringify(JSON.parse(obj.toString()),
@@ -191,7 +191,7 @@ function removeMoved(sourceRepo, paths) {
       } else {
         fs.unlinkSync(p);
       }
-      
+
       return removeMoved(sourceRepo, paths);
     });
   }
@@ -217,7 +217,7 @@ function commit(repo, treeId, name, eMail, time, offset, message) {
 
 function getWriteLocation(id) {
   for (var j = 0; j < CASCADE_LEVELS; j++) {
-    
+
   }
 }
 
