@@ -5,3 +5,17 @@
   background-color: yellow;
 }
 
+:host ::ng-deep document-view {
+  .panel-heading {
+    height: 14.3%;
+
+    .panel-heading-left {
+      margin-left: 0em !important;
+
+      b {
+        font-weight: normal;
+      }
+    }
+  }
+
+}

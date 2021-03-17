@@ -1,8 +1,6 @@
 <div [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 40px)' :'100%' }">
-  <div class="panel-heading" style="width: 100%; display: flex; flex-direction: row; align-items: center">
-    <label style="width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-      {{itemProxy.kind}} Information: {{itemProxy.item.name}}
-    </label>
+  <div class="panel-heading">
+    <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
     <ng-container *ngIf="itemProxy.item.parentId">
       <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
         itemProxy.item.parentId, false)" style="margin-left: auto;">
