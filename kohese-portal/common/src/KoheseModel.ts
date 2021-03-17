@@ -125,7 +125,9 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
 
         // Detect missing properties
         if (definition.required) {
-          if (!itemContent.hasOwnProperty(property) || itemContent[property] === null) {
+          if (!itemContent.hasOwnProperty(property) || itemContent[property] === null
+            || (Array.isArray(itemContent[property]) && !itemContent[property].length)
+            || (itemContent[property] === '')) {
             validationResult.valid = false;
             validationResult.missingProperties.push(property);
           }

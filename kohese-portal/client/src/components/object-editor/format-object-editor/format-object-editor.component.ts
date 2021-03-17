@@ -341,7 +341,10 @@ export class FormatObjectEditorComponent implements OnInit {
     for (let attributeName in this._selectedType.classProperties) {
       let attributeValue: any = this._object[attributeName];
       if (this._selectedType.classProperties[attributeName].definition.required
-        && ((attributeValue == null) || (attributeValue === ''))) {
+        && ((Array.isArray(attributeValue) && !attributeValue.length) ||
+            (attributeValue === undefined) ||
+            (attributeValue == null) ||
+            (attributeValue === ''))) {
         return false;
       }
     }

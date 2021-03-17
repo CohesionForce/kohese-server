@@ -587,7 +587,14 @@ export class ItemRepository {
 
     return new Promise<ItemProxy>((resolve: ((value: ItemProxy) => void), reject: ((value: any) => void)) => {
       if (upsertItemResponse.error) {
-        this.dialogService.openInformationDialog('Error', 'An error occurred while saving ' + clonedItem.name + '.');
+        let tmpstring: any = JSON.parse(JSON.stringify(upsertItemResponse.error));
+        if (JSON.stringify(tmpstring.validation.missingProperties)) {
+          this.dialogService.openInformationDialog('Error', 'An error occurred while saving '
+            + clonedItem.name + '. ' + 'Missing Properties ' + JSON.stringify(tmpstring.validation.missingProperties));
+        } else {
+          this.dialogService.openInformationDialog('Error', 'An error occurred while saving '
+            + clonedItem.name + '. ' + 'Validation Errors Exist ' + JSON.stringify(tmpstring.validation.invalidData));
+        }
         reject(upsertItemResponse.error);
       } else {
         let proxy: ItemProxy;
