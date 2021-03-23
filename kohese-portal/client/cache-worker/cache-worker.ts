@@ -451,7 +451,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
-        case 'Repository/unMountRepository':
+      case 'Repository/unMountRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
           () => void) => {
@@ -461,7 +461,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
-        case 'Repository/disableRepository':
+      case 'Repository/disableRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
           () => void) => {
@@ -471,7 +471,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
-        case 'Repository/getDisabledRepositories':
+      case 'Repository/getDisabledRepositories':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (disabledRepositories: Array<any>) => void, reject:
           () => void) => {
@@ -481,7 +481,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
-        case 'Repository/enableRepository':
+      case 'Repository/enableRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
           () => void) => {
@@ -491,25 +491,25 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
-        case 'Repository/mountRepository':
-          port.postMessage({ id: request.id, data: await new Promise<any>(
-            (resolve: () => void, reject:
-            () => void) => {
-            socket.emit('Repository/mountRepository', {kind: request.data.kind, id: request.data.id}, () => {
-              resolve();
-            });
-          }) });
-          break;
+      case 'Repository/mountRepository':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject:
+          () => void) => {
+          socket.emit('Repository/mountRepository', {kind: request.data.kind, id: request.data.id}, () => {
+            resolve();
+          });
+        }) });
+        break;
 
-          case 'Repository/addRepository':
-            port.postMessage({ id: request.id, data: await new Promise<any>(
-              (resolve: () => void, reject:
-              () => void) => {
-              socket.emit('Repository/addRepository', {repoId: request.data.id, parentId: request.data.parentId}, () => {
-                resolve();
-              });
-            }) });
-            break;
+      case 'Repository/addRepository':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: () => void, reject:
+          () => void) => {
+          socket.emit('Repository/addRepository', {repoId: request.data.id, parentId: request.data.parentId}, () => {
+            resolve();
+          });
+        }) });
+        break;
 
       default:
         console.log('$$$ Received unexpected event:' + request.type);

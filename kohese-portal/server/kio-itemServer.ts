@@ -41,7 +41,7 @@ if (!fs.existsSync(_REPORTS_DIRECTORY_PATH)) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
+ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
   console.log('+++ Received notification of change: ' + change.type);
   if (change.type === 'dirty') {
     return;
@@ -57,11 +57,12 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
     switch (change.type){
       case 'create':
       case 'update':
+        let status = [];
         if (!change.enableRepo) {
-        kdb.storeModelInstance(change.proxy, change.type === 'create')
-          .then(function (status) {
-            let proxy : ItemProxy = change.proxy;
-            proxy.updateVCStatus(status, false);
+          status = await kdb.storeModelInstance(change.proxy, change.type === 'create')
+        }
+        let proxy : ItemProxy = change.proxy;
+        proxy.updateVCStatus(status, false);
             let createNotification = {
               type: change.type,
               kind: change.kind,
@@ -70,19 +71,6 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
               status: status
             };
             kio.server.emit('Item/' + change.type, createNotification);
-          });
-        }
-        else {
-          let proxy: ItemProxy = change.proxy;
-          let createNotification = {
-            type: change.type,
-            kind: change.kind,
-            id: proxy.item.id,
-            item: proxy.cloneItemAndStripDerived(),
-            status: []
-          };
-          kio.server.emit('Item/' + change.type, createNotification);
-        }
         break;
       case 'delete':
         let deleteNotification = {
@@ -92,14 +80,6 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
         };
         if (!change.unmounting) {
           kdb.removeModelInstance(change.proxy);
-        }
-        if (change.childRepoList) {
-          console.log('here is the embedded repo list ', change.childRepoList)
-          // Refresh Child Repositories after Parent Unmount
-          for (let x: number =0; x<change.childRepoList.length; x++) {
-            kdb.refreshRepo(change.childRepoList[x].id)
-            kdb.openRepository(change.childRepoList[x].id)
-          }
         }
         kio.server.emit('Item/' + change.type, deleteNotification);
         break;

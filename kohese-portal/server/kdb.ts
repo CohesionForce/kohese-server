@@ -170,6 +170,8 @@ function unMountRepository(id) {
   kdbFS.removeFile(mountList[id].repoStoragePath + '.json.mount');
   delete mountList[id];
   updateMountFile();
+  let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+  proxy.deleteItem();
 }
 module.exports.unMountRepository = unMountRepository;
 
@@ -180,17 +182,10 @@ function disableRepository(id) {
   mountList[id].disabled = true;
   mountList[id].mounted = false;
   updateMountFile();
+  let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+  proxy.deleteItem();
 }
 module.exports.disableRepository = disableRepository;
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function refreshRepo(id) {
-  mountList[id].mounted = false;
-  updateMountFile();
-}
-module.exports.refreshRepo = refreshRepo;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -368,7 +363,11 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     modelInstance = repoRootData;
 
     if (isNewItem) {
-      // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-
+      availableRepositories.push({id: repoMountData.id,
+        name: repoMountData.name,
+        description: modelInstance.description,
+        repoStoragePath: repoStoragePath})
       promise = createRepoStructure(repoStoragePath).then(function (repo) {
         // TODO: Need to call create repo structure once that has been removed from validate
       });
@@ -507,7 +506,7 @@ function checkAndCreateDir(dirName, ignoreJSONFiles : boolean = false) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-async function mountRepository(mountData, enable: boolean = false) {
+function mountRepository(mountData, enable: boolean = false) {
 
     // Format: mountData = {id: , name: , parentId: , repoStoragePath: }
     // Attempt to mount the repository. If unable then make it apparent in the client.
@@ -546,7 +545,7 @@ async function mountRepository(mountData, enable: boolean = false) {
             proxy.repoPath = path.join(mountData.repoStoragePath, 'Root.json');
             console.log('::: Validating mounted repository: ' + repoRoot.name);
             if (enable === true) {
-              ItemProxy.getWorkingTree().getProxyFor(proxy.item.id).mountRepository(proxy.item.id, 'Repository')
+              proxy.mountRepository(proxy.item.id, 'Repository')
             }
             validateRepositoryStructure(mountData.repoStoragePath, enable);
         }
@@ -606,7 +605,7 @@ function loadModelInstances (kind, modelDirPath, inRepo, enable: boolean = false
       default:
         proxy = new ItemProxy(kind, itemPayload);
         if (enable === true) {
-          ItemProxy.getWorkingTree().getProxyFor(proxy.item.id).mountRepository(proxy.item.id, kind)
+          proxy.mountRepository(proxy.item.id, kind)
         }
     }
 
@@ -614,11 +613,11 @@ function loadModelInstances (kind, modelDirPath, inRepo, enable: boolean = false
       proxy.repoPath = itemPath;
     }
 
-    migrate(proxy, kind, enable);
+    migrate(proxy, kind);
   }
 }
 
-function migrate(itemProxy: ItemProxy, typeName: string, enable: boolean = false): void {
+function migrate(itemProxy: ItemProxy, typeName: string): void {
   let migrated: boolean = false;
   if ((typeName === 'KoheseModel') || (typeName === 'KoheseView')) {
     if (itemProxy.item.namespace == null) {
@@ -680,8 +679,6 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
                     mountList[repoMount.id].name = repoMount.name;
                     updateMountFile();
                 }
-            } else {
-              console.log('::: in mount list but disabled do not process', mountList[repoMount.id].name)
             }
 
             if (!mountList[repoMount.id].disabled) {
@@ -807,31 +804,20 @@ async function openRepository(id, indexAndExit){
   workingTree.setLoading();
   let enable : boolean = true;
 
-  // TODO: What do do here???
-  /* let kdbCache = new KDBCache(koheseKDBDirPath);
-  KDBCache.setItemCache(kdbCache);
+  // TODO: Do I Need to Update the Cache?
+  // await kdbCache.updateCache();
 
-  await kdbCache.updateCache();
- */
-  // console.log('::: Finished cache update: ' + kdbCache.repoPath);
-
-  /* if (indexAndExit){
-      return Promise.resolve(true);
-  } */
 
   // Validate the repositories listed inside the mount file
-  console.log('>>> Mounting Repository on Request from User', id);
-  await mountRepository({
+  mountRepository({
     'id': id, name: mountList[id].name, parentId: mountList[id].parentId,
     repoStoragePath: mountList[id].repoStoragePath
   }, enable);
 
-  // TODO: May need to add this in, i don't know.
-  /* var promise;
+  // Open Git Repo
   var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
-  promise(KDBRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, proxy.repoPath));
-  console.log('>>> Done loading mounted Repository');
- */
+  await KDBRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, mountList[id].repoStoragePath);
+
   console.log('::: End Enabled Repository Load');
   workingTree.unsetLoading();
   workingTree.saveToCache();

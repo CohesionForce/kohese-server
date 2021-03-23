@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 
 import { DetailsComponent } from '../../details/details.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
@@ -79,7 +79,6 @@ export class RepositoriesComponent extends NavigatableComponent implements
                 this.repoChangeSubscription.unsubscribe();
               }
               this.repoChangeSubscription = newConfig.config.repoChangeSubject.subscribe((repoChange) => {
-                console.log('::: Repo Change Occurred :', repoChange)
                 this.repositories = newConfig.config.getRepositories();
                 this._changeDetectorRef.markForCheck();
               });
@@ -182,14 +181,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
 
   public unmountRepo(id: string) {
     this.repositoryService.unMountRepository(id);
-    let index = this.repositories.findIndex(t => t.item.id === id);
-    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (true))
   }
 
   public disableRepo(id: string) {
     this.repositoryService.disableRepository(id);
-    let index = this.repositories.findIndex(t => t.item.id === id);
-    this.itemRepository.deleteItem((this.repositories[index] as ItemProxy), (true));
   }
 }
 
@@ -253,34 +248,45 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
               }
               this.repoChangeSubscription = newConfig.config.repoChangeSubject.subscribe(async (repoChange) => {
                 this.repositories = newConfig.config.getRepositories();
-                console.log('****   an update occurred', repoChange)
                 this.availablerepoList = await this.repositoryService.getAvailableRepositories();
                 this.repoList = [];
-                this.repoList = this.setData()
+                this.repoList = await this.setData()
                 this._changeDetectorRef.markForCheck();
               });
             })
           this.availablerepoList = await this.repositoryService.getAvailableRepositories();
           this.repoList = [];
-          this.repoList = this.setData();
+          this.repoList = await this.setData();
           this.isLoaded = true;
         }
       });
   }
 
-  setData(): any{
+  async setData() {
     let index: number = 0;
-    for (let x: number = 0; x < this.availablerepoList.length; x++) {
-      if (!(this.repositories.some(y => y.item.name === this.availablerepoList[x].name))) {
-        this.repoList[index] = this.availablerepoList[x];
+    for (let idx: number = 0; idx < this.availablerepoList.length; idx++) {
+      if (this.repositories.some(y => y.item.id === this.availablerepoList[idx].id)) {
+        if (this.repositories.some(y => y.item.name === this.availablerepoList[idx].name)) {
+          // This one is mounted and not a duplicate
+        } else {
+          this.repoList[index] = this.availablerepoList[idx];
+          this.repoList[index].descendantCount = 0;
+          this.repoList[index].duplicated = true;
+          this.repoList[index].mounted = false;
+          index++
+        }
+      } else {
+        this.repoList[index] = this.availablerepoList[idx];
         this.repoList[index].mounted = false;
         this.repoList[index].descendantCount = 0;
-        if (this.repositories.some(y => y.item.id === this.repoList[index].id)) {
-          this.repoList[index].duplicated = true;
-        } else {
-          this.repoList[index].duplicated = false;
-        }
-        index++
+        this.repoList[index].duplicated = false;
+        index++;
+      }
+    }
+    this.disabledRepos = await this.repositoryService.getDisabledRepositories();
+    for (var idx: number = 0; idx < this.repoList.length; idx++) {
+      if (this.disabledRepos.some(y => y.id === this.repoList[idx].id)) {
+        this.repoList[idx].disabled = true;
       }
     }
     return this.repoList;
@@ -304,32 +310,32 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
-  async mountRepo(id: string) {
+  async mountRepo(id: string, pickParent: boolean) {
     var repoDisabled: boolean = false;
     var parentId: any;
     this.disabledRepos = await this.repositoryService.getDisabledRepositories();
-    for (var x: number = 0; x < this.disabledRepos.length; x++) {
-      if (this.disabledRepos[x].id === id) {
+    for (var idx: number = 0; idx < this.disabledRepos.length; idx++) {
+      if (this.disabledRepos[idx].id === id) {
         var repoDisabled = true;
         break;
       }
     }
 
-    if (repoDisabled) {
-      var parentIndex = this.repoList.findIndex(y => y.id === this.disabledRepos[x].parentId)
+    if (!pickParent) {
+      var parentIndex = this.repoList.findIndex(y => y.id === this.disabledRepos[idx].parentId)
       if (parentIndex > -1) {
-        let response: boolean = await this.dialogueService.openYesNoDialog("Parent Not Mounted", "Parent Repo " +
-          this.repoList[parentIndex].name + " is not Mounted. " + "Do You Want To Pick A New Mount Point? " +
-          "If not, " + this.disabledRepos[x].name + " will go to Lost and Found ");
+        let response: boolean = await this.dialogueService.openYesNoDialog('Parent Not Mounted', 'Parent Repo ' +
+          this.repoList[parentIndex].name + ' is not Mounted. ' + 'Do You Want To Pick A New Mount Point? ' +
+          'If not, ' + this.disabledRepos[idx].name + ' will go to Lost and Found ');
         if (response) {
-          repoDisabled = false;
+          pickParent = true;
         }
       }
     }
-    if (repoDisabled) {
+    if (!pickParent) {
         console.log('::: Mounting a disabled Repository')
         this.repositoryService.enableRepository(id);
-        this.repositoryService.mountRepository(this.disabledRepos[x] as ItemProxy);
+        this.repositoryService.mountRepository(this.disabledRepos[idx] as ItemProxy);
     } else {
         // this.field.openObjectSelector;
         console.log('::: Mounting Unmounted Respository')
@@ -350,14 +356,13 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
           }
         }).updateSize('90%', '90%').afterClosed().subscribe((selection:
           Array<any>) => {
-          if (selection) {
-            this.parentId = selection[0].item.id;
-            this.repositoryService.addRepository(id, this.parentId);
-            var index = this.availablerepoList.findIndex(y => y.id === id)
-            this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);
-          }
+            if (selection) {
+              this.parentId = selection[0].item.id;
+              this.repositoryService.addRepository(id, this.parentId);
+              var index = this.availablerepoList.findIndex(y => y.id === id)
+              this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);
+            }
         });
     }
-    console.log('::: end Mount Repo', id)
   }
 }

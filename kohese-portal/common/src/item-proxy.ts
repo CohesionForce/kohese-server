@@ -497,7 +497,7 @@ export class ItemProxy {
     proxy.setItemKind(kind);
 
     if (kind === 'Repository') {
-      proxy.treeConfig.addRepoMap(itemId, proxy)
+      proxy.treeConfig.addRepo(itemId, proxy)
     }
 
     if (kind === 'Internal') {
@@ -2232,7 +2232,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  unMountRepository(childRepoList) {
+  unMountRepository() {
     var byId = this._item.id;
     var attemptToDeleteRestrictedNode = (
       (this._item.id === this.treeConfig.lostAndFound._item.id) ||
@@ -2246,29 +2246,23 @@ export class ItemProxy {
     // Unlink from all referred items
     this.removeAllReferences();
 
-    // Remove from RepoMap since it is unmounted
-    if (this.kind === 'Repository') {
-       this.treeConfig.deleteRepoMap(byId);
-    }
-
     // Delete children depth first (after visit)
-    this.visitChildren(null, null, (childProxy) => {
-      if (childProxy.item.kind === 'Repository') {
-        childRepoList.push(childProxy.item);
+    this.visitChildren({ excludeKind: ['Repository', 'Internal'] }, null, (childProxy) => {
+      if (childProxy.kind !== 'Repository') {
         this.treeConfig.changeSubject.next({
           type: 'delete',
-          kind: this.kind,
-          id: this._item.id,
-          proxy: this,
+          kind: childProxy.kind,
+          id: childProxy._item.id,
+          proxy: childProxy,
           unmounting: true
         });
+        delete this.treeConfig.proxyMap[childProxy._item.id];
       }
       childProxy.unMountRepository();
     });
     if (attemptToDeleteRestrictedNode) {
       // console.log('::: -> Not removing restricted node:' + this._item.name);
     }
-    delete this.treeConfig.proxyMap[byId];
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -2280,16 +2274,20 @@ export class ItemProxy {
     // console.log('::: Deleting proxy for ' + byId);
 
     if (this.kind === 'Repository') {
-      let childRepoList: Array<any> = [];
-      this.unMountRepository(childRepoList);
+      this.unMountRepository();
       this.treeConfig.changeSubject.next({
         type: 'delete',
         kind: this.kind,
         id: this._item.id,
         proxy: this,
-        unmounting: true,
-        childRepoList: childRepoList
+        unmounting: true
       });
+      if (this.children.length !== 0) {
+        ItemProxy.createMissingProxy('Item', 'id', byId, this.treeConfig);
+      } else {
+        delete this.treeConfig.proxyMap[byId];
+      }
+      this.treeConfig.deleteRepo(byId);
       return;
     }
 

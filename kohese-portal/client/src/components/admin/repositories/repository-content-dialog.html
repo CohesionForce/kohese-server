@@ -28,9 +28,14 @@
                 <mat-icon class="fa fa-bars"></mat-icon>
               </button>
               <mat-menu #menu="matMenu" [overlapTrigger]="false">
-                <button mat-menu-item [disabled]="repoList.duplicated" (click)="mountRepo(repoList.id)">
+                <button mat-menu-item [disabled]="repoList.duplicated" (click)="mountRepo(repoList.id, true)">
                   Mount
                 </button>
+                <ng-container *ngIf=repoList.disabled>
+                  <button mat-menu-item [disabled]="repoList.duplicated" (click)="mountRepo(repoList.id, false)">
+                    Enable
+                  </button>
+                </ng-container>
               </mat-menu>
             </div>
           </mat-cell>
