@@ -231,6 +231,18 @@ function addRepository(id: string, parentId: string) {
     delete mountList[id].disabled;
     mountList[id].parentId = parentId;
     updateMountFile();
+    let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
+    var repoMountFilePath = path + '/' + repoMount.id + '.json.mount';
+
+    var repoMountData = {
+      id: repoMount.id,
+      name: repoMount.name,
+      parentId: parentId
+    };
+
+    console.log('::: Repo Mount Information');
+    console.log(repoMountData)
+    kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
   }
 }
 module.exports.addRepository = addRepository;
