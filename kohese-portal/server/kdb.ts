@@ -229,6 +229,7 @@ function addRepository(id: string, parentId: string) {
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
   } else {
     delete mountList[id].disabled;
+    mountList[id].parentId = parentId;
     updateMountFile();
   }
 }
