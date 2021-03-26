@@ -152,6 +152,104 @@ module.exports.getAvailableRepositories = getAvailableRepositories;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function getDisabledRepositories(): any {
+  let disabledRepositories: any = [];
+  for (var id in mountList) {
+    if (mountList[id].disabled) {
+      disabledRepositories.push({id: id, kind: 'Repository', parentId: mountList[id].parentId, name: mountList[id].name})
+    }
+  }
+  return disabledRepositories;
+}
+module.exports.getDisabledRepositories = getDisabledRepositories;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function unMountRepository(id) {
+  kdbFS.removeFile(mountList[id].repoStoragePath + '.json.mount');
+  delete mountList[id];
+  updateMountFile();
+  let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+  proxy.deleteItem();
+}
+module.exports.unMountRepository = unMountRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function disableRepository(id) {
+  mountList[id].disabled = true;
+  mountList[id].mounted = false;
+  updateMountFile();
+  let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+  proxy.deleteItem();
+}
+module.exports.disableRepository = disableRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function enableRepository(id: string) {
+  delete mountList[id].disabled
+  updateMountFile();
+}
+module.exports.enableRepository = enableRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function addRepository(id: string, parentId: string) {
+  for (var x: number = 0; x<availableRepositories.length; x++) {
+    if (availableRepositories[x].id === id) {
+      var repoMount = availableRepositories[x];
+      break;
+    }
+  }
+  if (!mountList[id]) {
+    mountList[repoMount.id] = {
+      name: repoMount.name,
+      repoStoragePath: repoMount.repoStoragePath,
+      parentId: parentId
+    }
+
+    updateMountFile();
+
+    let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
+    var repoMountFilePath = path + '/' + repoMount.id + '.json.mount';
+
+    var repoMountData = {
+      id: repoMount.id,
+      name: repoMount.name,
+      parentId: parentId
+    };
+
+    console.log('::: Repo Mount Information');
+    console.log(repoMountData)
+    kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
+  } else {
+    delete mountList[id].disabled;
+    mountList[id].parentId = parentId;
+    updateMountFile();
+    let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
+    var repoMountFilePath = path + '/' + repoMount.id + '.json.mount';
+
+    var repoMountData = {
+      id: repoMount.id,
+      name: repoMount.name,
+      parentId: parentId
+    };
+
+    console.log('::: Repo Mount Information');
+    console.log(repoMountData)
+    kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
+  }
+}
+module.exports.addRepository = addRepository;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function setAvailableRepositories(dir, availableRepositories) {
   fs.readdirSync(dir).forEach(file => {
     let fullPath = path.join(dir, file);
@@ -160,6 +258,7 @@ function setAvailableRepositories(dir, availableRepositories) {
     } else {
       if (file === 'Root.json') {
         var repositories = kdbFS.loadJSONDoc(fullPath);
+        fullPath = path.parse(fullPath).dir
         availableRepositories.push({
           id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
         });
@@ -228,7 +327,7 @@ module.exports.retrieveAnalysis = retrieveAnalysis;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function storeModelInstance(proxy, isNewItem){
+function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
   var modelName = proxy.kind;
   var modelInstance = proxy.item;
@@ -249,16 +348,21 @@ function storeModelInstance(proxy, isNewItem){
     var parentRepo = proxy.parentProxy.getRepositoryProxy();
     var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
     var repoMountFilePath = parentRepoStoragePath + '/Repository/' + modelInstance.id + '.json.mount';
+
     var repoMountData = {
       id: modelInstance.id,
       name: modelInstance.name,
-      parentId: modelInstance.parentId,
+      parentId: modelInstance.parentId
     };
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData);
-    kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
-    mountList[repoMountData.id] = {'repoStoragePath': repoStoragePath, name: repoMountData.name};
+    if (enable === false) {
+      kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
+      kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
+    }
+    mountList[repoMountData.id] = { 'repoStoragePath': repoStoragePath, name: repoMountData.name, parentId: repoMountData.parentId };
+    mountList[repoMountData.id].mounted = true;
     updateMountFile();
 
     repoStoragePath = determineRepoStoragePath(proxy);
@@ -272,7 +376,11 @@ function storeModelInstance(proxy, isNewItem){
     modelInstance = repoRootData;
 
     if (isNewItem) {
-      // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-
+      availableRepositories.push({id: repoMountData.id,
+        name: repoMountData.name,
+        description: modelInstance.description,
+        repoStoragePath: repoStoragePath})
       promise = createRepoStructure(repoStoragePath).then(function (repo) {
         // TODO: Need to call create repo structure once that has been removed from validate
       });
@@ -290,18 +398,17 @@ function storeModelInstance(proxy, isNewItem){
 
   return promise.then(function () {
     // TODO:  This needs to be replaced with a uniform directory approach that does not include Model Kinds
-    kdbFS.createDirIfMissing(path.dirname(filePath));
-
-    kdbFS.storeJSONDoc(filePath, proxy.cloneItemAndStripDerived());
-
-    if (isNewItem && (modelName === 'Repository')) {
-      mountRepository({id: modelInstance.id, parentId: modelInstance.parentId, 'repoStoragePath': repoStoragePath});
-    }
-
-    var repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
-    repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
-    return KDBRepo.getItemStatus(ItemProxy.getWorkingTree().getRootProxy().item.id,
-        repositoryPath);
+      kdbFS.createDirIfMissing(path.dirname(filePath));
+      if (enable === false) {
+          kdbFS.storeJSONDoc(filePath, proxy.cloneItemAndStripDerived());
+      }
+      if (isNewItem && (modelName === 'Repository')) {
+        mountRepository({'repoStoragePath': repoStoragePath, name: repoMountData.name, id: repoMountData.id, parentId: repoMountData.parentId});
+      }
+      var repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
+      repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
+      return KDBRepo.getItemStatus(ItemProxy.getWorkingTree().getRootProxy().item.id,
+       repositoryPath);
   }).then((status) => {
     return status;
   });
@@ -412,7 +519,7 @@ function checkAndCreateDir(dirName, ignoreJSONFiles : boolean = false) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function mountRepository(mountData) {
+function mountRepository(mountData, enable: boolean = false) {
 
     // Format: mountData = {id: , name: , parentId: , repoStoragePath: }
     // Attempt to mount the repository. If unable then make it apparent in the client.
@@ -438,6 +545,7 @@ function mountRepository(mountData) {
     if(repoCanBeMounted) {
         let proxy;
         repoRoot.parentId = mountData.parentId;
+        repoRoot.name = mountData.name;
 
         // Check to see if the repo has already been mounted. If so, then update it.
         if(mountList[mountData.id].mounted) {
@@ -449,7 +557,10 @@ function mountRepository(mountData) {
             proxy = new ItemProxy('Repository', repoRoot);
             proxy.repoPath = path.join(mountData.repoStoragePath, 'Root.json');
             console.log('::: Validating mounted repository: ' + repoRoot.name);
-            validateRepositoryStructure(mountData.repoStoragePath);
+            if (enable === true) {
+              proxy.mountRepository(proxy.item.id, 'Repository')
+            }
+            validateRepositoryStructure(mountData.repoStoragePath, enable);
         }
     } else {
         // Repo cannot be mounted since Root.json is missing
@@ -489,14 +600,13 @@ function createRepoStructure(repoDirPath) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function loadModelInstances (kind, modelDirPath, inRepo) {
+function loadModelInstances (kind, modelDirPath, inRepo, enable: boolean = false) {
   let fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
   for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
     var itemPath = modelDirPath + '/' + fileList[fileIdx];
     var itemPayload = kdbFS.loadJSONDoc(itemPath);
 
     let proxy;
-
     switch (kind){
       case 'KoheseModel':
         proxy = new KoheseModel(itemPayload);
@@ -507,6 +617,9 @@ function loadModelInstances (kind, modelDirPath, inRepo) {
         break;
       default:
         proxy = new ItemProxy(kind, itemPayload);
+        if (enable === true) {
+          proxy.mountRepository(proxy.item.id, kind)
+        }
     }
 
     if(inRepo){
@@ -537,7 +650,7 @@ function migrate(itemProxy: ItemProxy, typeName: string): void {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function validateRepositoryStructure (repoDirPath) {
+function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
 
   var modelDirList = kdbFS.getRepositoryFileList(repoDirPath);
 
@@ -572,7 +685,7 @@ function validateRepositoryStructure (repoDirPath) {
             var subRepoDirPath;
 
             // Check mountFile for the mount path or use a .mount file if necessary
-            if(mountList[repoMount.id]) {
+            if(mountList[repoMount.id] && !mountList[repoMount.id].disabled) {
                 console.log('==> in mount list');
                 subRepoDirPath = mountList[repoMount.id].repoStoragePath;
                 if(!mountList[repoMount.id].name) {
@@ -581,13 +694,19 @@ function validateRepositoryStructure (repoDirPath) {
                 }
             }
 
-            console.log('==> sRDP: ' + subRepoDirPath);
+            if (!mountList[repoMount.id].disabled) {
+              console.log("==> sRDP: " + subRepoDirPath);
 
-            var mountData = {id: repoMount.id,
-                             name: repoMount.name,
-                             parentId: repoMount.parentId,
-                             repoStoragePath: subRepoDirPath};
-            mountRepository(mountData);
+              var mountData = {
+                id: repoMount.id,
+                name: repoMount.name,
+                parentId: repoMount.parentId,
+                repoStoragePath: subRepoDirPath,
+              };
+               mountRepository(mountData, enable);
+            } else {
+              console.log('::: not mounted - disabled ', mountList[repoMount.id].name)
+            }
         }
         break;
       case 'Analysis':
@@ -601,7 +720,7 @@ function validateRepositoryStructure (repoDirPath) {
 
       default:
         const inRepo = true;
-        loadModelInstances(modelName, modelDirPath, inRepo);
+        loadModelInstances(modelName, modelDirPath, inRepo, enable);
     }
   }
 }
@@ -649,8 +768,8 @@ async function openRepositories(indexAndExit) {
   // Validate the repositories listed inside the mount file
   console.log('>>> Mounting and Validating External Repos');
   for(let id in mountList) {
-    if(!mountList[id].mounted && mountList[id].repoStoragePath) {
-        mountRepository({'id': id, name: mountList[id].name, parentId: '',
+    if(!mountList[id].mounted && mountList[id].repoStoragePath && !mountList[id].disabled) {
+        mountRepository({'id': id, name: mountList[id].name, parentId: mountList[id].parentId,
                         repoStoragePath: mountList[id].repoStoragePath});
     }
   }
@@ -687,4 +806,35 @@ async function openRepositories(indexAndExit) {
   });
 
 }
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+async function openRepository(id, indexAndExit){
+
+
+  let workingTree = ItemProxy.getWorkingTree();
+  workingTree.setLoading();
+  let enable : boolean = true;
+
+  // TODO: Do I Need to Update the Cache?
+  // await kdbCache.updateCache();
+
+
+  // Validate the repositories listed inside the mount file
+  mountRepository({
+    'id': id, name: mountList[id].name, parentId: mountList[id].parentId,
+    repoStoragePath: mountList[id].repoStoragePath
+  }, enable);
+
+  // Open Git Repo
+  var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+  await KDBRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, mountList[id].repoStoragePath);
+
+  console.log('::: End Enabled Repository Load');
+  workingTree.unsetLoading();
+  workingTree.saveToCache();
+
+}
+module.exports.openRepository = openRepository;
 

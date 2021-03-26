@@ -1,61 +1,54 @@
-<h2 mat-dialog-title>Repositories</h2>
+<h2 mat-dialog-title>UnMounted Repositories</h2>
 <mat-dialog-content class="mat-typography">
   <div class="repo-list-dialog">
-    <mat-table [dataSource]="repoList" class="mat-elevation-z8">
+    <ng-container *ngIf="isLoaded">
+      <mat-table [dataSource]="repoList" class="mat-elevation-z8">
 
-      <ng-container matColumnDef="name">
-        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-        <mat-cell *matCellDef="let repoList">{{repoList.name}}</mat-cell>
-      </ng-container>
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+          <mat-cell *matCellDef="let repoList">{{repoList.name}}</mat-cell>
+        </ng-container>
 
-      <ng-container matColumnDef="count">
-        <mat-header-cell *matHeaderCellDef> Items </mat-header-cell>
-        <mat-cell *matCellDef="let repoList">{{repoList.descendantCount}}</mat-cell>
-      </ng-container>
+        <ng-container matColumnDef="duplicated">
+          <mat-header-cell *matHeaderCellDef> Duplicated </mat-header-cell>
+          <mat-cell *matCellDef="let repoList">{{repoList.duplicated}}</mat-cell>
+        </ng-container>
 
-      <ng-container matColumnDef="description">
-        <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-        <mat-cell *matCellDef="let repoList"> {{repoList.description | truncate: 120}}</mat-cell>
-      </ng-container>
+        <ng-container matColumnDef="description">
+          <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+          <mat-cell *matCellDef="let repoList"> {{repoList.description | truncate: 120}}</mat-cell>
+        </ng-container>
 
-      <ng-container matColumnDef="mounted">
-        <mat-header-cell *matHeaderCellDef> Mounted </mat-header-cell>
-        <mat-cell *matCellDef="let repoList"> {{repoList.mounted}}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="nav">
-        <mat-header-cell *matHeaderCellDef> Nav </mat-header-cell>
-        <mat-cell *matCellDef="let repoList" style="display: flex; justify-content: flex-end;">
-          <div class="hidden-buttons">
-            <!-- For SCSS styling -->
-            <ng-container *ngIf="repoList.mounted">
-              <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(repoList.id)">
-                <mat-icon class="fa fa-clone"></mat-icon>
-              </button>
+        <ng-container matColumnDef="options">
+          <mat-header-cell *matHeaderCellDef> Options </mat-header-cell>
+          <mat-cell *matCellDef="let repoList" style="display: flex; justify-content: flex-end;">
+            <div class="hidden-buttons">
+              <!-- For SCSS styling -->
               <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu">
                 <mat-icon class="fa fa-bars"></mat-icon>
               </button>
               <mat-menu #menu="matMenu" [overlapTrigger]="false">
-                <button mat-menu-item (click)="navigationService.navigate('Explore', { id: repoList.id })">
-                  <mat-icon class="fa fa-arrow-right"></mat-icon>
-                  Navigate in Explorer
+                <button mat-menu-item [disabled]="repoList.duplicated" (click)="mountRepo(repoList.id, true)">
+                  Mount
                 </button>
-                <button mat-menu-item (click)="navigationService.addTab('Explore', { id: repoList.id })">
-                  <mat-icon class="fa fa-external-link"></mat-icon>
-                  Navigate in New Tab
-                </button>
+                <ng-container *ngIf=repoList.disabled>
+                  <button mat-menu-item [disabled]="repoList.duplicated" (click)="mountRepo(repoList.id, false)">
+                    Enable
+                  </button>
+                </ng-container>
               </mat-menu>
-            </ng-container>
-          </div>
-        </mat-cell>
-      </ng-container>
+            </div>
+          </mat-cell>
+        </ng-container>
 
-      <mat-header-row *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
-      <mat-row *matRowDef="let proxy; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
-    </mat-table>
+        <mat-header-row *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let proxy; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
+      </mat-table>
+    </ng-container>
   </div>
 </mat-dialog-content>
 
+
 <mat-dialog-actions>
-  <button class="mat-raised-button mat-primary"(click)="close()">close</button>
+  <button class="mat-raised-button mat-primary" (click)="close()">close</button>
 </mat-dialog-actions>

@@ -41,7 +41,7 @@ if (!fs.existsSync(_REPORTS_DIRECTORY_PATH)) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
+ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
   console.log('+++ Received notification of change: ' + change.type);
   if (change.type === 'dirty') {
     return;
@@ -57,19 +57,20 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
     switch (change.type){
       case 'create':
       case 'update':
-        kdb.storeModelInstance(change.proxy, change.type === 'create')
-        .then(function (status) {
-          let proxy : ItemProxy = change.proxy;
-          proxy.updateVCStatus(status, false);
-          let createNotification = {
+        let status = [];
+        if (!change.enableRepo) {
+          status = await kdb.storeModelInstance(change.proxy, change.type === 'create')
+        }
+        let proxy : ItemProxy = change.proxy;
+        proxy.updateVCStatus(status, false);
+            let createNotification = {
               type: change.type,
               kind: change.kind,
               id: proxy.item.id,
               item: proxy.cloneItemAndStripDerived(),
               status: status
-          };
-          kio.server.emit('Item/' + change.type, createNotification);
-        });
+            };
+            kio.server.emit('Item/' + change.type, createNotification);
         break;
       case 'delete':
         let deleteNotification = {
@@ -77,7 +78,9 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
           kind: change.kind,
           id: change.proxy.item.id
         };
-        kdb.removeModelInstance(change.proxy);
+        if (!change.unmounting) {
+          kdb.removeModelInstance(change.proxy);
+        }
         kio.server.emit('Item/' + change.type, deleteNotification);
         break;
       case 'loading':
@@ -806,44 +809,44 @@ function KIOItemServer(socket){
       preview = await StringReplaceAsync(preview,
         /\[(?:(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?))\]\(([\s\S]+?)\)/g,
         async (matchedSubstring: string, embeddedImageCaptureGroup: string,
-        targetCaptureGroup: string, index: number, originalString: string) => {
-        let replacement: string = '';
-        if ((index > 0) && (originalString.charAt(index - 1) === '!')) {
-          replacement = await embedImage(matchedSubstring, targetCaptureGroup,
-            request.parameters.pathBase, mediaDirectoryPath);
-        } else {
-          replacement = matchedSubstring;
-
-          if (embeddedImageCaptureGroup) {
-            replacement = await embedImage(matchedSubstring,
-              embeddedImageCaptureGroup, request.parameters.pathBase,
-              mediaDirectoryPath);
-            if (!/^https?:\/\//.test(targetCaptureGroup) &&
-              !targetCaptureGroup.startsWith('javascript:')) {
-              let replacementCaptureGroupIndex: number = replacement.indexOf(
-                targetCaptureGroup);
-              replacement = replacement.substring(0,
-                replacementCaptureGroupIndex) + request.parameters.pathBase +
-                targetCaptureGroup + replacement.substring(
-                replacementCaptureGroupIndex + targetCaptureGroup.length);
-            }
+          targetCaptureGroup: string, index: number, originalString: string) => {
+          let replacement: string = '';
+          if ((index > 0) && (originalString.charAt(index - 1) === '!')) {
+            replacement = await embedImage(matchedSubstring, targetCaptureGroup,
+              request.parameters.pathBase, mediaDirectoryPath);
           } else {
-            if (!/^https?:\/\//.test(targetCaptureGroup) &&
-              !targetCaptureGroup.startsWith('javascript:')) {
-              let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
-                indexOf(targetCaptureGroup);
-              replacement = matchedSubstring.substring(0,
-                matchedSubstringCaptureGroupIndex) + request.parameters.
-                pathBase + targetCaptureGroup + matchedSubstring.substring(
-                matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
+            replacement = matchedSubstring;
+
+            if (embeddedImageCaptureGroup) {
+              replacement = await embedImage(matchedSubstring,
+                embeddedImageCaptureGroup, request.parameters.pathBase,
+                mediaDirectoryPath);
+              if (!/^https?:\/\//.test(targetCaptureGroup) &&
+                !targetCaptureGroup.startsWith('javascript:')) {
+                let replacementCaptureGroupIndex: number = replacement.indexOf(
+                  targetCaptureGroup);
+                replacement = replacement.substring(0,
+                  replacementCaptureGroupIndex) + request.parameters.pathBase +
+                  targetCaptureGroup + replacement.substring(
+                    replacementCaptureGroupIndex + targetCaptureGroup.length);
+              }
             } else {
-              replacement = matchedSubstring;
+              if (!/^https?:\/\//.test(targetCaptureGroup) &&
+                !targetCaptureGroup.startsWith('javascript:')) {
+                let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
+                  indexOf(targetCaptureGroup);
+                replacement = matchedSubstring.substring(0,
+                  matchedSubstringCaptureGroupIndex) + request.parameters.
+                    pathBase + targetCaptureGroup + matchedSubstring.substring(
+                      matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
+              } else {
+                replacement = matchedSubstring;
+              }
             }
           }
-        }
 
-        return replacement;
-      });
+          return replacement;
+        });
 
       if (fs.existsSync(mediaDirectoryPath)) {
         let directoryContents: Array<string> = fs.readdirSync(
@@ -1058,7 +1061,66 @@ function KIOItemServer(socket){
     respond(repositoryData);
   });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/getDisabledRepositories', (request: any, respond: Function) => {
+    console.log('::: session %s: Received getDisabledRepositories for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    let repositoryData = kdb.getDisabledRepositories();
+    respond(repositoryData);
+  });
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/unMountRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received UnMountRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId);
+    kdb.unMountRepository(request.repoId)
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/disableRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received disableRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('^^^ Received Disable Mount request ', request)
+    var proxy = ItemProxy.getWorkingTree().getProxyFor(request.repoId)
+    kdb.disableRepository(request.repoId)
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/enableRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received enableRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('^^^ Received Enabled Mount request ', request)
+    kdb.enableRepository(request.repoId)
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/mountRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received mountRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('^^^ Received Mount Repository request ', request)
+    kdb.openRepository(request.id)
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/addRepository', (request: any, respond: Function) => {
+    console.log('::: session %s: Received addRepository for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    console.log('^^^ Received Add Mount request ', request)
+    kdb.addRepository(request.repoId, request.parentId)
+  });
 
   //////////////////////////////////////////////////////////////////////////
   //

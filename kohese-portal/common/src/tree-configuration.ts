@@ -21,11 +21,12 @@ export class TreeConfiguration {
   public treeId;
   public proxyMap;
   public idMap;
-  public repoMap;
+  private repoMap;
   public loading : boolean = true;
   public treehashCalculated : boolean = false;
   public proxyHasDeferredModelAssociation;
   public changeSubject : Subject<any>;
+  public repoChangeSubject : Subject<any>;
 
   public root : ItemProxy;
   public lostAndFound : ItemProxy;
@@ -53,6 +54,7 @@ export class TreeConfiguration {
     this.proxyHasDeferredModelAssociation = {};
 
     this.changeSubject = new Subject<any>();
+    this.repoChangeSubject = new Subject<any>();
 
     // console.log('$$$ Checking IP');
     // console.log(ItemProxy);
@@ -160,6 +162,23 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  setLoading() {
+    this.loading = true;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  unsetLoading(deferCalc: boolean = false) : Promise<any> {
+    console.log('::: Loading complete called for tree: ' + this.treeId + ' (deferCalc = ' + deferCalc + ')');
+    this.loading = false;
+    let deferredCalcPromise = this.calculateAllTreeHashes(deferCalc);
+    return deferredCalcPromise;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   getLostAndFoundProxy() {
     return this.lostAndFound;
   }
@@ -198,6 +217,28 @@ export class TreeConfiguration {
     {
       delete this.idMap[kind][idProperty][idValue];
     }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  deleteRepo(id: string) {
+    delete this.repoMap[id];
+    this.repoChangeSubject.next({
+      id: id,
+      type: 'deleted'
+    });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  addRepo(id: string, proxy: ItemProxy) {
+    this.repoMap[id] = proxy;
+    this.repoChangeSubject.next({
+      id: id,
+      type: 'added'
+    });
   }
 
   //////////////////////////////////////////////////////////////////////////
