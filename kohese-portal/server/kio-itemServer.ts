@@ -58,19 +58,23 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
       case 'create':
       case 'update':
         let status = [];
-        if (!change.enableRepo) {
-          status = await kdb.storeModelInstance(change.proxy, change.type === 'create')
+        if (change.modifications && change.modifications.parentId && change.kind === 'Repository') {
+          kdb.storeParentId(change.modifications.parentId.to, change.proxy.item.id)
+        } else {
+          if (!change.enableRepo) {
+            status = await kdb.storeModelInstance(change.proxy, change.type === 'create')
+          }
         }
         let proxy : ItemProxy = change.proxy;
         proxy.updateVCStatus(status, false);
-            let createNotification = {
-              type: change.type,
-              kind: change.kind,
-              id: proxy.item.id,
-              item: proxy.cloneItemAndStripDerived(),
-              status: status
-            };
-            kio.server.emit('Item/' + change.type, createNotification);
+        let createNotification = {
+          type: change.type,
+          kind: change.kind,
+          id: proxy.item.id,
+          item: proxy.cloneItemAndStripDerived(),
+          status: status
+        };
+        kio.server.emit('Item/' + change.type, createNotification);
         break;
       case 'delete':
         let deleteNotification = {

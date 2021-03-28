@@ -250,6 +250,27 @@ module.exports.addRepository = addRepository;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function storeParentId(parentId: string, id: string) {
+  mountList[id].parentId = parentId;
+  updateMountFile();
+  let path = mountList[id].repoStoragePath.substring(0, mountList[id].repoStoragePath.lastIndexOf('/'));
+    var repoMountFilePath = path + '/' + id + '.json.mount';
+
+    var repoMountData = {
+      id: id,
+      name: mountList[id].name,
+      parentId: parentId
+    };
+
+    console.log('::: Repo Mount Information');
+    console.log(repoMountData)
+    kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
+}
+module.exports.storeParentId = storeParentId;
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function setAvailableRepositories(dir, availableRepositories) {
   fs.readdirSync(dir).forEach(file => {
     let fullPath = path.join(dir, file);
