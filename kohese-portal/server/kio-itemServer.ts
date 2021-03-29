@@ -58,12 +58,8 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
       case 'create':
       case 'update':
         let status = [];
-        if (change.modifications && change.modifications.parentId && change.kind === 'Repository') {
-          kdb.storeParentId(change.modifications.parentId.to, change.proxy.item.id)
-        } else {
-          if (!change.enableRepo) {
-            status = await kdb.storeModelInstance(change.proxy, change.type === 'create')
-          }
+        if (!change.enableRepo) {
+          status = await kdb.storeModelInstance(change.proxy, change.type === 'create')
         }
         let proxy : ItemProxy = change.proxy;
         proxy.updateVCStatus(status, false);
