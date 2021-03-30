@@ -63,14 +63,14 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
         }
         let proxy : ItemProxy = change.proxy;
         proxy.updateVCStatus(status, false);
-            let createNotification = {
-              type: change.type,
-              kind: change.kind,
-              id: proxy.item.id,
-              item: proxy.cloneItemAndStripDerived(),
-              status: status
-            };
-            kio.server.emit('Item/' + change.type, createNotification);
+        let createNotification = {
+          type: change.type,
+          kind: change.kind,
+          id: proxy.item.id,
+          item: proxy.cloneItemAndStripDerived(),
+          status: status
+        };
+        kio.server.emit('Item/' + change.type, createNotification);
         break;
       case 'delete':
         let deleteNotification = {

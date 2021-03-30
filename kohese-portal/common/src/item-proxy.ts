@@ -2196,7 +2196,8 @@ export class ItemProxy {
           type: 'update',
           kind: this.kind,
           id: this._item.id,
-          proxy: this
+          proxy: this,
+          modifications: modifications
         });
       }
     }

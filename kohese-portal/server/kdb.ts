@@ -345,9 +345,19 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
   var promise : Promise<boolean|void> = Promise.resolve(true);
   if (modelName === 'Repository'){
-    var parentRepo = proxy.parentProxy.getRepositoryProxy();
-    var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
-    var repoMountFilePath = parentRepoStoragePath + '/Repository/' + modelInstance.id + '.json.mount';
+    var repoMountFilePath;
+    if (isNewItem) {
+      var parentRepo = proxy.parentProxy.getRepositoryProxy();
+      var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
+      repoMountFilePath = parentRepoStoragePath + '/Repository/' + modelInstance.id + '.json.mount';
+    } else {
+      let path = mountList[modelInstance.id].repoStoragePath.substring(0, mountList[modelInstance.id].repoStoragePath.lastIndexOf('/'));
+      repoMountFilePath = path + '/' + modelInstance.id + '.json.mount';
+      // If repo name has changed, need to change the Name in Available Repositories since this is created at startup
+      // Use repo path so don't change name of a duplicate repo
+      let index = availableRepositories.findIndex(y => y.repoStoragePath === mountList[modelInstance.id].repoStoragePath)
+      availableRepositories[index].name = modelInstance.name
+    }
 
     var repoMountData = {
       id: modelInstance.id,
