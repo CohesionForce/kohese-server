@@ -93,8 +93,6 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
         if (project !== this.project) {
           // Update the project based on params if it is different
           this.project = project;
-          console.log('Current project by paramSubscription is: ');
-          console.log(this.project);
           this.projectStream.next(this.project);
           this.projectSelected.emit(this.project);
           this.navigationService.navigate('Dashboard', {
