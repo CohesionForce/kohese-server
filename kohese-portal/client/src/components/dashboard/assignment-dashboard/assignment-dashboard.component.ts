@@ -72,6 +72,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       this.sortedAssignmentList = this.sortAssignments(this.assignmentType, assignmentList);
       this.changeRef.markForCheck();
     })
+    this._navigationService.navigate('Dashboard', {});
   }
 
   ngOnDestroy() {

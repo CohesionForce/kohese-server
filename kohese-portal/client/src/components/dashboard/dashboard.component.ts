@@ -10,7 +10,7 @@ import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 import { DashboardSelections, DashboardSelectionInfo, DashboardTypes } from './dashboard-selector/dashboard-selector.component';
-import { ProjectInfo } from '../../services/project-service/project.service';
+import { ProjectInfo, ProjectService } from '../../services/project-service/project.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -31,6 +31,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
   };
 
   selectedProject : ProjectInfo;
+  initialized : boolean = false;
 
   DashboardSelections : any = DashboardSelections;
   DashboardTypes : any = DashboardTypes
@@ -41,10 +42,12 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
   changeSubjectSubscription : Subscription;
 
   constructor(protected navigationService : NavigationService,
+              private projectService : ProjectService,
               private itemRepository : ItemRepository,
               private currentUserService : CurrentUserService) {
     super(navigationService);
-               }
+    this.selectedProject = projectService.savedProject;
+  }
 
   ngOnInit() {
     this.currentUserService.getCurrentUserSubject().subscribe((userInfo) => {
@@ -57,6 +60,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
           this.changeSubjectSubscription = newConfig.config.getChangeSubject().subscribe((change)=>{
           })
           this.buildAssignmentList();
+          this.initialized = true;
           }
         })
       }
@@ -90,5 +94,6 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
 
   onProjectSelected(newProject : ProjectInfo) {
     this.selectedProject = newProject;
+    this.projectService.savedProject = this.selectedProject;
   }
 }

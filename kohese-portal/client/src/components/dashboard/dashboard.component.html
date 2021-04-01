@@ -3,7 +3,7 @@
   <dashboard-selector [user]="currentUser"
     (dashboardSelected)="dashboardSelected($event)" style="width: 20%;">
   </dashboard-selector>
-  <div style="width: 80%;">
+  <div *ngIf=initialized style="width: 80%;">
     <ng-container [ngSwitch]="selectedDashboard.dashboardType">
       <ng-container *ngSwitchCase="DashboardTypes.ASSIGNMENT">
         <assignment-dashboard [assignmentListStream]="assignmentListStream"
