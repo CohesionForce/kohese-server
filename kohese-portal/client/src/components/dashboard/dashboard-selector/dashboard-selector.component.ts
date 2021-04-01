@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 
@@ -52,12 +53,17 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   selectedDashboard: DashboardSelectionInfo;
   menuType : MenuTypes;
 
-  constructor() {
+  constructor(private router: ActivatedRoute) {
 
   }
 
   ngOnInit() {
     this.selectDashType(DashboardTypes.ASSIGNMENT);
+    this.router.params.subscribe((params: Params) => {
+      if (params['project-id']) {
+        this.selectDashType(DashboardTypes.PROJECT);
+      }
+    });
   }
 
   ngOnDestroy() {
