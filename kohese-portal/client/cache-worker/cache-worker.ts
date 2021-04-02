@@ -261,17 +261,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         break;
 
       case 'getStatus':
-        let rootProxy = _workingTree.getRootProxy();
-        var idStatusArray = [];
-        rootProxy.visitTree(null,(proxy: ItemProxy) => {
-          let statusArray = proxy.vcStatus.statusArray;
-          if (statusArray.length){
-            idStatusArray.push({
-              id: proxy.item.id,
-              status: statusArray
-            });
-          }
-        });
+        var idStatusArray = _workingTree.getVCStatus();
 
         port.postMessage({
           id: request.id,
@@ -548,6 +538,12 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     } else {
       console.log('*** Tab failed to respond to connection request, assuming it has closed unexpectedly: ' + clientId);
       port.koheseAssumedTabClosedUnexpectedly = true;
+
+      // Simulated sync failure in case tab reconnects
+      port.postMessage({message: 'connectionError', data: {}});
+      port.postMessage({message: 'reconnected', data: {}});
+
+      // Notify Server tab is disconnected
       tabDisconnected(clientId);
     }
   };
@@ -721,9 +717,12 @@ async function getStatus() : Promise<number> {
     socket.emit('Item/getStatus', {
       repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
     }, (response: Array<any>) => {
+      let currentVCStatus = _workingTree.getVCStatus();
+      let vcDiff = TreeConfiguration.compareVCStatus(currentVCStatus, response);
       console.log('::: Processing status response');
-      for (let j: number = 0; j < response.length; j++) {
-        updateItemStatus(response[j].id, response[j].status);
+      for (let key in vcDiff) {
+         let newStatus = vcDiff[key].to || [];
+         updateItemStatus(key, newStatus)
       }
       console.log('^^^ Received getStatus response from server')
       resolve(response.length);

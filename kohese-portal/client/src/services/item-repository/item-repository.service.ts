@@ -295,9 +295,13 @@ export class ItemRepository {
       console.log('^^^ Getting status');
       const statusResponse = await this.CacheManager.sendMessageToWorker(
         'getStatus', undefined, true);
-      statusResponse.idStatusArray.forEach(element => {
-        this.updateItemStatus(element.id, element.status);
-      });
+        let currentVCStatus = workingTree.getVCStatus();
+        let vcDiff = TreeConfiguration.compareVCStatus(currentVCStatus, statusResponse.idStatusArray);
+        console.log('::: Processing status response');
+        for (let key in vcDiff) {
+           let newStatus = vcDiff[key].to || [];
+           this.updateItemStatus(key, newStatus)
+        }
       console.log('^^^ Received status update with count of: ' + statusResponse.statusCount);
 
       let afterGetStatus = Date.now();

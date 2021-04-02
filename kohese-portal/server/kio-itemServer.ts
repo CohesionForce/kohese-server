@@ -482,18 +482,7 @@ function KIOItemServer(socket){
 
     let status = await retrieveVCStatus; //await KDBRepo.getStatus(request.repoId);
     if (status) {
-      var idStatusArray = [];
-
-      let rootProxy = workingTree.getRootProxy();
-      rootProxy.visitTree(null,(proxy: ItemProxy) => {
-        let statusArray = proxy.vcStatus.statusArray;
-        if (statusArray.length){
-          idStatusArray.push({
-            id: proxy.item.id,
-            status: statusArray
-          });
-        }
-      });
+      var idStatusArray = workingTree.getVCStatus();
 
       // console.log('::: Current status');
       // console.log(JSON.stringify(idStatusArray, null, '  '));
