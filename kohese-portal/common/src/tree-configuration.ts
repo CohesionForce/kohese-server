@@ -148,6 +148,54 @@ export class TreeConfiguration {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  getVCStatus(): Array<any> {
+    let rootProxy = workingTree.getRootProxy();
+    let idStatusArray = [];
+    rootProxy.visitTree(null,(proxy: ItemProxy) => {
+      let statusArray = proxy.vcStatus.statusArray;
+      if (statusArray.length){
+        idStatusArray.push({
+          id: proxy.item.id,
+          status: statusArray
+        });
+      }
+    });
+    return idStatusArray;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static compareVCStatus(left: Array<any>, right: Array<any>): any {
+    let result = {};
+    for (let idx: number = 0; idx< left.length; idx++) {
+      let vcStatus = left[idx];
+      result[vcStatus.id] = {
+        from: vcStatus.status
+      }
+    }
+    for (let idx: number = 0; idx < right.length; idx++) {
+      let vcStatus = right[idx];
+      if (result[vcStatus.id]) {
+        // vcStatus exists in left and right
+        if (_.isEqual(result[vcStatus.id].from, vcStatus.status)) {
+          delete result[vcStatus.id];
+        } else {
+          result[vcStatus.id].to = vcStatus.status;
+        }
+      } else {
+          //vcStatus does not exist in left
+          result[vcStatus.id] = {
+            to: vcStatus.status
+          };
+      }
+    }
+    return result;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   deleteConfig(){
     delete treeConfigMap[this.treeId];
   }
