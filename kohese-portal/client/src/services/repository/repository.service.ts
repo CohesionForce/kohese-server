@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { proxy } from 'jquery';
 import { CacheManager } from '../../../cache-worker/CacheManager';
 
 @Injectable()
