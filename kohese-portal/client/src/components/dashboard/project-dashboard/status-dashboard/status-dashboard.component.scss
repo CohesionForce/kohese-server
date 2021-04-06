@@ -18,6 +18,17 @@ mat-tab-group {
   height: 100%;
 }
 
+::ng-deep .mat-expansion-indicator:after {
+  color: black;
+}
+mat-expansion-panel {
+  mat-expansion-panel-header {
+    mat-panel-title {
+      font-weight: bold;
+    }
+  }
+}
+
 .grid-container {
   display: grid;
   width: 100%;
