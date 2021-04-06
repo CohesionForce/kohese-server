@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { proxy } from 'jquery';
 import { CacheManager } from '../../../cache-worker/CacheManager';
 
 @Injectable()
@@ -36,6 +37,10 @@ export class RepositoryService {
 
     public async addRepository(id: string, parentId: string): Promise<any> {
       return (await this.CacheManager.sendMessageToWorker('Repository/addRepository', {id, parentId}, true));
+    }
+
+    public async getItemStatus(proxy): Promise<any> {
+      return (await this.CacheManager.sendMessageToWorker('Repository/getItemStatus', {id: proxy.id}, true));
     }
 
     /* mountRepository = function (mountTarget, mountData, callback) {

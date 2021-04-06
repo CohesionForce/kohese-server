@@ -491,6 +491,10 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
+      case 'Repository/getItemStatus':
+        getItemStatus(request.data.id)
+        break;
+
       case 'Repository/addRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
@@ -715,7 +719,7 @@ async function getStatus() : Promise<number> {
   return new Promise((resolve : (statusCount:number) => void, reject) => {
     console.log('^^^ Requesting getStatus from server')
     socket.emit('Item/getStatus', {
-      repoId: TreeConfiguration.getWorkingTree().getRootProxy().item.id
+      repoId: ''
     }, (response: Array<any>) => {
       let currentVCStatus = _workingTree.getVCStatus();
       let vcDiff = TreeConfiguration.compareVCStatus(currentVCStatus, response);
@@ -728,8 +732,30 @@ async function getStatus() : Promise<number> {
       resolve(response.length);
     });
   });
-
 }
+
+  //////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+async function getItemStatus(id) : Promise<number> {
+  return new Promise((resolve : (statusCount:number) => void, reject) => {
+    console.log('^^^ Requesting getItemStatus from server')
+    socket.emit('Item/getStatus', {
+      repoId: id
+    }, (response: Array<any>) => {
+      let currentVCStatus = _workingTree.getVCStatus();
+      let vcDiff = TreeConfiguration.compareVCStatus(currentVCStatus, response);
+      console.log('::: Processing Item status response');
+      for (let key in vcDiff) {
+         let newStatus = vcDiff[key].to || [];
+         updateItemStatus(key, newStatus)
+      }
+      console.log('^^^ Received Item getItemStatus response from server')
+      resolve(response.length);
+    });
+  });
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////

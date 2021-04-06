@@ -20,8 +20,16 @@ export class KDBRepo {
     return nodegit.Repository.open(repositoryPath).then(function (r) {
       repoList[repositoryId] = r;
     }).catch(function (err) {
-      console.log('Error opening repository at ' + repositoryPath + '. ' + err);
+      console.log('*** Error opening repository at ' + repositoryPath + '. ' + err);
     });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static async closeRepo(repositoryId) {
+    console.log('::: Unmounting git repo ' + repositoryId);
+    delete repoList[repositoryId];
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -400,17 +408,17 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  private static pendingGetStatus = {};
-  static async getStatus (repositoryId) : Promise<any> {
-    //This code gets working directory changes similar to git status
+  private static pendingGetItemStatus = {};
+  static async getItemVCStatus (repositoryId) : Promise<any> {
+
+    // This code gets working directory changes similar to git status
     var repoStatus = [];
 
     let statuses;
-
-    if (!this.pendingGetStatus[repositoryId]) {
-      this.pendingGetStatus[repositoryId] = repoList[repositoryId].getStatusExt();
+    if (!this.pendingGetItemStatus[repositoryId]) {
+      this.pendingGetItemStatus[repositoryId] = repoList[repositoryId].getStatusExt();
     }
-    statuses = await this.pendingGetStatus[repositoryId];
+    statuses = await this.pendingGetItemStatus[repositoryId];
 
     statuses.forEach(function(file) {
 
@@ -425,6 +433,9 @@ export class KDBRepo {
           if (!UUID_REGEX.test(itemId)) {
             // Not an itemId, so reset to undefined
             itemId = undefined;
+            if (path === 'Root.json') {
+              itemId = repositoryId;
+            }
           }
         }
       }
@@ -443,9 +454,70 @@ export class KDBRepo {
 
     });
 
-    delete this.pendingGetStatus[repositoryId];
+    delete this.pendingGetItemStatus[repositoryId];
 
     return repoStatus;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  private static pendingGetStatus = {};
+  static async getStatus () : Promise<any> {
+    // This code gets working directory changes similar to git status
+    var repoStatus = [];
+    var promises = [];
+
+    for (let repositoryId in repoList) {
+
+      repoStatus[repositoryId] = [];
+      let statuses;
+
+      if (!this.pendingGetStatus[repositoryId]) {
+        this.pendingGetStatus[repositoryId] = repoList[repositoryId].getStatusExt();
+      }
+      statuses = await this.pendingGetStatus[repositoryId];
+
+      statuses.forEach(function (file) {
+
+        let path = file.path();
+
+        let itemId = undefined;
+
+        if (path.endsWith('.json')) {
+          itemId = Path.basename(path, '.json');
+          if (!UUID_REGEX.test(itemId)) {
+            itemId = Path.basename(Path.dirname(path));
+            if (!UUID_REGEX.test(itemId)) {
+              // Not an itemId, so reset to undefined
+              itemId = undefined;
+              if (path === 'Root.json') {
+                itemId = repositoryId;
+              }
+
+            }
+          }
+        }
+
+        let fileStatus = {
+          itemId: itemId,
+          path: path,
+          status: file.status()
+        };
+
+        if (!itemId) {
+          delete fileStatus.itemId;
+        }
+
+        promises.push(repoStatus[repositoryId].push(fileStatus));
+
+      });
+
+      delete this.pendingGetStatus[repositoryId];
+    }
+    return Promise.all(promises).then(async () => {
+      return repoStatus;
+    });
   }
 
   //////////////////////////////////////////////////////////////////////////
