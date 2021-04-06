@@ -77,7 +77,7 @@ async function initialize (koheseKdbPath, indexAndExit) {
   // TODO: checkAndCreateDir does not handle cases such as test1/test2 if test1 does not exist.
   checkAndCreateDir(koheseKDBDirPath);
 
- // Get all repositories and add to Roots.json file
+  // Get all repositories and add to AvailableRepositories.json file
   var repositoryList = fs.readdirSync('./kdb').filter(function (file) {
     return fs.statSync(path.join('./kdb', file)).isDirectory();
   });
@@ -101,17 +101,21 @@ async function initialize (koheseKdbPath, indexAndExit) {
   } catch(err) {
       // Check to see if a flag was provided to create a new KDB
       for (var i = 2; i < process.argv.length; i++) {
-          if(process.argv[i] === 'create') {
-              create = true;
-              break;
-          }
+        if (process.argv[i] === 'create') {
+          create = true;
+          break;
+        }
       }
 
-      if(!create && koheseKDBDirPath !== 'kdb/kohese-kdb') {
+      if (!create) {
+        if (koheseKDBDirPath === 'kdb/kohese-kdb') {
+          create = true;
+        } else {
           console.log('No KDB found at ' + koheseKDBDirPath);
           console.log('To create a new KDB, run with the extra argument "create"');
           console.log('For example, "-kdb=PATH create"');
           process.exit();
+        }
       }
   }
 

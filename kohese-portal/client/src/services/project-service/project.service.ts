@@ -15,6 +15,7 @@ export interface ProjectInfo {
 export class ProjectService {
   projects: Array<ProjectInfo>;
   workingProjects: Array<ProjectInfo>;
+  savedProject: ProjectInfo;
 
   workingConfig: any;
   currentConfig: any;
@@ -67,6 +68,18 @@ export class ProjectService {
 
   getProjects(): Array<ProjectInfo> {
     return this.projects;
+  }
+
+  // Used to remember the project currently selected within project dashboard
+  getProjectById(itemID: any): ProjectInfo {
+    let project: ProjectInfo = undefined;
+    for(let idx = 0; idx < this.projects.length; idx++) {
+      let projectInfo = this.projects[idx];
+      if(projectInfo.proxy.item.id === itemID) {
+        project = projectInfo;
+      }
+    }
+    return project;
   }
 
   getCurrentProjects(): Array<ProjectInfo> {
