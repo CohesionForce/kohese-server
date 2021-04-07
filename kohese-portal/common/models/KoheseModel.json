@@ -53,7 +53,6 @@
       "type": [
         "object"
       ],
-      "required": true,
       "name": "validations"
     },
     "relations": {
@@ -65,14 +64,12 @@
       "type": [
         "object"
       ],
-      "required": true,
       "name": "acls"
     },
     "methods": {
       "type": [
         "object"
       ],
-      "required": true,
       "name": "methods"
     },
     "classLocalTypes": {
