@@ -552,17 +552,14 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     if (updateStructure) {
       let expansionStates: Map<any, boolean> = this.getExpansionStates();
       this._elementMap.clear();
+      let depth = 0;
       if (this.isDialogInstance()) {
-        this.processElement(this._root, '', 0);
-        let children: Array<any> = this._getChildren(this._root);
-        for (let j: number = 0; j < children.length; j++) {
-          this.processElement(children[j], this._root, 1);
-        }
-      } else {
-        let children: Array<any> = this._getChildren(this._root);
-        for (let j: number = 0; j < children.length; j++) {
-          this.processElement(children[j], this._root, 0);
-        }
+        this.processElement(this._root, '', depth);
+        depth = depth + 1;
+      }
+      let children: Array<any> = this._getChildren(this._root);
+      for (let j: number = 0; j < children.length; j++) {
+        this.processElement(children[j], this._root, depth);
       }
 
       this.setExpansionStates(expansionStates);
