@@ -239,14 +239,15 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   @Input('quickSelectElements')
   set quickSelectElements(quickSelectElements: Array<any>) {
     for(let idx = 0; idx < quickSelectElements.length; idx++) {
-      if(!(quickSelectElements[idx].item.id === 'ROOT')) {
-        if (quickSelectElements == null) {
-          quickSelectElements = [];
-        }
-
-        this._quickSelectElements = quickSelectElements;
+      if(quickSelectElements[idx].item.name === 'Root of Knowledge Tree') {
+        quickSelectElements.splice(idx,1);
       }
     }
+    if (quickSelectElements == null) {
+      quickSelectElements = [];
+    }
+
+    this._quickSelectElements = quickSelectElements;
   }
 
   private _showSelections: boolean = false;
