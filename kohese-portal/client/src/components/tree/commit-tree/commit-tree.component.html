@@ -1,5 +1,5 @@
-<div style="height: 100%; overflow: hidden;">
-  <div>
+<div class=commit-tree-container style="height: calc(100% - 7px); overflow: hidden;">
+  <div class=root-container>
     <div class="kt-head kth-cell">
       Root
     </div>
@@ -11,11 +11,11 @@
       </div>
     </ng-container>
   </div>
-  <div style="height: calc(100% - 71px); width: 100%; overflow: hidden">
+  <div class=descendants-container style="height: calc(100% - 71px); width: 100%; overflow: hidden">
     <div class="kt-head kth-cell">
       Descendants
     </div>
-    <div class="kt-body">
+    <div class="kt-body" id=descendants-tree>
       <virtual-scroll #tree [items]="visibleRows">
         <tree-row *ngFor="let row of tree.viewPortItems"
           [treeRow]="row" [rowActions]="rowActions"

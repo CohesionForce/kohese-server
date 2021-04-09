@@ -39,6 +39,16 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this.proxyStream.next(this._itemProxy);
   }
 
+  startingTabIndex: number = 0;
+  _startWithJournal: boolean = false;
+  @Input('startWithJournal')
+  set startWithJournal(value: boolean) {
+    this._startWithJournal = value;
+    if (this._startWithJournal) {
+      this.startingTabIndex = 4;
+    }
+  }
+
   treeConfig: TreeConfiguration;
 
   /* Observables */
@@ -72,6 +82,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     if (this.isDialogInstance()) {
       this.treeConfig = TreeConfiguration.getWorkingTree();
       this.itemProxy = this._data['itemProxy'];
+      this.startWithJournal = this._data['startWithJournal'];
     } else {
       this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe(
         (treeConfigurationObject: any) => {

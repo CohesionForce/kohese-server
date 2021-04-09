@@ -30,7 +30,7 @@
   </div>
   <div style="height: calc(100% - 50px);">
     <!-- Nav tabs -->
-    <mat-tab-group id="details-tabs">
+    <mat-tab-group id="details-tabs" [selectedIndex]="startingTabIndex">
       <mat-tab id="defaultTab">
         <ng-template mat-tab-label>
           Document
