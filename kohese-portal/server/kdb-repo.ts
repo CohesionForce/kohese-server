@@ -16,7 +16,7 @@ export class KDBRepo {
   //
   //////////////////////////////////////////////////////////////////////////
   static async openRepo(repositoryId, repositoryPath) {
-    console.log('::: Opening git repo ' + repositoryPath);
+    console.log('::: Opening git repo ' + repositoryId + ' ' + repositoryPath);
     return nodegit.Repository.open(repositoryPath).then(function (r) {
       repoList[repositoryId] = r;
     }).catch(function (err) {
@@ -415,6 +415,12 @@ export class KDBRepo {
     var repoStatus = [];
 
     let statuses;
+
+    // TODO: Remove this code when repos are split and all repos have a GIT
+    if (!repoList[repositoryId]) {
+      console.log('Repo Not Found - will use Root ')
+      repositoryId = 'ROOT'
+    }
     if (!this.pendingGetItemStatus[repositoryId]) {
       this.pendingGetItemStatus[repositoryId] = repoList[repositoryId].getStatusExt();
     }
@@ -455,7 +461,6 @@ export class KDBRepo {
     });
 
     delete this.pendingGetItemStatus[repositoryId];
-
     return repoStatus;
   }
 
@@ -595,5 +600,23 @@ export class KDBRepo {
     });
 
     callback(historyResponse);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getRepoId(filePath) {
+    if (filePath !== '') {
+      var id: any = path.parse(filePath).base;
+      if (repoList[id]) {
+        return id;
+      } else {
+        let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
+        this.getRepoId(repopath)
+      }
+    } else {
+      id = undefined
+      return id;
+    }
   }
 }

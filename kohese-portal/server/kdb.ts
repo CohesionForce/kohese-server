@@ -391,6 +391,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     console.log('::: rSP: ' + repoStoragePath);
 
     filePath = repoStoragePath + '/Root.json';
+    proxy.repoPath = filePath
     var repoRootData = JSON.parse(JSON.stringify(modelInstance));
     delete repoRootData.parentId;
     delete repoRootData.repoStoragePath;
@@ -418,25 +419,29 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     }
   }
 
-  return promise.then(function () {
+  return promise.then(async function () {
     // TODO:  This needs to be replaced with a uniform directory approach that does not include Model Kinds
       kdbFS.createDirIfMissing(path.dirname(filePath));
       if (enable === false) {
           kdbFS.storeJSONDoc(filePath, proxy.cloneItemAndStripDerived());
       }
       if (isNewItem && (modelName === 'Repository')) {
-        mountRepository({
-          repoStoragePath: repoStoragePath,
-          name: repoMountData.name,
-          id: repoMountData.id,
-          parentId: repoMountData.parentId
-        });
+        if (kdbFS.containsGITFolder(path.join(repoStoragePath, '.git'))) {
+          await KDBRepo.openRepo(repoMountData.id, repoStoragePath)
+        } else {
+          console.log('*** No GIT Folder Exists - Invalid Repository for ' + repoMountData.id + ' repo ' + repoStoragePath)
+        }
       }
-      // TODO: Once Repo is split need to get the correct Repo ID, if embedded Repo will need to back track
-      // Through Repos to find the closests repo that is open
+      var repoId = KDBRepo.getRepoId(repoStoragePath);
+      if (repoId === undefined) {
+        repoId = ItemProxy.getWorkingTree().getRootProxy().item.id
+      }
+
       var repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
       repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
-      return KDBRepo.getItemStatus(ItemProxy.getWorkingTree().getRootProxy().item.id, repositoryPath);
+      // TODO: The repo path will need to change when we implement reading the Root.json instead of just the Repository
+      // directory
+      return KDBRepo.getItemStatus(repoId, repositoryPath);
   }).then((status) => {
     return status;
   });
