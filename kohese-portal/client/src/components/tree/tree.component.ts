@@ -555,7 +555,6 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       let depth = 0;
       if (this.isDialogInstance()) {
         this.processElement(this._root, '', depth);
-        depth = depth + 1;
       } else {
         let children: Array<any> = this._getChildren(this._root);
         for (let j: number = 0; j < children.length; j++) {
