@@ -123,6 +123,16 @@
             "source": "InVerification",
             "target": "InWork",
             "guard": {}
+          },
+          "Request Redisposition": {
+            "source": "InWork",
+            "target": "PendingRedisposition",
+            "guard": {}
+          },
+          "Revert To InVerification": {
+            "source": "Verified",
+            "target": "InVerification",
+            "guard": {}
           }
         }
       },
