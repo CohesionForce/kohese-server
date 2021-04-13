@@ -86,7 +86,7 @@
             "target": "Observed",
             "guard": {}
           },
-          "Revert To Analysis": {
+          "Revert To InAnalysis": {
             "source": "RequiresAction",
             "target": "InAnalysis",
             "guard": {}
