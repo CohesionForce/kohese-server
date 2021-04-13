@@ -83,14 +83,14 @@ export abstract class Tree {
   }
 
   private _expandDescendantsAction: Action = new Action('Expand Descendants',
-    'Expands all descendants', 'fa fa-caret-down', (object: any) => {
+    'expand', 'fa fa-chevron-down', (object: any) => {
     return (this.getChildren(object).length > 0);
     }, (object: any) => {
     this.expandDescendants(this._rowMap.get(this.getId(object)));
   });
 
   private _collapseDescendantsAction: Action = new Action('Collapse ' +
-    'Descendants', 'Collapses all descendants', 'fa fa-caret-right', (object:
+    'Descendants', 'collapse', 'fa fa-chevron-up', (object:
     any) => {
     return (this.getChildren(object).length > 0);
     }, (object: any) => {
