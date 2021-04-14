@@ -530,8 +530,8 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   static async getItemStatus(repositoryId, filePath) {
     var status = [];
+    console.log('::: Getting Item Status For ' + repositoryId + ' ' + filePath)
     var statPromise = nodegit.Status.file(repoList[repositoryId], filePath);
-
     return statPromise.then((statNum) => {
       for (var statusKey in nodegit.Status.STATUS) {
         if ((statNum & nodegit.Status.STATUS[statusKey]) !== 0) {
@@ -539,6 +539,8 @@ export class KDBRepo {
         }
       }
 
+      return status;
+    }).catch ((error) => {
       return status;
     });
 
@@ -617,6 +619,25 @@ export class KDBRepo {
     } else {
       id = undefined
       return id;
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getFilePath(filePath) {
+    console.log('here is the repoList 3', repoList)
+    if (filePath !== '') {
+      var id: any = path.parse(filePath).base;
+      if (repoList[id]) {
+        return filePath;
+      } else {
+        let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
+        this.getFilePath(repopath)
+      }
+    } else {
+      filePath = undefined
+      return filePath;
     }
   }
 }

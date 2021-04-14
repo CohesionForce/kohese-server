@@ -355,7 +355,7 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
             selection: (this.parentId ? [TreeConfiguration.getWorkingTree().
               getProxyFor(this.parentId)] : [])
           }
-        }).updateSize('90%', '90%').afterClosed().subscribe(async (selection:
+        }).updateSize('90%', '90%').afterClosed().subscribe((selection:
           Array<any>) => {
             if (selection) {
               this.parentId = selection[0].item.id;

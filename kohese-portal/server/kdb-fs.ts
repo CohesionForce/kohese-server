@@ -176,7 +176,7 @@ module.exports.removeFile = removeFile;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function containsGITFolder(path): boolean {
+function pathExists(path): boolean {
   if (fs.existsSync(path)) {
     return true;
   } else {
@@ -184,7 +184,7 @@ function containsGITFolder(path): boolean {
   }
 }
 
-module.exports.containsGITFolder = containsGITFolder;
+module.exports.pathExists = pathExists;
 
 //////////////////////////////////////////////////////////////////////////
 //

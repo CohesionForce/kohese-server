@@ -426,7 +426,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
           kdbFS.storeJSONDoc(filePath, proxy.cloneItemAndStripDerived());
       }
       if (isNewItem && (modelName === 'Repository')) {
-        if (kdbFS.containsGITFolder(path.join(repoStoragePath, '.git'))) {
+        if (kdbFS.pathExists(path.join(repoStoragePath, '.git'))) {
           await KDBRepo.openRepo(repoMountData.id, repoStoragePath)
         } else {
           console.log('*** No GIT Folder Exists - Invalid Repository for ' + repoMountData.id + ' repo ' + repoStoragePath)
@@ -437,11 +437,18 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
         repoId = ItemProxy.getWorkingTree().getRootProxy().item.id
       }
 
-      var repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
-      repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
-      // TODO: The repo path will need to change when we implement reading the Root.json instead of just the Repository
-      // directory
-      return KDBRepo.getItemStatus(repoId, repositoryPath);
+      var finalRepositoryPath;
+      var repositoryPath;
+      var filePath2 = KDBRepo.getFilePath(repoStoragePath)
+      if (filePath2 === undefined) {
+        repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
+        repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
+        finalRepositoryPath = repositoryPath;
+      } else {
+        repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(filePath2)[1];
+        finalRepositoryPath = repositoryPath.substring(1);
+      }
+      return KDBRepo.getItemStatus(repoId, finalRepositoryPath);
   }).then((status) => {
     return status;
   });
@@ -815,7 +822,7 @@ async function openRepositories(indexAndExit) {
   // Initialize nodegit repo-open promises
   for(let id in mountList) {
     if(mountList[id].mounted && mountList[id].repoStoragePath) {
-      if (kdbFS.containsGITFolder(path.join(mountList[id].repoStoragePath, '.git'))) {
+      if (kdbFS.pathExists(path.join(mountList[id].repoStoragePath, '.git'))) {
         promises.push(KDBRepo.openRepo(id, mountList[id].repoStoragePath));
       } else {
         console.log('*** No GIT Folder Exists - Invalid Repository for ' + id + ' repo ' + mountList[id].repoStoragePath)
@@ -857,7 +864,7 @@ async function openRepository(id, indexAndExit){
   }, enable);
 
   // Open Git Repo
-  if (kdbFS.containsGITFolder(path.join(mountList[id].repoStoragePath, '.git'))) {
+  if (kdbFS.pathExists(path.join(mountList[id].repoStoragePath, '.git'))) {
     await KDBRepo.openRepo(id, mountList[id].repoStoragePath);
   } else {
     console.log('*** No GIT Folder Exists - Invalid Repository for ' + id + ' repo ' + mountList[id].repoStoragePath)
