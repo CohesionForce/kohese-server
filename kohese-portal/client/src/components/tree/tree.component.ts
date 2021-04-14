@@ -441,7 +441,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
     if (elementMapValue.visible) {
       let parent: any = elementMapValue.parent;
-      if (parent === this._root) {
+      if (parent === this._root || parent === '') {
         return true;
       } else {
         return this._elementMap.get(parent).expanded;
@@ -557,9 +557,14 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     if (updateStructure) {
       let expansionStates: Map<any, boolean> = this.getExpansionStates();
       this._elementMap.clear();
-      let children: Array<any> = this._getChildren(this._root);
-      for (let j: number = 0; j < children.length; j++) {
-        this.processElement(children[j], this._root, 0);
+      let depth = 0;
+      if (this.isDialogInstance()) {
+        this.processElement(this._root, '', depth);
+      } else {
+        let children: Array<any> = this._getChildren(this._root);
+        for (let j: number = 0; j < children.length; j++) {
+          this.processElement(children[j], this._root, depth);
+        }
       }
 
       this.setExpansionStates(expansionStates);
