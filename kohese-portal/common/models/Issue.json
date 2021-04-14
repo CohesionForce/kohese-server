@@ -38,6 +38,14 @@
           "Resolved": {
             "name": "Resolved",
             "description": "The issue is Resolved."
+          },
+          "InReview": {
+            "name": "InReview",
+            "description": "The issue is In Review."
+          },
+          "ReviewComplete": {
+            "name": "Review Complete",
+            "description": "The issue review is Complete."
           }
         },
         "transition": {
@@ -67,11 +75,41 @@
             "requires": "resolutionActions"
           },
           "Resolve": {
-            "source": "RequiresAction",
+            "source": "ReviewComplete",
             "target": "Resolved",
             "guard": {
               "tbd": "Insert guard to ensure all associated actions are closed"
             }
+          },
+          "Revert To Observed": {
+            "source": "InAnalysis",
+            "target": "Observed",
+            "guard": {}
+          },
+          "Revert To InAnalysis": {
+            "source": "RequiresAction",
+            "target": "InAnalysis",
+            "guard": {}
+          },
+          "Review": {
+            "source": "RequiresAction",
+            "target": "InReview",
+            "guard": {}
+          },
+          "Revert To RequiresAction": {
+            "source": "InReview",
+            "target": "RequiresAction",
+            "guard": {}
+          },
+          "Reviewed": {
+            "source": "InReview",
+            "target": "ReviewComplete",
+            "guard": {}
+          },
+          "Revert To InReview": {
+            "source": "ReviewComplete",
+            "target": "InReview",
+            "guard": {}
           }
         }
       },
