@@ -13,12 +13,14 @@
   margin-bottom: 10px;
 }
 
-/deep/ .mat-expansion-panel-content {
-  height: unset;
-}
+:host {
+  ::ng-deep .mat-expansion-panel-content {
+    height: unset;
+  }
 
-/deep/ .mat-expansion-indicator:after {
-  color: whitesmoke;
+  ::ng-deep .mat-expansion-indicator:after {
+    color: whitesmoke;
+  }
 }
 
 mat-expansion-panel {
