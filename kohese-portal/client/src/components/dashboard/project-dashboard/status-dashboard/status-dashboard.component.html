@@ -11,6 +11,7 @@
                 <mat-panel-title>{{type}}</mat-panel-title>
                 <ng-template matExpansionPanelContent>
                   <div *ngFor="let stateType of stateInfo[type] | mapKey">
+                    <b>{{stateType}}</b>
                     <mat-list>
                       <mat-list-item class="state-item" *ngFor="let state of stateInfo[type][stateType].states"
                         (click)="toggleState(type, stateType, state)"
