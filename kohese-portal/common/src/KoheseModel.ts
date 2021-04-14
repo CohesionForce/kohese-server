@@ -221,7 +221,7 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
         let model : KoheseModel = (descendants[j] as KoheseModel);
         model.updateDerivedModelProperties();
         if (model.parentProxy.kind === 'KoheseModel' && model.view && (model.view.parentProxy !== model.parentProxy.view)) {
-          console.log('*** ERROR: View Model Hiearchary does not match Kohese Model Hierarchy for ' + model.view.item.id);
+          console.log('*** ERROR: View Model Hierarchy does not match Kohese Model Hierarchy for ' + model.view.item.id);
           // TODO: Remove these 2 lines when existing issues are corrected
           model.view.item.parentId = model.parentProxy.view.item.id;
           model.parentProxy.view.addChild(model.view);
