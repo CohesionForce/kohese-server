@@ -434,7 +434,11 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       }
       var repoId = KDBRepo.getRepoId(repoStoragePath);
       if (repoId === undefined) {
-        repoId = ItemProxy.getWorkingTree().getRootProxy().item.id
+        repoId = ItemProxy.getWorkingTree().getRootProxy().item.id;
+        // TODO: Investigate If This Is Still Needed After Split
+        // Close and reopen Root repo to Fix Error when creating Item after Repo creation
+        KDBRepo.closeRepo(repoId);
+        await KDBRepo.openRepo(repoId, koheseKDBDirPath)
       }
 
       var finalRepositoryPath;
