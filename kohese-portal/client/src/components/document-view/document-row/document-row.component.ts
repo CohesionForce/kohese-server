@@ -9,8 +9,12 @@ import { DocumentInfo } from '../document-view.component';
 import { Parser, HtmlRenderer } from 'commonmark';
 import * as commonmark from 'commonmark';
 import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
-import { MatMenuTrigger } from '@angular/material';
+import { MatDialog, MatDialogConfig, MatExpansionPanel, MatMenuTrigger } from '@angular/material';
 import { NavigationService } from "../../../services/navigation/navigation.service";
+import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { SessionService } from '../../../services/user/session.service';
+import { JournalComponent, JournalOrdering } from '../../details/journal/journal.component';
 
 @Component({
   selector: 'document-row',
@@ -28,6 +32,7 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   docReader: Parser;
   docWriter: HtmlRenderer;
   upsertComplete: Subject<any> = new Subject();
+  observationsPresent: boolean = false;
   private treeConfig;
   private treeConfigSub;
   private treeConfigProxyChangeSub;
@@ -50,7 +55,10 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     private _itemRepository: ItemRepository,
     private _dialogService: DialogService,
     private _navigationService: NavigationService,
-    private element: ElementRef) {
+    private element: ElementRef,
+    private sessionService: SessionService,
+    private dialog: MatDialog
+    ) {
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true},
     );
@@ -77,7 +85,11 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
               }
             }
           }
+          this.checkEntries();
+          this.changeRef.markForCheck();
         });
+        this.checkEntries();
+        this.changeRef.markForCheck();
       });
   }
 
@@ -102,13 +114,69 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
       });
     }
     row.editable = false;
+    this.checkEntries();
     this.changeRef.markForCheck();
   }
 
   public async discardChanges(proxy: ItemProxy): Promise<void> {
     await this._itemRepository.fetchItem(this.docInfo.proxy);
     this.row.editable = false;
+    this.checkEntries();
     this.changeRef.markForCheck();
+  }
+
+  numEntries: number = 0;
+  public checkEntries() {
+    this.numEntries = 0;
+    let observationRelation = this.docInfo.proxy.relations.referencedBy.Observation;
+    let issueRelation = this.docInfo.proxy.relations.referencedBy.Issue;
+
+    if(observationRelation && observationRelation.context) {
+      this.numEntries += observationRelation.context.length;
+    }
+    if(issueRelation && issueRelation.context) {
+      this.numEntries += issueRelation.context.length;
+    }
+    if(this.numEntries > 0) {
+      this.observationsPresent = true;
+    }
+  }
+
+  public addEntry(docInfo: DocumentInfo): void {
+    let username: string = this.sessionService.user.name;
+    let timestamp: number = Date.now();
+    this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
+      data: {
+        type: TreeConfiguration.getWorkingTree().getProxyFor('Observation').item,
+        object: {
+          createdOn: timestamp,
+          createdBy: username,
+          modifiedOn: timestamp,
+          modifiedBy: username,
+          parentId: docInfo.proxy.item.id,
+          context: [{ id: docInfo.proxy.item.id }],
+          observedBy: username,
+          observedOn: timestamp
+        },
+        formatDefinitionType: FormatDefinitionType.DEFAULT,
+        allowKindChange: true
+      }
+    }).updateSize('90%', '90%').afterClosed().subscribe(async (result: any) => {
+      if (result) {
+        await this._itemRepository.upsertItem(result.type.name, result.object);
+        this.checkEntries();
+        this.changeRef.markForCheck();
+      }
+    });
+  }
+
+  public displayJournal(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: itemProxy,
+        startWithJournal: true
+      }
+    }).updateSize('90%', '90%');
   }
 
   public displayInformation(itemProxy: ItemProxy): void {

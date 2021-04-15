@@ -1,7 +1,7 @@
 {
   "id": "view-keyevent",
   "name": "KeyEvent",
-  "parentId": "view-decision",
+  "parentId": "view-requirement",
   "namespace": {
     "id": "com.kohese"
   },

@@ -29,6 +29,15 @@
             <mat-icon class="fa fa-times"></mat-icon>
           </button>
         </ng-template>
+        <button mat-icon-button *ngIf="!observationsPresent else commentsPresent" matTooltip="Add Comment"
+          (click)=addEntry(docInfo)>
+          <mat-icon class="fa fa-comment-o"></mat-icon>
+        </button>
+        <ng-template #commentsPresent>
+          <button mat-icon-button matTooltip="Add Comment" (click)="displayJournal(docInfo.proxy)">
+            <mat-icon class="fa fa-comment-o" matBadgeSize=medium matBadge={{numEntries}}></mat-icon>
+          </button>
+        </ng-template>
         <button mat-icon-button (click)="displayInformation(docInfo.proxy)">
           <mat-icon class="fa fa-clone"></mat-icon>
         </button>

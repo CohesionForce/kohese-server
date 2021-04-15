@@ -46,6 +46,10 @@
           "InAppeal": {
             "name": "In Appeal",
             "description": "A decision that is In Appeal."
+          },
+          "Archived": {
+            "name": "Archived",
+            "description": "A decision that is Archived."
           }
         },
         "transition": {
@@ -87,6 +91,36 @@
           "Appeal": {
             "source": "Disapproved",
             "target": "InAppeal",
+            "guard": {}
+          },
+          "Review": {
+            "source": "Deferred",
+            "target": "InReview",
+            "guard": {}
+          },
+          "Review After Appeal": {
+            "source": "InAppeal",
+            "target": "InReview",
+            "guard": {}
+          },
+          "Return To InAnalysis": {
+            "source": "InReview",
+            "target": "InAnalysis",
+            "guard": {}
+          },
+          "Revise A Decision": {
+            "source": "Approved",
+            "target": "InAnalysis",
+            "guard": {}
+          },
+          "Cancel A Published Decision": {
+            "source": "Published",
+            "target": "Archived",
+            "guard": {}
+          },
+          "Cancel A Decision": {
+            "source": "Approved",
+            "target": "Archived",
             "guard": {}
           }
         }
