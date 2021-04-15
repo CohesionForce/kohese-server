@@ -317,6 +317,11 @@ export class DataModelEditorComponent {
     defaultFormatDefinition.containers[0].contents.length = 0;
 
     let parentTypeViewModel: any = (TreeConfiguration.getWorkingTree().getProxyFor(parentType.id) as KoheseModel).view.item;
+
+    if (viewModelProxy.item.parentId !== parentTypeViewModel.id) {
+      viewModelProxy.item.parentId = parentTypeViewModel.id;
+    }
+
     let parentTypeDefaultFormatDefinition: FormatDefinition =
       parentTypeViewModel.formatDefinitions[parentTypeViewModel.
       defaultFormatKey[FormatDefinitionType.DEFAULT]];
