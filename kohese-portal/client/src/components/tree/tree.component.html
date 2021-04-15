@@ -164,9 +164,6 @@
       (click)="matDialogRef.close(selection)">
       Select
     </button>
-    <button mat-button matTooltip="Cancel the selection process"
-      (click)="matDialogRef.close(undefined)">
-      Cancel
-    </button>
+    <button mat-button mat-dialog-close>Cancel</button>
   </mat-dialog-actions>
 </ng-container>
