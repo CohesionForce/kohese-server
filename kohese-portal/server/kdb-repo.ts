@@ -626,7 +626,6 @@ export class KDBRepo {
   //
   //////////////////////////////////////////////////////////////////////////
   static getFilePath(filePath) {
-    console.log('here is the repoList 3', repoList)
     if (filePath !== '') {
       var id: any = path.parse(filePath).base;
       if (repoList[id]) {
