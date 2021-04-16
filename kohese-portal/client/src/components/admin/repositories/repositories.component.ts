@@ -336,7 +336,6 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
         console.log('::: Mounting a disabled Repository')
         this.repositoryService.enableRepository(id);
         this.repositoryService.mountRepository(this.disabledRepos[idx] as ItemProxy);
-        this.repositoryService.getItemStatus(this.disabledRepos[idx] as ItemProxy)
     } else {
         // this.field.openObjectSelector;
         console.log('::: Mounting Unmounted Respository')
@@ -362,7 +361,6 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
               this.repositoryService.addRepository(id, this.parentId);
               var index = this.availablerepoList.findIndex(y => y.id === id)
               this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);
-              this.repositoryService.getItemStatus(this.availablerepoList[index] as ItemProxy)
             }
         });
     }

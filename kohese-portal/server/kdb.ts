@@ -371,7 +371,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       parentId: modelInstance.parentId
     };
 
-    console.log('::: Repo Mount Information');
+    console.log('::: Repo Mount Information -- StoreModelInstance');
     console.log(repoMountData);
     if (enable === false) {
       kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
@@ -384,7 +384,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       parentId: repoMountData.parentId
     };
 
-    mountList[repoMountData.id].mounted = true;
+    // mountList[repoMountData.id].mounted = true;
     updateMountFile();
 
     repoStoragePath = determineRepoStoragePath(proxy);
@@ -398,7 +398,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     delete repoRootData.mounted;
     modelInstance = repoRootData;
 
-    if (isNewItem) {
+    if (isNewItem && !enable) {
       // eslint-disable-next-line no-unused-
       availableRepositories.push({id: repoMountData.id,
         name: repoMountData.name,
@@ -425,7 +425,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       if (enable === false) {
           kdbFS.storeJSONDoc(filePath, proxy.cloneItemAndStripDerived());
       }
-      if (isNewItem && (modelName === 'Repository')) {
+      if (isNewItem && (modelName === 'Repository') && !enable) {
         if (kdbFS.pathExists(path.join(repoStoragePath, '.git'))) {
           await KDBRepo.openRepo(repoMountData.id, repoStoragePath)
         } else {
@@ -438,7 +438,6 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
         // TODO: Investigate If This Is Still Needed After Split or if it needs to change
         // Close and reopen Root repo to Fix Error when creating Item after Repo creation
         if (kdbFS.pathExists(filePath)) {
-            console.log('file exists ')
             KDBRepo.closeRepo(repoId);
             await KDBRepo.openRepo(repoId, koheseKDBDirPath)
         }
@@ -864,18 +863,19 @@ async function openRepository(id, indexAndExit){
   workingTree.setLoading();
   let enable : boolean = true;
 
-  // Mount Repository
-  mountRepository({
-    'id': id, name: mountList[id].name, parentId: mountList[id].parentId,
-    repoStoragePath: mountList[id].repoStoragePath
-  }, enable);
 
-  // Open Git Repo
+    // Open Git Repo
   if (kdbFS.pathExists(path.join(mountList[id].repoStoragePath, '.git'))) {
     await KDBRepo.openRepo(id, mountList[id].repoStoragePath);
   } else {
     console.log('*** No GIT Folder Exists - Invalid Repository for ' + id + ' repo ' + mountList[id].repoStoragePath)
   }
+
+  // Mount Repository
+  mountRepository({
+    'id': id, name: mountList[id].name, parentId: mountList[id].parentId,
+    repoStoragePath: mountList[id].repoStoragePath
+  }, enable);
 
   console.log('::: End Enabled Repository Load');
   workingTree.unsetLoading();

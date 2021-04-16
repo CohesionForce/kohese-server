@@ -60,6 +60,8 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
         let status = [];
         if (!change.enableRepo) {
           status = await kdb.storeModelInstance(change.proxy, change.type === 'create')
+        } else {
+          status = await kdb.storeModelInstance(change.proxy, change.type === 'create', true)
         }
         let proxy : ItemProxy = change.proxy;
         proxy.updateVCStatus(status, false);
@@ -128,39 +130,6 @@ retrieveVCStatus.then((status) => {
     console.log('::: Status length (Initial):' + idStatusArray.length);
   }
 });
-
-//////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////
-function retrieveItemStatus(repoID): any {
-
-  let retrieveItemVCStatus = KDBRepo.getItemVCStatus(repoID);
-  retrieveItemVCStatus.then((status) => {
-    console.log('::: Processing repo Item status', status);
-    var idStatusArray = [];
-    let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
-    for (var j = 0; j < status.length; j++) {
-      let statusRecord = status[j];
-
-      if (statusRecord.itemId) {
-        idStatusArray.push({
-          id: statusRecord.itemId,
-          status: statusRecord.status
-        });
-
-        // Create lost item to represent the item if it does not exist
-        let proxy = workingTree.getProxyFor(statusRecord.itemId);
-        if (!proxy) {
-          // TODO: Need to evaluate and remove the creation of missing proxies from this location
-          proxy = ItemProxy.createMissingProxy('Item', 'id', statusRecord.itemId, workingTree);
-        }
-        proxy.updateVCStatus(statusRecord.status, false);
-      }
-    }
-    console.log('::: Item Status length (Initial):' + idStatusArray.length);
-  });
-  return retrieveItemVCStatus;
-}
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -515,12 +484,8 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received getStatus for %s for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId, socket.id, username);
     let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
 
-    let status;
-    if (request.repoId === '') {
-      status = await retrieveVCStatus;
-    } else {
-      status = await retrieveItemStatus(request.repoId);
-    }
+    let status = await retrieveVCStatus;
+
     if (status) {
       var idStatusArray = workingTree.getVCStatus();
 

@@ -38,10 +38,6 @@ export class RepositoryService {
       return (await this.CacheManager.sendMessageToWorker('Repository/addRepository', {id, parentId}, true));
     }
 
-    public async getItemStatus(proxy): Promise<any> {
-      return (await this.CacheManager.sendMessageToWorker('Repository/getItemStatus', {id: proxy.id}, true));
-    }
-
     /* mountRepository = function (mountTarget, mountData, callback) {
       var data = {
         mountTarget : mountTarget,
