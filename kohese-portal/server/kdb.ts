@@ -81,15 +81,13 @@ async function initialize (koheseKdbPath, indexAndExit) {
   var repositoryList = fs.readdirSync('./kdb').filter(function (file) {
     return fs.statSync(path.join('./kdb', file)).isDirectory();
   });
-
-  setAvailableRepositories(koheseKDBDirPath, availableRepositories)
+  let configurationPath: string = path.resolve(kdbDirPath, 'AvailableRepositories.json');
   for (let n: number = 0; n < repositoryList.length; n++) {
-    var tmppath = path.join(kdbDirPath, repositoryList[n]);
-    if (fs.existsSync(tmppath + '/Root.json') && (!fs.existsSync(path.join(tmppath, 'KoheseUser')))) {
+    var tmppath = path.join(kdbDirPath, path.join(repositoryList[n], 'Repository'));
+    if (fs.existsSync(tmppath)) {
       setAvailableRepositories(tmppath, availableRepositories);
     }
   }
-  let configurationPath: string = path.resolve(kdbDirPath, 'AvailableRepositories.json');
   kdbFS.storeJSONDoc(configurationPath, availableRepositories);
 
 
