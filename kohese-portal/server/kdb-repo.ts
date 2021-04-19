@@ -412,7 +412,6 @@ export class KDBRepo {
   static async getStatus () : Promise<any> {
     // This code gets working directory changes similar to git status
     var repoStatus = [];
-    var promises = [];
 
     for (let repositoryId in repoList) {
 
@@ -455,15 +454,13 @@ export class KDBRepo {
           delete fileStatus.itemId;
         }
 
-        promises.push(repoStatus[repositoryId].push(fileStatus));
+        repoStatus[repositoryId].push(fileStatus);
 
       });
 
       delete this.pendingGetStatus[repositoryId];
     }
-    return Promise.all(promises).then(async () => {
       return repoStatus;
-    });
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -574,6 +571,7 @@ export class KDBRepo {
       } else {
         let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
         this.getFilePath(repopath)
+        return undefined;
       }
     } else {
       filePath = undefined
