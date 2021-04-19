@@ -110,6 +110,16 @@ export class ItemRepository {
         case 'loading':
           this.logService.log(this.logEvents.itemProxyLoading);
           break;
+        //////////////////////////////////////////////////////////////////////////
+        // This case prevents a previously focused item from showing a
+        // blank entry in the list of recent proxies once it has been deleted.
+        //////////////////////////////////////////////////////////////////////////
+        case 'delete':
+          let deletedItemIndex = this.recentProxies.findIndex(y => y.item.id === change.proxy.item.id);
+          if(deletedItemIndex !== -1) {
+            this.recentProxies.splice(deletedItemIndex, 1);
+          }
+          break;
       }
     });
 
@@ -468,20 +478,6 @@ export class ItemRepository {
   }
 
   //////////////////////////////////////////////////////////////////////////
-  // This method removes a previously focused item from showing a
-  // blank entry in the list of recent proxies.
-  //////////////////////////////////////////////////////////////////////////
-  removeDeletedProxy(id: string): void {
-    console.log(this.recentProxies);
-    let deletedItemIndex = this.recentProxies.findIndex(y => y.item.id === id);
-    if(deletedItemIndex !== -1) {
-      delete this.recentProxies[deletedItemIndex];
-      this.recentProxies.splice(deletedItemIndex, 1);
-    }
-    console.log(this.recentProxies);
-  }
-
-  //////////////////////////////////////////////////////////////////////////
   processCachePiece(cachePiece) {
 
     switch (cachePiece.key) {
@@ -646,7 +642,6 @@ export class ItemRepository {
       recursive: recursive
     }, true);
 
-    this.removeDeletedProxy(proxy.item.id);
     if (deletedItemResponse.error) {
       this.dialogService.openInformationDialog('Error', 'An error occurred while deleting ' + proxy.item.name + '.');
     }
