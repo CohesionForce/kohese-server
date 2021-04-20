@@ -186,6 +186,35 @@ export class RepositoriesComponent extends NavigatableComponent implements
   public disableRepo(id: string) {
     this.repositoryService.disableRepository(id);
   }
+
+  public changeMountPoint(id: string) {
+    let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
+    this.dialogueService.openComponentDialog(TreeComponent, {
+      data: {
+        root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getChildren: (element: any) => {
+          return (element as ItemProxy).children;
+        },
+        getText: (element: any) => {
+          return (element as ItemProxy).item.name;
+        },
+        getIcon: (element: any) => {
+          return (element as ItemProxy).model.view.item.icon;
+        },
+        selection: ([proxy.parentProxy])
+      }
+    }).updateSize('90%', '90%').afterClosed().subscribe((result:
+      Array<any>) => {
+        if (result) {
+          let newParentId = result[0].item.id;
+          let parentProxy = ItemProxy.getWorkingTree().getProxyFor(newParentId);
+          if (proxy && parentProxy) {
+              proxy.item.parentId = newParentId;
+              this.itemRepository.upsertItem(proxy.kind, proxy.item);
+          }
+        }
+    })
+  }
 }
 
 
@@ -311,8 +340,6 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
   }
 
   async mountRepo(id: string, pickParent: boolean) {
-    var repoDisabled: boolean = false;
-    var parentId: any;
     this.disabledRepos = await this.repositoryService.getDisabledRepositories();
     for (var idx: number = 0; idx < this.disabledRepos.length; idx++) {
       if (this.disabledRepos[idx].id === id) {
@@ -351,14 +378,13 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
             getIcon: (element: any) => {
               return (element as ItemProxy).model.view.item.icon;
             },
-            selection: (this.parentId ? [TreeConfiguration.getWorkingTree().
-              getProxyFor(this.parentId)] : [])
+            selection: ([])
           }
-        }).updateSize('90%', '90%').afterClosed().subscribe((selection:
+        }).updateSize('90%', '90%').afterClosed().subscribe((result:
           Array<any>) => {
-            if (selection) {
-              this.parentId = selection[0].item.id;
-              this.repositoryService.addRepository(id, this.parentId);
+            if (result) {
+              let parentId = result[0].item.id;
+              this.repositoryService.addRepository(id, parentId);
               var index = this.availablerepoList.findIndex(y => y.id === id)
               this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);
             }
