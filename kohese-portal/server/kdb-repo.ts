@@ -570,8 +570,7 @@ export class KDBRepo {
         return filePath;
       } else {
         let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
-        this.getFilePath(repopath)
-        return undefined;
+        return this.getFilePath(repopath)
       }
     } else {
       filePath = undefined
