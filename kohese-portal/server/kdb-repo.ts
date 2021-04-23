@@ -408,6 +408,61 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  private static pendingGetRepoStatus = {};
+  static async getRepoStatus (repositoryId) : Promise<any> {
+    // This code gets working directory changes similar to git status
+    var repoStatus = [];
+
+    let statuses;
+
+    if (!this.pendingGetRepoStatus[repositoryId]) {
+      this.pendingGetRepoStatus[repositoryId] = repoList[repositoryId].getStatusExt();
+    }
+    statuses = await this.pendingGetRepoStatus[repositoryId];
+
+    statuses.forEach(function (file) {
+
+      let path = file.path();
+
+      let itemId = undefined;
+
+      if (path.endsWith('.json')) {
+        itemId = Path.basename(path, '.json');
+        if (!UUID_REGEX.test(itemId)) {
+          itemId = Path.basename(Path.dirname(path));
+          if (!UUID_REGEX.test(itemId)) {
+            // Not an itemId, so reset to undefined
+            itemId = undefined;
+            if (path === 'Root.json') {
+              itemId = repositoryId;
+            }
+
+          }
+        }
+      }
+
+      let fileStatus = {
+        itemId: itemId,
+        path: path,
+        status: file.status()
+      };
+
+      if (!itemId) {
+        delete fileStatus.itemId;
+      }
+
+      repoStatus.push(fileStatus);
+
+    });
+
+    delete this.pendingGetRepoStatus[repositoryId];
+
+    return repoStatus;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   private static pendingGetStatus = {};
   static async getStatus () : Promise<any> {
     // This code gets working directory changes similar to git status

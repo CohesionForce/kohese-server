@@ -730,6 +730,19 @@ async function getStatus() : Promise<number> {
   });
 
 }
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function repoStatusUpdate(status) {
+  let currentVCStatus = _workingTree.getVCStatus();
+  let vcDiff = TreeConfiguration.compareVCStatus(currentVCStatus, status);
+  for (let key in vcDiff) {
+    let newStatus = vcDiff[key].to || [];
+    updateItemStatus(key, newStatus)
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
@@ -743,6 +756,11 @@ function registerKoheseIOListeners() {
   socket.on('Item/update', (notification) => {
     console.log('::: Received notification of ' + notification.kind + ' Updated:  ' + notification.item.id);
     buildOrUpdateProxy(notification.item, notification.kind, notification.status);
+  });
+
+  socket.on('Repository/updateRepoStatus', (notification) => {
+    console.log('::: Received notification of Mounted for ' + notification.id);
+    repoStatusUpdate(notification.status);
   });
 
   socket.on('Item/delete', (notification) => {
