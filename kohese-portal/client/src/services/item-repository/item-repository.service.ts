@@ -110,6 +110,16 @@ export class ItemRepository {
         case 'loading':
           this.logService.log(this.logEvents.itemProxyLoading);
           break;
+        //////////////////////////////////////////////////////////////////////////
+        // This case prevents a previously focused item from showing a
+        // blank entry in the list of recent proxies once it has been deleted.
+        //////////////////////////////////////////////////////////////////////////
+        case 'delete':
+          let deletedItemIndex = this.recentProxies.findIndex(y => y.item.id === change.proxy.item.id);
+          if(deletedItemIndex !== -1) {
+            this.recentProxies.splice(deletedItemIndex, 1);
+          }
+          break;
       }
     });
 
