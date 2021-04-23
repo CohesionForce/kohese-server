@@ -1,5 +1,11 @@
 @import '../../../../app.component';
 
+:host {
+  ::ng-deep .mat-expansion-indicator:after {
+  color: black;
+  }
+}
+
 .state-item {
   &:hover {
     cursor: pointer;
@@ -15,9 +21,6 @@ mat-tab-group {
   max-height: 100%;
 }
 
-::ng-deep .mat-expansion-indicator:after {
-  color: black;
-}
 mat-expansion-panel {
   mat-expansion-panel-header {
     mat-panel-title {
