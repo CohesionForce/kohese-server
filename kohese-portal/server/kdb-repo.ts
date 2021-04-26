@@ -16,12 +16,20 @@ export class KDBRepo {
   //
   //////////////////////////////////////////////////////////////////////////
   static async openRepo(repositoryId, repositoryPath) {
-    console.log('::: Opening git repo ' + repositoryPath);
+    console.log('::: Opening git repo ' + repositoryId + ' ' + repositoryPath);
     return nodegit.Repository.open(repositoryPath).then(function (r) {
       repoList[repositoryId] = r;
     }).catch(function (err) {
-      console.log('Error opening repository at ' + repositoryPath + '. ' + err);
+      console.log('*** Error opening repository at ' + repositoryPath + '. ' + err);
     });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static async closeRepo(repositoryId) {
+    console.log('::: Unmounting git repo ' + repositoryId);
+    delete repoList[repositoryId];
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -400,19 +408,19 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  private static pendingGetStatus = {};
-  static async getStatus (repositoryId) : Promise<any> {
-    //This code gets working directory changes similar to git status
+  private static pendingGetRepoStatus = {};
+  static async getRepoStatus (repositoryId) : Promise<any> {
+    // This code gets working directory changes similar to git status
     var repoStatus = [];
 
     let statuses;
 
-    if (!this.pendingGetStatus[repositoryId]) {
-      this.pendingGetStatus[repositoryId] = repoList[repositoryId].getStatusExt();
+    if (!this.pendingGetRepoStatus[repositoryId]) {
+      this.pendingGetRepoStatus[repositoryId] = repoList[repositoryId].getStatusExt();
     }
-    statuses = await this.pendingGetStatus[repositoryId];
+    statuses = await this.pendingGetRepoStatus[repositoryId];
 
-    statuses.forEach(function(file) {
+    statuses.forEach(function (file) {
 
       let path = file.path();
 
@@ -425,6 +433,10 @@ export class KDBRepo {
           if (!UUID_REGEX.test(itemId)) {
             // Not an itemId, so reset to undefined
             itemId = undefined;
+            if (path === 'Root.json') {
+              itemId = repositoryId;
+            }
+
           }
         }
       }
@@ -435,7 +447,7 @@ export class KDBRepo {
         status: file.status()
       };
 
-      if (!itemId){
+      if (!itemId) {
         delete fileStatus.itemId;
       }
 
@@ -443,7 +455,7 @@ export class KDBRepo {
 
     });
 
-    delete this.pendingGetStatus[repositoryId];
+    delete this.pendingGetRepoStatus[repositoryId];
 
     return repoStatus;
   }
@@ -451,10 +463,68 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  private static pendingGetStatus = {};
+  static async getStatus () : Promise<any> {
+    // This code gets working directory changes similar to git status
+    var repoStatus = [];
+
+    for (let repositoryId in repoList) {
+
+      repoStatus[repositoryId] = [];
+      let statuses;
+
+      if (!this.pendingGetStatus[repositoryId]) {
+        this.pendingGetStatus[repositoryId] = repoList[repositoryId].getStatusExt();
+      }
+      statuses = await this.pendingGetStatus[repositoryId];
+
+      statuses.forEach(function (file) {
+
+        let path = file.path();
+
+        let itemId = undefined;
+
+        if (path.endsWith('.json')) {
+          itemId = Path.basename(path, '.json');
+          if (!UUID_REGEX.test(itemId)) {
+            itemId = Path.basename(Path.dirname(path));
+            if (!UUID_REGEX.test(itemId)) {
+              // Not an itemId, so reset to undefined
+              itemId = undefined;
+              if (path === 'Root.json') {
+                itemId = repositoryId;
+              }
+
+            }
+          }
+        }
+
+        let fileStatus = {
+          itemId: itemId,
+          path: path,
+          status: file.status()
+        };
+
+        if (!itemId) {
+          delete fileStatus.itemId;
+        }
+
+        repoStatus[repositoryId].push(fileStatus);
+
+      });
+
+      delete this.pendingGetStatus[repositoryId];
+    }
+      return repoStatus;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   static async getItemStatus(repositoryId, filePath) {
     var status = [];
+    console.log('::: Getting Item Status For ' + repositoryId + ' ' + filePath)
     var statPromise = nodegit.Status.file(repoList[repositoryId], filePath);
-
     return statPromise.then((statNum) => {
       for (var statusKey in nodegit.Status.STATUS) {
         if ((statNum & nodegit.Status.STATUS[statusKey]) !== 0) {
@@ -462,6 +532,8 @@ export class KDBRepo {
         }
       }
 
+      return status;
+    }).catch ((error) => {
       return status;
     });
 
@@ -523,5 +595,41 @@ export class KDBRepo {
     });
 
     callback(historyResponse);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getRepoId(filePath) {
+    if (filePath !== '') {
+      var id: any = path.parse(filePath).base;
+      if (repoList[id]) {
+        return id;
+      } else {
+        let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
+        this.getRepoId(repopath)
+      }
+    } else {
+      id = undefined
+      return id;
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static getFilePath(filePath) {
+    if (filePath !== '') {
+      var id: any = path.parse(filePath).base;
+      if (repoList[id]) {
+        return filePath;
+      } else {
+        let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
+        return this.getFilePath(repopath)
+      }
+    } else {
+      filePath = undefined
+      return filePath;
+    }
   }
 }

@@ -101,31 +101,65 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-let retrieveVCStatus = KDBRepo.getStatus('ROOT');
+let retrieveVCStatus = KDBRepo.getStatus();
 retrieveVCStatus.then((status) => {
-  console.log('::: Processing repo status');
+  console.log('::: Processing repo status', status);
   var idStatusArray = [];
   let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
-  for (var j = 0; j < status.length; j++) {
-    let statusRecord = status[j];
+  for (var id in status) {
+    for (var j = 0; j < status[id].length; j++) {
+      let statusRecord = status[id][j];
 
-    if (statusRecord.itemId){
-      idStatusArray.push({
-        id: statusRecord.itemId,
-        status: statusRecord.status
-      });
+      if (statusRecord.itemId) {
+        idStatusArray.push({
+          id: statusRecord.itemId,
+          status: statusRecord.status
+        });
 
-      // Create lost item to represent the item if it does not exist
-      let proxy = workingTree.getProxyFor(statusRecord.itemId);
-      if (!proxy) {
-        // TODO: Need to evaluate and remove the creation of missing proxies from this location
-        proxy = ItemProxy.createMissingProxy('Item','id', statusRecord.itemId, workingTree);
+        // Create lost item to represent the item if it does not exist
+        let proxy = workingTree.getProxyFor(statusRecord.itemId);
+        if (!proxy) {
+          // TODO: Need to evaluate and remove the creation of missing proxies from this location
+          proxy = ItemProxy.createMissingProxy('Item', 'id', statusRecord.itemId, workingTree);
+        }
+        proxy.updateVCStatus(statusRecord.status, false);
       }
-      proxy.updateVCStatus(statusRecord.status, false);
     }
+    console.log('::: Status length (Initial):' + idStatusArray.length);
   }
-  console.log('::: Status length (Initial):' + idStatusArray.length);
 });
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function processRepoStatus(repoID) {
+  let retrieveRepoStatus = KDBRepo.getRepoStatus(repoID);
+  retrieveRepoStatus.then((status) => {
+    console.log('::: Processing repo Item status', status);
+    var idStatusArray = [];
+    let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
+    for (var j = 0; j < status.length; j++) {
+      let statusRecord = status[j];
+
+      if (statusRecord.itemId) {
+        idStatusArray.push({
+          id: statusRecord.itemId,
+          status: statusRecord.status
+        });
+
+        // Create lost item to represent the item if it does not exist
+        let proxy = workingTree.getProxyFor(statusRecord.itemId);
+        if (!proxy) {
+          // TODO: Need to evaluate and remove the creation of missing proxies from this location
+          proxy = ItemProxy.createMissingProxy('Item', 'id', statusRecord.itemId, workingTree);
+        }
+        proxy.updateVCStatus(statusRecord.status, false);
+      }
+    }
+    console.log('::: Item Status length (Initial):' + idStatusArray.length);
+  });
+  return retrieveRepoStatus;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -480,7 +514,8 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received getStatus for %s for repo: ' + repoProxy.item.name + ' rid: ' + request.repoId, socket.id, username);
     let workingTree : TreeConfiguration = ItemProxy.getWorkingTree();
 
-    let status = await retrieveVCStatus; //await KDBRepo.getStatus(request.repoId);
+    let status = await retrieveVCStatus;
+
     if (status) {
       var idStatusArray = workingTree.getVCStatus();
 
@@ -1094,11 +1129,24 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  socket.on('Repository/mountRepository', (request: any, respond: Function) => {
+  socket.on('Repository/mountRepository', async (request: any, respond: Function) => {
     console.log('::: session %s: Received mountRepository for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
     console.log('^^^ Received Mount Repository request ', request)
-    kdb.openRepository(request.id)
+    await kdb.openRepository(request.id)
+    let status = await processRepoStatus(request.id)
+    if (status) {
+      let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
+      var idStatusArray = workingTree.getVCStatus();
+      let repoStatusNotification = {
+        id: request.id,
+        status: idStatusArray
+      };
+      kio.server.emit('Repository/updateRepoStatus', repoStatusNotification);
+    } else {
+      console.log('*** Error Occurred with gettingRepoStatus ')
+      console.log(status);
+    }
   });
 
   //////////////////////////////////////////////////////////////////////////

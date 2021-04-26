@@ -186,12 +186,17 @@ describe('Test KDB Repository: ', function () {
   });
 
   it('retrieves Repository status', async function (done) {
-    let repoStatus = await KdbRepo.getStatus(repositoryId);
-    expect(repoStatus).toEqual([{
+    let repoStatus = await KdbRepo.getStatus();
+    expect(repoStatus).toEqual([[{
       itemId: '77777777-7777-1777-a777-777777777771',
       path: testFile,
       status : ['INDEX_MODIFIED']
-    }]);
+    },
+    {
+      itemId: '77777777-7777-1777-a777-777777777772',
+      path: testFile2,
+      status: ['INDEX_MODIFIED']
+    }]]);
     done();
   });
 

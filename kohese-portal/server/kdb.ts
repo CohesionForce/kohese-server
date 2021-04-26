@@ -176,6 +176,7 @@ function unMountRepository(id) {
   updateMountFile();
   let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
   proxy.deleteItem();
+  KDBRepo.closeRepo(id);
 }
 module.exports.unMountRepository = unMountRepository;
 
@@ -188,6 +189,7 @@ function disableRepository(id) {
   updateMountFile();
   let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
   proxy.deleteItem();
+  KDBRepo.closeRepo(id);
 }
 module.exports.disableRepository = disableRepository;
 
@@ -369,27 +371,34 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       parentId: modelInstance.parentId
     };
 
-    console.log('::: Repo Mount Information');
+    console.log('::: Repo Mount Information -- StoreModelInstance');
     console.log(repoMountData);
     if (enable === false) {
       kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
       kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     }
-    mountList[repoMountData.id] = { 'repoStoragePath': repoStoragePath, name: repoMountData.name, parentId: repoMountData.parentId };
-    mountList[repoMountData.id].mounted = true;
+
+    mountList[repoMountData.id] = {
+      repoStoragePath : repoStoragePath,
+      name: repoMountData.name,
+      parentId: repoMountData.parentId
+    };
+
+    // mountList[repoMountData.id].mounted = true;
     updateMountFile();
 
     repoStoragePath = determineRepoStoragePath(proxy);
     console.log('::: rSP: ' + repoStoragePath);
 
     filePath = repoStoragePath + '/Root.json';
+    proxy.repoPath = filePath
     var repoRootData = JSON.parse(JSON.stringify(modelInstance));
     delete repoRootData.parentId;
     delete repoRootData.repoStoragePath;
     delete repoRootData.mounted;
     modelInstance = repoRootData;
 
-    if (isNewItem) {
+    if (isNewItem && !enable) {
       // eslint-disable-next-line no-unused-
       availableRepositories.push({id: repoMountData.id,
         name: repoMountData.name,
@@ -410,19 +419,42 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     }
   }
 
-  return promise.then(function () {
+  return promise.then(async function () {
     // TODO:  This needs to be replaced with a uniform directory approach that does not include Model Kinds
       kdbFS.createDirIfMissing(path.dirname(filePath));
       if (enable === false) {
           kdbFS.storeJSONDoc(filePath, proxy.cloneItemAndStripDerived());
       }
-      if (isNewItem && (modelName === 'Repository')) {
-        mountRepository({'repoStoragePath': repoStoragePath, name: repoMountData.name, id: repoMountData.id, parentId: repoMountData.parentId});
+      if (isNewItem && (modelName === 'Repository') && !enable) {
+        if (kdbFS.pathExists(path.join(repoStoragePath, '.git'))) {
+          await KDBRepo.openRepo(repoMountData.id, repoStoragePath)
+        } else {
+          console.log('*** No GIT Folder Exists - Invalid Repository for ' + repoMountData.id + ' repo ' + repoStoragePath)
+        }
       }
-      var repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
-      repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
-      return KDBRepo.getItemStatus(ItemProxy.getWorkingTree().getRootProxy().item.id,
-       repositoryPath);
+      var repoId = KDBRepo.getRepoId(repoStoragePath);
+      if (repoId === undefined) {
+        repoId = ItemProxy.getWorkingTree().getRootProxy().item.id;
+        // TODO: Investigate If This Is Still Needed After Split or if it needs to change
+        // Close and reopen Root repo to Fix Error when creating Item after Repo creation
+        if (kdbFS.pathExists(filePath)) {
+            KDBRepo.closeRepo(repoId);
+            await KDBRepo.openRepo(repoId, koheseKDBDirPath)
+        }
+      }
+
+      var finalRepositoryPath;
+      var repositoryPath;
+      var filePath2 = KDBRepo.getFilePath(repoStoragePath)
+      if (filePath2 === undefined) {
+        repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
+        repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
+        finalRepositoryPath = repositoryPath;
+      } else {
+        repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(filePath2)[1];
+        finalRepositoryPath = repositoryPath.substring(1);
+      }
+      return KDBRepo.getItemStatus(repoId, finalRepositoryPath);
   }).then((status) => {
     return status;
   });
@@ -796,11 +828,11 @@ async function openRepositories(indexAndExit) {
   // Initialize nodegit repo-open promises
   for(let id in mountList) {
     if(mountList[id].mounted && mountList[id].repoStoragePath) {
-      // eslint-disable-next-line no-unused-vars
-      var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
-        //promises.push(KDBRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, proxy.repoPath));
-        // TODO Once Repositories are version controlled separately,
-        // index them here.
+      if (kdbFS.pathExists(path.join(mountList[id].repoStoragePath, '.git'))) {
+        promises.push(KDBRepo.openRepo(id, mountList[id].repoStoragePath));
+      } else {
+        console.log('*** No GIT Folder Exists - Invalid Repository for ' + id + ' repo ' + mountList[id].repoStoragePath)
+      }
     }
   }
 
@@ -831,19 +863,19 @@ async function openRepository(id, indexAndExit){
   workingTree.setLoading();
   let enable : boolean = true;
 
-  // TODO: Do I Need to Update the Cache?
-  // await kdbCache.updateCache();
 
+    // Open Git Repo
+  if (kdbFS.pathExists(path.join(mountList[id].repoStoragePath, '.git'))) {
+    await KDBRepo.openRepo(id, mountList[id].repoStoragePath);
+  } else {
+    console.log('*** No GIT Folder Exists - Invalid Repository for ' + id + ' repo ' + mountList[id].repoStoragePath)
+  }
 
-  // Validate the repositories listed inside the mount file
+  // Mount Repository
   mountRepository({
     'id': id, name: mountList[id].name, parentId: mountList[id].parentId,
     repoStoragePath: mountList[id].repoStoragePath
   }, enable);
-
-  // Open Git Repo
-  var proxy = ItemProxy.getWorkingTree().getProxyFor(id);
-  await KDBRepo.openRepo(ItemProxy.getWorkingTree().getRootProxy().item.id, mountList[id].repoStoragePath);
 
   console.log('::: End Enabled Repository Load');
   workingTree.unsetLoading();
