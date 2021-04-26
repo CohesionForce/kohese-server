@@ -48,8 +48,10 @@
   }
 }
 
-::ng-deep .mat-expansion-indicator:after {
-  color: whitesmoke;
+:host {
+  ::ng-deep .mat-expansion-indicator:after {
+    color: whitesmoke;
+  }
 }
 
 mat-expansion-panel {
