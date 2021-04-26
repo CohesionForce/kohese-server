@@ -172,8 +172,7 @@ module.exports.getDisabledRepositories = getDisabledRepositories;
 //
 //////////////////////////////////////////////////////////////////////////
 function unMountRepository(id) {
-  // kdbFS.removeFile(mountList[id].repoStoragePath + '.json.mount');
-  kdbFS.removeFile(path.join(koheseKDBDirPath, path.join('KoheseMounts', id + '.json.mount')));
+  kdbFS.removeFile(path.join(koheseKDBDirPath, path.join('RepoMount', id + '-mount.json')));
   delete mountList[id];
   updateMountFile();
   let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
@@ -223,11 +222,7 @@ function addRepository(id: string, parentId: string) {
 
     updateMountFile();
 
-    // let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
-    // var repoMountFilePath = path + '/' + repoMount.id + '.json.mount';
-    console.log('here is the koheseKDBDirPath ', koheseKDBDirPath);
-    console.log('here is the KoheseMounts path ', path.join('KoheseMounts', repoMount.id + '.json.mount'))
-    var repoMountFilePath = path.join(koheseKDBDirPath, path.join('KoheseMounts', repoMount.id + '.json.mount'));
+    var repoMountFilePath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMount.id + '-mount.json'));
 
     var repoMountData = {
       id: repoMount.id,
@@ -242,9 +237,8 @@ function addRepository(id: string, parentId: string) {
     delete mountList[id].disabled;
     mountList[id].parentId = parentId;
     updateMountFile();
-    // let path = repoMount.repoStoragePath.substring(0, repoMount.repoStoragePath.lastIndexOf('/'));
-    // var repoMountFilePath = path + '/' + repoMount.id + '.json.mount';
-    var repoMountFilePath = path.join(koheseKDBDirPath, path.join('KoheseMounts', repoMount.id + '.json.mount'));
+
+    var repoMountFilePath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMount.id + '-mount.json'));
 
     var repoMountData = {
       id: repoMount.id,
@@ -361,16 +355,13 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     if (isNewItem) {
       var parentRepo = proxy.parentProxy.getRepositoryProxy();
       var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
-      repoMountFilePath = parentRepoStoragePath + '/Repository/' + modelInstance.id + '.json.mount';
     } else {
-      // let path = mountList[modelInstance.id].repoStoragePath.substring(0, mountList[modelInstance.id].repoStoragePath.lastIndexOf('/'));
-      // repoMountFilePath = path + '/' + modelInstance.id + '.json.mount';
-      repoMountFilePath = path.join(koheseKDBDirPath, path.join('KoheseMounts', modelInstance.id + '.json.mount'));
       // If repo name has changed, need to change the Name in Available Repositories since this is created at startup
       // Use repo path so don't change name of a duplicate repo
       let index = availableRepositories.findIndex(y => y.repoStoragePath === mountList[modelInstance.id].repoStoragePath)
       availableRepositories[index].name = modelInstance.name
     }
+    repoMountFilePath = path.join(koheseKDBDirPath, path.join('RepoMount', modelInstance.id + '-mount.json'));
 
     var repoMountData = {
       id: modelInstance.id,
@@ -514,8 +505,7 @@ function removeModelInstance(proxy){
           var parentRepo = proxy.parentProxy.getRepositoryProxy();
           var parentRepoPath = mountList[parentRepo.item.id].repoStoragePath;
 
-          // kdbFS.removeFile(path.join(parentRepoPath, 'Repository', proxy.item.id + '.json.mount'));
-          kdbFS.removeFile(path.join(koheseKDBDirPath, path.join('KoheseMounts', proxy.item.id + '.json.mount')));
+          kdbFS.removeFile(path.join(koheseKDBDirPath, path.join('RepoMount', proxy.item.id + '-mount.json')));
           delete mountList[proxy.item.id];
           updateMountFile();
 
