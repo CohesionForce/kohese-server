@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>UnMounted Repositories</h2>
-<mat-dialog-content class="mat-typography">
+<h2 mat-dialog-title class=dialog-title>UnMounted Repositories</h2>
+<mat-dialog-content class="mat-typography dialog-content">
   <div class="repo-list-dialog">
     <ng-container *ngIf="isLoaded">
-      <mat-table [dataSource]="repoList" class="mat-elevation-z8">
+      <mat-table [dataSource]="repoList" class="mat-elevation-z8 mount-table">
 
         <ng-container matColumnDef="name">
           <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
@@ -50,5 +50,5 @@
 
 
 <mat-dialog-actions>
-  <button class="mat-raised-button mat-primary" (click)="close()">close</button>
+  <button mat-dialog-close class="mat-raised-button mat-primary">close</button>
 </mat-dialog-actions>

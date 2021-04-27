@@ -1,1 +1,37 @@
 @import '../../app.component';
+
+:host {
+
+  .top-bar {
+    height: 7%;
+  }
+
+
+  .filter-dialog-container {
+    height: 100%;
+    width: 100%;
+
+    .dialog-title {
+      height: 7%;
+      width: 100%;
+    }
+
+    .filter-tree-container {
+      height: calc(93% - 40px);
+      width: 100%;
+
+      virtual-scroll {
+        height: 100%;
+      }
+    }
+
+    mat-dialog-actions {
+      display: flex;
+      flex-direction: row;
+      padding: 0px !important;
+    }
+  }
+
+
+
+}

@@ -1,6 +1,12 @@
 @import '../../app.component';
 
-/deep/ .mat-tab-body-wrapper {
+::ng-deep .mat-tab-body-wrapper {
   height: 100%;
   width: 100%;
+
+  .mat-tab-body {
+    .mat-tab-body-content {
+      overflow: hidden;
+    }
+  }
 }
