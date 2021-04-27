@@ -1,24 +1,62 @@
+@import '../../../../app.component';
 
-.left-content {
-  overflow: auto;
-  height: 700px !important;
-  width: 20%;
-  display: inline-block;
+.statistics-grid-container {
+  display: grid;
+  overflow: hidden;
+  height: calc(100% - 35px) !important;
+  padding-top: 1em;
+  padding-left: 0.1em;
+  gap: 1em;
+
+  grid-template-columns: [left-content] 2fr [middle-content] 7fr [right-content] 2fr;
+  grid-template-rows: auto;
+
+  .left-content {
+    grid-column-start: left-content;
+    grid-column-end: middle-content;
+
+    place-self: stretch;
+    height: 100% !important;
+    overflow: auto !important;
+  }
+
+  .middle-content {
+    grid-column-start: middle-content;
+    grid-column-end: right-content;
+
+    place-self: stretch;
+    overflow: auto !important;
+
+    mat-table {
+
+      mat-row {
+        cursor: pointer;
+      }
+
+      // Every other row is colored
+      mat-row:nth-child(even) {
+        background-color: rgb(245,245,245);
+      }
+
+      // Highlights row when mouse hovers over it
+      mat-row:hover {
+        background-color: rgb(230,230,230);
+      }
+    }
+
+  }
+
+  .right-content {
+    grid-column-start: right-content;
+    grid-column-end: auto;
+
+    place-self: stretch;
+    height: 100% !important;
+    overflow: auto !important;
+  }
 }
-.middle-content {
-  overflow: auto;
-  height: 700px !important;
-  width: 50%;
-  display: inline-block;
-}
-.right-content {
-  overflow: auto;
-  height: 700px !important;
-  width: 20%;
-  display: inline-block;
-  border-left : black 1px solid;
-  padding-left : 10px;
-}
+
+
 
 .selected-user {
   background-color : rgba(106, 168, 106, 0.795);
