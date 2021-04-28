@@ -619,7 +619,7 @@ export class KDBRepo {
   static getRepoId(filePath) {
     if (filePath !== '') {
       var id: any = path.parse(filePath).base;
-      if (repoList[id]) {
+      if (repoList[id + '-mount']) {
         return id;
       } else {
         let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
@@ -637,7 +637,7 @@ export class KDBRepo {
   static getFilePath(filePath) {
     if (filePath !== '') {
       var id: any = path.parse(filePath).base;
-      if (repoList[id]) {
+      if (repoList[id + '-mount']) {
         return filePath;
       } else {
         let repopath = filePath.substring(0, filePath.lastIndexOf('/'));

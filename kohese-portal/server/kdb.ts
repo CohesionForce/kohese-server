@@ -357,6 +357,12 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
   console.log('>>> Repo storage: ' + repoStoragePath);
   var filePath = repoStoragePath + '/' + modelName + '/' + modelInstance.id + '.json';
 
+  let parentProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstance.parentId);
+  var parentId = modelInstance.parentId
+  if (parentProxy.kind === 'Repository') {
+    parentId = modelInstance.parentId + '-mount'
+  }
+
   var promise : Promise<boolean|void> = Promise.resolve(true);
   if (modelName === 'Repository'){
     var repoMountFilePath;
@@ -366,15 +372,15 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     } else {
       // If repo name has changed, need to change the Name in Available Repositories since this is created at startup
       // Use repo path so don't change name of a duplicate repo
-      let index = availableRepositories.findIndex(y => y.repoStoragePath === mountList[modelInstance.id].repoStoragePath)
+      let index = availableRepositories.findIndex(y => y.repoStoragePath === mountList[modelInstance.id + '-mount'].repoStoragePath)
       availableRepositories[index].name = modelInstance.name
     }
     repoMountFilePath = path.join(koheseKDBDirPath, path.join('RepoMount', modelInstance.id + '-mount.json'));
 
     var repoMountData = {
-      id: modelInstance.id,
+      id: modelInstance.id + '-mount',
       name: modelInstance.name,
-      parentId: modelInstance.parentId
+      parentId: parentId
     };
 
     console.log('::: Repo Mount Information -- StoreModelInstance');
@@ -387,7 +393,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     mountList[repoMountData.id] = {
       repoStoragePath : repoStoragePath,
       name: repoMountData.name,
-      parentId: repoMountData.parentId
+      parentId: parentId
     };
 
     // mountList[repoMountData.id].mounted = true;
@@ -406,7 +412,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
     if (isNewItem && !enable) {
       // eslint-disable-next-line no-unused-
-      availableRepositories.push({id: repoMountData.id,
+      availableRepositories.push({id: modelInstance.id,
         name: repoMountData.name,
         description: modelInstance.description,
         repoStoragePath: repoStoragePath})
@@ -447,6 +453,8 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
             KDBRepo.closeRepo(repoId);
             await KDBRepo.openRepo(repoId, koheseKDBDirPath)
         }
+      } else {
+        repoId = repoId + '-mount'
       }
 
       var finalRepositoryPath;
