@@ -1,11 +1,19 @@
 @import '../../app.component';
 
-mat-tab-group {
-  height: 93%;
-  width: 100%;
-
-  /deep/ .mat-tab-body-wrapper {
-    height: 100%;
+:host {
+  mat-tab-group {
+    height: 93%;
     width: 100%;
+
+    /deep/ .mat-tab-body-wrapper {
+      height: 100%;
+      width: 100%;
+
+      .mat-tab-body {
+        .mat-tab-body-content {
+          overflow: auto;
+        }
+      }
+    }
   }
 }
