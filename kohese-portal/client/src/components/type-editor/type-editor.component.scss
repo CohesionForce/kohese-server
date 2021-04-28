@@ -4,14 +4,8 @@ mat-tab-group {
   height: 93%;
   width: 100%;
 
-  ::ng-deep .mat-tab-body-wrapper {
+  /deep/ .mat-tab-body-wrapper {
     height: 100%;
     width: 100%;
-  }
-}
-
-:host {
-  .pad {
-    padding: 0 0 0 5px;
   }
 }
