@@ -776,6 +776,7 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
       case 'KoheseModel':
       case 'KoheseView':
       case 'KoheseUser':
+      case 'RepoMount':
 
         // Skip this model kind
         console.log('::: Skipping ' + modelName);
