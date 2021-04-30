@@ -108,6 +108,7 @@ implements OnInit, OnDestroy {
   filterSubscription: Subscription;
   proxyStreamSubscription: Subscription;
   selectedProxySubscription: Subscription;
+  changeSubjectSubscription: Subscription;
 
   constructor(navigationService: NavigationService,
     private changeRef: ChangeDetectorRef,
@@ -178,6 +179,27 @@ implements OnInit, OnDestroy {
         this.initialized = true;
       }
     });
+
+    // Grab the update to the treeConfig
+    this.changeSubjectSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
+      switch(change.type) {
+        case 'delete':
+          // if the current itemProxy is being changed
+          if(this.itemProxy.item.id === change.id) {
+            // if the current itemProxy has a parent
+            if(this.itemProxy.item.parentId) {
+              let parentProxy = this.itemProxy.treeConfig.getProxyFor(this.itemProxy.item.parentId);
+              this.itemProxy = parentProxy;
+            } else {
+              this.itemProxy = this.itemProxy.treeConfig.getProxyFor('ROOT');
+            }
+          } else {
+          }
+          break;
+      }
+      this.generateDoc();
+      this.changeRef.markForCheck();
+     });
   }
 
   ngOnDestroy() {
