@@ -2250,8 +2250,8 @@ export class ItemProxy {
     this.removeAllReferences();
 
     // Delete children depth first (after visit)
-    this.visitChildren({ excludeKind: ['Repository', 'Internal'] }, null, (childProxy) => {
-      if (childProxy.kind !== 'Repository') {
+    this.visitChildren({ excludeKind: ['Repository', 'Internal', 'RepoMount'] }, null, (childProxy) => {
+      if (childProxy.kind !== 'Repository' || childProxy.kind !== 'RepoMount') {
         this.treeConfig.changeSubject.next({
           type: 'delete',
           kind: childProxy.kind,

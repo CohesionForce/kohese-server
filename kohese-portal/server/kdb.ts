@@ -420,13 +420,13 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
         name: repoMountData.name,
         description: modelInstance.description,
         repoStoragePath: repoStoragePath})
-      proxy = new ItemProxy('RepoMount', repoMountData);
+      let mountProxy = new ItemProxy('RepoMount', repoMountData);
       promise = createRepoStructure(repoStoragePath).then(function (repo) {
         // TODO: Need to call create repo structure once that has been removed from validate
       });
     } else {
-      proxy = ItemProxy.getWorkingTree().getProxyFor(repoMountData.id);
-      proxy.updateItem('RepoMount', repoMountData.id);
+      let mountProxy = ItemProxy.getWorkingTree().getProxyFor(repoMountData.id);
+      mountProxy.updateItem('RepoMount', repoMountData.id);
     }
   } else {
     if(modelName !== 'Analysis' && filePath !== proxy.repoPath){
@@ -621,7 +621,7 @@ function mountRepository(mountData, enable: boolean = false) {
             proxy = ItemProxy.getWorkingTree().getProxyFor(id);
             proxy.updateItem('Repository', repoRoot);
             let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(mountData.id)
-            proxy.updateItem('RepoMount', mountedRepoProxy)
+            mountedRepoProxy.updateItem('RepoMount', mountData)
         } else {
             mountList[mountData.id].mounted = true;
             repoRoot.mounted = true;
@@ -910,6 +910,16 @@ async function openRepository(id, indexAndExit){
 
   console.log('::: End Enabled Repository Load');
   workingTree.unsetLoading();
+  // Update -mount file and get status
+  let mountFileProxy = workingTree.getProxyFor(id);
+
+  var repoMountData = {
+    id: id,
+    name: mountList[id].name,
+    parentId: mountList[id].parentId
+  };
+
+  mountFileProxy.updateItem('RepoMount', repoMountData)
   workingTree.saveToCache();
 
 }
