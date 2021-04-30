@@ -417,6 +417,8 @@ export class ItemProxy {
     if (!itemId){
       if ('KoheseModel' === kind) {
         forItem.id = forItem.name;
+      } else if  ('RepoMount' === kind) {
+        forItem.id = forItem.id;
       } else {
         forItem.id = uuidV1();
       }
@@ -2274,7 +2276,7 @@ export class ItemProxy {
 
     // console.log('::: Deleting proxy for ' + byId);
 
-    if (this.kind === 'Repository') {
+    if (this.kind === 'Repository' || this.kind === 'RepoMount') {
       this.unMountRepository();
       this.treeConfig.changeSubject.next({
         type: 'delete',

@@ -179,7 +179,9 @@ function unMountRepository(id) {
   updateMountFile();
   let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
   proxy.deleteItem();
-  KDBRepo.closeRepo( + '-mount');
+  let mountProxy = ItemProxy.getWorkingTree().getProxyFor(id + '-mount')
+  mountProxy.deleteItem();
+  KDBRepo.closeRepo(id + '-mount');
 }
 module.exports.unMountRepository = unMountRepository;
 
@@ -192,6 +194,8 @@ function disableRepository(id) {
   updateMountFile();
   let proxy = ItemProxy.getWorkingTree().getProxyFor(id);
   proxy.deleteItem();
+  let mountProxy = ItemProxy.getWorkingTree().getProxyFor(id + '-mount')
+  mountProxy.deleteItem();
   KDBRepo.closeRepo(id + '-mount');
 }
 module.exports.disableRepository = disableRepository;
@@ -416,9 +420,13 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
         name: repoMountData.name,
         description: modelInstance.description,
         repoStoragePath: repoStoragePath})
+      proxy = new ItemProxy('RepoMount', repoMountData);
       promise = createRepoStructure(repoStoragePath).then(function (repo) {
         // TODO: Need to call create repo structure once that has been removed from validate
       });
+    } else {
+      proxy = ItemProxy.getWorkingTree().getProxyFor(repoMountData.id);
+      proxy.updateItem('RepoMount', repoMountData.id);
     }
   } else {
     if(modelName !== 'Analysis' && filePath !== proxy.repoPath){
@@ -612,14 +620,18 @@ function mountRepository(mountData, enable: boolean = false) {
             let id = KDBRepo.getMountId(mountData.id)
             proxy = ItemProxy.getWorkingTree().getProxyFor(id);
             proxy.updateItem('Repository', repoRoot);
+            let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(mountData.id)
+            proxy.updateItem('RepoMount', mountedRepoProxy)
         } else {
             mountList[mountData.id].mounted = true;
             repoRoot.mounted = true;
             proxy = new ItemProxy('Repository', repoRoot);
             proxy.repoPath = path.join(mountData.repoStoragePath, 'Root.json');
+            let mountedRepoProxy = new ItemProxy('RepoMount', mountData);
             console.log('::: Validating mounted repository: ' + repoRoot.name);
             if (enable === true) {
               proxy.mountRepository(proxy.item.id, 'Repository')
+              mountedRepoProxy.mountRepository(mountedRepoProxy.item.id, 'RepoMount')
             }
             validateRepositoryStructure(mountData.repoStoragePath, enable);
         }
@@ -776,7 +788,7 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
       case 'KoheseModel':
       case 'KoheseView':
       case 'KoheseUser':
-      case 'RepoMount':
+      // case 'RepoMount':
 
         // Skip this model kind
         console.log('::: Skipping ' + modelName);

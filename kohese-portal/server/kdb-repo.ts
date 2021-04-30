@@ -442,7 +442,7 @@ export class KDBRepo {
 
       if (path.endsWith('.json')) {
         itemId = Path.basename(path, '.json');
-        if (!UUID_REGEX.test(itemId)) {
+        if (!UUID_REGEX.test(itemId) && (itemId.indexOf('-mount') === -1)) {
           itemId = Path.basename(Path.dirname(path));
           if (!UUID_REGEX.test(itemId)) {
             // Not an itemId, so reset to undefined
@@ -502,7 +502,7 @@ export class KDBRepo {
 
         if (path.endsWith('.json')) {
           itemId = Path.basename(path, '.json');
-          if (!UUID_REGEX.test(itemId)) {
+          if (!UUID_REGEX.test(itemId) && (itemId.indexOf('-mount') === -1)) {
             itemId = Path.basename(Path.dirname(path));
             if (!UUID_REGEX.test(itemId)) {
               // Not an itemId, so reset to undefined
@@ -510,7 +510,6 @@ export class KDBRepo {
               if (path === 'Root.json') {
                 itemId = repoId;
               }
-
             }
           }
         }
