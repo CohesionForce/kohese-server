@@ -602,6 +602,7 @@ function mountRepository(mountData, enable: boolean = false) {
         console.log('::: Mounting repository: ' + mountData.name);
         try {
             repoRoot = kdbFS.loadJSONDoc(path.join(mountData.repoStoragePath, 'Root.json'));
+            var repoMountData = kdbFS.loadJSONDoc(path.join(koheseKDBDirPath, path.join('RepoMount', mountData.id + '.json')));
         } catch(err) {
             repoCanBeMounted = false;
         }
@@ -621,14 +622,14 @@ function mountRepository(mountData, enable: boolean = false) {
             proxy = ItemProxy.getWorkingTree().getProxyFor(id);
             proxy.updateItem('Repository', repoRoot);
             let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(mountData.id)
-            mountedRepoProxy.updateItem('RepoMount', mountData)
+            mountedRepoProxy.updateItem('RepoMount', repoMountData)
         } else {
             mountList[mountData.id].mounted = true;
             repoRoot.mounted = true;
             proxy = new ItemProxy('Repository', repoRoot);
             proxy.repoPath = path.join(mountData.repoStoragePath, 'Root.json');
-            let mountedRepoProxy = new ItemProxy('RepoMount', mountData);
-            console.log('::: Validating mounted repository: ' + repoRoot.name);
+            let mountedRepoProxy = new ItemProxy('RepoMount', repoMountData);
+            console.log('::: Validating mounted repository: ' + repoRoot.name)
             if (enable === true) {
               proxy.mountRepository(proxy.item.id, 'Repository')
               mountedRepoProxy.mountRepository(mountedRepoProxy.item.id, 'RepoMount')

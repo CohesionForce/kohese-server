@@ -9,7 +9,7 @@ import * as fs from 'fs';
 let Path = require('path');
 
 let repoList = {};
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(\-mount)?$/i;
 
 export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
@@ -442,7 +442,7 @@ export class KDBRepo {
 
       if (path.endsWith('.json')) {
         itemId = Path.basename(path, '.json');
-        if (!UUID_REGEX.test(itemId) && (itemId.indexOf('-mount') === -1)) {
+        if (!UUID_REGEX.test(itemId)) {
           itemId = Path.basename(Path.dirname(path));
           if (!UUID_REGEX.test(itemId)) {
             // Not an itemId, so reset to undefined
@@ -502,7 +502,7 @@ export class KDBRepo {
 
         if (path.endsWith('.json')) {
           itemId = Path.basename(path, '.json');
-          if (!UUID_REGEX.test(itemId) && (itemId.indexOf('-mount') === -1)) {
+          if (!UUID_REGEX.test(itemId)) {
             itemId = Path.basename(Path.dirname(path));
             if (!UUID_REGEX.test(itemId)) {
               // Not an itemId, so reset to undefined

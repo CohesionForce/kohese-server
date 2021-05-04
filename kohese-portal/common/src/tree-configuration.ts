@@ -32,6 +32,7 @@ export class TreeConfiguration {
   public lostAndFound : ItemProxy;
   public rootModelProxy;
   public rootViewModelProxy;
+  public rootRepoMountProxy;
 
 
   //////////////////////////////////////////////////////////////////////////
@@ -87,6 +88,12 @@ export class TreeConfiguration {
     this.root.addChild(this.rootViewModelProxy);
     this.repoMap['View-Model-Definitions'] = this.rootViewModelProxy;
 
+    this.rootRepoMountProxy = new ItemProxy('Internal', {
+      id: 'Repo-Mount-Definitions',
+      name: 'Repo Mount Definitions'
+    }, this);
+    this.root.addChild(this.rootRepoMountProxy);
+    this.repoMap['Repo-Mount-Definitions'] = this.rootRepoMountProxy;
 
     treeConfigMap[treeId] = this;
 
