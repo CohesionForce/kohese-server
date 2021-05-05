@@ -238,7 +238,9 @@ function addRepository(id: string, parentId: string) {
     let repoMountData = {
       id: repoMount.id + '-mount',
       name: repoMount.name,
-      parentId: parentId
+      parentId: 'Repo-Mount-Definitions',
+      repoId: repoMount.id,
+      mountPoint: KDBRepo.getMountId(parentId)
     };
 
     console.log('::: Repo Mount Information');
@@ -254,7 +256,9 @@ function addRepository(id: string, parentId: string) {
     let repoMountData = {
       id: repoMount.id + '-mount',
       name: repoMount.name,
-      parentId: parentId
+      parentId: 'Repo-Mount-Definitions',
+      repoId: repoMount.Id,
+      mountPoint: KDBRepo.getMountId(parentId)
     };
 
     console.log('::: Repo Mount Information');
@@ -384,7 +388,9 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     var repoMountData = {
       id: modelInstance.id + '-mount',
       name: modelInstance.name,
-      parentId: parentId
+      parentId: 'Repo-Mount-Definitions',
+      mountPoint: modelInstance.parentId,
+      repoId: modelInstance.id
     };
 
     console.log('::: Repo Mount Information -- StoreModelInstance');
@@ -632,7 +638,6 @@ function mountRepository(mountData, enable: boolean = false) {
             console.log('::: Validating mounted repository: ' + repoRoot.name)
             if (enable === true) {
               proxy.mountRepository(proxy.item.id, 'Repository')
-              mountedRepoProxy.mountRepository(mountedRepoProxy.item.id, 'RepoMount')
             }
             validateRepositoryStructure(mountData.repoStoragePath, enable);
         }
@@ -789,7 +794,7 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
       case 'KoheseModel':
       case 'KoheseView':
       case 'KoheseUser':
-      // case 'RepoMount':
+      case 'RepoMount':
 
         // Skip this model kind
         console.log('::: Skipping ' + modelName);
@@ -917,7 +922,9 @@ async function openRepository(id, indexAndExit){
   var repoMountData = {
     id: id,
     name: mountList[id].name,
-    parentId: mountList[id].parentId
+    parentId: 'Repo-Mount-Definitions',
+    mountPoint: KDBRepo.getMountId(mountList[id].parentId),
+    repoId: KDBRepo.getMountId(id)
   };
 
   mountFileProxy.updateItem('RepoMount', repoMountData)

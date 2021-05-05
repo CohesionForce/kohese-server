@@ -3,7 +3,7 @@
   "name": "RepoMount",
   "parentId": "Model-Definitions",
   "preventModification": true,
-  "restrictInstanceEditing": true,  
+  "restrictInstanceEditing": true,
   "namespace": {
     "id": "com.kohese.metamodel"
   },
@@ -25,6 +25,24 @@
       "type": "string",
       "name": "parentId",
       "required": true
+    },
+    "mountPoint": {
+      "name": "mountPoint",
+      "type": "Item",
+      "required": true,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
+    },
+    "repoId": {
+      "name": "repoId",
+      "type": "Repository",
+      "required": true,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     }
   },
   "validations": [],

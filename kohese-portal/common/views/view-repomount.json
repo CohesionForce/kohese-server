@@ -38,6 +38,22 @@
       },
       "displayName": "ParentId",
       "name": "parentId"
+    },
+    "mountPoint": {
+      "name": "mountPoint",
+      "displayName": "mountPoint",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
+    },
+    "repoId": {
+      "name": "repoId",
+      "displayName": "repoId",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
     }
   },
   "localTypes": {},
@@ -109,6 +125,22 @@
               "labelOrientation": "Top",
               "kind": "text",
               "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "mountPoint",
+              "customLabel": "mountPoint",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "repoId",
+              "customLabel": "repoId",
+              "labelOrientation": "Top",
+              "kind": "",
               "visible": true,
               "editable": true
             }
