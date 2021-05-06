@@ -6,7 +6,7 @@
     "id": "com.kohese"
   },
   "modelName": "RepoMount",
-  "icon": "",
+  "icon": "fa fa-plug",
   "color": "#000000",
   "viewProperties": {
     "id": {
