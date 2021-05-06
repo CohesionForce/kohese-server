@@ -71,6 +71,21 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
           status: status
         };
         kio.server.emit('Item/' + change.type, createNotification);
+        // Update RepoMountData based on Repo Mount Point Change (move)
+        if (change.kind === 'Repository' && change.type === 'update' && !change.enableRepo && change.modifications.parentId) {
+          let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(proxy.item.id + '-mount');
+          mountedRepoProxy.item.mountPoint = change.modifications.parentId.to;
+          status = await kdb.storeModelInstance(mountedRepoProxy)
+          mountedRepoProxy.updateVCStatus(status, false);
+          let updateNotification = {
+            type: change.type,
+            kind: mountedRepoProxy.kind,
+            id: mountedRepoProxy.item.id,
+            item: mountedRepoProxy.cloneItemAndStripDerived(),
+            status: status
+          };
+          kio.server.emit('Item/update', updateNotification);
+        }
         break;
       case 'delete':
         let deleteNotification = {
