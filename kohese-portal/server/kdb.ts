@@ -352,7 +352,6 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
   var modelName = proxy.kind;
   var modelInstance = proxy.item;
-  // TODO: remove -mount off parent ID before store
 
   if(modelName !== 'Analysis'){
     // Delete any associated analysis
@@ -430,9 +429,6 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       promise = createRepoStructure(repoStoragePath).then(function (repo) {
         // TODO: Need to call create repo structure once that has been removed from validate
       });
-    } else {
-      let mountProxy = ItemProxy.getWorkingTree().getProxyFor(repoMountData.id);
-      mountProxy.updateItem('RepoMount', repoMountData.id);
     }
   } else {
     if(modelName !== 'Analysis' && filePath !== proxy.repoPath){
@@ -635,9 +631,11 @@ function mountRepository(mountData, enable: boolean = false) {
             proxy = new ItemProxy('Repository', repoRoot);
             proxy.repoPath = path.join(mountData.repoStoragePath, 'Root.json');
             let mountedRepoProxy = new ItemProxy('RepoMount', repoMountData);
+            mountedRepoProxy.repoPath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMountData.id + '-mount.json'));
             console.log('::: Validating mounted repository: ' + repoRoot.name)
             if (enable === true) {
               proxy.mountRepository(proxy.item.id, 'Repository')
+              mountedRepoProxy.mountRepository(mountedRepoProxy.item.id, 'RepoMount')
             }
             validateRepositoryStructure(mountData.repoStoragePath, enable);
         }
@@ -916,18 +914,7 @@ async function openRepository(id, indexAndExit){
 
   console.log('::: End Enabled Repository Load');
   workingTree.unsetLoading();
-  // Update -mount file and get status
-  let mountFileProxy = workingTree.getProxyFor(id);
 
-  var repoMountData = {
-    id: id,
-    name: mountList[id].name,
-    parentId: 'Repo-Mount-Definitions',
-    mountPoint: KDBRepo.getMountId(mountList[id].parentId),
-    repoId: KDBRepo.getMountId(id)
-  };
-
-  mountFileProxy.updateItem('RepoMount', repoMountData)
   workingTree.saveToCache();
 
 }

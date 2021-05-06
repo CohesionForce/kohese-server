@@ -1147,6 +1147,20 @@ function KIOItemServer(socket){
       console.log('*** Error Occurred with gettingRepoStatus ')
       console.log(status);
     }
+    // Get Status of RepoMountDefinitions
+    let repoMountStatus = await processRepoStatus('ROOT')
+    if (repoMountStatus) {
+      let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
+      var idStatusArray = workingTree.getVCStatus();
+      let repoStatusNotification = {
+        id: request.id,
+        status: idStatusArray
+      };
+      kio.server.emit('Repository/updateRepoStatus', repoStatusNotification);
+    } else {
+      console.log('*** Error Occurred with gettingRepoStatus of ROOT')
+      console.log(status);
+    }
   });
 
   //////////////////////////////////////////////////////////////////////////

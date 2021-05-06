@@ -427,7 +427,13 @@ export class KDBRepo {
 
     let statuses;
 
-    repositoryId = repositoryId + '-mount'
+    if (repositoryId !== 'ROOT') {
+      repositoryId = repositoryId + '-mount'
+    }
+
+    if (!repoList[repositoryId]) {
+      repositoryId = 'ROOT'
+    }
 
     if (!this.pendingGetRepoStatus[repositoryId]) {
       this.pendingGetRepoStatus[repositoryId] = repoList[repositoryId].getStatusExt();
