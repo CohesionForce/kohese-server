@@ -75,16 +75,7 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
         if (change.kind === 'Repository' && change.type === 'update' && !change.enableRepo && change.modifications.parentId) {
           let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(proxy.item.id + '-mount');
           mountedRepoProxy.item.mountPoint = change.modifications.parentId.to;
-          status = await kdb.storeModelInstance(mountedRepoProxy)
-          mountedRepoProxy.updateVCStatus(status, false);
-          let updateNotification = {
-            type: change.type,
-            kind: mountedRepoProxy.kind,
-            id: mountedRepoProxy.item.id,
-            item: mountedRepoProxy.cloneItemAndStripDerived(),
-            status: status
-          };
-          kio.server.emit('Item/update', updateNotification);
+          mountedRepoProxy.updateItem('RepoMount', mountedRepoProxy.item);
         }
         break;
       case 'delete':
@@ -1162,6 +1153,9 @@ function KIOItemServer(socket){
       console.log('*** Error Occurred with gettingRepoStatus ')
       console.log(status);
     }
+    // TODO: Need to get this code working. Getting error Proxy does not match missing root tree
+    // let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(request.id + '-mount');
+    // mountedRepoProxy.updateItem('RepoMount', mountedRepoProxy.item);
     // Get Status of RepoMountDefinitions
     let repoMountStatus = await processRepoStatus('ROOT')
     if (repoMountStatus) {

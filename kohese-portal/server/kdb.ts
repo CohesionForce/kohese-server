@@ -257,7 +257,7 @@ function addRepository(id: string, parentId: string) {
       id: repoMount.id + '-mount',
       name: repoMount.name,
       parentId: 'Repo-Mount-Definitions',
-      repoId: repoMount.Id,
+      repoId: repoMount.id,
       mountPoint: KDBRepo.getMountId(parentId)
     };
 
@@ -631,7 +631,7 @@ function mountRepository(mountData, enable: boolean = false) {
             proxy = new ItemProxy('Repository', repoRoot);
             proxy.repoPath = path.join(mountData.repoStoragePath, 'Root.json');
             let mountedRepoProxy = new ItemProxy('RepoMount', repoMountData);
-            mountedRepoProxy.repoPath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMountData.id + '-mount.json'));
+            mountedRepoProxy.repoPath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMountData.id));
             console.log('::: Validating mounted repository: ' + repoRoot.name)
             if (enable === true) {
               proxy.mountRepository(proxy.item.id, 'Repository')
