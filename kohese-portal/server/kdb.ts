@@ -366,23 +366,30 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
   let parentProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstance.parentId);
   var parentId = modelInstance.parentId
-  if (parentProxy.kind === 'Repository') {
-    parentId = modelInstance.parentId + '-mount'
+  if (parentProxy) {
+    if (parentProxy.kind === 'Repository') {
+      parentId = modelInstance.parentId + '-mount'
+    }
   }
 
   var promise : Promise<boolean|void> = Promise.resolve(true);
   if (modelName === 'Repository'){
-    var repoMountFilePath;
+    var repoFilePath;
     if (isNewItem) {
       var parentRepo = proxy.parentProxy.getRepositoryProxy();
       var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
+      repoFilePath = parentRepoStoragePath + '/Repository';
+      kdbFS.createDirIfMissing(repoFilePath);
     } else {
+      repoFilePath = mountList[modelInstance.id + '-mount'].repoStoragePath.substring
+           (0, mountList[modelInstance.id + '-mount'].repoStoragePath.lastIndexOf('/'));
+      kdbFS.createDirIfMissing(repoFilePath)
       // If repo name has changed, need to change the Name in Available Repositories since this is created at startup
       // Use repo path so don't change name of a duplicate repo
       let index = availableRepositories.findIndex(y => y.repoStoragePath === mountList[modelInstance.id + '-mount'].repoStoragePath)
       availableRepositories[index].name = modelInstance.name
     }
-    repoMountFilePath = path.join(koheseKDBDirPath, path.join('RepoMount', modelInstance.id + '-mount.json'));
+    var repoMountFilePath = path.join(koheseKDBDirPath, path.join('RepoMount', modelInstance.id + '-mount.json'));
 
     var repoMountData = {
       id: modelInstance.id + '-mount',
@@ -405,7 +412,6 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       parentId: parentId
     };
 
-    // mountList[repoMountData.id].mounted = true;
     updateMountFile();
 
     repoStoragePath = determineRepoStoragePath(proxy);
