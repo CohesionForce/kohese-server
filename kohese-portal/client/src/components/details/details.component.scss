@@ -1,5 +1,19 @@
 @import '../../app.component';
 
+:host {
+  ::ng-deep .mat-tab-body-wrapper {
+    height: 100%;
+    width: 100%;
+
+    .mat-tab-body {
+      .mat-tab-body-content {
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+    }
+  }
+}
+
 #details-tabs {
   height: 100%;
 
