@@ -10,23 +10,20 @@ export enum DashboardSelections {
   COMPLETED_ASSIGNMENTS,
   PROJECT_OVERVIEW,
   USER_STATISTICS,
-  PROJECT_STATUS,
-  REPORT_GENERATION
+  PROJECT_STATUS
 }
 
 // Used to determine greater sub-type of dashboards
 export enum DashboardTypes {
   PROJECT,
   USER,
-  ASSIGNMENT,
-  REPORT
+  ASSIGNMENT
 }
 
 // Specific non-overlapping menu configurations
 enum MenuTypes {
   PERSONAL,
-  PROJECT,
-  REPORT
+  PROJECT
 }
 
 export interface DashboardSelectionInfo {
@@ -92,14 +89,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         this.menuType = MenuTypes.PERSONAL
         this.dashboardSelected.emit(this.selectedDashboard);
         break;
-      case (DashboardTypes.REPORT):
-        this.selectedDashboard = {
-          dashboard: DashboardSelections.REPORT_GENERATION,
-          dashboardType: DashboardTypes.REPORT
-        };
-        this.menuType = MenuTypes.REPORT
-        this.dashboardSelected.emit(this.selectedDashboard);
-        break;
     }
   }
 
@@ -151,13 +140,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
           dashboardType: DashboardTypes.PROJECT
         };
         this.menuType = MenuTypes.PROJECT;
-        break;
-      case (DashboardSelections.REPORT_GENERATION):
-        this.selectedDashboard = {
-          dashboard: DashboardSelections.REPORT_GENERATION,
-          dashboardType: DashboardTypes.REPORT
-        };
-        this.menuType = MenuTypes.REPORT;
         break;
       default:
         console.error('Invalid Dashboard selection :');
