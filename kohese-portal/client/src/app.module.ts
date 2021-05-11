@@ -30,7 +30,6 @@ import { NavigatorModule } from './components/navigator/navigator.module';
 import { StateMachineEditorModule } from './components/state-machine-editor/state-machine-editor.module';
 import { TreeViewModule } from './components/tree/tree.module'
 import { VersionsModule } from './components/versions/versions.module';
-import { ReportGeneratorModule } from './components/report-generator/report-generator.module';
 import { ReportsModule } from './components/reports/reports.module';
 import { ImportModule } from './components/import/import.module';
 import { TextEditorModule } from './components/text-editor/text-editor.module';
@@ -110,7 +109,6 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     TreeViewModule,
     VersionsModule,
     LensModule,
-    ReportGeneratorModule,
     ReportsModule,
     ImportModule,
     TextEditorModule,
