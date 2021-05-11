@@ -183,28 +183,44 @@ implements OnInit, OnDestroy {
     // Grab the update to the treeConfig
     this.changeSubjectSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
       switch(change.type) {
+        case 'create':
+          // if the current itemproxy is changing
+          // OR if a child of the current itemProxy is changing
+          if((change.proxy.item.id === this.itemProxy.item.id) || (change.proxy.item.parentId === this.itemProxy.item.id)) {
+            this.generateDoc();
+            this.changeRef.markForCheck();
+          }
+          break;
+        case 'update':
+          if((change.proxy.item.id === this.itemProxy.item.id) || (change.proxy.item.parentId === this.itemProxy.item.id)) {
+            this.generateDoc();
+            this.changeRef.markForCheck();
+          }
+          break;
         case 'delete':
-          // if the current itemProxy is being changed
-          if(this.itemProxy.item.id === change.id) {
-            // if the current itemProxy has a parent
-            if(this.itemProxy.item.parentId) {
-              let parentProxy = this.itemProxy.treeConfig.getProxyFor(this.itemProxy.item.parentId);
-              this.itemProxy = parentProxy;
-            } else {
-              // if the current itemProxy has no parent, set the proxy to root
-              this.itemProxy = this.itemProxy.treeConfig.getProxyFor('ROOT');
+          if((change.proxy.item.id === this.itemProxy.item.id) || (change.proxy.item.parentId === this.itemProxy.item.id)) {
+            // if a child of the current itemProxy is being deleted
+            if(change.proxy.item.parentId === this.itemProxy.item.id) {
+              this.generateDoc();
+              this.changeRef.markForCheck();
             }
-          } else {
-            // TODO: 'delete' case is handled differently with update than 'create'
-            // this "else" is to update the document-view when a child is deleted while the parent
-            // is focused; i.e. the parent of the item being deleted isFocused() with the child in-view,
-            // but the deleted child is not removed from the document-row item-list.
+            // if the current itemProxy is being deleted
+            if(change.proxy.item.id === this.itemProxy.item.id) {
+              if(this.itemProxy.item.parentId) {
+                let itemProxyParent = this.itemProxy.treeConfig.getProxyFor(this.itemProxy.item.parentId);
+                this.itemProxy = itemProxyParent;
+                this.generateDoc();
+                this.changeRef.markForCheck();
+              } else {
+                this.itemProxy = this.itemProxy.treeConfig.getProxyFor('ROOT');
+                this.generateDoc();
+                this.changeRef.markForCheck();
+              }
+            }
           }
           break;
       }
-      this.generateDoc();
-      this.changeRef.markForCheck();
-     });
+    });
   }
 
   ngOnDestroy() {
