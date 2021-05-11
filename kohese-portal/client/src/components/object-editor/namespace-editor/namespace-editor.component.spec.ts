@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatIconModule, MatInputModule, MatSelectModule,
-  MatTooltipModule } from '@angular/material';
+import { MaterialModule } from '../../../material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularSplitModule } from 'angular-split';
 import { of } from 'rxjs';
@@ -16,17 +15,14 @@ import { NamespaceEditorComponent } from './namespace-editor.component';
 
 describe('NamespaceEditorComponent', () => {
   let component: NamespaceEditorComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [NamespaceEditorComponent],
       imports: [
         FormsModule,
         BrowserAnimationsModule,
-        MatInputModule,
-        MatTooltipModule,
-        MatIconModule,
-        MatSelectModule,
+        MaterialModule,
         AngularSplitModule
       ],
       providers: [
@@ -122,8 +118,12 @@ describe('NamespaceEditorComponent', () => {
   });
 
   it('adds subcomponents to a Namespace', async () => {
+    console.log('WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO');
+    // component.selectedNamespace = TreeConfiguration.getWorkingTree().
+    //   getProxyFor('com.kohese').item;
     component.selectedNamespace = TreeConfiguration.getWorkingTree().
-      getProxyFor('com.kohese').item;
+      getProxyFor('com.kohese');
+      console.log('COMPONENT SELECTED NAMESPACE' + component.selectedNamespace);
     let namespaceItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913');
     let matDialogRefPlaceholder: any = {

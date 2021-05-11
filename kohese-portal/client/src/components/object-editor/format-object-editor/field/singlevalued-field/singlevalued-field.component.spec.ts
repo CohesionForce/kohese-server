@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-  MatExpansionModule, MatIconModule, MatInputModule, MatSelectModule,
-  MatTooltipModule } from '@angular/material';
+import { MaterialModule } from '../../../../../material.module';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { MarkdownEditorModule } from '../../../../../components/markdown-editor/markdown-editor.module';
@@ -35,16 +35,10 @@ describe('SinglevaluedFieldComponent', () => {
         MultivaluedFieldComponent
       ],
       imports: [
+        RouterModule.forRoot([]),
         FormsModule,
         BrowserAnimationsModule,
-        MatTooltipModule,
-        MatCheckboxModule,
-        MatInputModule,
-        MatDatepickerModule,
-        MatIconModule,
-        MatSelectModule,
-        MatExpansionModule,
-        MatDialogModule,
+        MaterialModule,
         MarkdownModule,
         MarkdownEditorModule,
         TableModule,
@@ -53,7 +47,8 @@ describe('SinglevaluedFieldComponent', () => {
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: DialogService, useClass: MockDialogService },
-        { provide: SessionService, useClass: MockSessionService }
+        { provide: SessionService, useClass: MockSessionService },
+        { provide: APP_BASE_HREF, useValue : '/' } // acts as <head> for routerModule. Describes non-static URL pieces
       ]
     }).compileComponents();
 

@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 import { of as ObservableOf } from 'rxjs';
 
 import { DashboardModule } from '../dashboard.module';
@@ -15,10 +17,14 @@ describe('ProjectDashboardComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ DashboardModule ],
+      imports: [
+        RouterModule.forRoot([]),
+        DashboardModule
+      ],
       providers: [
         { provide: DialogService, useClass: MockDialogService },
-        { provide: ItemRepository, useClass: MockItemRepository }
+        { provide: ItemRepository, useClass: MockItemRepository },
+        { provide: APP_BASE_HREF, useValue : '/' } // acts as <head> for routerModule. Describes non-static URL pieces
       ]
     }).compileComponents();
 

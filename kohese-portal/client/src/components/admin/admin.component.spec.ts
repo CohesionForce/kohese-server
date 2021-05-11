@@ -19,6 +19,7 @@ import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { PipesModule } from '../../pipes/pipes.module';
 import { MockUserData } from '../../../mocks/data/MockUser';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { CacheManager } from '../../../../client/cache-worker/CacheManager';
 
 import { LensModule } from '../lens/lens.module';
 import { LensService } from '../../services/lens-service/lens.service';
@@ -47,6 +48,7 @@ describe('Component: Admin', () => {
         { provide: SessionService, useClass: MockSessionService },
         { provide: DialogService, useClass: MockDialogService },
         { provide: LensService, useClass: MockLensService },
+        { provide: CacheManager, useClass: MockItemRepository } // Possibly wrong useClass
 
       ]
     }).compileComponents();
