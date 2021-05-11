@@ -171,7 +171,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
     // Provides additional dialog configuration options
     const dialogConfig = new MatDialogConfig();
 
-    let dialogRef = this.dialog.open(RepositoryContentDialog, {}).updateSize('90%', '50%');
+    let dialogRef = this.dialog.open(RepositoryContentDialog, {}).updateSize('80%');
 
     // Used to Pass Data back from the RepositoryContentComponent dialog
     // Typically used with the data: {} handler.
@@ -333,10 +333,6 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
     this.dialogueService.openComponentDialog(DetailsComponent, {
       data: { itemProxy: this.repositories[index] }
     }).updateSize('90%', '90%');
-  }
-
-  close() {
-    this.dialogRef.close();
   }
 
   async mountRepo(id: string, pickParent: boolean) {

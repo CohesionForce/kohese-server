@@ -19,7 +19,7 @@ class AddRowObject {
 @Component({
   selector: 'filter-tree',
   templateUrl: './filter-tree.component.html',
-  styleUrls: ['../tree.component.scss'],
+  styleUrls: ['./filter-tree.component.scss'],
   //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
@@ -42,7 +42,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
 
   private _addRowObjectMap: Map<FilterCriteriaConnection, AddRowObject> =
     new Map<FilterCriteriaConnection, AddRowObject>();
-    
+
   private _targetFilterSubscription: Subscription;
 
   public constructor(route: ActivatedRoute, _dialogService: DialogService,
@@ -166,7 +166,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
         let elementStack: Array<FilterCriteriaConnection> = [root];
         while (elementStack.length > 0) {
           let connection: FilterCriteriaConnection = elementStack.pop();
-        
+
           if (object instanceof FilterCriterion) {
             for (let j: number = 0; j < connection.criteria.length; j++) {
               if (object === connection.criteria[j]) {
@@ -211,11 +211,11 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
   protected postTreeTraversalActivity(): void {
     this._changeDetectorRef.markForCheck();
   }
-  
+
   protected isMultiselectEnabled(object: any): boolean {
     return true;
   }
-  
+
   public addElementToConnection(type: string, connection:
     FilterCriteriaConnection): void {
     let element: FilterElement;
@@ -238,7 +238,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
         filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, '');
       connection.criteria.push(element as FilterCriterion);
     }
-    
+
     this.buildRow(element);
     if (element instanceof FilterCriteriaConnection) {
       this.getRow(this.getId(element)).expanded = true;
@@ -246,7 +246,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
     this.getRow(this.getId(connection)).expanded = true;
     this.refresh();
   }
-  
+
   public addCriterionToSelectedConnections(): void {
     let selectedObjects: Array<any> = this.selectedObjectsSubject.getValue();
     for (let j: number = 0; j < selectedObjects.length; j++) {
@@ -277,14 +277,14 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
         for (let j: number = 0; j < selectedObjects.length; j++) {
           this.deleteElement(selectedObjects[j] as FilterElement);
         }
-        
+
         this.deselectAll();
       }
     } else {
       for (let j: number = 0; j < selectedObjects.length; j++) {
         this.deleteElement(selectedObjects[j] as FilterElement);
       }
-      
+
       this.deselectAll();
     }
   }
@@ -354,7 +354,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       for (let j: number = 0; j < connection.criteria.length; j++) {
         this.buildRow(connection.criteria[j]);
       }
-      
+
       let addRowObject: AddRowObject = new AddRowObject(connection);
       this._addRowObjectMap.set(connection, addRowObject);
       row.expanded = true;
@@ -363,7 +363,7 @@ export class FilterTreeComponent extends Tree implements OnInit, OnDestroy {
       elementStack.push(...connection.connections);
     }
   }
-  
+
   private connectionTargeted(connection: FilterCriteriaConnection, element:
     FilterElement): void {
     if (this._isTargetingForCopy) {

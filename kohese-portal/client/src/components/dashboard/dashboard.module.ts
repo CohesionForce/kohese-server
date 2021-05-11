@@ -29,8 +29,6 @@ import { ProjectSelectorComponent } from "./project-dashboard/project-selector/p
 import { TreeModule } from "angular-tree-component";
 import { StateFilterService } from './state-filter.service';
 import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy-card.component';
-import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
-import { ReportGeneratorModule } from '../report-generator/report-generator.module';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 import { ItemBoardModule } from '../item-board/item-board.module';
 import { DirectivesModule } from '../../directives/directives.module'
@@ -52,7 +50,6 @@ import { DirectivesModule } from '../../directives/directives.module'
     StateBarChartComponent,
     StateSummaryDialogComponent,
     StatefulProxyCardComponent,
-    ReportDashboardComponent,
     ActivityFeedComponent
   ],
   providers : [
@@ -76,7 +73,6 @@ import { DirectivesModule } from '../../directives/directives.module'
     FormsModule,
     ReactiveFormsModule,
     NgxDatatableModule,
-    ReportGeneratorModule,
     ObjectEditorModule,
     ItemBoardModule,
     DirectivesModule

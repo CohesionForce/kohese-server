@@ -460,33 +460,27 @@
           "kind": "list",
           "contents": [
             {
-              "propertyName": "estimatedStart",
-              "customLabel": "Estimated Start",
+              "propertyName": "description",
+              "customLabel": "Description",
               "labelOrientation": "Top",
-              "kind": "date",
+              "kind": "markdown",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             },
             {
-              "propertyName": "estimatedCompletion",
-              "customLabel": "Estimated Completion",
-              "labelOrientation": "Top",
-              "kind": "date",
+              "propertyName": "assignedTo",
+              "customLabel": "Assigned To",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
               "visible": true,
               "editable": true
             },
             {
               "propertyName": "estimatedHoursEffort",
               "customLabel": "Estimated Hours Effort",
-              "labelOrientation": "Top",
-              "kind": "number",
-              "visible": true,
-              "editable": true
-            },
-            {
-              "propertyName": "remainingHoursEffort",
-              "customLabel": "Remaining Hours Effort",
-              "labelOrientation": "Top",
+              "labelOrientation": "Left",
               "kind": "number",
               "visible": true,
               "editable": true
@@ -494,8 +488,32 @@
             {
               "propertyName": "actualHoursEffort",
               "customLabel": "Actual Hours Effort",
-              "labelOrientation": "Top",
+              "labelOrientation": "Left",
               "kind": "number",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "remainingHoursEffort",
+              "customLabel": "Remaining Hours Effort",
+              "labelOrientation": "Left",
+              "kind": "number",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "estimatedStart",
+              "customLabel": "Estimated Start",
+              "labelOrientation": "Left",
+              "kind": "date",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "estimatedCompletion",
+              "customLabel": "Estimated Completion",
+              "labelOrientation": "Left",
+              "kind": "date",
               "visible": true,
               "editable": true
             },
@@ -509,18 +527,9 @@
               "tableDefinition": "3b4d68d0-e603-11e9-bf30-55b2f7a3af55"
             },
             {
-              "propertyName": "assignedTo",
-              "customLabel": "Assigned To",
-              "labelOrientation": "Left",
-              "kind": "text",
-              "tableDefinition": "",
-              "visible": true,
-              "editable": true
-            },
-            {
               "propertyName": "taskState",
               "customLabel": "Task State",
-              "labelOrientation": "Top",
+              "labelOrientation": "Left",
               "kind": "state-editor",
               "visible": true,
               "editable": true

@@ -30,7 +30,6 @@ module.exports = function (app) {
       /^\/devtools.*/,
       /^\/outline.*/,
       /^\/document.*/,
-      /^\/report-gen.*/,
       /^\/reports.*/
     ];
 
