@@ -1,19 +1,16 @@
-<div style="height: 100%; width: 100%;">
-  <h2 mat-dialog-title style="height: 7%; width: 100%;">
-    Filter
-  </h2>
-  <div style="height: calc(93% - 40px); width: 100%;">
+<div class=filter-dialog-container>
+  <h2 mat-dialog-title class=dialog-title>Filter</h2>
+  <div class=filter-tree-container>
     <filter-tree [targetFilterSubject]="filterSubject"></filter-tree>
   </div>
   <ng-container *ngIf="data">
-    <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
-      row;">
+    <mat-dialog-actions>
       <button mat-button [disabled]="!isCriterionDefined()"
-        class="flex-right-align" [mat-dialog-close]="filterSubject.
-        getValue()">
+        class="flex-right-align mat-raised-button mat-primary"
+        [mat-dialog-close]="filterSubject.getValue()">
         Apply
       </button>
-      <button mat-button [mat-dialog-close]="">
+      <button mat-dialog-close class='mat-raised-button mat-primary'>
         Cancel
       </button>
     </mat-dialog-actions>

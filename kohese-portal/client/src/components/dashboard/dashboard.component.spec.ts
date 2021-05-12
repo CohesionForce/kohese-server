@@ -19,7 +19,6 @@ import { SessionService } from '../../services/user/session.service';
 import { ItemBoardModule } from '../item-board/item-board.module';
 import { LensModule } from '../lens/lens.module';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
-import { ReportGeneratorModule } from '../report-generator/report-generator.module';
 import { ActivityFeedComponent } from './activity-feed/activity-feed.component';
 import { AssignmentDashboardComponent } from './assignment-dashboard/assignment-dashboard.component';
 import { DashboardSelectorComponent } from './dashboard-selector/dashboard-selector.component';
@@ -29,7 +28,6 @@ import { ProjectOverviewComponent } from './project-dashboard/project-overview/p
 import { StateBarChartComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-bar-chart.component';
 import { StatusDashboardComponent } from './project-dashboard/status-dashboard/status-dashboard.component';
 import { UserStatisticsComponent } from './project-dashboard/user-statistics/user-statistics.component';
-import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
 
 describe('Component: Dashboard', ()=>{
   let dashboardComponent: DashboardComponent;
@@ -42,7 +40,6 @@ describe('Component: Dashboard', ()=>{
         DashboardSelectorComponent,
         AssignmentDashboardComponent,
         ProjectDashboardComponent,
-        ReportDashboardComponent,
         ActivityFeedComponent,
         ProjectOverviewComponent,
         UserStatisticsComponent,
@@ -59,7 +56,6 @@ describe('Component: Dashboard', ()=>{
         PipesModule,
         LensModule,
         ObjectEditorModule,
-        ReportGeneratorModule,
         ItemBoardModule
       ],
       providers: [
