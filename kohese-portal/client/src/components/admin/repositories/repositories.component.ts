@@ -15,6 +15,7 @@ import { VersionControlService } from '../../../services/version-control/version
 import { RepositoryService } from '../../../services/repository/repository.service';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../tree/tree.component';
+import { NamespaceEditorComponent } from '../../object-editor/namespace-editor/namespace-editor.component';
 
 
 @Component({
@@ -198,10 +199,20 @@ export class RepositoriesComponent extends NavigatableComponent implements
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
+        maySelect: (element: any) => {
+          let itemProxy: ItemProxy = (element as ItemProxy);
+          for (let j: number = 0; j < proxy.item.children.length; j++) {
+            let newChildId = proxy.item.children[j].id;
+            if (newChildId === itemProxy.item.id) {
+              return false;
+            }
+          }
+          return true;
+        },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
         },
-        selection: ([proxy.parentProxy])
+        selection: ([proxy])
       }
     }).updateSize('90%', '90%').afterClosed().subscribe((result:
       Array<any>) => {
@@ -209,8 +220,14 @@ export class RepositoriesComponent extends NavigatableComponent implements
           let newParentId = result[0].item.id;
           let parentProxy = ItemProxy.getWorkingTree().getProxyFor(newParentId);
           if (proxy && parentProxy) {
+            if ((id === newParentId) || (id === parentProxy.item.parentId)) {
+              console.log('&&& Cannot select ' + proxy.item.name + ' as repo Mount Point');
+              this.dialogueService.openInformationDialog('Error',
+                 'Cannot select ' + proxy.item.name + ' as repo Mount Point');
+            } else {
               proxy.item.parentId = newParentId;
               this.itemRepository.upsertItem(proxy.kind, proxy.item);
+            }
           }
         }
     })
