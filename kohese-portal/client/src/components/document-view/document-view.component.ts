@@ -183,8 +183,10 @@ implements OnInit, OnDestroy {
     // Grab the update to the treeConfig for redrawing document-view
     this.changeSubjectSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
       if((change.proxy === this.itemProxy) || change.proxy.hasAncestor(this.itemProxy)) {
-        this.generateDoc();
-        this.changeRef.markForCheck();
+        if(change.type !== 'dirty') {
+          this.generateDoc();
+          this.changeRef.markForCheck();
+        }
       }
     });
   }
@@ -196,6 +198,10 @@ implements OnInit, OnDestroy {
 
     if (this.proxyStreamSubscription) {
       this.proxyStreamSubscription.unsubscribe();
+    }
+
+    if (this.changeSubjectSubscription) {
+      this.changeSubjectSubscription.unsubscribe();
     }
   }
 
@@ -230,6 +236,8 @@ implements OnInit, OnDestroy {
       } else if (this.itemsLoaded < subTree.length) {
         // Case 3 : Load based on defined increment
         newLoad = currentLoad + 20;
+      } else {
+        newLoad = subTree.length;
       }
     }
 
@@ -242,7 +250,6 @@ implements OnInit, OnDestroy {
 
     if (this.itemsLoaded >= subtreeAsList.length) {
       this.itemsLoaded = subtreeAsList.length;
-      return;
     }
 
     this.loadedProxies = [];
