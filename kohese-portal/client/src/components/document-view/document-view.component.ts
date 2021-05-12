@@ -180,29 +180,9 @@ implements OnInit, OnDestroy {
       }
     });
 
-    // Grab the update to the treeConfig
+    // Grab the update to the treeConfig for redrawing document-view
     this.changeSubjectSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
-      switch(change.type) {
-        case 'delete':
-          // if the current itemProxy is being changed
-          if(this.itemProxy.item.id === change.id) {
-            // if the current itemProxy has a parent
-            if(this.itemProxy.item.parentId) {
-              let parentProxy = this.itemProxy.treeConfig.getProxyFor(this.itemProxy.item.parentId);
-              this.itemProxy = parentProxy;
-            } else {
-              // if the current itemProxy has no parent, set the proxy to root
-              this.itemProxy = this.itemProxy.treeConfig.getProxyFor('ROOT');
-            }
-          } else {
-            // TODO: 'delete' case is handled differently with update than 'create'
-            // this "else" is to update the document-view when a child is deleted while the parent
-            // is focused; i.e. the parent of the item being deleted isFocused() with the child in-view,
-            // but the deleted child is not removed from the document-row item-list.
-          }
-          break;
-      }
-      if((change.proxy === this.itemProxy) || change.proxy.hasAncestor(this.itemProxy)) {
+      if((change.proxy.item.id === this.itemProxy.item.id) || change.proxy.hasAncestor(this.itemProxy)) {
         this.generateDoc();
         this.changeRef.markForCheck();
       }
