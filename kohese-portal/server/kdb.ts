@@ -749,7 +749,7 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
               };
                mountRepository(mountData, enable);
             } else {
-              console.log('*** Not mounted - Not In Mount File (mounts.json) ' + repoMount.name + ' ' + repoMount.id)
+              console.log('*** Not mounted - Not In Mount File (mounts.json) or is Disabled ' + repoMount.name + ' ' + repoMount.id)
             }
         }
         break;
