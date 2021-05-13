@@ -201,13 +201,8 @@ export class RepositoriesComponent extends NavigatableComponent implements
         },
         maySelect: (element: any) => {
           let itemProxy: ItemProxy = (element as ItemProxy);
-          for (let j: number = 0; j < proxy.item.children.length; j++) {
-            let newChildId = proxy.item.children[j].id;
-            if (newChildId === itemProxy.item.id) {
-              return false;
-            }
-          }
-          return true;
+          let isAncestor: boolean = itemProxy.hasAncestor(proxy);
+          return (!isAncestor);
         },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
@@ -220,13 +215,12 @@ export class RepositoriesComponent extends NavigatableComponent implements
           let newParentId = result[0].item.id;
           let parentProxy = ItemProxy.getWorkingTree().getProxyFor(newParentId);
           if (proxy && parentProxy) {
-            if ((id === newParentId) || (id === parentProxy.item.parentId)) {
-              console.log('&&& Cannot select ' + proxy.item.name + ' as repo Mount Point');
+            if (parentProxy.item.id === proxy.item.parentId) {
               this.dialogueService.openInformationDialog('Error',
-                 'Cannot select ' + proxy.item.name + ' as repo Mount Point');
+                 'Cannot select ' + parentProxy.item.name + ' as Repository Mount Point');
             } else {
-              proxy.item.parentId = newParentId;
-              this.itemRepository.upsertItem(proxy.kind, proxy.item);
+            proxy.item.parentId = newParentId;
+            this.itemRepository.upsertItem(proxy.kind, proxy.item);
             }
           }
         }
