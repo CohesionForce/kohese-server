@@ -118,12 +118,8 @@ describe('NamespaceEditorComponent', () => {
   });
 
   it('adds subcomponents to a Namespace', async () => {
-    console.log('WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO');
-    // component.selectedNamespace = TreeConfiguration.getWorkingTree().
-    //   getProxyFor('com.kohese').item;
     component.selectedNamespace = TreeConfiguration.getWorkingTree().
-      getProxyFor('com.kohese');
-      console.log('COMPONENT SELECTED NAMESPACE' + component.selectedNamespace);
+      getProxyFor('com.kohese').item;
     let namespaceItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913');
     let matDialogRefPlaceholder: any = {

@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-  MatExpansionModule, MatIconModule, MatInputModule, MatSelectModule,
-  MatTooltipModule } from '@angular/material';
+import { MaterialModule} from '../../../material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 import { MarkdownModule, MarkdownService, MarkedOptions } from 'ngx-markdown';
 
 import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
@@ -33,17 +33,11 @@ describe('FormatObjectEditorComponent', () => {
         SinglevaluedFieldComponent
       ],
       imports: [
+        RouterModule.forRoot([]),
         CommonModule,
         FormsModule,
         BrowserAnimationsModule,
-        MatSelectModule,
-        MatIconModule,
-        MatTooltipModule,
-        MatCheckboxModule,
-        MatInputModule,
-        MatDatepickerModule,
-        MatExpansionModule,
-        MatDialogModule,
+        MaterialModule,
         MarkdownModule,
         TableModule,
         MarkdownEditorModule,
@@ -54,7 +48,8 @@ describe('FormatObjectEditorComponent', () => {
         MarkedOptions,
         { provide: DialogService, useClass: MockDialogService },
         { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: SessionService, useClass: MockSessionService }
+        { provide: SessionService, useClass: MockSessionService },
+        { provide: APP_BASE_HREF, useValue : '/' } // acts as <head> for routerModule. Describes non-static URL pieces
       ]
     }).compileComponents();
 
