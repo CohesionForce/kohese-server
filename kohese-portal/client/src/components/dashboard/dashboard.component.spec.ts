@@ -1,9 +1,8 @@
-import { CommonModule } from '@angular/common';
+import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { TreeModule } from 'angular-tree-component';
 
 import { MockCurrentUserService } from '../../../mocks/services/MockCurrentUserService';
@@ -45,6 +44,7 @@ describe('Component: Dashboard', ()=>{
         UserStatisticsComponent,
         StatusDashboardComponent,
         StateBarChartComponent,
+
       ],
       imports: [
         RouterModule.forRoot([]),
@@ -63,7 +63,7 @@ describe('Component: Dashboard', ()=>{
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: SessionService, useClass: MockSessionService},
         {provide: CurrentUserService, useClass: MockCurrentUserService},
-        {provide: APP_BASE_HREF, useValue : '/' } // acts as <head> for routerModule. Describes non-static URL pieces
+        { provide: APP_BASE_HREF, useValue: '/'}
       ]
     }).compileComponents();
 

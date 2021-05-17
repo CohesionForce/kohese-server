@@ -1,6 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
 import { of as ObservableOf } from 'rxjs';
 
 import { DashboardModule } from '../dashboard.module';
@@ -10,6 +8,8 @@ import { MockDialogService } from '../../../../mocks/services/MockDialogService'
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { ProjectDashboardComponent } from './project-dashboard.component';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 describe('ProjectDashboardComponent', () => {
   let projectDashboardComponent: ProjectDashboardComponent;
@@ -24,7 +24,7 @@ describe('ProjectDashboardComponent', () => {
       providers: [
         { provide: DialogService, useClass: MockDialogService },
         { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: APP_BASE_HREF, useValue : '/' } // acts as <head> for routerModule. Describes non-static URL pieces
+        { provide: APP_BASE_HREF, useValue: '/'}
       ]
     }).compileComponents();
 
