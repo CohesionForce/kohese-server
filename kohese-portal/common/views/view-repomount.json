@@ -1,0 +1,157 @@
+{
+  "id": "view-repomount",
+  "name": "RepoMount",
+  "parentId": "View-Model-Definitions",
+  "namespace": {
+    "id": "com.kohese"
+  },
+  "modelName": "RepoMount",
+  "icon": "fa fa-plug",
+  "color": "#000000",
+  "viewProperties": {
+    "id": {
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
+      "displayName": "ID",
+      "name": "id"
+    },
+    "name": {
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
+      "displayName": "Name",
+      "name": "name"
+    },
+    "parentId": {
+      "inputType": {
+        "type": "text",
+        "options": {
+          "isMultiLine": false
+        }
+      },
+      "displayName": "ParentId",
+      "name": "parentId"
+    },
+    "mountPoint": {
+      "name": "mountPoint",
+      "displayName": "mountPoint",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
+    },
+    "repoId": {
+      "name": "repoId",
+      "displayName": "repoId",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
+    }
+  },
+  "localTypes": {},
+  "formatDefinitions": {
+    "5cb6da40-a841-11eb-ae0c-57652ba545fa": {
+      "id": "5cb6da40-a841-11eb-ae0c-57652ba545fa",
+      "name": "Default Format Definition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": "id",
+            "customLabel": "id",
+            "labelOrientation": "Top",
+            "kind": "text",
+            "visible": true,
+            "editable": true
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": []
+        }
+      ]
+    },
+    "29341120-a845-11eb-ae0c-57652ba545fa": {
+      "id": "29341120-a845-11eb-ae0c-57652ba545fa",
+      "name": "RepoMountFormatDefinition",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": "name",
+            "customLabel": "name",
+            "labelOrientation": "Top",
+            "kind": "text",
+            "visible": true,
+            "editable": true
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "id",
+              "customLabel": "id",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "name",
+              "customLabel": "name",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "parentId",
+              "customLabel": "parentId",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "mountPoint",
+              "customLabel": "mountPoint",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "repoId",
+              "customLabel": "repoId",
+              "labelOrientation": "Top",
+              "kind": "",
+              "visible": true,
+              "editable": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "defaultFormatKey": {
+    "default": "29341120-a845-11eb-ae0c-57652ba545fa",
+    "document": "29341120-a845-11eb-ae0c-57652ba545fa"
+  },
+  "tableDefinitions": {}
+}

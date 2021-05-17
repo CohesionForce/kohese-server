@@ -71,6 +71,12 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
           status: status
         };
         kio.server.emit('Item/' + change.type, createNotification);
+        // Update RepoMountData based on Repo Mount Point Change (move)
+        if (change.kind === 'Repository' && change.type === 'update' && !change.enableRepo && change.modifications.parentId) {
+          let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(proxy.item.id + '-mount');
+          mountedRepoProxy.item.mountPoint = change.modifications.parentId.to;
+          mountedRepoProxy.updateItem('RepoMount', mountedRepoProxy.item);
+        }
         break;
       case 'delete':
         let deleteNotification = {
@@ -1145,6 +1151,23 @@ function KIOItemServer(socket){
       kio.server.emit('Repository/updateRepoStatus', repoStatusNotification);
     } else {
       console.log('*** Error Occurred with gettingRepoStatus ')
+      console.log(status);
+    }
+    // TODO: Need to get this code working. Getting error Proxy does not match missing root tree
+    // let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(request.id + '-mount');
+    // mountedRepoProxy.updateItem('RepoMount', mountedRepoProxy.item);
+    // Get Status of RepoMountDefinitions
+    let repoMountStatus = await processRepoStatus('ROOT')
+    if (repoMountStatus) {
+      let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
+      var idStatusArray = workingTree.getVCStatus();
+      let repoStatusNotification = {
+        id: request.id,
+        status: idStatusArray
+      };
+      kio.server.emit('Repository/updateRepoStatus', repoStatusNotification);
+    } else {
+      console.log('*** Error Occurred with gettingRepoStatus of ROOT')
       console.log(status);
     }
   });
