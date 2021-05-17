@@ -207,21 +207,15 @@ export class RepositoriesComponent extends NavigatableComponent implements
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
         },
-        selection: ([proxy])
+        selection: ([proxy.parentProxy])
       }
     }).updateSize('90%', '90%').afterClosed().subscribe((result:
       Array<any>) => {
         if (result) {
           let newParentId = result[0].item.id;
-          let parentProxy = ItemProxy.getWorkingTree().getProxyFor(newParentId);
-          if (proxy && parentProxy) {
-            if (parentProxy.item.id === proxy.item.parentId) {
-              this.dialogueService.openInformationDialog('Error',
-                 'Cannot select ' + parentProxy.item.name + ' as Repository Mount Point');
-            } else {
+          if (proxy) {
             proxy.item.parentId = newParentId;
             this.itemRepository.upsertItem(proxy.kind, proxy.item);
-            }
           }
         }
     })
