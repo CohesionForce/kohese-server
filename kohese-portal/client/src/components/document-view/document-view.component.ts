@@ -83,6 +83,7 @@ implements OnInit, OnDestroy {
   docWriter: HtmlRenderer;
   initialized: boolean;
   treeConfig: TreeConfiguration;
+  paramSubscription: Subscription;
   treeConfigSubscription: Subscription;
   repoStatusSubscription: Subscription;
 
@@ -182,10 +183,19 @@ implements OnInit, OnDestroy {
 
     // Grab the update to the treeConfig for redrawing document-view
     this.changeSubjectSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
+      // if we are changing the current itemProxy or a descendant of the current itemProxy
       if((change.proxy === this.itemProxy) || change.proxy.hasAncestor(this.itemProxy)) {
         if(change.type !== 'dirty') {
           this.generateDoc();
           this.changeRef.markForCheck();
+        }
+        // if we are deleting the currently focused itemProxy
+        if((change.type === 'delete') && (change.proxy === this.itemProxy)) {
+          // Set active itemProxy to its parent's proxy
+          let parentProxy = this.itemProxy.treeConfig.getProxyFor(this.itemProxy.item.parentId);
+          this.itemProxy = parentProxy;
+          // Sets the id param in the URL to the new itemProxy id (if there is one) and therefore redraws the page
+          this.NavigationService.navigate('Explore', {'id': ( (this.itemProxy.item.id) ? this.itemProxy.item.id : '')});
         }
       }
     });
