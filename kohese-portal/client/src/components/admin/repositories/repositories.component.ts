@@ -201,6 +201,9 @@ export class RepositoriesComponent extends NavigatableComponent implements
         },
         maySelect: (element: any) => {
           let itemProxy: ItemProxy = (element as ItemProxy);
+          if (itemProxy.item.id === proxy.item.parentId) {
+            return false;
+          }
           let isAncestor: boolean = itemProxy.hasAncestor(proxy);
           return (!isAncestor);
         },
