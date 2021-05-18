@@ -216,7 +216,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
       Array<any>) => {
         if (result) {
           let newParentId = result[0].item.id;
-          if (proxy) {
+          if ((proxy) && (proxy.item.parentId != newParentId)) {
             proxy.item.parentId = newParentId;
             this.itemRepository.upsertItem(proxy.kind, proxy.item);
           }
