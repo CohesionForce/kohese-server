@@ -38,4 +38,8 @@ describe('ProjectDashboardComponent', () => {
   it('should instantiate', () => {
     expect(projectDashboardComponent).toBeTruthy();
   });
+
+  afterEach(() => {
+    fixture.destroy();
+  });
 });

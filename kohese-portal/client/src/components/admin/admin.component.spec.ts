@@ -63,4 +63,7 @@ describe('Component: Admin', () => {
    expect(AdminComponent).toBeTruthy();
   });
 
+  afterEach(() => {
+    adminFixture.destroy();
+  });
 });
