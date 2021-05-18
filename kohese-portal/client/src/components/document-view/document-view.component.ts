@@ -83,7 +83,6 @@ implements OnInit, OnDestroy {
   docWriter: HtmlRenderer;
   initialized: boolean;
   treeConfig: TreeConfiguration;
-  paramSubscription: Subscription;
   treeConfigSubscription: Subscription;
   repoStatusSubscription: Subscription;
 
