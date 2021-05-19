@@ -8,6 +8,8 @@ import { MockDialogService } from '../../../../mocks/services/MockDialogService'
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { ProjectDashboardComponent } from './project-dashboard.component';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 describe('ProjectDashboardComponent', () => {
   let projectDashboardComponent: ProjectDashboardComponent;
@@ -15,10 +17,14 @@ describe('ProjectDashboardComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ DashboardModule ],
+      imports: [
+        RouterModule.forRoot([]),
+        DashboardModule
+      ],
       providers: [
         { provide: DialogService, useClass: MockDialogService },
-        { provide: ItemRepository, useClass: MockItemRepository }
+        { provide: ItemRepository, useClass: MockItemRepository },
+        { provide: APP_BASE_HREF, useValue: '/'}
       ]
     }).compileComponents();
 
@@ -31,5 +37,9 @@ describe('ProjectDashboardComponent', () => {
 
   it('should instantiate', () => {
     expect(projectDashboardComponent).toBeTruthy();
+  });
+
+  afterEach(() => {
+    fixture.destroy();
   });
 });

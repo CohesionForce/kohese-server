@@ -1,8 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatCheckboxModule, MatDialogRef, MatExpansionModule, MatIconModule,
-  MatInputModule, MatMenuModule, MatSelectModule,
-  MatTableModule } from '@angular/material';
+import { MaterialModule } from '../../../material.module';
+import { MatDialogRef } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of as observableOf } from 'rxjs';
 
@@ -20,18 +19,12 @@ import { DataModelEditorComponent } from './data-model-editor.component';
 
 describe('DataModelEditorComponent', () => {
   let component: DataModelEditorComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DataModelEditorComponent],
       imports: [
-        MatIconModule,
-        MatInputModule,
-        MatSelectModule,
-        MatTableModule,
-        MatCheckboxModule,
-        MatMenuModule,
-        MatExpansionModule,
+        MaterialModule,
         BrowserAnimationsModule
       ],
       providers: [
@@ -40,7 +33,7 @@ describe('DataModelEditorComponent', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    
+
     let componentFixture: ComponentFixture<DataModelEditorComponent> = TestBed.
       createComponent(DataModelEditorComponent);
     component = componentFixture.componentInstance;
@@ -98,7 +91,7 @@ describe('DataModelEditorComponent', () => {
     expect(Object.keys((localTypeDataModel as KoheseDataModel).properties).
       length).toBeGreaterThan(0);
   });
-  
+
   // it('removes an attribute', fakeAsync(() => {
   //   // Test global and local type attribute removal
   //   let attributeName: string = 'tags';
@@ -107,7 +100,7 @@ describe('DataModelEditorComponent', () => {
   //   expect(component.dataModel.properties[attributeName]).not.toBeDefined();
   //   let typeViewModel: any;
   //   expect(typeViewModel.viewProperties[attributeName].not.toBeDefined());
-    
+
   //   let examineFormatDefinitions: (viewModel: any) => void = (viewModel:
   //     any) => {
   //     expect(viewModel.formatDefinitions[viewModel.defaultFormatKey[
@@ -133,7 +126,7 @@ describe('DataModelEditorComponent', () => {
   //       }
   //     }
   //   };
-    
+
   //   examineFormatDefinitions(typeViewModel);
   //   let subtypeViewModel: any;
   //   examineFormatDefinitions(subtypeViewModel);
@@ -146,7 +139,7 @@ describe('DataModelEditorComponent', () => {
     expect(component.areNamespaceReferencesEqual({ id: '' }, { id: '' })).toBe(
       true);
   });
-  
+
   it('adds an EnumerationValue', async () => {
     let enumeration: Enumeration = {
       metatype: Metatype.ENUMERATION,

@@ -1126,7 +1126,6 @@ export function ModelDefinitions() {
             "type": [
               "object"
             ],
-            "required": true,
             "name": "validations"
           },
           "relations": {
@@ -1138,14 +1137,12 @@ export function ModelDefinitions() {
             "type": [
               "object"
             ],
-            "required": true,
             "name": "acls"
           },
           "methods": {
             "type": [
               "object"
             ],
-            "required": true,
             "name": "methods"
           },
           "classLocalTypes": {

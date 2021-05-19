@@ -19,7 +19,7 @@ describe('Component: Editable Cell ', ()=>{
   let editableCellFixture : ComponentFixture<EditableCellComponent>;
   let editableStream = new BehaviorSubject<boolean>(true);
   let rowActionStream = new Subject<any>();
-  
+
   let actionProxy = new ItemProxy('Action', MockItem())
 
   beforeEach(async(()=>{
@@ -80,5 +80,7 @@ describe('Component: Editable Cell ', ()=>{
 
   afterEach(()=>{
     ItemProxy.getWorkingTree().reset();
+    editableCellFixture.destroy();
+    TestBed.resetTestingModule();
   })
 })
