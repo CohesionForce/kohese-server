@@ -9,7 +9,7 @@ import * as fs from 'fs';
 let Path = require('path');
 
 let repoList = {};
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(\-mount)?$/i;
 
 export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
@@ -408,12 +408,32 @@ export class KDBRepo {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  static getMountId(id) {
+    if (id.indexOf('-mount') !== -1) {
+      // remove -mount from ID
+      return  id.split('-mount')[0];
+    }else {
+      return id;
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   private static pendingGetRepoStatus = {};
   static async getRepoStatus (repositoryId) : Promise<any> {
     // This code gets working directory changes similar to git status
     var repoStatus = [];
 
     let statuses;
+
+    if (repositoryId !== 'ROOT') {
+      repositoryId = repositoryId + '-mount'
+    }
+
+    if (!repoList[repositoryId]) {
+      repositoryId = 'ROOT'
+    }
 
     if (!this.pendingGetRepoStatus[repositoryId]) {
       this.pendingGetRepoStatus[repositoryId] = repoList[repositoryId].getStatusExt();
@@ -434,7 +454,7 @@ export class KDBRepo {
             // Not an itemId, so reset to undefined
             itemId = undefined;
             if (path === 'Root.json') {
-              itemId = repositoryId;
+              itemId = KDBRepo.getMountId(repositoryId);
             }
 
           }
@@ -470,7 +490,9 @@ export class KDBRepo {
 
     for (let repositoryId in repoList) {
 
-      repoStatus[repositoryId] = [];
+      let repoId = KDBRepo.getMountId(repositoryId);
+
+      repoStatus[repoId] = [];
       let statuses;
 
       if (!this.pendingGetStatus[repositoryId]) {
@@ -492,9 +514,8 @@ export class KDBRepo {
               // Not an itemId, so reset to undefined
               itemId = undefined;
               if (path === 'Root.json') {
-                itemId = repositoryId;
+                itemId = repoId;
               }
-
             }
           }
         }
@@ -509,7 +530,7 @@ export class KDBRepo {
           delete fileStatus.itemId;
         }
 
-        repoStatus[repositoryId].push(fileStatus);
+        repoStatus[repoId].push(fileStatus);
 
       });
 
@@ -603,7 +624,7 @@ export class KDBRepo {
   static getRepoId(filePath) {
     if (filePath !== '') {
       var id: any = path.parse(filePath).base;
-      if (repoList[id]) {
+      if (repoList[id + '-mount']) {
         return id;
       } else {
         let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
@@ -621,7 +642,7 @@ export class KDBRepo {
   static getFilePath(filePath) {
     if (filePath !== '') {
       var id: any = path.parse(filePath).base;
-      if (repoList[id]) {
+      if (repoList[id + '-mount']) {
         return filePath;
       } else {
         let repopath = filePath.substring(0, filePath.lastIndexOf('/'));

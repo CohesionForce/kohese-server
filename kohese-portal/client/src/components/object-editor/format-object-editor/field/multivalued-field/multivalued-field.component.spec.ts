@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QueryList } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-  MatExpansionModule, MatIconModule, MatInputModule, MatSelectModule,
-  MatTooltipModule, MatExpansionPanel} from '@angular/material';
+import { MaterialModule } from '../../../../../material.module';
+import { MatExpansionPanel } from '@angular/material';
 import { MarkdownModule } from 'ngx-markdown';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { FormatDefinitionType } from '../../../../../../../common/src/FormatDefinition.interface';
 import { PropertyDefinition } from '../../../../../../../common/src/PropertyDefinition.interface';
@@ -22,6 +23,7 @@ import { FormatObjectEditorComponent } from '../../format-object-editor.componen
 import { SinglevaluedFieldComponent } from '../singlevalued-field/singlevalued-field.component';
 import { MultivaluedFieldComponent } from './multivalued-field.component';
 import { TreeViewModule } from '../../../../tree/tree.module';
+import { DirectivesModule } from '../../../../../directives/directives.module'
 
 describe('MultivaluedFieldComponent', () => {
   let component: MultivaluedFieldComponent;
@@ -34,24 +36,20 @@ describe('MultivaluedFieldComponent', () => {
         SinglevaluedFieldComponent
       ],
       imports: [
+        RouterModule.forRoot([]),
         FormsModule,
-        MatTooltipModule,
-        MatCheckboxModule,
-        MatInputModule,
-        MatDatepickerModule,
-        MatIconModule,
-        MatSelectModule,
-        MatExpansionModule,
-        MatDialogModule,
+        MaterialModule,
         MarkdownModule,
         TableModule,
         MarkdownEditorModule,
-        TreeViewModule
+        TreeViewModule,
+        DirectivesModule
       ],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: DialogService, useClass: MockDialogService },
-        { provide: SessionService, useClass: MockSessionService }
+        { provide: SessionService, useClass: MockSessionService },
+        { provide: APP_BASE_HREF, useValue : '/' } // acts as <head> for routerModule. Describes non-static URL pieces
       ]
     }).compileComponents();
 

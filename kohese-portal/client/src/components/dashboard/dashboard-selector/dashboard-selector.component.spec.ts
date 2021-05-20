@@ -1,13 +1,13 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-
-import { CommonModule } from '@angular/common';
+import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { MaterialModule } from '../../../material.module'
 
 import { DashboardSelectorComponent } from './dashboard-selector.component';
 import { MockUserData } from '../../../../mocks/data/MockUser';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 
 describe('Component: Dashboard Selector', ()=>{
   let dashboardSelectorComponent: DashboardSelectorComponent;
@@ -16,12 +16,15 @@ describe('Component: Dashboard Selector', ()=>{
   beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [DashboardSelectorComponent],
-      imports : [CommonModule,
-         MaterialModule,
-         BrowserAnimationsModule
-         ],
+      imports : [
+        RouterModule.forRoot([]),
+        CommonModule,
+        MaterialModule,
+        BrowserAnimationsModule
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
+        { provide: APP_BASE_HREF, useValue: '/'}
       ]
     }).compileComponents();
 

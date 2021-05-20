@@ -19,10 +19,12 @@ import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { PipesModule } from '../../pipes/pipes.module';
 import { MockUserData } from '../../../mocks/data/MockUser';
 import { ItemProxy } from '../../../../common/src/item-proxy';
+import { CacheManager } from '../../../../client/cache-worker/CacheManager';
 
 import { LensModule } from '../lens/lens.module';
 import { LensService } from '../../services/lens-service/lens.service';
 import { MockLensService } from '../../../mocks/services/MockLensService';
+import { MockCacheManager } from '../../../mocks/services/MockCacheManager';
 
 describe('Component: Admin', () => {
   let adminComponent: AdminComponent;
@@ -47,6 +49,7 @@ describe('Component: Admin', () => {
         { provide: SessionService, useClass: MockSessionService },
         { provide: DialogService, useClass: MockDialogService },
         { provide: LensService, useClass: MockLensService },
+        { provide: CacheManager, useClass: MockCacheManager }
 
       ]
     }).compileComponents();
@@ -61,4 +64,7 @@ describe('Component: Admin', () => {
    expect(AdminComponent).toBeTruthy();
   });
 
+  afterEach(() => {
+    adminFixture.destroy();
+  });
 });

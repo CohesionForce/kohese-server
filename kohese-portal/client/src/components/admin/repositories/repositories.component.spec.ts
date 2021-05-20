@@ -9,6 +9,7 @@ import { MaterialModule } from '../../../material.module'
 import { PipesModule } from "../../../pipes/pipes.module";
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { RepositoryService } from '../../../services/repository/repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { RepositoriesComponent } from './repositories.component';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
@@ -40,11 +41,12 @@ describe('Component: Repositories', ()=>{
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: DialogService, useClass: MockDialogService },
-        {provide: ItemRepository, useClass: MockItemRepository},
-        {provide: VersionControlService, useClass: MockVersionControlService},
-        {provide: NavigationService, useClass: MockNavigationService},
+        { provide: ItemRepository, useClass: MockItemRepository},
+        { provide: VersionControlService, useClass: MockVersionControlService},
+        { provide: NavigationService, useClass: MockNavigationService},
         { provide: SessionService, useClass: MockSessionService },
-        { provide: NotificationService, useClass: MockNotificationService }
+        { provide: NotificationService, useClass: MockNotificationService },
+        { provide: RepositoryService, useClass: MockItemRepository }
       ]
     }).compileComponents();
 
