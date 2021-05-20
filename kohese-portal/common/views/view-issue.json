@@ -2,7 +2,7 @@
   "id": "view-issue",
   "name": "Issue View Model",
   "parentId": "view-observation",
-   "namespace": {
+  "namespace": {
     "id": "com.kohese"
   },
   "modelName": "Issue",
