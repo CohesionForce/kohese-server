@@ -15,7 +15,6 @@ import { VersionControlService } from '../../../services/version-control/version
 import { RepositoryService } from '../../../services/repository/repository.service';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../tree/tree.component';
-import { NamespaceEditorComponent } from '../../object-editor/namespace-editor/namespace-editor.component';
 
 
 @Component({
