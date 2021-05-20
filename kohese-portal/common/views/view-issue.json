@@ -2,7 +2,7 @@
   "id": "view-issue",
   "name": "Issue View Model",
   "parentId": "view-observation",
-  "namespace": {
+   "namespace": {
     "id": "com.kohese"
   },
   "modelName": "Issue",
@@ -351,10 +351,10 @@
               "editable": true
             },
             {
-              "propertyName": "response",
-              "customLabel": "Response",
-              "labelOrientation": "Top",
-              "kind": "markdown",
+              "propertyName": "analysisAction",
+              "customLabel": "Analysis Action",
+              "labelOrientation": "Left",
+              "kind": "",
               "tableDefinition": "",
               "visible": true,
               "editable": true
@@ -369,10 +369,10 @@
               "editable": true
             },
             {
-              "propertyName": "analysisAction",
-              "customLabel": "Analysis Action",
-              "labelOrientation": "Left",
-              "kind": "",
+              "propertyName": "response",
+              "customLabel": "Response",
+              "labelOrientation": "Top",
+              "kind": "markdown",
               "tableDefinition": "",
               "visible": true,
               "editable": true
