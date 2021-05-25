@@ -57,6 +57,10 @@ describe('ViewModelEditorComponent', () => {
     componentFixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('retrieves an identifier for a given EnumerationValue at the given ' +
     'index', () => {
     expect(component.getEnumerationValueIdentifier(3,

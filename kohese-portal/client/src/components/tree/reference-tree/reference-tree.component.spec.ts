@@ -16,7 +16,7 @@ import { ReferenceTreeComponent } from './reference-tree.component';
 
 describe('Component: reference-tree', () => {
   let component: ReferenceTreeComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ReferenceTreeComponent],
@@ -35,14 +35,18 @@ describe('Component: reference-tree', () => {
         DynamicTypesService
       ]
     }).compileComponents();
-    
+
     let fixture: ComponentFixture<ReferenceTreeComponent> = TestBed.
       createComponent(ReferenceTreeComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
-  
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('initializes', () => {
     expect(component.getRootRow()).toBeDefined();
   });

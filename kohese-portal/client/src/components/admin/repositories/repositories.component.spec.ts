@@ -57,6 +57,11 @@ describe('Component: Repositories', ()=>{
 
   })
 
+  afterEach(() => {
+    repositoriesFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the Repositories component', ()=>{
     expect(repositoriesComponent).toBeTruthy();
   })

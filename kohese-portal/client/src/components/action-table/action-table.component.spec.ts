@@ -52,6 +52,11 @@ describe('Component: Action Table', ()=>{
 
   })
 
+  afterEach(() => {
+    actionTableFixture.destroy;
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the actionTable component', ()=>{
     expect(actionTableComponent).toBeTruthy();
   })

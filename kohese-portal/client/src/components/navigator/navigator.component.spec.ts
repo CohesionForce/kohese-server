@@ -18,10 +18,17 @@ describe('Component: navigator', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
-    let fixture: ComponentFixture<NavigatorComponent> = TestBed.
-      createComponent(NavigatorComponent);
+    let fixture: ComponentFixture<NavigatorComponent> = TestBed.createComponent(NavigatorComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
+  it('instantiates the navigator component', () => {
+    expect(component).toBeTruthy();
+  })
 });

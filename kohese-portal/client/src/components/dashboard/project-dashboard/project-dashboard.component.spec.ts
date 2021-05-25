@@ -35,6 +35,11 @@ describe('ProjectDashboardComponent', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    fixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('should instantiate', () => {
     expect(projectDashboardComponent).toBeTruthy();
   });

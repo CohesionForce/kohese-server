@@ -66,6 +66,10 @@ describe('FormatObjectEditorComponent', () => {
     componentFixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('provides a function that retrieves text for a table cell', () => {
     expect(component.getTableCellTextRetrievalFunction()(TreeConfiguration.
       getWorkingTree().getProxyFor(component.object[

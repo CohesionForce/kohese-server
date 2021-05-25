@@ -60,11 +60,12 @@ describe('Component: Admin', () => {
     adminFixture.detectChanges();
   });
 
+  afterEach(() => {
+    adminFixture.destroy();
+  });
+
   it('should instantiate the admin component', () => {
    expect(AdminComponent).toBeTruthy();
   });
 
-  afterEach(() => {
-    adminFixture.destroy();
-  });
 });

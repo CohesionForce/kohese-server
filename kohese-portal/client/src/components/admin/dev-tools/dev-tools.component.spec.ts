@@ -20,14 +20,15 @@ describe('DevToolsComponent', () => {
         MaterialModule
       ],
       providers: [ { provide: LogService, useClass: MockLogService } ]
-    })
-    .compileComponents();
-  });
+    }).compileComponents();
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(DevToolsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  beforeEach(() => {
+
   });
 
   it('should create', () => {

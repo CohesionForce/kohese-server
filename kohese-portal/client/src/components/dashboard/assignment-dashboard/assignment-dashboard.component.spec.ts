@@ -49,6 +49,11 @@ describe('Component: ', ()=>{
 
   })
 
+  afterEach(() => {
+    assignmentDashboardFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the assignmentDashboard component', ()=>{
     expect(assignmentDashboardComponent).toBeTruthy();
   })

@@ -60,6 +60,11 @@ describe('Component: Create Wizard', ()=>{
     createWizardFixture.detectChanges();
   })
 
+  afterEach(() => {
+    createWizardFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   describe('initialization', ()=>{
     it('instantiates the createWizard component', ()=>{
       expect(createWizardComponent).toBeTruthy();
@@ -93,6 +98,4 @@ describe('Component: Create Wizard', ()=>{
     }))
   })
 
-  afterEach(()=>{
-  })
 })

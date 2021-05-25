@@ -36,6 +36,11 @@ describe('Component: Dashboard Selector', ()=>{
 
   })
 
+  afterEach(() => {
+    dashboardSelectorFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the dashboardSelector component', ()=>{
     expect(dashboardSelectorComponent).toBeTruthy();
   })

@@ -36,15 +36,18 @@ describe('StateSummaryDialogComponent', () => {
         { provide: DialogService, useClass: MockDialogService }
       ],
       schemas: [ NO_ERRORS_SCHEMA ]
-    })
-    .compileComponents();
-  }));
+    }).compileComponents();
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(StateSummaryDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
+  }));
+
+  afterEach(() => {
+    fixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
 
   it('should create', () => {
     expect(component).toBeTruthy();

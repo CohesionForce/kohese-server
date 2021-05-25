@@ -66,6 +66,11 @@ describe('Component: Sentence View', ()=>{
 
   })
 
+  afterEach(() => {
+    sentenceFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the sentence component', ()=>{
     expect(sentenceComponent).toBeTruthy();
   })

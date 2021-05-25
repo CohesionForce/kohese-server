@@ -43,6 +43,10 @@ describe('DataModelEditorComponent', () => {
     componentFixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('adds a local type', async () => {
     let matDialogRefPlaceholder: MatDialogRef<ComponentDialogComponent> = ({
       'updateSize': (width: string, height: string) => {

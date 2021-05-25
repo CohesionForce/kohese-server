@@ -43,10 +43,15 @@ describe('Component: SideBar', ()=>{
     sideBarComponent = sideBarFixture.componentInstance;
 
     sideBarFixture.detectChanges();
-    
+
+  })
+
+  afterEach(() => {
+    sideBarFixture.destroy();
+    TestBed.resetTestingModule();
   })
 
   it('instantiates the SideBar component', ()=>{
-    expect(sideBarComponent).toBeTruthy(); 
+    expect(sideBarComponent).toBeTruthy();
   })
 })

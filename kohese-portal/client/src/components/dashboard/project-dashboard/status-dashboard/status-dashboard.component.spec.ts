@@ -35,7 +35,7 @@ describe('Component: StatusDashboardComponent', () => {
       ],
       schemas: [ NO_ERRORS_SCHEMA ]
     }).compileComponents();
-    
+
     let fixture: ComponentFixture<StatusDashboardComponent> = TestBed.
       createComponent(StatusDashboardComponent);
     component = fixture.componentInstance;
@@ -43,6 +43,10 @@ describe('Component: StatusDashboardComponent', () => {
       new MockProjectService().getProjects()[0]);
     fixture.detectChanges();
   });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy();

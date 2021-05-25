@@ -39,6 +39,11 @@ describe('Component: ', ()=>{
 
   })
 
+  afterEach(() => {
+    openAssignmentFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the openAssignment component', ()=>{
     expect(openAssignmentComponent).toBeTruthy();
   })

@@ -51,6 +51,12 @@ describe('Component: Editable Cell ', ()=>{
 
   }))
 
+  afterEach(()=>{
+    ItemProxy.getWorkingTree().reset();
+    editableCellFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the editableCell component', ()=>{
     expect(editableCellComponent).toBeTruthy();
   })
@@ -78,9 +84,4 @@ describe('Component: Editable Cell ', ()=>{
     expect(editableCellComponent.editable).toBeTruthy();
   })
 
-  afterEach(()=>{
-    ItemProxy.getWorkingTree().reset();
-    editableCellFixture.destroy();
-    TestBed.resetTestingModule();
-  })
 })

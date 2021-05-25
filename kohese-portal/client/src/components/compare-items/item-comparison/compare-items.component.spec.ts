@@ -46,7 +46,11 @@ describe('Component: compare-items', () => {
 
     compareItemsFixture.detectChanges();
   });
-  
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('responds to selecting a base ItemProxy', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       'test-uuid6');
@@ -55,7 +59,7 @@ describe('Component: compare-items', () => {
     expect(component.selectedBaseVersion).toBeTruthy();
     expect(component.baseVersions.length).toBeGreaterThan(0);
   });
-  
+
   it('responds to selecting a change ItemProxy', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       'test-uuid6');
@@ -64,7 +68,7 @@ describe('Component: compare-items', () => {
     expect(component.selectedChangeVersion).toBeTruthy();
     expect(component.changeVersions.length).toBeGreaterThan(0);
   });
-  
+
   it('compares two objects', async () => {
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
       'test-uuid6');
@@ -73,7 +77,7 @@ describe('Component: compare-items', () => {
     await component.compare();
     expect(component.comparison).toBeDefined();
   }, 10000);
-  
+
   it('toggles the value of the showDifferencesOnlySubject', () => {
     expect(component.showDifferencesOnlySubject.getValue()).toEqual(true);
     component.toggleShowingDifferencesOnly();
