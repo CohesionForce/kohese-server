@@ -198,6 +198,11 @@ export class RepositoriesComponent extends NavigatableComponent implements
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
+        maySelect: (element: any) => {
+          let itemProxy: ItemProxy = (element as ItemProxy);
+          let isAncestor: boolean = itemProxy.hasAncestor(proxy);
+          return (!isAncestor);
+        },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
         },
@@ -207,10 +212,9 @@ export class RepositoriesComponent extends NavigatableComponent implements
       Array<any>) => {
         if (result) {
           let newParentId = result[0].item.id;
-          let parentProxy = ItemProxy.getWorkingTree().getProxyFor(newParentId);
-          if (proxy && parentProxy) {
-              proxy.item.parentId = newParentId;
-              this.itemRepository.upsertItem(proxy.kind, proxy.item);
+          if ((proxy) && (proxy.item.parentId != newParentId)) {
+            proxy.item.parentId = newParentId;
+            this.itemRepository.upsertItem(proxy.kind, proxy.item);
           }
         }
     })
