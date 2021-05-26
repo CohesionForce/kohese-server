@@ -514,6 +514,23 @@
               "editable": true
             }
           ]
+        },
+        {
+          "kind": "ReverseReferenceTable",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "Issue",
+                "attribute": "analysisAction"
+              },
+              "customLabel": "Analysis Action",
+              "labelOrientation": "Top",
+              "kind": "",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": false
+            }
+          ]
         }
       ],
       "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
