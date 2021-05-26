@@ -183,7 +183,7 @@ implements OnInit, OnDestroy {
     // Grab the update to the treeConfig for redrawing document-view
     this.changeSubjectSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
       // if we are changing the current itemProxy or a descendant of the current itemProxy
-      if((change.proxy === this.itemProxy) || change.proxy.hasAncestor(this.itemProxy)) {
+      if((change.proxy === this.itemProxy) || (change.proxy && change.proxy.hasAncestor(this.itemProxy))) {
         if(change.type !== 'dirty') {
           this.generateDoc();
           this.changeRef.markForCheck();

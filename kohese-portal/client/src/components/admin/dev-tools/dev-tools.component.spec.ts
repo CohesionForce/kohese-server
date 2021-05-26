@@ -27,9 +27,10 @@ describe('DevToolsComponent', () => {
     fixture.detectChanges();
   });
 
-  beforeEach(() => {
-
-  });
+  afterEach(() => {
+    fixture.destroy();
+    TestBed.resetTestingModule();
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy();

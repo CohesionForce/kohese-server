@@ -61,6 +61,11 @@ describe('Component: Document View', ()=>{
     });
   })
 
+  afterEach(() => {
+    documentViewFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the Document View component', ()=>{
     documentViewComponent.proxyStream = new BehaviorSubject(TreeConfiguration.
       getWorkingTree().getProxyFor('test-uuid1'));
@@ -77,12 +82,18 @@ describe('Component: Document View', ()=>{
 
   it('loads only a subset of the document when incremental load is on', ()=>{
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getRootProxy();
+    // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    // console.log(proxy);
     let item: any = MockItem();
+    // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    // console.log(item);
     item.parentId = '';
     for (let j: number = 0; j < 33; j++) {
       item.id = item.id + j;
       new ItemProxy('Item', item);
     }
+    // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    // console.log(item.id);
     documentViewComponent.proxyStream = new BehaviorSubject(proxy);
     documentViewComponent.incrementalLoad = true;
     documentViewFixture.detectChanges();

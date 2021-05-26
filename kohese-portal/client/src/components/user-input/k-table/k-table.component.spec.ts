@@ -7,7 +7,7 @@ import { KTableComponent } from './k-table.component';
 
 describe('Component: k-table', () => {
   let component: KTableComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [KTableComponent],
@@ -16,11 +16,14 @@ describe('Component: k-table', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    
-    let fixture: ComponentFixture<KTableComponent> = TestBed.createComponent(
-      KTableComponent);
+
+    let fixture: ComponentFixture<KTableComponent> = TestBed.createComponent(KTableComponent);
     component = fixture.componentInstance;
-    
     fixture.detectChanges();
   });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
 });
