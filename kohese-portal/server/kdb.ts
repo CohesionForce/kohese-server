@@ -771,15 +771,12 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
 
             // Check mountFile for the mount path or use a .mount file if necessary
             if(mountList[repoMount.id] && !mountList[repoMount.id].disabled) {
-                console.log('==> in mount list');
-                subRepoDirPath = mountList[repoMount.id].repoStoragePath;
-                if(!mountList[repoMount.id].name) {
+              console.log('==> in mount list');
+              subRepoDirPath = mountList[repoMount.id].repoStoragePath;
+              if(!mountList[repoMount.id].name) {
                     mountList[repoMount.id].name = repoMount.name;
                     updateMountFile();
-                }
-            }
-
-            if (!mountList[repoMount.id].disabled) {
+              }
               console.log("==> sRDP: " + subRepoDirPath);
 
               var mountData = {
@@ -790,7 +787,7 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
               };
                mountRepository(mountData, enable);
             } else {
-              console.log('::: not mounted - disabled ', mountList[repoMount.id].name)
+              console.log('*** Not mounted - Not In Mount File (mounts.json) or is Disabled ' + repoMount.name + ' ' + repoMount.id)
             }
         }
         break;
