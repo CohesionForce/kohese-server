@@ -529,6 +529,18 @@
               "tableDefinition": "",
               "visible": true,
               "editable": false
+            },
+            {
+              "propertyName": {
+                "kind": "Issue",
+                "attribute": "resolutionActions"
+              },
+              "customLabel": "Resolution Actions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": false
             }
           ]
         }
