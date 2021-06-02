@@ -27,6 +27,10 @@ describe('Component: change-summary', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('determines if a Comparison has changes', async () => {
     let comparisonWithChanges: Comparison = new Comparison({
       property: 'value'

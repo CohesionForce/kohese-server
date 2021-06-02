@@ -64,6 +64,10 @@ describe('Component: version-control-tree', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('initializes', () => {
     expect(component.getRootRow()).toBeDefined();
     let descendantIndex: number = -1;

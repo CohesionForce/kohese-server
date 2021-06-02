@@ -66,6 +66,11 @@ describe('Component: Term View', ()=>{
 
   })
 
+  afterEach(() => {
+    termFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the term component', ()=>{
     expect(termComponent).toBeTruthy();
   })

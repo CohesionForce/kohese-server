@@ -41,6 +41,11 @@ describe('Component: Parent Selector', ()=>{
 
   })
 
+  afterEach(() => {
+    proxySelectorFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the proxySelector component', ()=>{
     expect(proxySelectorComponent).toBeTruthy();
   })

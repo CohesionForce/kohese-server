@@ -1,10 +1,11 @@
+import { TestBed } from '@angular/core/testing';
 import { Filter, FilterCriteriaConnection, FilterCriteriaConnectionType,
   FilterCriterion } from './filter.class';
 
 class EvaluationObject {
   private _numericProperty: number = 3;
   private _stringProperty: string = 'String Property';
-  
+
   public constructor() {
   }
 }
@@ -13,7 +14,7 @@ let evaluationObject: any = new EvaluationObject();
 
 describe('Class: Filter', () => {
   let filter: Filter;
-  
+
   beforeEach(() => {
     filter = new Filter();
     let connection: FilterCriteriaConnection = new FilterCriteriaConnection(
@@ -29,7 +30,11 @@ describe('Class: Filter', () => {
     filter.rootElement.criteria.push(new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.LESS_THAN, '3'));
   });
-  
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('filters based on criteria', () => {
     let results: Array<any> = filter.filter([evaluationObject]);
     expect(results.indexOf(evaluationObject)).toEqual(-1);
@@ -37,7 +42,7 @@ describe('Class: Filter', () => {
     results = filter.filter([evaluationObject]);
     expect(results.indexOf(evaluationObject)).not.toEqual(-1);
   });
-  
+
   it('removes FilterElements', () => {
     expect(filter.removeElement(filter.rootElement.connections[0].criteria[
       0])).toEqual(true);
@@ -50,7 +55,7 @@ describe('Class: Filter', () => {
 
 describe('Class: FilterCriterion', () => {
   let filter: Filter = new Filter();
-  
+
   it('evaluates whether a property value is < a value', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.LESS_THAN, '3');
@@ -58,7 +63,7 @@ describe('Class: FilterCriterion', () => {
     criterion.value = '7';
     expect(criterion.evaluate(evaluationObject)).toEqual(true);
   });
-  
+
   it('evaluates whether a property value is <= to a value', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.
@@ -67,7 +72,7 @@ describe('Class: FilterCriterion', () => {
     criterion.value = '1';
     expect(criterion.evaluate(evaluationObject)).toEqual(false);
   });
-  
+
   it('evaluates whether a property value equals a value', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.EQUALS, '3');
@@ -75,7 +80,7 @@ describe('Class: FilterCriterion', () => {
     criterion.value = '7';
     expect(criterion.evaluate(evaluationObject)).toEqual(false);
   });
-  
+
   it('evaluates whether a property value contains a value', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.CONTAINS, 'String');
@@ -83,7 +88,7 @@ describe('Class: FilterCriterion', () => {
     criterion.value = 'value';
     expect(criterion.evaluate(evaluationObject)).toEqual(false);
   });
-  
+
   it('evaluates whether a property value matches a regular expression', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.
@@ -92,7 +97,7 @@ describe('Class: FilterCriterion', () => {
     criterion.value = '/prop/';
     expect(criterion.evaluate(evaluationObject)).toEqual(false);
   });
-  
+
   it('evaluates whether a property value ends with a value', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.ENDS_WITH,
@@ -101,7 +106,7 @@ describe('Class: FilterCriterion', () => {
     criterion.value = 'value';
     expect(criterion.evaluate(evaluationObject)).toEqual(false);
   });
-  
+
   it('evaluates whether a property value begins with a value', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.BEGINS_WITH,
@@ -110,7 +115,7 @@ describe('Class: FilterCriterion', () => {
     criterion.value = 'value';
     expect(criterion.evaluate(evaluationObject)).toEqual(false);
   });
-  
+
   it('evaluates whether a property value is >= a value', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.
@@ -119,7 +124,7 @@ describe('Class: FilterCriterion', () => {
     criterion.value = '7';
     expect(criterion.evaluate(evaluationObject)).toEqual(false);
   });
-  
+
   it('evaluates whether a property value is > a value', () => {
     let criterion: FilterCriterion = new FilterCriterion(filter.
       filterableProperties[0], FilterCriterion.CONDITIONS.GREATER_THAN, '3');

@@ -39,10 +39,15 @@ describe('Component: Login Component', ()=>{
     loginComponent = loginFixture.componentInstance;
 
     loginFixture.detectChanges();
-    
+
+  })
+
+  afterEach(() => {
+    loginFixture.destroy();
+    TestBed.resetTestingModule();
   })
 
   it('instantiates the login component', ()=>{
-    expect(loginComponent).toBeTruthy(); 
+    expect(loginComponent).toBeTruthy();
   })
 })

@@ -15,7 +15,7 @@ describe('Component: filter-tree', () => {
   let component: FilterTreeComponent;
   let filterableProperty: FilterableProperty = new FilterableProperty(
     'Filterable Property', [], ValueInputType.STRING, []);
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [FilterTreeComponent],
@@ -27,15 +27,19 @@ describe('Component: filter-tree', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    
+
     let fixture: ComponentFixture<FilterTreeComponent> = TestBed.
       createComponent(FilterTreeComponent);
     component = fixture.componentInstance;
     component.targetFilterSubject = new BehaviorSubject<Filter>(new Filter());
-    
+
     fixture.detectChanges();
   });
-  
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('adds a FilterElement of the specified type to the given connection',
     () => {
     let connection: FilterCriteriaConnection = component.targetFilterSubject.
@@ -46,7 +50,7 @@ describe('Component: filter-tree', () => {
     component.addElementToConnection('FilterCriterion', connection);
     expect(connection.criteria.length).toBeGreaterThan(0);
   });
-  
+
   it('adds a FilterCriterion to the selected connections', () => {
     let connection: FilterCriteriaConnection = component.targetFilterSubject.
       getValue().rootElement;
@@ -54,7 +58,7 @@ describe('Component: filter-tree', () => {
     component.addCriterionToSelectedConnections();
     expect(connection.criteria.length).toBeGreaterThan(0);
   });
-  
+
   it('adds a FilterCriteriaConnection to the selected connections', () => {
     let connection: FilterCriteriaConnection = component.targetFilterSubject.
       getValue().rootElement;
@@ -62,7 +66,7 @@ describe('Component: filter-tree', () => {
     component.addConnectionToSelectedConnections('AND');
     expect(connection.connections.length).toBeGreaterThan(0);
   });
-  
+
   it('deletes a FilterCriterion', () => {
     let criterion: FilterCriterion = new FilterCriterion(filterableProperty,
       FilterCriterion.CONDITIONS.CONTAINS, '');
@@ -71,31 +75,31 @@ describe('Component: filter-tree', () => {
     expect(component.selectedObjectsSubject.getValue().indexOf(criterion)).
       toEqual(-1);
   });
-  
+
   it('enters Targeting Mode', () => {
     component.enterCopyTargetingMode(undefined);
     expect(component.localInTargetingMode).toEqual(true);
   });
-  
+
   it('exits Targeting Mode', () => {
     component.localExitTargetingMode();
     expect(component.localInTargetingMode).toEqual(false);
   });
-  
+
   it('determines if all of the selected objects are connections', () => {
     component.selectedObjectsSubject.next([new FilterCriteriaConnection(
       FilterCriteriaConnectionType.AND), new FilterCriterion(
       filterableProperty, FilterCriterion.CONDITIONS.CONTAINS, '')]);
     expect(component.areSelectedElementsConnections()).toEqual(false);
   });
-  
+
   it('determines if all of the selected objects are criteria', () => {
     component.selectedObjectsSubject.next([new FilterCriteriaConnection(
       FilterCriteriaConnectionType.AND), new FilterCriterion(
       filterableProperty, FilterCriterion.CONDITIONS.CONTAINS, '')]);
     expect(component.areSelectedElementsCriteria()).toEqual(false);
   });
-  
+
   it('suppresses display of the Anchor Action', () => {
     let anchorActionPresent: boolean = false;
     for (let j: number = 0; j < component.rowActions.length; j++) {
@@ -104,7 +108,7 @@ describe('Component: filter-tree', () => {
         break;
       }
     }
-    
+
     expect(anchorActionPresent).toEqual(false);
   });
 });

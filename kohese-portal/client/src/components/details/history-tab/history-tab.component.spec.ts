@@ -44,6 +44,11 @@ describe('Component: History Tab', ()=>{
 
   })
 
+  afterEach(() => {
+    historyFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the history component', ()=>{
     expect(historyComponent).toBeTruthy();
   })

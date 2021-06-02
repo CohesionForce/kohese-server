@@ -41,6 +41,11 @@ describe('Component: Completed Assignment', ()=>{
 
   })
 
+  afterEach(() => {
+    completedAssignmentFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the completedAssignment component', ()=>{
     expect(completedAssignmentComponent).toBeTruthy();
   })

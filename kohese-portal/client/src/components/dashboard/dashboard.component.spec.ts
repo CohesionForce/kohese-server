@@ -74,6 +74,11 @@ describe('Component: Dashboard', ()=>{
 
   })
 
+  afterEach(() => {
+    dashboardFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the dashboard component', ()=>{
     expect(dashboardComponent).toBeTruthy();
   })

@@ -25,4 +25,12 @@ describe('Component: tree-row', () => {
 
     fixture.detectChanges();
   });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
+  it('instantiates the tree-row component', () => {
+    expect(TreeRowComponent).toBeTruthy();
+  })
 });

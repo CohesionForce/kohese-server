@@ -52,6 +52,10 @@ describe('TreeComponent', () => {
     componentFixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('moves the selected element at a given index', () => {
     component.moveElement(2, 0, true);
     expect(component.selection).toEqual([TreeConfiguration.getWorkingTree().

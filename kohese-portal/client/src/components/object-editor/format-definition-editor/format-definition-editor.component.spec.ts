@@ -50,6 +50,10 @@ describe('FormatDefinitionEditorComponent', () => {
     componentFixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('retrieves display options', () => {
     let propertyDefinitions: Array<PropertyDefinition> = component.
       formatDefinition.containers[0].contents;

@@ -27,10 +27,14 @@ describe('Component: filter', () => {
     let fixture: ComponentFixture<FilterComponent> = TestBed.
       createComponent(FilterComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
-  
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('determines if a criterion is defined', () => {
     expect(component.isCriterionDefined()).toEqual(false);
     let filter: Filter = component.filterSubject.getValue();

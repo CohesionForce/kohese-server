@@ -70,6 +70,10 @@ describe('SinglevaluedFieldComponent', () => {
     componentFixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('retrieves a string representation of the associated attribute', () => {
     expect(component.getAttributeRepresentation()).toBe('Name*');
 

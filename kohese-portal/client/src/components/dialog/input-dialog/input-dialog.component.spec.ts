@@ -8,7 +8,7 @@ import { InputDialogComponent, InputDialogKind } from './input-dialog.component'
 
 describe('InputDialogComponent', () => {
   let component: InputDialogComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [InputDialogComponent],
@@ -39,6 +39,10 @@ describe('InputDialogComponent', () => {
 
     componentFixture.detectChanges();
   });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
 
   it('validates input', () => {
     expect(component.isValid()).toBe(true);

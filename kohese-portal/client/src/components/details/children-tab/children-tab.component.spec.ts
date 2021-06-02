@@ -48,6 +48,11 @@ describe('Component: Children Tab', ()=>{
 
   })
 
+  afterEach(() => {
+    childrenTabFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the childrenTab component', ()=>{
     expect(childrenTabComponent).toBeTruthy();
   })

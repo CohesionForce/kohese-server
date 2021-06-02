@@ -13,18 +13,18 @@ import { MockItemRepository } from '../../../../mocks/services/MockItemRepositor
 
 describe('Component: commit-comparison', () => {
   let component: CommitComparisonComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [CommitComparisonComponent],
-      providers: [ 
+      providers: [
         {
           provide: MAT_DIALOG_DATA,
           useValue: {
             baseCommitId: '7ef7525795a5c370b0abfa501ab87324f5ce5908',
             changeCommitId: '42a8e801f9efef73db114730d5819997e38916d7'
           }
-        }, 
+        },
         { provide: ItemRepository, useClass: MockItemRepository },
         DynamicTypesService
       ],
@@ -35,14 +35,18 @@ describe('Component: commit-comparison', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    
+
     let fixture: ComponentFixture<CommitComparisonComponent> = TestBed.
       createComponent(CommitComparisonComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
-  
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('compares two commits', (done) => {
     let firstTime : boolean = true;
     let subscription = component.comparisonsSubject.subscribe((comparisons: Array<Comparison>) => {

@@ -22,7 +22,7 @@ describe('Component: Details', ()=>{
     TestBed.configureTestingModule({
       declarations: [DetailsComponent],
       imports : [CommonModule,
-         FormsModule, 
+         FormsModule,
          MaterialModule,
          PipesModule,
          ServicesModule,
@@ -43,7 +43,12 @@ describe('Component: Details', ()=>{
     detailsFixture.detectChanges();
   });
 
+  afterEach(() => {
+    detailsFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the details component', () => {
-    expect(detailsComponent).toBeTruthy(); 
+    expect(detailsComponent).toBeTruthy();
   });
 });

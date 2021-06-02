@@ -2,7 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
+import { of } from 'rxjs';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 
 import { MaterialModule } from '../../../material.module';
@@ -12,23 +12,24 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { LensService } from '../../../services/lens-service/lens.service';
 import { MockLensService } from '../../../../mocks/services/MockLensService';
+import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { CommitTreeComponent } from './commit-tree.component';
 
 describe('Component: commit-tree', () => {
   let component: CommitTreeComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [CommitTreeComponent],
-      providers: [ {
-          provide: ActivatedRoute,
-          useValue: { params: Observable.of({ id: '' })}
-        }, { provide: DialogService, useClass: MockDialogService },
+      providers: [
+        { provide: ActivatedRoute, useValue: { params: of({ id: '' })} },
+        { provide: DialogService, useClass: MockDialogService },
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: LensService, useClass: MockLensService },
-        { provide: NavigationService, useClass: MockNavigationService }
+        { provide: NavigationService, useClass: MockNavigationService },
+        { provide: DynamicTypesService, useClass: MockDialogService } // !!! Change useClass
       ],
       imports: [
         VirtualScrollModule,
@@ -36,11 +37,18 @@ describe('Component: commit-tree', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    
-    let fixture: ComponentFixture<CommitTreeComponent> = TestBed.
-      createComponent(CommitTreeComponent);
+
+    let fixture: ComponentFixture<CommitTreeComponent> = TestBed.createComponent(CommitTreeComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
+  it('instantiates the commit-tree component', () => {
+    expect(CommitTreeComponent).toBeTruthy();
+  })
 });
