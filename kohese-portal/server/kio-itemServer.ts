@@ -1179,7 +1179,7 @@ function KIOItemServer(socket){
     console.log('::: session %s: Received addRepository for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
     console.log('^^^ Received Add Mount request ', request)
-    kdb.addRepository(request.repoId, request.parentId)
+    kdb.addRepository(request)
   });
 
   //////////////////////////////////////////////////////////////////////////

@@ -212,23 +212,23 @@ module.exports.enableRepository = enableRepository;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function addRepository(id: string, parentId: string) {
+function addRepository(mountData) {
   for (var x: number = 0; x<availableRepositories.length; x++) {
-    if (availableRepositories[x].id === id) {
+    if (availableRepositories[x].id === mountData.repoId) {
       var repoMount = availableRepositories[x];
       break;
     }
   }
-  let parentProxy = ItemProxy.getWorkingTree().getProxyFor(parentId);
+  let parentProxy = ItemProxy.getWorkingTree().getProxyFor(mountData.parentId);
   if (parentProxy.kind === 'Repository') {
-    parentId = parentId + '-mount'
+    mountData.parentId = mountData.parentId + '-mount'
   }
-  if (!mountList[id + '-mount']) {
+  if (!mountList[mountData.repoId + '-mount']) {
 
     mountList[repoMount.id + '-mount'] = {
       name: repoMount.name,
       repoStoragePath: repoMount.repoStoragePath,
-      parentId: parentId
+      parentId: mountData.parentId
     }
 
     updateMountFile();
@@ -239,27 +239,26 @@ function addRepository(id: string, parentId: string) {
       id: repoMount.id + '-mount',
       name: repoMount.name,
       parentId: 'Repo-Mount-Definitions',
+      createdBy: mountData.username,
+      createdOn: mountData.timestamp,
+      modifiedBy: mountData.username,
+      modifiedOn: mountData.timestamp,
       repoId: repoMount.id,
-      mountPoint: KDBRepo.getMountId(parentId)
+      mountPoint: KDBRepo.getMountId(mountData.parentId)
     };
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData)
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
   } else {
-    delete mountList[id + '-mount'].disabled;
-    mountList[id + '-mount'].parentId = parentId;
+    delete mountList[mountData.repoId + '-mount'].disabled;
+    mountList[mountData.repoId + '-mount'].parentId = mountData.parentId;
     updateMountFile();
 
     var repoMountFilePath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMount.id + '-mount.json'));
 
-    let repoMountData = {
-      id: repoMount.id + '-mount',
-      name: repoMount.name,
-      parentId: 'Repo-Mount-Definitions',
-      repoId: repoMount.id,
-      mountPoint: KDBRepo.getMountId(parentId)
-    };
+    let repoMountData = kdbFS.loadJSONDoc(repoMountFilePath);
+    repoMountData.mountPoint = KDBRepo.getMountId(mountData.parentId)
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData)
@@ -395,6 +394,10 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       id: modelInstance.id + '-mount',
       name: modelInstance.name,
       parentId: 'Repo-Mount-Definitions',
+      createdBy: modelInstance.createdBy,
+      createdOn: modelInstance.createdOn,
+      modifiedBy: modelInstance.modifiedBy,
+      modifiedOn: modelInstance.modifiedOn,
       mountPoint: modelInstance.parentId,
       repoId: modelInstance.id
     };

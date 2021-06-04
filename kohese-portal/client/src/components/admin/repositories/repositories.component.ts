@@ -384,7 +384,9 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
           Array<any>) => {
             if (result) {
               let parentId = result[0].item.id;
-              this.repositoryService.addRepository(id, parentId);
+              let timestamp: number = Date.now();
+              let username: string = this._sessionService.user.name;
+              this.repositoryService.addRepository(id, parentId, timestamp, username);
               var index = this.availablerepoList.findIndex(y => y.id === id)
               this.repositoryService.mountRepository(this.availablerepoList[index] as ItemProxy);
             }
