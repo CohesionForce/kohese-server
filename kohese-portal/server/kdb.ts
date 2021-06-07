@@ -81,6 +81,7 @@ async function initialize (koheseKdbPath, indexAndExit) {
   var repositoryList = fs.readdirSync('./kdb').filter(function (file) {
     return fs.statSync(path.join('./kdb', file)).isDirectory();
   });
+  setAvailableRepositories(koheseKDBDirPath, availableRepositories)
   for (let n: number = 0; n < repositoryList.length; n++) {
     var tmppath = path.join(kdbDirPath, repositoryList[n]);
     if (fs.existsSync(tmppath + '/Root.json') && (!fs.existsSync(path.join(tmppath, 'KoheseUser')))) {
@@ -279,9 +280,11 @@ function setAvailableRepositories(dir, availableRepositories) {
       if (file === 'Root.json') {
         var repositories = kdbFS.loadJSONDoc(fullPath);
         fullPath = path.parse(fullPath).dir
-        availableRepositories.push({
-          id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
-        });
+        if (fullPath !== koheseKDBDirPath) {
+          availableRepositories.push({
+            id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
+          });
+        }
       }
     }
   });
