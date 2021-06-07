@@ -81,7 +81,6 @@ async function initialize (koheseKdbPath, indexAndExit) {
   var repositoryList = fs.readdirSync('./kdb').filter(function (file) {
     return fs.statSync(path.join('./kdb', file)).isDirectory();
   });
-  setAvailableRepositories(koheseKDBDirPath, availableRepositories)
   for (let n: number = 0; n < repositoryList.length; n++) {
     var tmppath = path.join(kdbDirPath, repositoryList[n]);
     if (fs.existsSync(tmppath + '/Root.json') && (!fs.existsSync(path.join(tmppath, 'KoheseUser')))) {
