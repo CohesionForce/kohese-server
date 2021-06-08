@@ -4,13 +4,13 @@ import { MatDialog } from '@angular/material';
 import { InputDialogKind } from '../../components/dialog/input-dialog/input-dialog.component';
 import { DialogService } from './dialog.service';
 
-xdescribe('DialogService', () => {
+describe('DialogService', () => {
   let dialogService: DialogService = new DialogService({
     open: (component: ComponentType<any>, dialogConfiguration: any) => {
      return this;
     }
   } as any as MatDialog);
-  
+
   it('displays a confirmation dialog', () => {
     expect(dialogService.openConfirmDialog('', '')).toBeTruthy();
   });
@@ -19,8 +19,8 @@ xdescribe('DialogService', () => {
     expect(dialogService.openYesNoDialog('', '')).toBeTruthy();
   });
 
-  it('displays an informational dialog', async () => {
-    expect(await dialogService.openInformationDialog('', '')).toBeFalsy();
+  it('displays an informational dialog', () => {
+    expect(dialogService.openInformationDialog('', '')).toBeTruthy();
   });
 
   it('displays an input dialog', () => {

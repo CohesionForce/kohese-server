@@ -46,14 +46,19 @@ describe('Component: Analysis', ()=>{
     analysisComponent = analysisFixture.componentInstance;
 
     analysisFixture.detectChanges();
-    
+
+  })
+
+  afterEach(() => {
+    analysisFixture.destroy();
+    TestBed.resetTestingModule();
   })
 
   it('instantiates the analysis component', ()=>{
-    expect(analysisComponent).toBeTruthy(); 
+    expect(analysisComponent).toBeTruthy();
   });
-  
-  xit('does not produce an error when the URL contains an invalid id', () => {
+
+  it('does not produce an error when the URL contains an invalid id', () => {
     expect(analysisComponent.itemProxy).not.toBeDefined();
   });
 })

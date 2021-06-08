@@ -24,7 +24,7 @@ import { MockItem } from '../../../../mocks/data/MockItem';
 
 describe('Component: default-tree', () => {
   let component: DefaultTreeComponent;
-  
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DefaultTreeComponent],
@@ -45,14 +45,18 @@ describe('Component: default-tree', () => {
         DynamicTypesService
       ]
     }).compileComponents();
-    
+
     let fixture: ComponentFixture<DefaultTreeComponent> = TestBed.
       createComponent(DefaultTreeComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
-  
+
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('builds a TreeRow for a new Item', fakeAsync(() => {
     let item: any = MockItem();
     item.id = 'test-new-row';
@@ -77,7 +81,7 @@ describe('Component: default-tree', () => {
 
     expect(newRowIndex).toEqual(5);
   }));
-  
+
   it('removes the TreeRow for a deleted Item', fakeAsync(() => {
     let numberOfVisibleRows: number = component.visibleRows.length;
     let proxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
@@ -87,7 +91,7 @@ describe('Component: default-tree', () => {
 
     expect(component.visibleRows.length).toEqual(numberOfVisibleRows - 1);
   }));
-  
+
   it('correctly responds to the tree root changing', fakeAsync(() => {
     let initialTreeRoot: any = component.rootSubject.getValue();
     let initialVisibleRows: Array<TreeRow> = component.visibleRows;
@@ -97,7 +101,7 @@ describe('Component: default-tree', () => {
     expect(initialTreeRoot).not.toBe(component.rootSubject.getValue());
     expect(component.visibleRows.indexOf(initialVisibleRows[0])).toEqual(-1);
   }));
-  
+
   it('synchronizes with selection', fakeAsync(() => {
     let index: number = -1;
     for (let j: number = 0; j < component.visibleRows.length; j++) {
@@ -107,7 +111,7 @@ describe('Component: default-tree', () => {
       }
     }
     expect(index).toEqual(-1);
-    
+
     TestBed.get(ActivatedRoute).params.next({ id: 'Item' });
     tick();
 
@@ -119,7 +123,7 @@ describe('Component: default-tree', () => {
     }
     expect(index).not.toEqual(-1);
   }));
-  
+
   it('does not produce an error when the value of selectedIdSubject is ' +
     'invalid', fakeAsync(() => {
     let id: string = '-1';
@@ -136,7 +140,7 @@ describe('Component: default-tree', () => {
     // TODO: This test seems to be missing some expect clauses
     expect(true).toEqual(true);
   }));
-  
+
   it('filters when a search string is provided', (done: Function) => {
     expect(component.filterSubject.getValue()).not.toBeDefined();
     component.searchStringChanged('Search String');
@@ -147,7 +151,7 @@ describe('Component: default-tree', () => {
       done();
     }, 1000);
   });
-  
+
   it('moves an Item before another Item', () => {
     let targetingProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid5');
@@ -159,7 +163,7 @@ describe('Component: default-tree', () => {
     expect(targetingProxy.parentProxy.children.indexOf(targetingProxy)).
       toEqual(targetingProxy.parentProxy.children.indexOf(targetProxy) - 1);
   });
-  
+
   it('moves an Item after another Item', () => {
     let targetProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid5');
@@ -171,7 +175,7 @@ describe('Component: default-tree', () => {
     expect(targetProxy.parentProxy.children.indexOf(targetProxy)).toEqual(
       targetProxy.parentProxy.children.indexOf(targetingProxy) - 1);
   });
-  
+
   it('makes an Item a child of another Item', () => {
     let targetProxy: ItemProxy = TreeConfiguration.getWorkingTree().
       getProxyFor('test-uuid5');

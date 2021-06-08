@@ -44,8 +44,14 @@ describe('Component: App Bar', ()=>{
 
     appBarFixture = TestBed.createComponent(AppBarComponent);
     appBarComponent = appBarFixture.componentInstance;
-    
+
   })
+
+  afterEach(() => {
+    appBarFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('displays a syncing message', ()=>{
     spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
       new BehaviorSubject<any>({state : RepoStates.SYNCHRONIZING}))
@@ -69,8 +75,8 @@ describe('Component: App Bar', ()=>{
 
   it('instantiates the App Bar component', ()=>{
     appBarFixture.detectChanges();
-    expect(appBarComponent).toBeTruthy(); 
+    expect(appBarComponent).toBeTruthy();
   })
 
-  
+
 })

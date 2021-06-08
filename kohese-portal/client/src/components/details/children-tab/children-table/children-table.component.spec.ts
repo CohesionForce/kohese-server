@@ -50,6 +50,11 @@ describe('Component: Children Table', ()=>{
 
   })
 
+  afterEach(() => {
+    childrenTableFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the ChildrenTable component', ()=>{
     expect(childrenTableComponent).toBeTruthy();
   })

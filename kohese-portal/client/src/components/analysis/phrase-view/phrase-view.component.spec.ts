@@ -67,6 +67,11 @@ describe('Component: Phrase View', ()=>{
 
   })
 
+  afterEach(() => {
+    phraseFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the phrase component', ()=>{
     expect(phraseComponent).toBeTruthy();
   })

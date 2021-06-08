@@ -40,13 +40,18 @@ describe('Component: Explore', ()=>{
     exploreComponent = exploreFixture.componentInstance;
 
     exploreFixture.detectChanges();
-    
+
+  })
+
+  afterEach(() => {
+    exploreFixture.destroy();
+    TestBed.resetTestingModule();
   })
 
   it('instantiates the Explore component', ()=>{
-    expect(exploreComponent).toBeTruthy(); 
+    expect(exploreComponent).toBeTruthy();
   });
-  
+
   it('should display details-view', () => {
     expect(exploreComponent.itemProxy).toBeTruthy();
   });

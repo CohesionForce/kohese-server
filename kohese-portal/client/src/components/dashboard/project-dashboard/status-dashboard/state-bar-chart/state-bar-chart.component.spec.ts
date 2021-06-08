@@ -37,7 +37,7 @@ describe('StateBarChartComponent', () => {
       users: [],
       projectItems: []
     });
-    
+
     fixture.detectChanges();
   });
 

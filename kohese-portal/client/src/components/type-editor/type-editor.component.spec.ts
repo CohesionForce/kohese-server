@@ -45,8 +45,13 @@ describe('Component: Type Editor', ()=>{
     typeEditorFixture.detectChanges();
   });
 
+  afterEach(() => {
+    typeEditorFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the Type Editor component', ()=>{
-    expect(typeEditorComponent).toBeTruthy(); 
+    expect(typeEditorComponent).toBeTruthy();
   });
 
   it('retrieves all Namespaces', () => {

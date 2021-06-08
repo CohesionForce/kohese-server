@@ -783,15 +783,8 @@ export class ItemRepository {
       let formatContainer: FormatContainer = formatDefinition.containers[j];
       if (formatContainer.kind === FormatContainerKind.
         REVERSE_REFERENCE_TABLE) {
-        representation += '### Reverse References For ' + formatContainer.
-          contents.map((propertyDefinition: PropertyDefinition) => {
-          return propertyDefinition.propertyName.kind + '\'s ' +
-            propertyDefinition.propertyName.attribute;
-        }).join('\n');
 
-        representation += '\n\n<table><tr><th>' +
-          'Name</th></tr>';
-
+        let references: string = '';
         let reverseReferencesObject: any = this.currentTreeConfigSubject.
           getValue().config.getProxyFor(koheseObject.id).relations.
           referencedBy;
@@ -799,14 +792,27 @@ export class ItemRepository {
           let propertyDefinition: PropertyDefinition = formatContainer.
             contents[j];
           if (reverseReferencesObject[propertyDefinition.propertyName.kind]) {
+            references = '#### Referenced by ' + propertyDefinition.customLabel + '\n\n';
             let reverseReferences: Array<any> = reverseReferencesObject[
-              propertyDefinition.propertyName.kind][propertyDefinition.
-              propertyName.attribute].map((itemProxy: ItemProxy) => {
-              return itemProxy.item;
-            });
-            for (let k: number = 0; k < reverseReferences.length; k++) {
-              representation += ('<tr style="vertical-align: top;"><td>' +
-                reverseReferences[k].name + '</td></tr>');
+              propertyDefinition.propertyName.kind][propertyDefinition.propertyName.attribute];
+
+            let reverseReferencesItems: Array<any>;
+            if (reverseReferences) {
+              reverseReferencesItems = reverseReferences.map((itemProxy: ItemProxy) => {
+                return itemProxy.item;
+              });
+            }
+
+            if (reverseReferencesItems) {
+              representation += references;
+              for (let k: number = 0; k < reverseReferencesItems.length; k++) {
+                representation += '**Name:** ' + reverseReferencesItems[k].name;
+                representation += '\n\n';
+                if (reverseReferencesItems[k].kind === 'Issue') {
+                  representation += '**Issue State:** ' + reverseReferencesItems[k].issueState;
+                }
+                representation += '\n\n';
+              }
             }
           }
         }

@@ -18,11 +18,16 @@ describe('ProjectSelectorComponent', () => {
         { provide: ProjectService, useClass: MockProjectService }
       ]
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(ProjectSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  afterEach(() => {
+    fixture.destroy();
+    TestBed.resetTestingModule();
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy();

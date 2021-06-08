@@ -49,39 +49,44 @@ describe('Component: attribute-editor', ()=>{
 
     fixture.detectChanges();
   });
-  
+
+  afterEach(() => {
+    fixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('determines whether two type strings represent the same type', () => {
     expect(component.areTypesSame('type', ['type'])).toEqual(
       true);
-    
+
     expect(component.areTypesSame(['type'], 'type')).toEqual(
       false);
-    
+
     expect(component.areTypesSame('type', 'type')).toEqual(
       true);
-    
+
     expect(component.areTypesSame('type', 't')).toEqual(false);
   });
-  
+
   it('determines and changes multivalued-ness of properties', () => {
     component.toggleMultivaluedness();
     expect(Array.isArray(component.attribute.type)).toEqual(true);
-    
+
     component.toggleMultivaluedness();
     expect(Array.isArray(component.attribute.type)).toEqual(false);
   });
-  
+
   it('determines if two relations are equal', () => {
     let firstRelation: any = {
       kind: 'FirstTestKind',
       foreignKey: 'FirstTestKey'
     };
-    
+
     let secondRelation: any = {
       kind: 'SecondTestKind',
       foreignKey: 'SecondTestKey'
     };
-    
+
     let thirdRelation : any = {
       kind: 'FirstTestKind',
       foreignKey: 'FirstTestKey'

@@ -495,7 +495,11 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:
           () => void) => {
-          socket.emit('Repository/addRepository', {repoId: request.data.id, parentId: request.data.parentId}, () => {
+          socket.emit('Repository/addRepository',
+            {repoId: request.data.id,
+             parentId: request.data.parentId,
+             timestamp: request.data.timestamp,
+             username: request.data.username}, () => {
             resolve();
           });
         }) });

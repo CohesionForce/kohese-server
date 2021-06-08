@@ -34,8 +34,8 @@ export class RepositoryService {
           id: proxy.id}, true));
     }
 
-    public async addRepository(id: string, parentId: string): Promise<any> {
-      return (await this.CacheManager.sendMessageToWorker('Repository/addRepository', {id, parentId}, true));
+    public async addRepository(id: string, parentId: string, timestamp: number, username: string): Promise<any> {
+      return (await this.CacheManager.sendMessageToWorker('Repository/addRepository', {id, parentId, timestamp, username}, true));
     }
 
     /* mountRepository = function (mountTarget, mountData, callback) {

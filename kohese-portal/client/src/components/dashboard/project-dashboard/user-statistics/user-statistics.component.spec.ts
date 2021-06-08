@@ -24,7 +24,7 @@ describe('UserStatisticsComponent', () => {
         { provide: StateFilterService, useClass: MockStateFilterService }
       ]
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(UserStatisticsComponent);
     component = fixture.componentInstance;
     component.projectStream = ObservableOf({
@@ -32,9 +32,14 @@ describe('UserStatisticsComponent', () => {
       users: [],
       projectItems: []
     });
-    
+
     fixture.detectChanges();
   });
+
+  afterEach(() => {
+    fixture.destroy();
+    TestBed.resetTestingModule();
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy();

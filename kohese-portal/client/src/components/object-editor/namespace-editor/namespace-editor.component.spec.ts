@@ -40,6 +40,10 @@ describe('NamespaceEditorComponent', () => {
     componentFixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('determines if the selected Namespace is valid', () => {
     expect(component.isValid()).toBe(true);
     component.selectedNamespace.name = '';

@@ -76,6 +76,10 @@ describe('MultivaluedFieldComponent', () => {
     componentFixture.detectChanges();
   });
 
+  afterEach(() => {
+    TestBed.resetTestingModule();
+  })
+
   it('retrieves elements to display in a table based on the associated ' +
     'PropertyDefinition', () => {
     let propertyDefinitions: Array<PropertyDefinition> = component.viewModel.

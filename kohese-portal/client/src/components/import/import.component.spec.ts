@@ -39,6 +39,11 @@ describe('Component: ', ()=>{
 
   })
 
+  afterEach(() => {
+    importFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the Import component', ()=>{
     //pending();
     expect(importComponent).toBeTruthy();

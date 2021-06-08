@@ -165,6 +165,11 @@ describe('Component: Journal', () => {
     journalFixture.detectChanges();
   });
 
+  afterEach(() => {
+    journalFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the Journal component', () => {
     expect(JournalComponent).toBeTruthy();
   });

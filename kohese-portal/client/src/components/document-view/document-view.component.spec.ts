@@ -61,6 +61,11 @@ describe('Component: Document View', ()=>{
     });
   })
 
+  afterEach(() => {
+    documentViewFixture.destroy();
+    TestBed.resetTestingModule();
+  })
+
   it('instantiates the Document View component', ()=>{
     documentViewComponent.proxyStream = new BehaviorSubject(TreeConfiguration.
       getWorkingTree().getProxyFor('test-uuid1'));

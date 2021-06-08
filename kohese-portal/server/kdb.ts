@@ -212,23 +212,23 @@ module.exports.enableRepository = enableRepository;
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
-function addRepository(id: string, parentId: string) {
+function addRepository(mountData) {
   for (var x: number = 0; x<availableRepositories.length; x++) {
-    if (availableRepositories[x].id === id) {
+    if (availableRepositories[x].id === mountData.repoId) {
       var repoMount = availableRepositories[x];
       break;
     }
   }
-  let parentProxy = ItemProxy.getWorkingTree().getProxyFor(parentId);
+  let parentProxy = ItemProxy.getWorkingTree().getProxyFor(mountData.parentId);
   if (parentProxy.kind === 'Repository') {
-    parentId = parentId + '-mount'
+    mountData.parentId = mountData.parentId + '-mount'
   }
-  if (!mountList[id + '-mount']) {
+  if (!mountList[mountData.repoId + '-mount']) {
 
     mountList[repoMount.id + '-mount'] = {
       name: repoMount.name,
       repoStoragePath: repoMount.repoStoragePath,
-      parentId: parentId
+      parentId: mountData.parentId
     }
 
     updateMountFile();
@@ -239,8 +239,12 @@ function addRepository(id: string, parentId: string) {
       id: repoMount.id + '-mount',
       name: repoMount.name,
       parentId: 'Repo-Mount-Definitions',
-      repoId: {id: repoMount.id},
-      mountPoint: {id: KDBRepo.getMountId(parentId)}
+      createdBy: mountData.username,
+      createdOn: mountData.timestamp,
+      modifiedBy: mountData.username,
+      modifiedOn: mountData.timestamp,
+      repoId: { id : repoMount.id},
+      mountPoint: {id: KDBRepo.getMountId(mountData.parentId)}
     };
 
     console.log('::: Repo Mount Information');
@@ -248,19 +252,14 @@ function addRepository(id: string, parentId: string) {
     kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
   } else {
-    delete mountList[id + '-mount'].disabled;
-    mountList[id + '-mount'].parentId = parentId;
+    delete mountList[mountData.repoId + '-mount'].disabled;
+    mountList[mountData.repoId + '-mount'].parentId = mountData.parentId;
     updateMountFile();
 
     var repoMountFilePath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMount.id + '-mount.json'));
 
-    let repoMountData = {
-      id: repoMount.id + '-mount',
-      name: repoMount.name,
-      parentId: 'Repo-Mount-Definitions',
-      repoId: {id: repoMount.id},
-      mountPoint: {id: KDBRepo.getMountId(parentId)}
-    };
+    let repoMountData = kdbFS.loadJSONDoc(repoMountFilePath);
+    repoMountData.mountPoint = KDBRepo.getMountId(mountData.parentId)
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData)
@@ -282,9 +281,11 @@ function setAvailableRepositories(dir, availableRepositories) {
       if (file === 'Root.json') {
         var repositories = kdbFS.loadJSONDoc(fullPath);
         fullPath = path.parse(fullPath).dir
-        availableRepositories.push({
-          id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
-        });
+        if (fullPath !== koheseKDBDirPath) {
+          availableRepositories.push({
+            id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
+          });
+        }
       }
     }
   });
@@ -397,13 +398,12 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       id: modelInstance.id + '-mount',
       name: modelInstance.name,
       parentId: 'Repo-Mount-Definitions',
-      mountPoint: {id: modelInstance.parentId},
-      repoId: {id: modelInstance.id}
+      repoId: {id: modelInstance.id},
+      mountPoint: {id: modelInstance.parentId}
     };
 
     console.log('::: Repo Mount Information -- StoreModelInstance');
     console.log(repoMountData);
-    if (enable === false) {
       kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
       kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     }
