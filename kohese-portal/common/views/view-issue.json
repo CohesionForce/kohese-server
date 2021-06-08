@@ -390,11 +390,148 @@
         }
       ],
       "id": "89324a90-a7af-11e8-8662-71e48f0160fe"
+    },
+    "0149d8e0-ba7c-11eb-b7a0-cf526c2fdba2": {
+      "id": "0149d8e0-ba7c-11eb-b7a0-cf526c2fdba2",
+      "name": "Document",
+      "header": {
+        "kind": "header",
+        "contents": [
+          {
+            "propertyName": "name",
+            "customLabel": "name",
+            "labelOrientation": "Top",
+            "kind": "text",
+            "visible": true,
+            "editable": true
+          }
+        ]
+      },
+      "containers": [
+        {
+          "kind": "list",
+          "contents": [
+            {
+              "propertyName": "description",
+              "customLabel": "Description",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "observedBy",
+              "customLabel": "Observed By",
+              "labelOrientation": "Left",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "observedOn",
+              "customLabel": "Observed On",
+              "labelOrientation": "Left",
+              "kind": "date",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "analysisAction",
+              "customLabel": "Analysis Action",
+              "labelOrientation": "Left",
+              "kind": "",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "resolutionActions",
+              "customLabel": "Resolution Actions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "response",
+              "customLabel": "Response",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "relatedIssues",
+              "customLabel": "Related Issues",
+              "labelOrientation": "Top",
+              "kind": "",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            },
+            {
+              "propertyName": "issueState",
+              "customLabel": "Issue State",
+              "labelOrientation": "Left",
+              "kind": "state-editor",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": true
+            }
+          ]
+        },
+        {
+          "kind": "ReverseReferenceTable",
+          "contents": [
+            {
+              "propertyName": {
+                "kind": "Issue",
+                "attribute": "relatedIssues"
+              },
+              "customLabel": "Related Issues",
+              "labelOrientation": "Top",
+              "kind": "",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": {
+                "kind": "Issue",
+                "attribute": "analysisAction"
+              },
+              "customLabel": "Analysis Action",
+              "labelOrientation": "Top",
+              "kind": "",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": false
+            },
+            {
+              "propertyName": {
+                "kind": "Issue",
+                "attribute": "resolutionActions"
+              },
+              "customLabel": "Resolution Actions",
+              "labelOrientation": "Top",
+              "kind": "",
+              "tableDefinition": "",
+              "visible": true,
+              "editable": false
+            }
+          ]
+        }
+      ]
     }
   },
   "defaultFormatKey": {
     "default": "bc5d43c0-5d7f-11ea-9d2a-81904e0f9ce1",
-    "document": "89324a90-a7af-11e8-8662-71e48f0160fe",
+    "document": "0149d8e0-ba7c-11eb-b7a0-cf526c2fdba2",
     "card": "89324a90-a7af-11e8-8662-71e48f0160fe",
     "board": "89324a90-a7af-11e8-8662-71e48f0160fe"
   },
