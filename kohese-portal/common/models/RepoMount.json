@@ -1,31 +1,16 @@
 {
   "id": "RepoMount",
   "name": "RepoMount",
-  "parentId": "Model-Definitions",
+  "parentId": "Item",
   "preventModification": true,
   "restrictInstanceEditing": true,
   "namespace": {
     "id": "com.kohese.metamodel"
   },
-  "base": "PersistedModel",
+  "base": "Item",
   "idInjection": true,
   "invertItemOrder": true,
   "properties": {
-    "id": {
-      "type": "string",
-      "required": true,
-      "name": "id"
-    },
-    "name": {
-      "type": "string",
-      "name": "name",
-      "required": true
-    },
-    "parentId": {
-      "type": "string",
-      "name": "parentId",
-      "required": true
-    },
     "mountPoint": {
       "name": "mountPoint",
       "type": "Item",
