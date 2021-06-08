@@ -398,6 +398,10 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       id: modelInstance.id + '-mount',
       name: modelInstance.name,
       parentId: 'Repo-Mount-Definitions',
+      createdBy: modelInstance.createdBy,
+      createdOn: modelInstance.createdOn,
+      modifiedBy: modelInstance.modifiedBy,
+      modifiedOn: modelInstance.modifiedOn,
       repoId: {id: modelInstance.id},
       mountPoint: {id: modelInstance.parentId}
     };
