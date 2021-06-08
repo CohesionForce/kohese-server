@@ -243,7 +243,7 @@ function addRepository(mountData) {
       createdOn: mountData.timestamp,
       modifiedBy: mountData.username,
       modifiedOn: mountData.timestamp,
-      repoId: { id : repoMount.id},
+      repoId: {id : repoMount.id},
       mountPoint: {id: KDBRepo.getMountId(mountData.parentId)}
     };
 
@@ -408,6 +408,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
     console.log('::: Repo Mount Information -- StoreModelInstance');
     console.log(repoMountData);
+    if (enable === false) {
       kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
       kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     }
