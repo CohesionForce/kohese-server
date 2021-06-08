@@ -279,9 +279,11 @@ function setAvailableRepositories(dir, availableRepositories) {
       if (file === 'Root.json') {
         var repositories = kdbFS.loadJSONDoc(fullPath);
         fullPath = path.parse(fullPath).dir
-        availableRepositories.push({
-          id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
-        });
+        if (fullPath !== koheseKDBDirPath) {
+          availableRepositories.push({
+            id: repositories.id, name: repositories.name, description: repositories.description, repoStoragePath: fullPath
+          });
+        }
       }
     }
   });
