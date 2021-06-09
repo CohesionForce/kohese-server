@@ -17,7 +17,7 @@
       </button>
     </div>
     <mat-form-field style="width: 40%; margin: 0px 3px 0px 3px;">
-      <mat-select placeholder="Type" [(ngModel)]="selectedType">
+      <mat-select placeholder="Kind" [(ngModel)]="selectedType">
         <ng-container *ngFor="let type of getNamespaceTypes(
           selectedNamespace)">
           <mat-option [value]="type">
@@ -26,11 +26,11 @@
         </ng-container>
       </mat-select>
     </mat-form-field>
-    <button mat-icon-button matTooltip="Add Type" [disabled]="!itemRepository.
+    <button mat-icon-button matTooltip="Add Kind" [disabled]="!itemRepository.
       getTreeConfig().getValue()" style="margin-left: auto;" (click)="add()">
       <mat-icon class="fa fa-plus"></mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Delete Type" (click)="delete()"
+    <button mat-icon-button matTooltip="Delete Kind" (click)="delete()"
       [disabled]="((selectedType == null) || (selectedType.
       preventModification === true))">
       <mat-icon class="fa fa-trash"></mat-icon>
