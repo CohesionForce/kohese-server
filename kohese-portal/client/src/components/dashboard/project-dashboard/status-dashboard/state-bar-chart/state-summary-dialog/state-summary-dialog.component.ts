@@ -102,7 +102,11 @@ export class StateSummaryDialogComponent implements OnInit {
         case 'reference-removed':
           if(this.numCommentsMap[notification.proxy.item.id]) {
             this.checkEntries(notification.proxy);
-            this.changeRef.markForCheck();
+            this.changeRef.detectChanges();
+          }
+          if(this.numCommentsMap[notification.referenceProxy.item.id]) {
+            this.checkEntries(notification.referenceProxy);
+            this.changeRef.detectChanges();
           }
           break;
         case 'delete':

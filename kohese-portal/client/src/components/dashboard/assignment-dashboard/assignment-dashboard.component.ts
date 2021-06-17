@@ -1,7 +1,7 @@
 // Angular
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
          ViewChild, ViewChildren, QueryList } from '@angular/core';
-import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material';
+import { MatExpansionPanel } from '@angular/material';
 
 // NPM
 import { Observable, Subscription } from 'rxjs';
@@ -12,8 +12,7 @@ import { SessionService } from '../../../services/user/session.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../details/details.component';
-import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
-import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
+import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
@@ -95,7 +94,11 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
           case 'reference-removed':
             if(this.numCommentsMap[notification.proxy.item.id]) {
               this.checkEntries(notification.proxy);
-              this.changeRef.markForCheck();
+              this.changeRef.detectChanges();
+            }
+            if(this.numCommentsMap[notification.referenceProxy.item.id]) {
+              this.checkEntries(notification.referenceProxy);
+              this.changeRef.detectChanges();
             }
             break;
           case 'delete':
