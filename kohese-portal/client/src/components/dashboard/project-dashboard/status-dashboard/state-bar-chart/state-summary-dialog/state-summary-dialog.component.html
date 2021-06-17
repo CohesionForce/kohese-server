@@ -41,6 +41,16 @@
               <mat-icon class="fa fa-times"></mat-icon>
             </button>
           </ng-template>
+          <button mat-icon-button *ngIf="!numCommentsMap[row.item.id] else commentsPresent"
+            matTooltip="Add Comment" (click)="$event.stopPropagation(); addEntry(row)">
+            <mat-icon class="fa fa-comment-o"></mat-icon>
+          </button>
+          <ng-template #commentsPresent>
+            <button mat-icon-button matTooltip="Add Comment"
+              (click)="$event.stopPropagation(); displayJournal(row)">
+              <mat-icon class="fa fa-comment-o" matBadgeSize=medium matBadge={{numCommentsMap[row.item.id]}}></mat-icon>
+            </button>
+          </ng-template>
           <button mat-icon-button matTooltip="Display Item information"
             (click)="$event.stopPropagation(); displayInformation(row)">
             <mat-icon class="fa fa-clone"></mat-icon>

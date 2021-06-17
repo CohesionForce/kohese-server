@@ -1,8 +1,12 @@
+// Angular
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
          ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material';
+
+// NPM
 import { Observable, Subscription } from 'rxjs';
 
+// Custom
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { SessionService } from '../../../services/user/session.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
