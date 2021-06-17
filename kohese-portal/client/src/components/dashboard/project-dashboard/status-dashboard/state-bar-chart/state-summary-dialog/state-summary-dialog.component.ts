@@ -137,7 +137,7 @@ export class StateSummaryDialogComponent implements OnInit {
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
     this.checkEntries(itemProxy);
-    this.changeRef.markForCheck();
+    this.changeRef.detectChanges();
   }
 
   public displayInformation(itemProxy: ItemProxy): void {
@@ -155,7 +155,7 @@ export class StateSummaryDialogComponent implements OnInit {
       formatDefinitionId = viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT];
     }
     this.checkEntries(itemProxy);
-    this.changeRef.markForCheck();
+    this.changeRef.detectChanges();
     return viewModel.formatDefinitions[formatDefinitionId].header.contents[0].propertyName;
   }
 
@@ -219,7 +219,7 @@ export class StateSummaryDialogComponent implements OnInit {
       }
     });
     this.checkEntries(assignment);
-    this.changeRef.markForCheck();
+    this.changeRef.detectChanges();
   }
 
   public expandAll(): void {
