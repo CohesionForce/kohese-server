@@ -124,7 +124,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   public save(itemProxy: ItemProxy): void {
     this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
       (returnedItemProxy: ItemProxy) => {
-      this.changeRef.detectChanges();
+      this.changeRef.markForCheck();
     });
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
   }
@@ -134,7 +134,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
     this.checkEntries(itemProxy);
-    this.changeRef.detectChanges();
+    this.changeRef.markForCheck();
   }
 
   public displayInformation(itemProxy: ItemProxy): void {
@@ -228,7 +228,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       formatDefinitionId = viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT];
     }
     this.checkEntries(itemProxy);
-    this.changeRef.detectChanges();
+    this.changeRef.markForCheck();
     return viewModel.formatDefinitions[formatDefinitionId].header.contents[0].propertyName;
   }
 
@@ -289,10 +289,11 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     }).updateSize('90%', '90%').afterClosed().subscribe(async (result: any) => {
       if (result) {
         await this._itemRepository.upsertItem(result.type.name, result.object);
+        this.checkEntries(assignment);
+        this.changeRef.markForCheck();
       }
     });
-    this.checkEntries(assignment);
-    this.changeRef.detectChanges();
+
   }
 
   public expandAll(): void {
