@@ -477,6 +477,8 @@ export class KDBCache extends LevelCache {
           var deltaUpdateTime = afterTime-afterLoadCache;
           console.log('::: Update time for cached objects in ' + kdbCache.repoPath + ': ' + deltaUpdateTime/1000);
         });
+      }).catch ((error) => {
+        console.log('No master commit exists yet');
       });
     });
   }
