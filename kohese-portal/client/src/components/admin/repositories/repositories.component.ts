@@ -15,6 +15,7 @@ import { VersionControlService } from '../../../services/version-control/version
 import { RepositoryService } from '../../../services/repository/repository.service';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../tree/tree.component';
+import { CacheManager } from '../../../../cache-worker/CacheManager';
 
 
 @Component({
@@ -58,6 +59,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
     private _sessionService: SessionService,
     private dialogueService: DialogService,
     private dialog: MatDialog,
+    private cacheManager : CacheManager,
     private _changeDetectorRef: ChangeDetectorRef
   ) {
     super(_navigationService);
@@ -177,6 +179,12 @@ export class RepositoriesComponent extends NavigatableComponent implements
     // Typically used with the data: {} handler.
     dialogRef.afterClosed().subscribe(result => {
     })
+  }
+
+  public refreshRepositories(): void {
+    this.cacheManager.subscribe('Repository/refreshRepositories', (messageData) => {
+      this.cacheManager.sendMessageToWorker('Repository/refreshRepositories', undefined, false);
+    });
   }
 
   public unmountRepo(id: string) {

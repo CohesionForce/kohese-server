@@ -51,9 +51,15 @@
     float: left;
   }
 
-  // refresh button
+  // Mount Repositories button
   .float-child-2 {
     float: right;
+  }
+
+  // Refresh Repositories button
+  .float-child-3 {
+    float: right;
+    padding-right: 1em;
   }
 }
 

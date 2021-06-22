@@ -1094,6 +1094,16 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/refreshRepositories', (request: any, respond: Function) => {
+    console.log('::: session %s: Received refreshRepositories for user %s at %s',
+    socket.id, socket.koheseUser.username, socket.handshake.address);
+    let repositoryRefreshData;
+    respond(repositoryRefreshData);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
   socket.on('Repository/getDisabledRepositories', (request: any, respond: Function) => {
     console.log('::: session %s: Received getDisabledRepositories for user %s at %s',
       socket.id, socket.koheseUser.username, socket.handshake.address);
