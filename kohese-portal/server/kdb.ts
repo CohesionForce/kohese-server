@@ -381,7 +381,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     if (isNewItem) {
       var parentRepo = proxy.parentProxy.getRepositoryProxy();
       var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
-      repoFilePath = parentRepoStoragePath + '/Repository';
+      repoFilePath = path.join(kdbDirPath, modelInstance.name)
       kdbFS.createDirIfMissing(repoFilePath);
     } else {
       repoFilePath = mountList[modelInstance.id + '-mount'].repoStoragePath.substring
@@ -413,6 +413,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     }
 
+    repoStoragePath = path.join(kdbDirPath, modelInstance.name)
     mountList[repoMountData.id] = {
       repoStoragePath : repoStoragePath,
       name: repoMountData.name,
@@ -421,7 +422,6 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
     updateMountFile();
 
-    repoStoragePath = determineRepoStoragePath(proxy);
     console.log('::: rSP: ' + repoStoragePath);
 
     filePath = repoStoragePath + '/Root.json';
