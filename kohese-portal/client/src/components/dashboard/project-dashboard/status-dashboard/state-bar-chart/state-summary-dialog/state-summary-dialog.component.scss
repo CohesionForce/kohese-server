@@ -34,9 +34,15 @@ mat-panel-title {
   align-items:center;
   color: whitesmoke;
   font-size: x-large;
-  width: 72%;
+  width: 68%;
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.mat-badge-content {
+  background-color: transparent;
+  color: whitesmoke;
+}
+
