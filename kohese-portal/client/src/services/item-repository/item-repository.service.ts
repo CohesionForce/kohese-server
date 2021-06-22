@@ -809,7 +809,7 @@ export class ItemRepository {
           let propertyDefinition: PropertyDefinition = formatContainer.
             contents[j];
           if (reverseReferencesObject[propertyDefinition.propertyName.kind]) {
-            references = '#### Referenced by ' + propertyDefinition.customLabel + '\n\n';
+            references = '#### Referenced as ' + propertyDefinition.customLabel + '\n\n';
             let reverseReferences: Array<any> = reverseReferencesObject[
               propertyDefinition.propertyName.kind][propertyDefinition.propertyName.attribute];
 

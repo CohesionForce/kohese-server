@@ -1088,10 +1088,11 @@ export class ItemProxy {
       if(!this.treeConfig.loading){
         this.treeConfig.changeSubject.next({
           type: 'reference-added',
-          relation: 'forProperty',
+          relation: forProperty,
           kind: this.kind,
           id: toProxy._item.id,
-          proxy: toProxy
+          proxy: this,
+          referenceProxy: toProxy
         });
       }
     }
@@ -1138,10 +1139,11 @@ export class ItemProxy {
       if(!this.treeConfig.loading){
         this.treeConfig.changeSubject.next({
           type: 'reference-removed',
-          relation: 'forProperty',
+          relation: forProperty,
           kind: this.kind,
           id: toProxy._item.id,
-          proxy: toProxy
+          proxy: this,
+          referenceProxy: toProxy
         });
       }
     }
@@ -1874,7 +1876,8 @@ export class ItemProxy {
         relation: 'children',
         kind: this.kind,
         id: this._item.id,
-        proxy: this
+        proxy: this,
+        referenceProxy: childProxy
       });
     }
 
@@ -1924,7 +1927,8 @@ export class ItemProxy {
         relation: 'children',
         kind: this.kind,
         id: this._item.id,
-        proxy: this
+        proxy: this,
+        referenceProxy: childProxy
       });
     }
   }

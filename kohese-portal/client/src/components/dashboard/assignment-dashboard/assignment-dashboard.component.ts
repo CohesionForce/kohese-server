@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-
+// Angular
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
          ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { MatExpansionPanel } from '@angular/material';
 
+// NPM
+import { Observable, Subscription } from 'rxjs';
+
+// Custom
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { SessionService } from '../../../services/user/session.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../details/details.component';
-import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
-import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
+import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
-import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
-
-import { Observable, Subscription } from 'rxjs';
+import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 
 @Component({
   selector : 'assignment-dashboard',
@@ -38,7 +41,12 @@ import { Observable, Subscription } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssignmentDashboardComponent implements OnInit, OnDestroy {
-  /* Data */
+  // Data
+  numCommentsMap = {}; //TODO: Add type definition
+  treeConfigSubscription: Subscription;
+  changeSubjectSubscription: Subscription;
+
+  // I/O
   @Input()
   assignmentListStream : Observable<Array<ItemProxy>>;
   assignmentList : Array<ItemProxy> = [];
@@ -54,6 +62,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   @ViewChildren(MatExpansionPanel)
   private expansionPanels: QueryList<MatExpansionPanel>;
 
+  // Getters/Setters
   private _editableSet: Array<string> = [];
   get editableSet() {
     return this._editableSet;
@@ -71,9 +80,13 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     return this._navigationService;
   }
 
-  constructor(private _navigationService : NavigationService,
-    private changeRef : ChangeDetectorRef, private _itemRepository:
-    ItemRepository, private _dialogService: DialogService) {
+  constructor(
+    private _navigationService : NavigationService,
+    private changeRef : ChangeDetectorRef,
+    private _itemRepository : ItemRepository,
+    private _dialogService : DialogService,
+    private sessionService : SessionService
+    ) {
     this.assignmentTypes = DashboardSelections;
     console.log(this.assignmentTypes)
   }
@@ -89,6 +102,29 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       this.sortedAssignmentList = this.sortAssignments(this.assignmentType, assignmentList);
       this.changeRef.markForCheck();
     })
+
+    // TODO: decide how to handle assignments (current and prior) on the dashboard with regard to the lenses
+    this.treeConfigSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((notification: any) => {
+        switch (notification.type) {
+          case 'reference-added':
+          case 'reference-removed':
+            if(this.numCommentsMap[notification.proxy.item.id]) {
+              this.checkEntries(notification.proxy);
+              this.changeRef.detectChanges();
+            }
+            if(this.numCommentsMap[notification.referenceProxy.item.id]) {
+              this.checkEntries(notification.referenceProxy);
+              this.changeRef.detectChanges();
+            }
+            break;
+          case 'delete':
+            if(this.numCommentsMap[notification.proxy.item.id]) {
+              delete this.numCommentsMap[notification.proxy.item.id];
+            }
+            break;
+        }
+    });
+
     this._navigationService.navigate('Dashboard', {});
   }
 
@@ -113,6 +149,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     await this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+    this.checkEntries(itemProxy);
     this.changeRef.markForCheck();
   }
 
@@ -172,6 +209,10 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     return sortedArray;
   }
 
+  ////////////////////////////////////////////////////////////////////
+  // Determines which items are valid for
+  // DashboardSelections.COMPLETED_ASSIGNMENTS
+  ////////////////////////////////////////////////////////////////////
   isCompleted(assignment : ItemProxy) : boolean {
     let types: Array<string> = [];
     let kindProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(
@@ -202,7 +243,73 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     if(formatDefinitionId == null) {
       formatDefinitionId = viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT];
     }
+    this.checkEntries(itemProxy);
+    this.changeRef.markForCheck();
     return viewModel.formatDefinitions[formatDefinitionId].header.contents[0].propertyName;
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  // Counts Observations/Issues on an item.
+  // used to display the number of entries and determine which
+  // dialog to display
+  ////////////////////////////////////////////////////////////////////
+  public checkEntries(assignment: ItemProxy) {
+    this.numCommentsMap[assignment.item.id] = 0;
+
+    let observationRelation = assignment.relations.referencedBy.Observation;
+    let issueRelation = assignment.relations.referencedBy.Issue;
+
+    if(observationRelation && observationRelation.context) {
+      this.numCommentsMap[assignment.item.id] += observationRelation.context.length;
+    }
+    if(issueRelation && issueRelation.context) {
+      this.numCommentsMap[assignment.item.id] += issueRelation.context.length;
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  //  opens to the journal tab if comments are present
+  ////////////////////////////////////////////////////////////////////
+  public displayJournal(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: itemProxy,
+        startWithJournal: true
+      }
+    }).updateSize('90%', '90%');
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  // Opens a dialog to add a journal entry with pre-filled data if
+  // no comments are present
+  ////////////////////////////////////////////////////////////////////
+  public addEntry(assignment: ItemProxy): void {
+    let username: string = this.sessionService.user.name;
+    let timestamp: number = Date.now();
+    this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
+      data: {
+        type: TreeConfiguration.getWorkingTree().getProxyFor('Observation').item,
+        object: {
+          createdOn: timestamp,
+          createdBy: username,
+          modifiedOn: timestamp,
+          modifiedBy: username,
+          parentId: assignment.item.id,
+          context: [{ id: assignment.item.id }],
+          observedBy: username,
+          observedOn: timestamp
+        },
+        formatDefinitionType: FormatDefinitionType.DEFAULT,
+        allowKindChange: true
+      }
+    }).updateSize('90%', '90%').afterClosed().subscribe(async (result: any) => {
+      if (result) {
+        await this._itemRepository.upsertItem(result.type.name, result.object);
+        this.checkEntries(assignment);
+        this.changeRef.markForCheck();
+      }
+    });
+
   }
 
   public expandAll(): void {

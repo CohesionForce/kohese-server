@@ -15,19 +15,23 @@
  */
 
 
-import { MAT_DIALOG_DATA } from '@angular/material';
-import { Input, Inject, ViewChild, ViewChildren, QueryList } from '@angular/core';
+// Angular
+import { Component, OnInit, Input, Inject, ViewChild, ViewChildren, QueryList, ChangeDetectorRef } from '@angular/core';
+import { MatExpansionPanel, MAT_DIALOG_DATA } from '@angular/material';
 
+// NPM
+import { Subscription } from 'rxjs';
+
+// Custom
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../../../../services/navigation/navigation.service';
 import { DialogService } from '../../../../../../services/dialog/dialog.service';
+import { SessionService } from '../../../../../../services/user/session.service';
 import { DetailsComponent } from '../../../../../details/details.component';
-import { FormatDefinition, FormatDefinitionType } from '../../../../../../../../common/src/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from './../../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../../common/src/tree-configuration';
-import { Component, OnInit } from '@angular/core';
-import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
-
+import { FormatObjectEditorComponent } from '../../../../../object-editor/format-object-editor/format-object-editor.component';
 
 @Component({
   selector: 'state-summary-dialog',
@@ -35,6 +39,12 @@ import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansi
   styleUrls: ['./state-summary-dialog.component.scss']
 })
 export class StateSummaryDialogComponent implements OnInit {
+
+  // Data
+  numCommentsMap = {}; //TODO: Add type definition
+  treeConfigSubscription: Subscription;
+  changeSubjectSubscription: Subscription;
+
   private _proxies: Array<ItemProxy>;
   get proxies() {
     return this._proxies;
@@ -85,9 +95,14 @@ export class StateSummaryDialogComponent implements OnInit {
   @ViewChildren(MatExpansionPanel)
   private expansionPanels: QueryList<MatExpansionPanel>;
 
-  constructor(@Inject(MAT_DIALOG_DATA) private data: any,
-    private _itemRepository: ItemRepository, private _navigationService:
-    NavigationService, private _dialogService: DialogService) {
+  constructor(
+    @Inject(MAT_DIALOG_DATA) private data: any,
+    private _itemRepository: ItemRepository,
+    private _navigationService: NavigationService,
+    private _dialogService: DialogService,
+    private sessionService: SessionService,
+    private changeRef : ChangeDetectorRef,
+    ) {
     if (this.data) {
       this._proxies = data.proxies;
       this._kindName = data.kindName;
@@ -96,7 +111,29 @@ export class StateSummaryDialogComponent implements OnInit {
     }
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    // TODO: decide how to handle assignments (current and prior) on the dashboard with regard to the lenses
+    this.treeConfigSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((notification: any) => {
+      switch (notification.type) {
+        case 'reference-added':
+        case 'reference-removed':
+          if(this.numCommentsMap[notification.proxy.item.id]) {
+            this.checkEntries(notification.proxy);
+            this.changeRef.detectChanges();
+          }
+          if(this.numCommentsMap[notification.referenceProxy.item.id]) {
+            this.checkEntries(notification.referenceProxy);
+            this.changeRef.detectChanges();
+          }
+          break;
+        case 'delete':
+          if(this.numCommentsMap[notification.proxy.item.id]) {
+            delete this.numCommentsMap[notification.proxy.item.id];
+          }
+          break;
+      }
+  });
+  }
 
   toggleExpandRow(row) {
     console.log('Toggled Expand Row!', row);
@@ -116,6 +153,8 @@ export class StateSummaryDialogComponent implements OnInit {
     this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
       getProxyFor(itemProxy.item.id));
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+    this.checkEntries(itemProxy);
+    this.changeRef.markForCheck();
   }
 
   public displayInformation(itemProxy: ItemProxy): void {
@@ -132,7 +171,73 @@ export class StateSummaryDialogComponent implements OnInit {
     if(formatDefinitionId == null) {
       formatDefinitionId = viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT];
     }
+    this.checkEntries(itemProxy);
+    this.changeRef.markForCheck();
     return viewModel.formatDefinitions[formatDefinitionId].header.contents[0].propertyName;
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  // Counts Observations/Issues on an item.
+  // used to display the number of entries and determine which
+  // dialog to display
+  ////////////////////////////////////////////////////////////////////
+  public checkEntries(row: ItemProxy) {
+    this.numCommentsMap[row.item.id] = 0;
+
+    let observationRelation = row.relations.referencedBy.Observation;
+    let issueRelation = row.relations.referencedBy.Issue;
+
+    if(observationRelation && observationRelation.context) {
+      this.numCommentsMap[row.item.id] += observationRelation.context.length;
+    }
+    if(issueRelation && issueRelation.context) {
+      this.numCommentsMap[row.item.id] += issueRelation.context.length;
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  //  opens to the journal tab if comments are present
+  ////////////////////////////////////////////////////////////////////
+  public displayJournal(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: itemProxy,
+        startWithJournal: true
+      }
+    }).updateSize('90%', '90%');
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  // Opens a dialog to add a journal entry with pre-filled data if
+  // no comments are present
+  ////////////////////////////////////////////////////////////////////
+  public addEntry(assignment: ItemProxy): void {
+    let username: string = this.sessionService.user.name;
+    let timestamp: number = Date.now();
+    this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
+      data: {
+        type: TreeConfiguration.getWorkingTree().getProxyFor('Observation').item,
+        object: {
+          createdOn: timestamp,
+          createdBy: username,
+          modifiedOn: timestamp,
+          modifiedBy: username,
+          parentId: assignment.item.id,
+          context: [{ id: assignment.item.id }],
+          observedBy: username,
+          observedOn: timestamp
+        },
+        formatDefinitionType: FormatDefinitionType.DEFAULT,
+        allowKindChange: true
+      }
+    }).updateSize('90%', '90%').afterClosed().subscribe(async (result: any) => {
+      if (result) {
+        await this._itemRepository.upsertItem(result.type.name, result.object);
+      }
+      this.checkEntries(assignment);
+      this.changeRef.markForCheck();
+    });
+
   }
 
   public expandAll(): void {

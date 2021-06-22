@@ -50,7 +50,7 @@ limitations under the License.
 </mat-form-field>
 <br/>
 <mat-form-field style="width: 100%;">
-  <mat-select placeholder="Parent Type" [ngModel]="dataModel.base"
+  <mat-select placeholder="Parent Kind" [ngModel]="dataModel.base"
     (ngModelChange)="parentTypeSelected($event)"
     [compareWith]="areParentTypeValuesEqual" [disabled]="!editable">
     <ng-container *ngFor="let kind of filteredKinds">
