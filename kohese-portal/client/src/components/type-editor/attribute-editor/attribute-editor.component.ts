@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce inc. | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
   Input } from '@angular/core';
 
@@ -30,7 +47,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
   set attribute(attribute: Attribute) {
     this._attribute = attribute;
   }
-  
+
   private _contextualGlobalType: any;
   get contextualGlobalType() {
     return this._contextualGlobalType;
@@ -39,7 +56,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
   set contextualGlobalType(contextualGlobalType: any) {
     this._contextualGlobalType = contextualGlobalType;
   }
-  
+
   private _view: any = {
     name: '',
     displayName: '',
@@ -55,7 +72,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
   set view(view: any) {
     this._view = view;
   }
-  
+
   private _editable: boolean = true;
   get editable() {
     return this._editable;
@@ -64,16 +81,16 @@ export class AttributeEditorComponent implements OnInit, Dialog {
   set editable(editable: boolean) {
     this._editable = editable;
   }
-  
+
   get dynamicTypesService() {
     return this._dynamicTypesService;
   }
-  
+
   private _idAttributes: any = {};
   get idAttributes() {
     return this._idAttributes;
   }
-  
+
   private _fundamentalTypes: any = {
     'Boolean': 'boolean',
     'Number': 'number',
@@ -85,7 +102,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
   get fundamentalTypes() {
     return this._fundamentalTypes;
   }
-  
+
   private _displayTypes: any = {
     'boolean': {
       'Boolean': 'boolean'
@@ -108,26 +125,26 @@ export class AttributeEditorComponent implements OnInit, Dialog {
       'Username': 'user-selector'
     }
   };
-  
+
   private _attributeTypes: any = JSON.parse(JSON.stringify(this.
     _fundamentalTypes));
   get attributeTypes() {
     return this._attributeTypes;
   }
-  
+
   get Array() {
     return Array;
   }
-  
+
   get Object() {
     return Object;
   }
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dynamicTypesService: DynamicTypesService, private _dialogService:
     DialogService) {
   }
-  
+
   public ngOnInit(): void {
     let koheseTypes: any = this._dynamicTypesService.getKoheseTypes();
     for (let typeName in koheseTypes) {
@@ -144,7 +161,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
           this._idAttributes[typeName].push(attributeName);
         }
       }
-      
+
       if (koheseType.dataModelProxy.item === this._contextualGlobalType) {
         for (let localTypeName in this._contextualGlobalType.classLocalTypes) {
           this._attributeTypes[localTypeName] = localTypeName;
@@ -152,20 +169,20 @@ export class AttributeEditorComponent implements OnInit, Dialog {
       }
     }
   }
-  
+
   public typeSelected(attributeType: string): void {
     if (Array.isArray(this._attribute.type)) {
       this._attribute.type = [attributeType];
     } else {
       this._attribute.type = attributeType;
     }
-    
+
     if (this._attribute.type === 'string') {
       this._attribute.default = '';
     } else {
       delete this._attribute.default;
     }
-    
+
     if (Object.values(this._fundamentalTypes).indexOf(attributeType) === -1) {
       if (this._contextualGlobalType.classLocalTypes[attributeType]) {
         this._attribute.relation = {
@@ -180,11 +197,11 @@ export class AttributeEditorComponent implements OnInit, Dialog {
           };
         }
       }
-      
+
       this._view.inputType.type = '';
     } else {
       delete this._attribute.relation;
-      
+
       if (attributeType === 'string') {
         this._view.inputType.type = 'text';
       } else if (attributeType === 'timestamp') {
@@ -196,7 +213,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
       }
     }
   }
-  
+
   public openStateMachineEditor(): void {
     let stateMachine: any = this._attribute.properties;
     if (stateMachine) {
@@ -220,7 +237,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
       }
     });
   }
-  
+
   public areTypesSame(option: any, selection: any): boolean {
     let selectionType: any;
     if (Array.isArray(selection)) {
@@ -231,7 +248,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
 
     return (option === selectionType);
   }
-  
+
   public parseType(attributeType: any): string {
     let type: string;
     if (Array.isArray(attributeType)) {
@@ -239,15 +256,15 @@ export class AttributeEditorComponent implements OnInit, Dialog {
     } else {
       type = attributeType;
     }
-    
+
     return type;
   }
-  
+
   public areRelationsEqual(option: any, selection: any): boolean {
     return (selection && (option.kind === selection.kind) && (option.foreignKey
       === selection.foreignKey));
   }
-  
+
   public getTypes(): Array<string> {
     let dataModelType: string = (Array.isArray(this._attribute.type) ? this.
       _attribute.type[0] : this._attribute.type);
@@ -265,7 +282,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
       }
     }
   }
-  
+
   public getTypeValue(type: string): string {
     if ((type === 'Reference') || (type === 'Dropdown')) {
       return '';
@@ -279,7 +296,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
       }
     }
   }
-  
+
   public areTypeValuesEqual(option: string, selection: string): boolean {
     if ((option === '') && (selection === 'proxy-selector')) {
       return true;
@@ -289,7 +306,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
       return (option === selection);
     }
   }
-  
+
   public toggleMultivaluedness(): void {
     let type: any = this._attribute.type;
     if (Array.isArray(type)) {
@@ -304,11 +321,11 @@ export class AttributeEditorComponent implements OnInit, Dialog {
 
     this._attribute.type = type;
   }
-  
+
   public isValid(): boolean {
     return !!this._attribute.name;
   }
-  
+
   public close(value: any): any {
     let result: any;
     if (value) {
@@ -317,7 +334,7 @@ export class AttributeEditorComponent implements OnInit, Dialog {
         view: this._view
       };
     }
-    
+
     return result;
   }
 }

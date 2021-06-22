@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce inc. | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { ItemProxy } from '../../../common/src/item-proxy';
 import { KoheseModel } from '../../../common/src/KoheseModel';
 const kdbFS = require('../../../server/kdb-fs');
@@ -190,7 +207,7 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
     testField(proxy, 'aStringField', 'test', 'test-changed', 'test-changed-again', undefined);
 
     proxy.deleteItem();
-  
+
   });
 
   it('should detect dirty boolean', () => {
@@ -206,7 +223,7 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
     testField(proxy, 'aBooleanField', false, true, false, undefined);
 
     proxy.deleteItem();
-  
+
   });
 
   it('should detect dirty number', () => {
@@ -221,7 +238,7 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
     testField(proxy, 'aNumberField', 1, 2, 3, undefined);
 
     proxy.deleteItem();
-  
+
   });
 
   it('should detect dirty array data', () => {
@@ -269,7 +286,7 @@ describe('ItemProxy ItemChangeHandler Test:', () => {
     let proxy = koheseModelModel;
 
     proxy.item.aLDTArrayField = [];
-    
+
     proxy.item.aLDTArrayField.push({
       name: 'TestProperty',
       id: 'test-property'

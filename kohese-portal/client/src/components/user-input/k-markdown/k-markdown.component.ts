@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce inc. | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { Input, Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
@@ -10,26 +27,26 @@ import { DialogService } from '../../../services/dialog/dialog.service';
   templateUrl : './k-markdown.component.html',
   styleUrls: [
     './k-markdown.component.scss'
-  ] 
+  ]
 })
-export class KMarkdownComponent extends UserInput 
+export class KMarkdownComponent extends UserInput
                                 implements OnInit, OnDestroy, OnChanges {
-  @Input() 
+  @Input()
   editableStream : Observable<boolean>;
 
   /* Data */
   editable : boolean;
-  
+
   private _value: string;
   get value() {
     return this._value;
   }
-  
+
   private _formattedValue: string;
   get formattedValue() {
     return this._formattedValue;
   }
-  
+
   private _images: Array<string> = [];
   private static readonly _IMAGE_REGEXP: RegExp = /!\[.*?\]\((.+?)\)/g;
 
@@ -45,7 +62,7 @@ export class KMarkdownComponent extends UserInput
       console.log(editable);
       this.editable = editable;
     })
-    
+
     this._value = this.formGroup.get(this.fieldId).value;
     this.formatValue();
   }
@@ -68,7 +85,7 @@ export class KMarkdownComponent extends UserInput
     this.dialogService.openComponentDialog(MarkdownCheatSheetComponent, {}).
       updateSize('60%', '60%');
   }
-  
+
   public updateValue(input: string): void {
     this._value = (input ? input.replace(
       KMarkdownComponent._IMAGE_REGEXP, (matchedSubstring: string,
@@ -91,7 +108,7 @@ export class KMarkdownComponent extends UserInput
     this.formatValue();
     this.formGroup.get(this.fieldId).setValue(this._value);
   }
-  
+
   public addImagesToMarkdown(insertionIndex: number, images: Array<File>):
     void {
     for (let j: number = images.length - 1; j >= 0; j--) {
@@ -112,7 +129,7 @@ export class KMarkdownComponent extends UserInput
       }
     }
   }
-  
+
   private formatValue(): void {
     this._formattedValue = (this._value ? this._value.replace(
       KMarkdownComponent._IMAGE_REGEXP, (matchedSubstring: string,
@@ -123,7 +140,7 @@ export class KMarkdownComponent extends UserInput
           this._images.push(captureGroup);
           imageIndex = this._images.length - 1;
         }
-        
+
         let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
           indexOf(captureGroup);
         return matchedSubstring.substring(0,
@@ -134,4 +151,4 @@ export class KMarkdownComponent extends UserInput
       }
     }) : this._value);
   }
-}  
+}

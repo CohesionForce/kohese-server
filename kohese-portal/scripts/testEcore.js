@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce inc. | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
@@ -11,7 +28,7 @@ function displayModelInfo(model) {
       }).join(', ') + ') features(' + c.get('eStructuralFeatures').map(function(f) {
           return f.get('name') + ' : ' + f.get('eType').get('name');
       }).join(', ') + ')';
-  }));  
+  }));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -22,7 +39,7 @@ function processFile(file) {
 	var resource = resourceSet.create({uri : 'uri-' + file});
 
 	var fileContents = fs.readFileSync(file, 'utf8');
-	try { 
+	try {
 		resource.parse(fileContents, Ecore.XMI);
 	} catch(err) {
 		console.log('*** Failed parsing file: ' + file);
@@ -37,7 +54,7 @@ function processFile(file) {
 		Ecore.EPackage.Registry.register(firstElement);
 		displayModelInfo(resource);
 	}
-	
+
 	var result = resource.to(Ecore.JSON);
 	console.log("::: JSON Dump of " + file);
 	console.log(util.inspect(result, false, null));

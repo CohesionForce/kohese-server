@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce inc. | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 
 import { ProjectInfo } from '../../../../services/project-service/project.service';
@@ -150,20 +167,20 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       console.log(items, e);
       let htmlString = '';
       let textString = '';
-      htmlString = 
+      htmlString =
         '<table>\n' +
         '  <thead>\n' +
         '    <tr>\n' +
         '      <th>Id</th>\n' +
-        '      <th>Name</th>\n' + 
-        '      <th>Kind</th>\n' + 
-        '      <th>State</th>\n' + 
-        '      <th>Assigned To</th>\n' + 
+        '      <th>Name</th>\n' +
+        '      <th>Kind</th>\n' +
+        '      <th>State</th>\n' +
+        '      <th>Assigned To</th>\n' +
         '    </tr>\n' +
         '  </thead>\n' +
         '  <tbody>';
       for (let item of items) {
-        htmlString += 
+        htmlString +=
           '  <tr>\n' +
           '    <td><a href="' + this.origin + item.item.id + '">' + item.item.id + '</a></td>\n' +
           '    <td>' + item.item.name  + '</td>\n' +
@@ -177,7 +194,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
                       'State: ' + item.state + '\n' +
                       'Assigned To: ' + item.item.assignedTo + '\n\n'
       }
-      htmlString += 
+      htmlString +=
         '  </tbody>\n' +
         '</table>\n'
       e.clipboardData.setData('text/html', (htmlString));

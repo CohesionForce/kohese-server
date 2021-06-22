@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce inc. | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 'use strict';
 import { ItemProxy } from '../common/src/item-proxy';
 import { ItemCache } from '../common/src/item-cache';
@@ -439,27 +456,27 @@ async function diffItemVersions(itemId) {
       let newOid = versionDiff.newTreeEntry.oid;
       let oldBlob = await itemCache.getBlob(oldOid);
       let newBlob = await itemCache.getBlob(newOid);
-  
+
       let blobCompare = ItemCache.compareObjects(oldBlob, newBlob);
-    
+
       // console.log('::: Blob Diff');
       // console.log(JSON.stringify(blobCompare, null, '  '));
-  
+
       for (let field in blobCompare.details.changed) {
         console.log('::: Field Changed: ' + field);
         let leftValue = blobCompare.details.changed[field].left;
         let rightValue = blobCompare.details.changed[field].right;
-  
+
         leftValue = replaceImage(leftValue);
         rightValue = replaceImage(rightValue);
         let fieldDiff = JsDiff.diffWords(leftValue, rightValue);
         fieldDiff = JSON.parse(JSON.stringify(fieldDiff));
         console.log(fieldDiff);
-      }  
+      }
     }
-  
+
     let afterTime = Date.now();
-    console.log('::: Diff time:  ' + itemId + ' - ' + (afterTime-beforeTime)/1000);  
+    console.log('::: Diff time:  ' + itemId + ' - ' + (afterTime-beforeTime)/1000);
   }
 }
 

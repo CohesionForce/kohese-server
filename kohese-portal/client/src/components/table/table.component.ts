@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce inc. | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   ViewChild } from '@angular/core';
 import { Sort } from '@angular/material';
@@ -19,7 +36,7 @@ export class TableComponent implements Dialog {
   set rows(rows: Array<any>) {
     this._rows = rows;
   }
-  
+
   private _columns: Array<string>;
   get columns() {
     return this._columns;
@@ -35,10 +52,10 @@ export class TableComponent implements Dialog {
         });
       }
     }
-    
+
     this._columns = columns;
   }
-  
+
   private _getText: (row: any, columnId: string) => string;
   get getText() {
     return this._getText;
@@ -47,12 +64,12 @@ export class TableComponent implements Dialog {
   set getText(getText: (row: any, columnId: string) => string) {
     this._getText = getText;
   }
-  
+
   private _selection: Array<any> = [];
   get selection() {
     return this._selection;
   }
-  
+
   private _add: () => Promise<Array<any>>;
   get add() {
     if (this._add) {
@@ -70,7 +87,7 @@ export class TableComponent implements Dialog {
   set add(add: () => Promise<Array<any>>) {
     this._add = add;
   }
-  
+
   private _edit: (element: any) => void;
   get edit() {
     if (this._edit) {
@@ -87,7 +104,7 @@ export class TableComponent implements Dialog {
   set edit(edit: (element: any) => void) {
     this._edit = edit;
   }
-  
+
   private _move: (elements: Array<any>, referenceElement: any, moveBefore:
     boolean) => void;
   get move() {
@@ -98,7 +115,7 @@ export class TableComponent implements Dialog {
     boolean) => void) {
     this._move = move;
   }
-  
+
   private _remove: (elements: Array<any>) => void;
   get remove() {
     if (this._remove) {
@@ -119,7 +136,7 @@ export class TableComponent implements Dialog {
   set remove(remove: (elements: Array<any>) => void) {
     this._remove = remove;
   }
-  
+
   private _isDisabled: boolean = false;
   get isDisabled() {
     return this._isDisabled;
@@ -128,17 +145,17 @@ export class TableComponent implements Dialog {
   set isDisabled(isDisabled: boolean) {
     this._isDisabled = isDisabled;
   }
-  
+
   @ViewChild('table')
   private _table: any;
-  
+
   get changeDetectorRef() {
     return this._changeDetectorRef;
   }
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef) {
   }
-  
+
   public sort(sortInformation: Sort): void {
     this._rows.sort((oneElement: any, anotherElement: any) => {
       let comparison: number = String(oneElement[sortInformation.active]).
@@ -146,17 +163,17 @@ export class TableComponent implements Dialog {
       return ((sortInformation.direction === 'desc') ? -comparison :
         comparison);
     });
-    
+
     this._table.renderRows();
   }
-  
+
   public toggleAllSelected(select: boolean): void {
     this._selection.length = 0;
     if (select) {
       this._selection.push(...this._rows);
     }
   }
-  
+
   public toggleSelected(row: any): void {
     let index: number = this._selection.indexOf(row);
     if (index === -1) {
@@ -165,12 +182,12 @@ export class TableComponent implements Dialog {
       this._selection.splice(index, 1);
     }
   }
-  
+
   public getDisplayColumnIdentifiers(): Array<string> {
     return [this._columns.join() + 'selection', ...this._columns, this.
       _columns.join() + 'menu'];
   }
-  
+
   public getMoveDataTransferValue(row: any): string {
     if (this._selection.length > 0) {
       let indices: Array<number> = this._selection.map((element: any) => {
@@ -179,21 +196,21 @@ export class TableComponent implements Dialog {
       if (this._selection.indexOf(row) === -1) {
         indices.push(this._rows.indexOf(row));
       }
-      
+
       indices.sort();
       return JSON.stringify(indices);
     } else {
       return JSON.stringify([this._rows.indexOf(row)]);
     }
   }
-  
+
   public getRowsFromDataTransfer(dataTransferValue: string): Array<any> {
     let indices: Array<number> = JSON.parse(dataTransferValue);
     return indices.map((index: number) => {
       return this._rows[index];
     });
   }
-  
+
   public close(accept: boolean): any {
     return (accept ? this._selection : undefined);
   }
