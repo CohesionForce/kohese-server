@@ -170,10 +170,10 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: {
-          title: 'Add Type',
+          title: 'Add Kind',
           text: '',
           fieldName: 'Name',
-          value: 'Type',
+          value: 'Kind',
           validate: (input: any) => {
             let names: Array<string> = [];
             this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
