@@ -1,5 +1,11 @@
-import { LoggingEventRecord } from './../../../../../common/src/k-logger';
+// Angular
 import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+
+// NPM
+
+// Custom
+import { LoggingEventRecord } from './../../../../../common/src/k-logger';
 import { LogService } from '../../../services/log/log.service';
 
 @Component({
@@ -10,7 +16,12 @@ import { LogService } from '../../../services/log/log.service';
 export class DevToolsComponent implements OnInit {
   logRegistry : Array<LoggingEventRecord>;
 
-  constructor(private logService: LogService) { }
+  constructor(
+    private logService : LogService,
+    private title : Title
+    ) {
+      this.title.setTitle("Dev Tools");
+    }
 
   ngOnInit() {
     this.logRegistry = this.logService.getLogEvents();
@@ -21,17 +32,17 @@ export class DevToolsComponent implements OnInit {
   saveLogSelections() {
     this.logService.updateLogRegistry(this.logRegistry);
   }
-  
+
   public areAllConsoleMessagesSelected(): boolean {
     for (let j: number = 0; j < this.logRegistry.length; j++) {
       if (!this.logRegistry[j].active) {
         return false;
       }
     }
-    
+
     return true;
   }
-  
+
   public toggleAllConsoleMessagesSelected(select: boolean): void {
     for (let j: number = 0; j < this.logRegistry.length; j++) {
       this.logRegistry[j].active = select;

@@ -1,8 +1,14 @@
+// Angular
+import { Component, OnInit, Output } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+
+// NPM
+import { BehaviorSubject, Subscription } from 'rxjs';
+
+// Custom
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ActivatedRoute } from '@angular/router';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { Component, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'document-outline',
@@ -20,7 +26,13 @@ export class DocumentOutlineComponent implements OnInit {
 
   @Output() outlineView: boolean = true;
 
-  constructor(private router : ActivatedRoute, private itemRepository: ItemRepository) { }
+  constructor(
+    private router : ActivatedRoute,
+    private itemRepository : ItemRepository,
+    private title : Title
+    ) {
+      this.title.setTitle("Outline");
+    }
 
   ngOnInit() {
     this.paramSubscription = this.router.params.subscribe(params => {

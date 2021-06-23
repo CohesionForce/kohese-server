@@ -1,13 +1,17 @@
+// Angular
 import { Component, OnInit, OnDestroy, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
+// NPM
+import { BehaviorSubject ,  Subscription } from 'rxjs';
+
+// Custom
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service'
 import { AnalysisService } from '../../services/analysis/analysis.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-
-import { BehaviorSubject ,  Subscription } from 'rxjs';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { AnalysisViews, AnalysisFilter } from './AnalysisViewComponent.class';
 
@@ -38,12 +42,16 @@ export class AnalysisComponent extends NavigatableComponent
   filterSubject: BehaviorSubject<AnalysisFilter>
   proxyStream: BehaviorSubject<ItemProxy>;
 
-  constructor(protected NavigationService: NavigationService,
+  constructor(
+    protected NavigationService: NavigationService,
     private route: ActivatedRoute,
     private ItemRepository: ItemRepository,
-    private AnalysisService: AnalysisService, private _dialogService:
-    DialogService) {
+    private AnalysisService: AnalysisService,
+    private _dialogService: DialogService,
+    private title : Title
+    ) {
     super(NavigationService);
+    this.title.setTitle("Analysis");
     this.filterSubject = new BehaviorSubject({
       filter: '',
       source: AnalysisViews.TERM_VIEW,

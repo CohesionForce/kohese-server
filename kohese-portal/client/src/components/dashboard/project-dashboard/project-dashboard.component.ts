@@ -1,11 +1,16 @@
+// Angular
+import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { ActivatedRoute, Params } from '@angular/router';
+
+// NPM
+import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+
+// Custom
 import { ProjectService } from './../../../services/project-service/project.service';
 import { DetailsComponent } from './../../details/details.component';
-import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
-import { ItemProxy} from '../../../../../common/src/item-proxy';
-
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
-import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+import { ItemProxy} from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ProjectSelectorComponent } from './project-selector/project-selector.component'
@@ -43,7 +48,11 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
     private router: ActivatedRoute,
     private navigationService: NavigationService,
     private itemRepository: ItemRepository,
-    private projectService : ProjectService) { }
+    private projectService : ProjectService,
+    private title : Title
+    ) {
+      this.title.setTitle("Project Dashboard");
+    }
 
   ngOnInit() {
     this.projectStream = new BehaviorSubject<ProjectInfo>(undefined);

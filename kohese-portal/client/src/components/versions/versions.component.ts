@@ -1,6 +1,11 @@
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+
+// NPM
 import { BehaviorSubject } from 'rxjs';
 
+// Custom
 import { Commit } from '../tree/commit-tree/commit-tree.component';
 import { Comparison } from '../compare-items/comparison.class';
 
@@ -26,8 +31,12 @@ export class VersionsComponent {
     return this._showDifferencesOnlySubject;
   }
 
-  public constructor(private _changeDetectorRef: ChangeDetectorRef) {
-  }
+  public constructor(
+    private title : Title,
+    private _changeDetectorRef: ChangeDetectorRef
+    ) {
+      this.title.setTitle("Versions");
+    }
 
   public commitTreeRowSelected(object: any): void {
     this._selectedVersionObject = object;

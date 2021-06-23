@@ -1,7 +1,13 @@
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy,
          ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { MatExpansionPanel } from '@angular/material';
+import { Title } from '@angular/platform-browser';
+
+// NPM
 import { Subscription } from 'rxjs';
 
+// Custom
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { LensService, ApplicationLens } from '../../services/lens-service/lens.service';
@@ -14,9 +20,6 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DetailsComponent } from '../details/details.component';
 import { CacheManager } from '../../../../client/cache-worker/CacheManager';
-
-import { MatExpansionPanel } from '@angular/material'
-
 
 @Component({
   selector: 'app-admin',
@@ -87,7 +90,11 @@ export class AdminComponent implements OnInit, OnDestroy {
     private _itemRepository:ItemRepository,
     private _lensService: LensService,
     private _dialogService: DialogService,
-    private _navigationService: NavigationService) { }
+    private _navigationService: NavigationService,
+    private title : Title
+    ) {
+      this.title.setTitle("Users");
+    }
 
   public ngOnInit(): void {
     this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
