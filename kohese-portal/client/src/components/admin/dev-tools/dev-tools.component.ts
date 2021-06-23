@@ -4,7 +4,7 @@ import { Title } from '@angular/platform-browser';
 
 // NPM
 
-// Custom
+// Kohese
 import { LoggingEventRecord } from './../../../../../common/src/k-logger';
 import { LogService } from '../../../services/log/log.service';
 

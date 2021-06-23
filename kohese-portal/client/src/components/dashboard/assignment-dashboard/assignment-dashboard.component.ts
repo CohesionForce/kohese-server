@@ -1,12 +1,13 @@
 // Angular
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
          ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { MatExpansionPanel } from '@angular/material';
 
 // NPM
 import { Observable, Subscription } from 'rxjs';
 
-// Custom
+// Kohese
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { SessionService } from '../../../services/user/session.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -69,8 +70,10 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     private changeRef : ChangeDetectorRef,
     private _itemRepository : ItemRepository,
     private _dialogService : DialogService,
-    private sessionService : SessionService
+    private sessionService : SessionService,
+    private title : Title
     ) {
+      this.title.setTitle("My Dashboard");
     this.assignmentTypes = DashboardSelections;
     console.log(this.assignmentTypes)
   }

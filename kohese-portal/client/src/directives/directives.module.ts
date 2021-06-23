@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 // NPM Direcives
 
-// Custom Directives
+// Kohese Directives
 import { ShowIfTruncatedDirective } from '../directives/show-if-truncated.directive';
 
 @NgModule({

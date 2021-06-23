@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 // NPM
 
-// Custom
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';

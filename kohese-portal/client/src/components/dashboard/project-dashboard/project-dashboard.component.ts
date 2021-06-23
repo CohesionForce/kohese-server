@@ -6,7 +6,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 // NPM
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 
-// Custom
+// Kohese
 import { ProjectService } from './../../../services/project-service/project.service';
 import { DetailsComponent } from './../../details/details.component';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';

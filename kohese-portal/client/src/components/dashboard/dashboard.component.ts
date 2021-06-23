@@ -6,7 +6,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 // NPM
 import { Subscription ,  BehaviorSubject } from 'rxjs';
 
-// CUstom
+// Kohese
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { CurrentUserService } from './../../services/user/current-user.service';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
@@ -51,7 +51,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
               private title : Title
               ) {
     super(navigationService);
-    this.title.setTitle("Dashboard");
+    this.title.setTitle("My Dashboard");
     this.selectedProject = projectService.savedProject;
   }
 

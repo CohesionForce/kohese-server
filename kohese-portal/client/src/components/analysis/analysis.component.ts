@@ -6,7 +6,7 @@ import { Title } from '@angular/platform-browser';
 // NPM
 import { BehaviorSubject ,  Subscription } from 'rxjs';
 
-// Custom
+// Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service'
 import { AnalysisService } from '../../services/analysis/analysis.service';
@@ -51,7 +51,10 @@ export class AnalysisComponent extends NavigatableComponent
     private title : Title
     ) {
     super(NavigationService);
-    this.title.setTitle("Analysis");
+
+    let analysisTitle: string = ("Analysis");
+    this.title.setTitle(analysisTitle);
+
     this.filterSubject = new BehaviorSubject({
       filter: '',
       source: AnalysisViews.TERM_VIEW,

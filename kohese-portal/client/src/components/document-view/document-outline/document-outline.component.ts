@@ -5,7 +5,7 @@ import { Title } from '@angular/platform-browser';
 // NPM
 import { BehaviorSubject, Subscription } from 'rxjs';
 
-// Custom
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ActivatedRoute } from '@angular/router';
 import { ItemProxy } from '../../../../../common/src/item-proxy';

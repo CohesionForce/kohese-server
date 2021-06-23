@@ -6,7 +6,7 @@ import { Title } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import * as Uuid from 'uuid';
 
-// Custom
+// Kohese
 import { FormatContainer, FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
 import { FormatDefinition, FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';

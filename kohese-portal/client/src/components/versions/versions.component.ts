@@ -5,7 +5,7 @@ import { Title } from '@angular/platform-browser';
 // NPM
 import { BehaviorSubject } from 'rxjs';
 
-// Custom
+// Kohese
 import { Commit } from '../tree/commit-tree/commit-tree.component';
 import { Comparison } from '../compare-items/comparison.class';
 

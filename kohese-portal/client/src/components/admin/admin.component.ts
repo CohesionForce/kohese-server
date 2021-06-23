@@ -7,7 +7,7 @@ import { Title } from '@angular/platform-browser';
 // NPM
 import { Subscription } from 'rxjs';
 
-// Custom
+// Kohese
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { LensService, ApplicationLens } from '../../services/lens-service/lens.service';

@@ -6,7 +6,7 @@ import { Title } from '@angular/platform-browser';
 // NPM
 import { Subscription } from 'rxjs';
 
-// Custom
+// Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
