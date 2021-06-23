@@ -1096,8 +1096,9 @@ function KIOItemServer(socket){
   //////////////////////////////////////////////////////////////////////////
   socket.on('Repository/refreshRepositories', (request: any, respond: Function) => {
     console.log('::: session %s: Received refreshRepositories for user %s at %s',
-    socket.id, socket.koheseUser.username, socket.handshake.address);
+      socket.id, socket.koheseUser.username, socket.handshake.address);
     let repositoryRefreshData;
+    // TODO: refresh repositories and update VC status to propagate changes in all clients
     respond(repositoryRefreshData);
   });
 

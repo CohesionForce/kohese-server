@@ -182,9 +182,11 @@ export class RepositoriesComponent extends NavigatableComponent implements
   }
 
   public refreshRepositories(): void {
-    this.cacheManager.subscribe('Repository/refreshRepositories', (messageData) => {
-      this.cacheManager.sendMessageToWorker('Repository/refreshRepositories', undefined, false);
-    });
+    let request = this.cacheManager.sendMessageToWorker('Repository/refreshRepositories', undefined, true);
+    request.then((response) => {
+      console.log('*** refreshRepositories response: ');
+      console.log(response);
+    })
   }
 
   public unmountRepo(id: string) {
