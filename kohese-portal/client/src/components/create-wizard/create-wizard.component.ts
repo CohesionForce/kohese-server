@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { Component, OnInit, Input, Optional, Inject,
   ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatStepper, MatDialogRef } from '@angular/material';
@@ -25,7 +42,7 @@ export class CreateWizardComponent extends NavigatableComponent
   set parentId(parentId: string) {
     this._parentId = parentId;
   }
-  
+
 // tslint:disable-next-line: no-inferrable-types
   private _isDisabled: boolean = false;
   get isDisabled() {
@@ -37,10 +54,10 @@ export class CreateWizardComponent extends NavigatableComponent
   get proxyPlaceholderStream() {
     return this._proxyPlaceholderStream;
   }
-  
+
   @ViewChild('formatObjectEditor')
   private _formatObjectEditor: FormatObjectEditorComponent;
-  
+
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
@@ -57,15 +74,15 @@ export class CreateWizardComponent extends NavigatableComponent
     if (this.isDialogInstance()) {
       this._parentId = this.data['parentId'];
     }
-    
+
     this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
   }
-  
+
   public isDialogInstance(): boolean {
     return this.MatDialogRef && (this.MatDialogRef.componentInstance ===
       this) && this.data;
   }
-  
+
   private buildProxyPlaceholder(): any {
     let timestamp: number = Date.now();
     let username: string = this._sessionService.user.name;

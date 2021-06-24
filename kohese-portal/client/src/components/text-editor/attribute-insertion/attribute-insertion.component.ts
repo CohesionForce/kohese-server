@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
@@ -11,11 +28,11 @@ class Entry {
   get key() {
     return this._key;
   }
-  
+
   get value() {
     return this._value;
   }
-  
+
   public constructor(private _key: any, private _value: any) {
   }
 }
@@ -38,7 +55,7 @@ export class AttributeInsertionSpecification {
   set insertionLocation(insertionLocation: InsertionLocation) {
     this._insertionLocation = insertionLocation;
   }
-  
+
   private _types: any = {};
   get types() {
     return this._types;
@@ -46,7 +63,7 @@ export class AttributeInsertionSpecification {
   set types(types: any) {
     this._types = types;
   }
-  
+
   public constructor() {
   }
 }
@@ -63,7 +80,7 @@ export class AttributeInsertionComponent {
   get attributeInsertionSpecification() {
     return this._attributeInsertionSpecification;
   }
-  
+
   private _getSourceChildren: (element: any) => Array<any> = (element:
     any) => {
     let children: Array<any> = [];
@@ -81,7 +98,7 @@ export class AttributeInsertionComponent {
           children.push(new Entry(localTypeName, item.localTypes[
             localTypeName]));
         }
-        
+
         for (let attributeName in item.classProperties) {
           if (attributeName !== 'description') {
             children.push(new Entry(attributeName, attributeName));
@@ -93,20 +110,20 @@ export class AttributeInsertionComponent {
         }
       }
     }
-    
+
     return children;
   };
   get getSourceChildren() {
     return this._getSourceChildren;
   }
-  
+
   private _getSourceText: (element: any) => string = (element: any) => {
     return (element as Entry).key;
   };
   get getSourceText() {
     return this._getSourceText;
   }
-  
+
   private _getTargetChildren: (element: any) => Array<any> = (element:
     any) => {
     let children: Array<any> = [];
@@ -126,7 +143,7 @@ export class AttributeInsertionComponent {
             localTypeKeys[j]]));
         }
       }
-      
+
       if (element.value.attributes) {
         let attributeKeys: Array<string> = Object.keys(element.value.
           attributes);
@@ -136,39 +153,39 @@ export class AttributeInsertionComponent {
         }
       }
     }
-    
+
     return children;
   };
   get getTargetChildren() {
     return this._getTargetChildren;
   }
-  
+
   private _getTargetText: (element: any) => string = (element: any) => {
     return (element as Entry).key;
   };
   get getTargetText() {
     return this._getTargetText;
   }
-  
+
   @ViewChild('targetTree')
   private _targetTree: TreeComponent;
-  
+
   get changeDetectorRef() {
     return this._changeDetectorRef;
   }
-  
+
   get matDialogRef() {
     return this._matDialogRef;
   }
-  
+
   get Object() {
     return Object;
   }
-  
+
   get InsertionLocation() {
     return InsertionLocation;
   }
-  
+
   get HeadingStyle() {
     return HeadingStyle;
   }
@@ -179,12 +196,12 @@ export class AttributeInsertionComponent {
     MatDialogRef<AttributeInsertionComponent>, private _dynamicTypesService:
     DynamicTypesService) {
   }
-  
+
   public isDialogInstance(): boolean {
     return this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data;
   }
-  
+
   public addAttribute(treePath: Array<any>): void {
     let types: any = this._attributeInsertionSpecification.types;
     if (!types[treePath[0].key]) {
@@ -195,7 +212,7 @@ export class AttributeInsertionComponent {
         }
       };
     }
-    
+
     if (treePath.length > 1) {
       let typeValue: any = types[treePath[0].key];
       if (treePath[1].value instanceof Object) {
@@ -205,7 +222,7 @@ export class AttributeInsertionComponent {
             }
           };
         }
-        
+
         if (treePath.length > 2) {
           typeValue.localTypes[treePath[1].key].attributes[treePath[2].key] = {
             showAttributeName: false,
@@ -223,12 +240,12 @@ export class AttributeInsertionComponent {
         };
       }
     }
-    
+
     this._attributeInsertionSpecification.types = types;
     this._targetTree.update(true);
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public removeAttribute(treePath: Array<any>): void {
     let types: any = this._attributeInsertionSpecification.types;
     if (treePath.length > 1) {
@@ -245,7 +262,7 @@ export class AttributeInsertionComponent {
     } else {
       delete types[treePath[0].key];
     }
-    
+
     this._targetTree.update(true);
     this._changeDetectorRef.markForCheck();
   }
