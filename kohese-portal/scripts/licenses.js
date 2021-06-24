@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 /**
  *  Checks all licenses via license-checker
  *  Uses a user interactive prompt unless given with command-line arguments:
@@ -17,7 +34,7 @@ prompt.start();
 
 const mainMenu = {properties: {option: {
     description: '[L]ist Licenses; \n[G]et Modules from License; \nGet [M]odule info; \n[C]hange mode; \nGet [N]ode Dependency by package; \nE[x]it',
-    pattern: /^[CcGgLlMmNnXx]{1}$/, 
+    pattern: /^[CcGgLlMmNnXx]{1}$/,
     message: 'Invalid input.',
     required: true
 }}};
@@ -47,7 +64,7 @@ var licenseStore = {};
 
 var loadData = new Promise(function(resolve, reject) {
     console.log('Initializing data...');
-    
+
     var nlcProdPromise = new Promise(function(resolve, reject) {
         nlcProd.init({start: __dirname + '/..', production: true}, function(err, node) {
             if(err) {
@@ -96,7 +113,7 @@ var loadData = new Promise(function(resolve, reject) {
             resolve();
         })
     });
-    
+
     var npmProdPromise = new Promise(function(resolve, reject) {
         var npmls = spawn('npm', ['ls', '-prod', '-json']);
         var data = '';
@@ -109,7 +126,7 @@ var loadData = new Promise(function(resolve, reject) {
             resolve();
         })
     });
-    
+
     Promise.all([nlcPromise, nlcProdPromise, blcPromise, npmPromise, npmProdPromise]).then(function() {
         resolve();
     });
@@ -119,8 +136,8 @@ loadData.then(function() {
     var mode = 'node';
     var json = licenseStore[mode];
     console.log('List initialized.');
-    
-    /* Format of json for licenseStore[mode]: 
+
+    /* Format of json for licenseStore[mode]:
      *   ...
      *   name@version: {
      *       licenses: ,
@@ -143,7 +160,7 @@ loadData.then(function() {
             if(!licensesList.hasOwnProperty(moduleLicense)) {
                 licensesList[moduleLicense] = {};
                 counter[moduleLicense] = 0;
-            } 
+            }
             licensesList[moduleLicense][module] = json[module];
             counter[moduleLicense]++;
         }
@@ -153,12 +170,12 @@ loadData.then(function() {
     if(notInteractive) {
         runNotInteractive();
     }
-    
+
     // Register 'beforeExit' event so you dont need makeMenu() after every menu function.
     process.on('beforeExit', function() {
         makeMenu();
     });
-    
+
     makeMenu();
 
     function makeMenu() {
@@ -172,7 +189,7 @@ loadData.then(function() {
             }
             if(result.option === 'g' || result.option === 'G') {
                 prompt.get(getModulePrompt, function(err, result) {
-                    getModulesFromLicense(result.license); 
+                    getModulesFromLicense(result.license);
                 });
             }
             if(result.option === 'm' || result.option === 'M') {
@@ -217,7 +234,7 @@ loadData.then(function() {
             if(a.toLowerCase() <= b.toLowerCase())
                 return -1;
             else
-                return 1;  
+                return 1;
         });
         for(var i = 0; i < sorted.length; i++) {
             console.log(counter[sorted[i]] + '\t' + sorted[i]);

@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   ViewChild, Output, EventEmitter } from '@angular/core';
 import * as Uuid from 'uuid/v1';
@@ -47,9 +64,9 @@ export class ViewModelEditorComponent {
         this._isLocalType = false;
       }
     }, undefined);
-    
+
     this._editable = this._hasUnsavedChanges;
-    
+
     let viewModels: Array<any> = [];
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
@@ -57,7 +74,7 @@ export class ViewModelEditorComponent {
         viewModels.push(itemProxy.item);
       }
     }, undefined);
-    
+
     this._itemRepository.getIcons().then((iconNames: Array<string>) => {
       this._icons = iconNames.sort().map(
         (iconName: string) => {
@@ -73,7 +90,7 @@ export class ViewModelEditorComponent {
         };
       });
     });
-    
+
     this._attributes = [];
     for (let attributeName in this._viewModel.viewProperties) {
       let attribute: any = this._viewModel.viewProperties[attributeName];
@@ -82,7 +99,7 @@ export class ViewModelEditorComponent {
       this._attributes.push(attribute);
     }
   }
-  
+
   private _hasUnsavedChanges: boolean = false;
   get hasUnsavedChanges() {
     return this._hasUnsavedChanges;
@@ -92,7 +109,7 @@ export class ViewModelEditorComponent {
     this._hasUnsavedChanges = hasUnsavedChanges;
     this.viewModel = this._viewModel;
   }
-  
+
   private _modifiedEventEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output('modified')
   get modifiedEventEmitter() {
@@ -107,7 +124,7 @@ export class ViewModelEditorComponent {
   set enclosingDataModel(enclosingDataModel: KoheseDataModel) {
     this._enclosingDataModel = enclosingDataModel;
   }
-   
+
   private _dataModel: any;
   get dataModel() {
     return this._dataModel;
@@ -116,7 +133,7 @@ export class ViewModelEditorComponent {
   set dataModel(dataModel: any) {
     this._dataModel = dataModel;
   }
-  
+
   private _editable: boolean = false;
   get editable() {
     return this._editable;
@@ -124,24 +141,24 @@ export class ViewModelEditorComponent {
   set editable(editable: boolean) {
     this._editable = editable;
   }
-  
+
   private _isLocalType: boolean = false;
   get isLocalType() {
     return this._isLocalType;
   }
-  
+
   private _icons: Array<Icon>;
   private _filter: string;
   private _iconFilterTimeoutIdentifier: any;
-  
+
   @ViewChild('attributeTable')
   private _attributeTable: MatTable<any>;
-  
+
   private _attributes: Array<any>;
   get attributes() {
     return this._attributes;
   }
-  
+
   private _types: any = {
     'boolean': {
       'Boolean': 'boolean'
@@ -164,67 +181,67 @@ export class ViewModelEditorComponent {
       'Username': 'user-selector'
     }
   };
-  
+
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
-  
+
   get Metatype() {
     return Metatype;
   }
-  
+
   get Object() {
     return Object;
   }
-  
+
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _dialogService: DialogService, private _itemRepository:
     ItemRepository) {
   }
-  
+
   public save(): void {
     this._itemRepository.upsertItem('KoheseView', this._viewModel);
     this._editable = false;
   }
-  
+
   public discardChanges(): void {
     this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
       getProxyFor(this._viewModel.id));
     this._editable = false;
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public getIconName(iconName: string): string {
     let name: string =  iconName.replace(/-(\S{1})/g, (match: string,
       captureGroup: string, offset: number, source: string) => {
       return ' ' + captureGroup.toUpperCase();
     });
-    
+
     return name.charAt(0).toUpperCase() + name.substring(1);
   }
-  
+
   public filterChanged(filter: string): void {
     if (this._iconFilterTimeoutIdentifier) {
       clearTimeout(this._iconFilterTimeoutIdentifier);
     }
-    
+
     this._iconFilterTimeoutIdentifier = setTimeout(() => {
-      this._filter = filter;      
+      this._filter = filter;
       this._changeDetectorRef.markForCheck();
       this._iconFilterTimeoutIdentifier = undefined;
     }, 700);
   }
-  
+
   public getIcons(): Array<Icon> {
     if (this._filter) {
       return this._icons.filter((icon: Icon) => {
         return icon.name.toLowerCase().includes(this._filter.toLowerCase());
       });
     }
-    
+
     return this._icons;
   }
-  
+
   public iconSelected(icon: string): void {
     let conflictingKindNames: Array<string> = [];
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
@@ -234,17 +251,17 @@ export class ViewModelEditorComponent {
         conflictingKindNames.push(itemProxy.item.modelName);
       }
     }, undefined);
-    
+
     if (conflictingKindNames.length > 0) {
       this._dialogService.openInformationDialog('Icon In Use', 'This icon ' +
         'is already used for the following kinds:\n\t\t- ' +
         conflictingKindNames.join('\n\t\t- '));
     }
-    
+
     this._viewModel.icon = icon;
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public colorSelected(color: string): void {
     let conflictingKindNames: Array<string> = [];
     TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
@@ -254,17 +271,17 @@ export class ViewModelEditorComponent {
         conflictingKindNames.push(itemProxy.item.modelName);
       }
     }, undefined);
-    
+
     if (conflictingKindNames.length > 0) {
       this._dialogService.openInformationDialog('Color In Use', 'This ' +
         'color is already used for the following kinds:\n\t\t- ' +
         conflictingKindNames.join('\n\t\t- '));
     }
-    
+
     this._viewModel.color = color;
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public async addTableDefinition(): Promise<void> {
     let name: any = await this._dialogService.openInputDialog('Add Table ' +
       'Definition', '', InputDialogKind.STRING, 'Name', '', (input: any) => {
@@ -283,12 +300,12 @@ export class ViewModelEditorComponent {
           column4: []
         }
       };
-      
+
       this._modifiedEventEmitter.emit();
       this._changeDetectorRef.markForCheck();
     }
   }
-  
+
   public async renameTableDefinition(tableDefinitionId: string):
     Promise<void> {
     let tableDefinition: TableDefinition = this._viewModel.tableDefinitions[
@@ -304,13 +321,13 @@ export class ViewModelEditorComponent {
       this._changeDetectorRef.markForCheck();
     }
   }
-  
+
   public removeTableDefinition(tableDefinitionId: string): void {
     delete this._viewModel.tableDefinitions[tableDefinitionId];
     this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public async addFormatDefinition(): Promise<void> {
     let name: any = await this._dialogService.openInputDialog('Add Format ' +
       'Definition', '', InputDialogKind.STRING, 'Name', '', (input: any) => {
@@ -327,7 +344,7 @@ export class ViewModelEditorComponent {
         },
         containers: []
       };
-      
+
       let propertyDefinition: PropertyDefinition = {
         propertyName: '',
         customLabel: '',
@@ -336,7 +353,7 @@ export class ViewModelEditorComponent {
         visible: true,
         editable: true
       };
-      
+
       let attribute: any;
       if (this._isLocalType) {
         attribute = this._dataModel.properties[Object.keys(this._dataModel.
@@ -344,12 +361,12 @@ export class ViewModelEditorComponent {
       } else {
         attribute = this._dataModel.classProperties['name'].definition;
       }
-      
+
       propertyDefinition.propertyName = attribute.name;
       propertyDefinition.customLabel = attribute.name;
-      
+
       let attributeType: string = (Array.isArray(attribute.type) ? attribute.
-        type[0] : attribute.type); 
+        type[0] : attribute.type);
       switch (attributeType) {
         case 'boolean':
           propertyDefinition.kind = 'boolean';
@@ -370,7 +387,7 @@ export class ViewModelEditorComponent {
           propertyDefinition.kind = 'user-selector';
           break;
       }
-      
+
       if (this._isLocalType) {
         formatDefinition.containers.push({
           kind: FormatContainerKind.VERTICAL,
@@ -379,14 +396,14 @@ export class ViewModelEditorComponent {
       } else {
         formatDefinition.header.contents.push(propertyDefinition);
       }
-      
+
       this._viewModel.formatDefinitions[id] = formatDefinition;
-      
+
       this._modifiedEventEmitter.emit();
       this._changeDetectorRef.markForCheck();
     }
   }
-  
+
   public async renameFormatDefinition(formatDefinitionId: string):
     Promise<void> {
     let formatDefinition: FormatDefinition = this._viewModel.formatDefinitions[
@@ -402,7 +419,7 @@ export class ViewModelEditorComponent {
       this._changeDetectorRef.markForCheck();
     }
   }
-  
+
   public previewFormatDefinition(formatDefinitionId: string): void {
     this._dialogService.openComponentDialog(FormatPreviewComponent, {
       data: {
@@ -411,7 +428,7 @@ export class ViewModelEditorComponent {
       }
     }).updateSize('70%', '70%');
   }
-  
+
   public setDefaultFormatDefinition(formatDefinitionType: FormatDefinitionType,
     formatDefinitionId: string): void {
     if ((formatDefinitionType !== FormatDefinitionType.DOCUMENT) &&
@@ -422,11 +439,11 @@ export class ViewModelEditorComponent {
       this._viewModel.defaultFormatKey[formatDefinitionType] =
         formatDefinitionId;
     }
-    
+
     this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public mayRemoveFormatDefinition(formatDefinitionId: string): boolean {
     if (this._isLocalType) {
       TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
@@ -439,7 +456,7 @@ export class ViewModelEditorComponent {
               formatDefinitionId) {
               return false;
             }
-            
+
             for (let j: number = 0; j < formatDefinition.containers.length;
               j++) {
               let formatContainer: FormatContainer = formatDefinition.
@@ -456,23 +473,23 @@ export class ViewModelEditorComponent {
         }
       }, undefined);
     }
-    
+
     return (this._viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT] !==
       formatDefinitionId);
   }
-  
+
   public removeFormatDefinition(formatDefinitionId: string): void {
     if (this._viewModel.defaultFormatKey === formatDefinitionId) {
       this._viewModel.defaultFormatKey = Object.keys(this._viewModel.
         formatDefinitions)[0];
     }
-    
+
     delete this._viewModel.formatDefinitions[formatDefinitionId];
-    
+
     this._modifiedEventEmitter.emit();
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public getAttributes(): Array<any> {
     if (this._isLocalType) {
       return Object.values(this._dataModel.properties);
@@ -484,11 +501,11 @@ export class ViewModelEditorComponent {
         attribute.name = attributeName;
         attributes.push(attribute);
       }
-      
+
       return attributes;
     }
   }
-  
+
   public sortAttributes(columnId: string, sortDirection: string): void {
     if (sortDirection) {
       if (columnId === 'Display Type') {
@@ -511,7 +528,7 @@ export class ViewModelEditorComponent {
             attributeName = 'displayName';
             break;
         }
-        
+
         this._attributes.sort((oneElement: any, anotherElement: any) => {
           if (sortDirection === 'asc') {
             return String(oneElement[attributeName]).localeCompare(
@@ -530,17 +547,17 @@ export class ViewModelEditorComponent {
         attribute.name = attributeName;
         unsortedData.push(attribute);
       }
-      
+
       this._attributes.sort((oneElement: any, anotherElement: any) => {
         return (unsortedData.indexOf(oneElement) - unsortedData.indexOf(
           anotherElement));
       });
     }
-    
+
     this._attributeTable.renderRows();
     this._changeDetectorRef.markForCheck();
   }
-  
+
   public getTypes(attributeName: string): Array<string> {
     let dataModelType: string = (Array.isArray(this._dataModel.properties[
       attributeName].type) ? this._dataModel.properties[attributeName].type[
@@ -554,7 +571,7 @@ export class ViewModelEditorComponent {
       return ['Reference'];
     }
   }
-  
+
   public getTypeValue(attributeName: string, type: string): string {
     if (type === 'Reference') {
       return '';
@@ -569,7 +586,7 @@ export class ViewModelEditorComponent {
       }
     }
   }
-  
+
   public areTypeValuesEqual(option: string, selection: string): boolean {
     if ((option === '') && (selection === 'proxy-selector')) {
       return true;
