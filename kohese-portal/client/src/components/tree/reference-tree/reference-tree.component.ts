@@ -55,26 +55,28 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    let stagedVersionComparisonAction: Action = new Action('Compare ' +
-      'Against Staged Version', 'Compare this Item against the staged ' +
-      'version of this Item', 'fa fa-exchange', (object: any) => {
-      let enable: boolean = false;
-      let path: Array<string> = (object as Array<string>);
-      let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
-        path.length - 1]);
-      if (proxy) {
-        enable = (proxy.vcStatus.statusArray.filter((status: string) => {
-          return status.startsWith('INDEX');
-        }).length > 0);
-      }
+    // TODO: Reimplement when "User can stage tree" task is completed
 
-      return enable;
-      }, (object: any) => {
-      this.openComparisonDialog((object as Array<string>), VersionDesignator.
-        STAGED_VERSION);
-    });
-    this.rootMenuActions.push(stagedVersionComparisonAction);
-    this.menuActions.push(stagedVersionComparisonAction);
+    // let stagedVersionComparisonAction: Action = new Action('Compare ' +
+    //   'Against Staged Version', 'Compare this Item against the staged ' +
+    //   'version of this Item', 'fa fa-exchange', (object: any) => {
+    //   let enable: boolean = false;
+    //   let path: Array<string> = (object as Array<string>);
+    //   let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
+    //     path.length - 1]);
+    //   if (proxy) {
+    //     enable = (proxy.vcStatus.statusArray.filter((status: string) => {
+    //       return status.startsWith('INDEX');
+    //     }).length > 0);
+    //   }
+
+    //   return enable;
+    //   }, (object: any) => {
+    //   this.openComparisonDialog((object as Array<string>), VersionDesignator.
+    //     STAGED_VERSION);
+    // });
+    // this.rootMenuActions.push(stagedVersionComparisonAction);
+    // this.menuActions.push(stagedVersionComparisonAction);
 
     let lastCommittedVersionComparisonAction: Action = new Action(
       'Compare Against Last Committed Version', 'Compares this Item against ' +

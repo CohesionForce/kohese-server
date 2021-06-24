@@ -156,16 +156,18 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
     this.rootRowActions.splice(0, 0, ...versionControlRowActions);
     this.rowActions.splice(0, 0, ...versionControlRowActions);
 
-    let stagedVersionComparisonAction: Action = new Action('Compare ' +
-      'Against Staged Version', 'Compare this Item against the staged ' +
-      'version of this Item', 'fa fa-exchange', (object: any) => {
-      return ((object as ItemProxy).vcStatus.isStaged());
-      }, (object: any) => {
-      this.openComparisonDialog((object as ItemProxy), VersionDesignator.
-        STAGED_VERSION);
-    });
-    this.rootMenuActions.push(stagedVersionComparisonAction);
-    this.menuActions.push(stagedVersionComparisonAction);
+    // TODO: Reimplement when "User can stage tree" task is completed
+
+    // let stagedVersionComparisonAction: Action = new Action('Compare ' +
+    //   'Against Staged Version', 'Compare this Item against the staged ' +
+    //   'version of this Item', 'fa fa-exchange', (object: any) => {
+    //   return ((object as ItemProxy).vcStatus.isStaged());
+    //   }, (object: any) => {
+    //   this.openComparisonDialog((object as ItemProxy), VersionDesignator.
+    //     STAGED_VERSION);
+    // });
+    // this.rootMenuActions.push(stagedVersionComparisonAction);
+    // this.menuActions.push(stagedVersionComparisonAction);
 
     let lastCommittedVersionComparisonAction: Action = new Action(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
