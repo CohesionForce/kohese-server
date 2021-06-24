@@ -260,12 +260,13 @@ function addRepository(mountData) {
       createdOn: mountData.timestamp,
       modifiedBy: mountData.username,
       modifiedOn: mountData.timestamp,
-      repoId: repoMount.id,
-      mountPoint: KDBRepo.getMountId(mountData.parentId)
+      repoId: {id : repoMount.id},
+      mountPoint: {id: KDBRepo.getMountId(mountData.parentId)}
     };
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData)
+    kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
   } else {
     delete mountList[mountData.repoId + '-mount'].disabled;
@@ -279,6 +280,7 @@ function addRepository(mountData) {
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData)
+    kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
   }
 }
@@ -417,8 +419,8 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       createdOn: modelInstance.createdOn,
       modifiedBy: modelInstance.modifiedBy,
       modifiedOn: modelInstance.modifiedOn,
-      mountPoint: modelInstance.parentId,
-      repoId: modelInstance.id
+      repoId: {id: modelInstance.id},
+      mountPoint: {id: modelInstance.parentId}
     };
 
     console.log('::: Repo Mount Information -- StoreModelInstance');

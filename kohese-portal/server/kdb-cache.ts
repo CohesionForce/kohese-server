@@ -66,7 +66,9 @@ export class KDBCache extends LevelCache {
   public kTreeDirectory;
   public expandedRepoCommitDirectory;
   public hashmapDirectory;
-  private cacheLoaded : Boolean;
+  private cacheLoaded : boolean;
+  private repoSchemaVersion: string;
+  private repoSchemaMountMigration: boolean;
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -83,6 +85,7 @@ export class KDBCache extends LevelCache {
     super(levelDown);
 
     this.cacheLoaded = false;
+    this.repoSchemaMountMigration = false;
     this.repoCommitMap = new Map<string, any>();
     this.repoTreeMap = new Map<string, any>();
 
@@ -694,12 +697,23 @@ export class KDBCache extends LevelCache {
 
     if (contents.hasOwnProperty('export')) {
       console.log('::: Found early legacy dir (v0.1) for ' + treeData.oid);
+      this.repoSchemaVersion = 'v0.1'
       await this.loadProxiesForRepoRootDir(contents['export'], treeConfig);
       return;
     }
 
     if (contents.hasOwnProperty('Item')){
-      console.log('::: Found legacy dir (v0.2) for ' + treeData.oid);
+      if (contents.hasOwnProperty('RepoMount') && (!this.repoSchemaVersion)) {
+        //  what to put here  && version is empty or 0.1) {
+        console.log('::: Repo Schema Versions (v0.3) for ' + treeData.oid);
+        this.repoSchemaVersion = 'v0.3'
+      } else {
+        if (this.repoSchemaVersion !== 'v0.1') {
+          console.log('::: Found legacy dir (v0.2) for ' + treeData.oid);
+          this.repoSchemaVersion = 'v0.2'
+        }
+        this.repoSchemaMountMigration = true;
+      }
 
       for(var kind in contents){
         switch (kind) {
@@ -723,31 +737,51 @@ export class KDBCache extends LevelCache {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  async loadProxiesForRepoContents(repoDir, treeConfig){
-    console.log('::: Processing Repositories');
+  async loadProxiesForRepoContents(repoDir, treeConfig) {
+    console.log('::: Processing Repositories', repoDir);
 
-    for(var repoFile in repoDir){
+    for (var repoFile in repoDir) {
 
-      // TODO: Need to convert to jsonMountExt and merge the contents
-
-      if (!jsonExt.test(repoFile)){
+      if (jsonExt.test(repoFile) || repoFile === '.gitignore') {
+        // repofile is a .json file or .gitignore
         console.log('>>> Skipping repo file ' + repoFile);
         continue;
-      }
+      } else if (jsonMountExt.test(repoFile)) {
 
-      console.log('+++ Found Repository ' + repoFile);
+        if (this.repoSchemaMountMigration) {
 
-      var oid = repoDir[repoFile].oid;
-
-      var item = await this.getBlob(oid);
-      // eslint-disable-next-line no-unused-vars
-      var proxy = new ItemProxy('Repository', item, treeConfig);
-
-      // TODO Need to handle mount files
-
-      var repoSubdir = repoDir[item.id];
-      if(repoSubdir){
-        await this.loadProxiesForRepoRootDir(repoSubdir, treeConfig);
+          let oid = repoDir[repoFile].oid;
+          let repoItem = await this.getBlob(oid);
+          let cloneRepoItem = JSON.parse(JSON.stringify(repoItem));
+          cloneRepoItem.repoId = {id: repoItem.id};
+          cloneRepoItem.id = repoItem.id + '-mount'
+          if (!repoItem.parentId) {
+            cloneRepoItem.mountPoint = {id: 'ROOT'};
+          } else {
+            cloneRepoItem.mountPoint = {id: repoItem.parentId}
+          }
+          cloneRepoItem.parentId = 'Repo-Mount-Definitions';
+          let repoMountProxy = new ItemProxy('RepoMount', cloneRepoItem, treeConfig)
+        }
+      } else {
+        if (repoDir[repoFile].contents) {
+           let repoContents = repoDir[repoFile].contents;
+           if (repoContents['Root.json']) {
+             let repoRootFile = repoContents['Root.json'];
+             let oid = repoRootFile.oid;
+             let repoRoot = await this.getBlob(oid)
+             let repoMountProxy = treeConfig.getProxyFor(repoRoot.id + '-mount')
+             if (repoMountProxy) {
+               let cloneRepoRoot = JSON.parse(JSON.stringify(repoRoot));
+               cloneRepoRoot.parentId = repoMountProxy.item.mountPoint.id;
+               let repoProxy = new ItemProxy('Repository', cloneRepoRoot, treeConfig)
+               let repoSubDir = repoDir[repoRoot.id];
+               if (repoSubDir) {
+                 await this.loadProxiesForRepoRootDir(repoSubDir, treeConfig)
+               }
+             }
+           }
+        }
       }
     }
   }
