@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 
 var fs = require('fs');
 var util = require('util');
@@ -50,7 +67,7 @@ function dumpAttr(node, attr) {
     if ("{}" != value) {
       console.log(" -- " + attr + ": " + JSON.stringify(node[attr]));
     }
-  }  
+  }
 }
 
 function dumpNode(node) {
@@ -76,10 +93,10 @@ function dumpNode(node) {
   dumpAttr(node, "_fenceLength");
   dumpAttr(node, "_fenceOffset");
   dumpAttr(node, "_level");
-  
+
   //console.log("??? " + node.type + ' - ' + util.inspect(node.sourcepos) + ' - ' + event.entering + " - " + util.inspect(node, null, 2, false));
   console.log("<====");
- 
+
 }
 
 while ((event = walker.next())) {
@@ -111,13 +128,13 @@ while ((event = walker.next())) {
         break;
       case 'what':
         dumpNode(node);
-        break; 
+        break;
       case 'softbreak':
         console.log("}}} softbreak");
         break;
       default:
         console.log("~~~ " + node.type + " - " + util.inspect(node.sourcepos));
-        dumpNode(node);  
+        dumpNode(node);
     }
   } else {
     switch (node.type) {

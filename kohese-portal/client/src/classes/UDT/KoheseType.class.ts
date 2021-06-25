@@ -1,14 +1,31 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 
 export class KoheseType {
   get dataModelProxy() {
     return this._dataModelProxy;
   }
-  
+
   get viewModelProxy() {
     return this._viewModelProxyMap[this._dataModelProxy.item.id];
   }
-  
+
   private _fields: any = {};
   get fields() {
     return this._fields;
@@ -18,7 +35,7 @@ export class KoheseType {
     private _viewModelProxyMap: any) {
     this.compileFields();
   }
-  
+
   public addProperty(propertyId: string): void {
     let property: any = {
       type: 'boolean',
@@ -41,7 +58,7 @@ export class KoheseType {
     }
     this._fields[propertyId] = combinedProperty;
   }
-  
+
   public deleteProperty(propertyId: string): void {
     delete this._dataModelProxy.item.properties[propertyId];
     if (this.viewModelProxy) {
@@ -49,7 +66,7 @@ export class KoheseType {
     }
     delete this._fields[propertyId];
   }
-  
+
   public updateProperty(propertyId: string, property: any): void {
     this._fields[propertyId] = JSON.parse(JSON.stringify(property));
     if (this.viewModelProxy) {
@@ -60,11 +77,11 @@ export class KoheseType {
     this._dataModelProxy.item.properties[propertyId] = JSON.parse(JSON.
       stringify(property));
   }
-  
+
   private compileFields(): void {
     let fieldGroups: Array<any> = [];
     let modelProxy: KoheseModel = this._dataModelProxy;
-    
+
     do {
       let modelFields: any = {};
       for (let fieldKey in modelProxy.item.properties) {
@@ -79,7 +96,7 @@ export class KoheseType {
               stringify(viewProperty));
           }
         }
-        
+
         modelFields[fieldKey] = field;
       }
       fieldGroups.push(modelFields);

@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { MarkdownCheatSheetComponent } from './../markdown-cheat-sheet.component';
 import { PropertyDefinition } from '../../../../../../common/src/PropertyDefinition.interface';
 import { Input } from '@angular/core';
@@ -19,12 +36,12 @@ export class KdMarkdownComponent implements OnInit {
   proxy: ItemProxy;
   @Input()
   container: string;
-  
+
   private _formattedValue: string;
   get formattedValue() {
     return this._formattedValue;
   }
-  
+
   private _images: Array<string> = [];
   private static readonly _IMAGE_REGEXP: RegExp = /!\[.*?\]\((.+?)\)/g;
 
@@ -38,7 +55,7 @@ export class KdMarkdownComponent implements OnInit {
     this.dialogService.openComponentDialog(MarkdownCheatSheetComponent, {}).
       updateSize('60%', '60%');
   }
-  
+
   public updateValue(input: string): void {
     this.proxy.item[this.property.propertyName] = (input ? input.replace(
       KdMarkdownComponent._IMAGE_REGEXP, (matchedSubstring: string,
@@ -60,7 +77,7 @@ export class KdMarkdownComponent implements OnInit {
     }) : input);
     this.formatValue();
   }
-  
+
   public addImagesToMarkdown(insertionIndex: number, images: Array<File>):
     void {
     for (let j: number = images.length - 1; j >= 0; j--) {
@@ -81,7 +98,7 @@ export class KdMarkdownComponent implements OnInit {
       }
     }
   }
-  
+
   private formatValue(): void {
     this._formattedValue = (this.proxy.item[this.property.propertyName] ? this.
       proxy.item[this.property.propertyName].replace(KdMarkdownComponent.
@@ -93,7 +110,7 @@ export class KdMarkdownComponent implements OnInit {
           this._images.push(captureGroup);
           imageIndex = this._images.length - 1;
         }
-        
+
         let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
           indexOf(captureGroup);
         return matchedSubstring.substring(0,

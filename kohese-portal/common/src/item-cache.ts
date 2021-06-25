@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 /**
  *
  */
@@ -95,7 +112,7 @@ export class ItemCache {
   cacheKeyValuePair(sublevelName, key, value, alreadyCached: boolean = false) {
     // Default implementation does nothing
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
@@ -361,7 +378,7 @@ export class ItemCache {
       commitArray.sort((left: KoheseCommit, right: KoheseCommit) => {
         return right.time - left.time;
       });
-  
+
       this.historyMap = {};
       for (let commit of commitArray) {
         let diff : TreeHashMapDifference = await commit.newDiff();
@@ -395,14 +412,14 @@ export class ItemCache {
               summary: diff.summary.itemDeleted[itemId],
               details: {left: oldTreeEntry}
             });
-          }  
+          }
         }
       }
-      
+
       let afterTime = Date.now();
-  
+
       console.log('### Time to compute history map: ' + (afterTime-beforeTime)/1000);
-  
+
     }
 
     return this.historyMap;
