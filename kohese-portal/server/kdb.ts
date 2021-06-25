@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 /**
  *
  */
@@ -243,12 +260,13 @@ function addRepository(mountData) {
       createdOn: mountData.timestamp,
       modifiedBy: mountData.username,
       modifiedOn: mountData.timestamp,
-      repoId: repoMount.id,
-      mountPoint: KDBRepo.getMountId(mountData.parentId)
+      repoId: {id : repoMount.id},
+      mountPoint: {id: KDBRepo.getMountId(mountData.parentId)}
     };
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData)
+    kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
   } else {
     delete mountList[mountData.repoId + '-mount'].disabled;
@@ -262,6 +280,7 @@ function addRepository(mountData) {
 
     console.log('::: Repo Mount Information');
     console.log(repoMountData)
+    kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
     kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
   }
 }
@@ -400,8 +419,8 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       createdOn: modelInstance.createdOn,
       modifiedBy: modelInstance.modifiedBy,
       modifiedOn: modelInstance.modifiedOn,
-      mountPoint: modelInstance.parentId,
-      repoId: modelInstance.id
+      repoId: {id: modelInstance.id},
+      mountPoint: {id: modelInstance.parentId}
     };
 
     console.log('::: Repo Mount Information -- StoreModelInstance');

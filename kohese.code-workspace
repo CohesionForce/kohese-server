@@ -8,6 +8,46 @@
 		"workbench.editor.enablePreviewFromQuickOpen": false,
 		"files.watcherExclude": {
 			"**/kdb/**": true
-		}
+		},
+
+		"psi-header.config": {
+			"forceToTop": true,
+			"blankLinesAfter": 2,
+		},
+		"psi-header.templates": [
+			{
+				"language": "*",
+				"template": [
+					"Copyright (c) <<year>> <<company>> | <<url>> | <<email>>",
+					"",
+					"Licensed under the Apache License, Version 2.0 (the \"License\");",
+					"you may not use this file except in compliance with the License.",
+					"You may obtain a copy of the License at",
+					"",
+					"     http://www.apache.org/licenses/LICENSE-2.0",
+					"",
+					"Unless required by applicable law or agreed to in writing, software",
+					"distributed under the License is distributed on an \"AS IS\" BASIS,",
+					"WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.",
+					"See the License for the specific language governing permissions and",
+					"limitations under the License."
+				],
+				"changeLogCaption": "HISTORY:",
+				"changeLogHeaderLineCount": 2,
+				"changeLogEntryTemplate": [
+					"<<dateformat('YYYY-MM-DD')>>\t<<initials>>\t"
+				]
+			},
+			{
+				"language": "typescript",
+				"mapTo": "javascript"
+			},
+		],
+		"psi-header.variables": [
+			["company", "CohesionForce Inc"],
+			["address", "101 Quality Cir NW #140, Huntsville, AL 35806"],
+			["url", "www.CohesionForce.com"],
+			["email", "info@CohesionForce.com"],
+		]
 	}
 }
