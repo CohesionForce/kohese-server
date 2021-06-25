@@ -1,5 +1,7 @@
 const Fetch = require('node-fetch');
 const StringReplaceAsync = require('string-replace-async');
+const childProcess = require('child_process');
+const { writeFileSync } = require('fs');
 
 import { ItemProxy } from '../common/src/item-proxy';
 import { KoheseModel } from '../common/src/KoheseModel';
@@ -1621,6 +1623,16 @@ function KIOItemServer(socket){
       sendResponse({err:err});
     }
   });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('About/getCommitInfo', function (request: any, sendResponse) {
+    console.log('::: session %s: Received About/getCommitInfo for user %s at %s',
+        socket.id, socket.koheseUser.username, socket.handshake.address);
+    let gitInfo = generateGitCommitInfo();
+    sendResponse(gitInfo);
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1716,6 +1728,39 @@ function getRepositoryInformation(proxy) {
     pathToRepo: pathToRepo,
     relativeFilePath: relativeFilePath
   };
+}
+
+/////////////////////////////////////////////////////
+// Returns current git versioning
+/////////////////////////////////////////////////////
+function generateGitCommitInfo() {
+  const longSHA    = childProcess.execSync("git rev-parse HEAD").toString().trim();
+  const shortSHA   = childProcess.execSync("git rev-parse --short HEAD").toString().trim();
+  const branch     = childProcess.execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+  const authorName = childProcess.execSync("git log -1 --pretty=format:'%an'").toString().trim();
+  const commitTime = childProcess.execSync("git log -1 --pretty=format:'%cd'").toString().trim();
+  const commitMsg  = childProcess.execSync("git log -1 --pretty=%B").toString().trim();
+  const totalCommitCount = childProcess.execSync("git rev-list --count HEAD").toString().trim();
+  const changedFiles     = childProcess.execSync("git status -sb").toString();
+
+  const versionInfo = {
+      shortSHA: shortSHA,
+      SHA :     longSHA,
+      branch:   branch,
+      lastCommitAuthor:  authorName,
+      lastCommitTime:    commitTime,
+      lastCommitMessage: commitMsg,
+      lastCommitNumber:  totalCommitCount,
+      modifiedFiles:     changedFiles
+  }
+
+  const versionInfoJson = JSON.stringify(versionInfo, null, 2);
+  writeFileSync('./git-version.json', versionInfoJson);
+
+  const gitVersionFile: string = './git-version.json';
+  let gitVersion: Array<string> = kdbFS.loadJSONDocIfItExists(gitVersionFile) || [];
+
+  return gitVersion;
 }
 
 module.exports.KIOItemServer = KIOItemServer;

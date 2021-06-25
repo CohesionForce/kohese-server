@@ -431,6 +431,12 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         });
         break;
 
+      case 'About/getCommitInfo':
+        socket.emit(request.type, request.data, (response) => {
+          port.postMessage({id: request.id, data: response});
+        });
+        break;
+
       case 'Repository/getAvailableRepositories':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (availableRepositories: Array<any>) => void, reject:

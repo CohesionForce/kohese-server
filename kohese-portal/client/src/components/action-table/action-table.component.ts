@@ -17,7 +17,7 @@ import { MatTableDataSource } from '@angular/material';
 export class ActionTableComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   @Input()
-  proxyStream: Observable<ItemProxy>
+  proxyStream: Observable<ItemProxy>;
   actionProxies: Array<ItemProxy>;
   tableStream: MatTableDataSource<ItemProxy>;
   itemProxy: ItemProxy;
