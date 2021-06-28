@@ -167,6 +167,11 @@ export class VersionStatus {
   }
 
   //////////////////////////////////////////////////////////////////////////
+  deleteStatus () {
+    this.vcArray.length = 0;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
   static translateStatus(statuses: Array<string>): any {
     let translatedStatus: any = {};
     for (let j: number = 0; j < statuses.length; j++) {

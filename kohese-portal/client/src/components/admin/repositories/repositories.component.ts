@@ -198,12 +198,16 @@ export class RepositoriesComponent extends NavigatableComponent implements
     })
   }
 
-  public refreshRepositories(): void {
-    let request = this.cacheManager.sendMessageToWorker('Repository/refreshRepositories', undefined, true);
-    request.then((response) => {
-      console.log('*** refreshRepositories response: ');
-      console.log(response);
-    })
+  async refreshRepositories() {
+    let request = await this.repositoryService.refreshRepositories();
+    console.log('*** refreshRepositories response: ', request);
+    if (request === true) {
+      this._toastrService.success('Repositories Status Refreshed', 'Repository Refresh',  {positionClass: 'toast-bottom-right'});
+      this._notificationService.addNotifications('COMPLETED: Repositories Refresh - Completed');
+    } else {
+      this._toastrService.error('Repositories Status Refresh Failed ', 'Repository Refresh',  {positionClass: 'toast-bottom-right'});
+      this._notificationService.addNotifications('FAILED: Repositories Refresh - Failed');
+    }
   }
 
   public unmountRepo(id: string) {
