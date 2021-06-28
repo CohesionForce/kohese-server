@@ -83,6 +83,7 @@ implements OnInit, OnDestroy {
   @ViewChild('docView') docView: ElementRef;
 
   /* Data */
+  proxyTitle: string = '';
   itemProxy: ItemProxy;
   itemLength: number;
   selectedRow: number;
@@ -165,9 +166,9 @@ implements OnInit, OnDestroy {
 
     if (this.selectedProxyStream) {
       this.selectedProxySubscription = this.selectedProxyStream.subscribe((newSelection) => {
-        if (newSelection) {
-          let proxyTitle: string = newSelection.item.name;
-          this.title.setTitle('Explorer | ' + proxyTitle);
+        if (newSelection && (this.outlineView === false)) {
+          this.proxyTitle = newSelection.item.name;
+          this.title.setTitle('Explorer | ' + this.proxyTitle);
           this.rowMap[newSelection.item.id].nativeElement.scrollIntoView();
         }
       });
@@ -219,8 +220,8 @@ implements OnInit, OnDestroy {
           let parentProxy = this.itemProxy.treeConfig.getProxyFor(this.itemProxy.item.parentId);
           this.itemProxy = parentProxy;
           // Sets the id param in the URL to the new itemProxy id (if there is one) and therefore redraws the page
-          let proxyTitle: string = this.itemProxy.item.name;
-          this.title.setTitle('Explorer | ' + proxyTitle);
+          this.proxyTitle = this.itemProxy.item.name;
+          this.title.setTitle('Explorer | ' + this.proxyTitle);
           this.NavigationService.navigate('Explore', {'id': ( (this.itemProxy.item.id) ? this.itemProxy.item.id : '')});
         }
       }

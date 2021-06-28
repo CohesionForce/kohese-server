@@ -328,6 +328,11 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
         this._route.params.subscribe((parameters: Params) => {
           if (this._synchronizeWithSelection) {
+            if(parameters) {
+              let focusedItem = TreeConfiguration.getWorkingTree().getProxyFor(parameters.id);
+              let proxyTitle = focusedItem.item.name;
+              this.title.setTitle('Explorer | ' + proxyTitle);
+            }
             this.showFocus();
           }
         });
