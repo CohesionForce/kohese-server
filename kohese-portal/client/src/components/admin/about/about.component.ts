@@ -16,6 +16,7 @@
 
 // Angular
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 // NPM
 
@@ -38,8 +39,11 @@ export class AboutComponent implements OnInit {
 
   constructor(
     private changeRef : ChangeDetectorRef,
-    private cacheManager : CacheManager
-  ){}
+    private cacheManager : CacheManager,
+    private title : Title
+  ){
+    this.title.setTitle('About');
+  }
 
   ngOnInit(){
     this.getGitCommitInfo().then(() => {
