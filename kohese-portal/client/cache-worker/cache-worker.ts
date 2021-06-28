@@ -459,7 +459,6 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         break;
 
       case 'Repository/refreshRepositories':
-        // TODO: Remove console log upon completion of task
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: (refreshedRepositories: boolean) => void, reject: () => void) => {
           socket.emit('Repository/refreshRepositories', {}, (refreshedRepositories: boolean) => {
