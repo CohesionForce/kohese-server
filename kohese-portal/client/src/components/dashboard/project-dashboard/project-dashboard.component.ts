@@ -51,7 +51,7 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
     private projectService : ProjectService,
     private title : Title
     ) {
-      this.title.setTitle("Project Dashboard");
+      this.title.setTitle('Project Dashboard');
     }
 
   ngOnInit() {
@@ -89,6 +89,8 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
 
     if (this.savedProject) {
       this.project = this.savedProject;
+      let projectName: string = this.project.proxy.item.name;
+      this.title.setTitle('Project Dashboard | ' + projectName);
       this.projectStream.next(this.project);
     }
 
@@ -102,6 +104,8 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
         if (project !== this.project) {
           // Update the project based on params if it is different
           this.project = project;
+          let projectTitle: string = this.project.proxy.item.name;
+          this.title.setTitle('Project Dashboard | ' + projectTitle);
           this.projectStream.next(this.project);
           this.projectSelected.emit(this.project);
           this.navigationService.navigate('Dashboard', {
@@ -127,6 +131,8 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
         console.log(selection);
         if (selection) {
           this.project = selection;
+          let projectTitle: string = this.project.proxy.item.name;
+          this.title.setTitle('Project Dashboard | ' + projectTitle);
           this.projectStream.next(this.project);
           this.projectSelected.emit(this.project);
           this.navigationService.navigate('Dashboard', {

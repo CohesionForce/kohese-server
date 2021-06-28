@@ -33,7 +33,7 @@ export class ExploreComponent extends NavigatableComponent
                private title : Title
                ) {
     super(NavigationService);
-    this.title.setTitle("Explorer");
+    this.title.setTitle('Explorer');
   }
 
   ngOnInit () {

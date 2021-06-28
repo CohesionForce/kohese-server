@@ -1,12 +1,16 @@
+// Angular
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { MatTableDataSource } from '@angular/material';
+import { Title } from '@angular/platform-browser';
 
-import { ProjectInfo } from '../../../../services/project-service/project.service';
+// NPM
 import { Subscription, Observable } from 'rxjs';
 
+// Kohese
+import { ProjectInfo } from '../../../../services/project-service/project.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
-import { MatTableDataSource } from '@angular/material';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../../details/details.component';
 import { StateInfo, StateFilterService } from '../../state-filter.service';
@@ -34,9 +38,12 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
   origin : string;
 
-  constructor(protected navigationService: NavigationService,
+  constructor(
+    protected navigationService: NavigationService,
     protected dialogService: DialogService,
-    private stateFilterService : StateFilterService) {
+    private stateFilterService : StateFilterService,
+    private title : Title
+    ) {
     super(navigationService)
   }
 
@@ -45,6 +52,8 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
+        let projectTitle = this.project.proxy.item.name;
+        this.title.setTitle('User Statistics | ' + projectTitle);
         this.deselectAll();
         this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
       }
@@ -150,20 +159,20 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       console.log(items, e);
       let htmlString = '';
       let textString = '';
-      htmlString = 
+      htmlString =
         '<table>\n' +
         '  <thead>\n' +
         '    <tr>\n' +
         '      <th>Id</th>\n' +
-        '      <th>Name</th>\n' + 
-        '      <th>Kind</th>\n' + 
-        '      <th>State</th>\n' + 
-        '      <th>Assigned To</th>\n' + 
+        '      <th>Name</th>\n' +
+        '      <th>Kind</th>\n' +
+        '      <th>State</th>\n' +
+        '      <th>Assigned To</th>\n' +
         '    </tr>\n' +
         '  </thead>\n' +
         '  <tbody>';
       for (let item of items) {
-        htmlString += 
+        htmlString +=
           '  <tr>\n' +
           '    <td><a href="' + this.origin + item.item.id + '">' + item.item.id + '</a></td>\n' +
           '    <td>' + item.item.name  + '</td>\n' +
@@ -177,7 +186,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
                       'State: ' + item.state + '\n' +
                       'Assigned To: ' + item.item.assignedTo + '\n\n'
       }
-      htmlString += 
+      htmlString +=
         '  </tbody>\n' +
         '</table>\n'
       e.clipboardData.setData('text/html', (htmlString));

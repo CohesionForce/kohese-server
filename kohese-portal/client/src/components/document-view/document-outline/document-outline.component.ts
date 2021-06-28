@@ -31,7 +31,7 @@ export class DocumentOutlineComponent implements OnInit {
     private itemRepository : ItemRepository,
     private title : Title
     ) {
-      this.title.setTitle("Outline");
+      this.title.setTitle('Outline');
     }
 
   ngOnInit() {
@@ -44,12 +44,16 @@ export class DocumentOutlineComponent implements OnInit {
     this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
       if (newConfig) {
         this.documentRoot = newConfig.config.getProxyFor(this.documentRootId);
+        let documentRootTitle: string = this.documentRoot.item.name;
+        this.title.setTitle('Outline | ' + documentRootTitle);
         this.proxyStream.next(this.documentRoot);
       }
-    })
+    });
   }
 
   setRoot(newRoot: ItemProxy) {
+    let newRootTitle: string = newRoot.item.name;
+    this.title.setTitle('Outline | ' + newRootTitle)
     this.proxyStream.next(newRoot)
   }
 

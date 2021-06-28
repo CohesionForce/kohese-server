@@ -1,8 +1,12 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
-  OnInit, OnDestroy } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+
+// NPM
 import { Subscription } from 'rxjs';
 
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
@@ -10,8 +14,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { CompareItemsComponent,
-  VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
+import { CompareItemsComponent, VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Action } from '../tree-row/tree-row.component';
@@ -30,10 +33,14 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
 
   private static readonly PATH_SEGMENT_SEPARATOR: string = '\0';
 
-  public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _itemRepository: ItemRepository, route: ActivatedRoute,
-    dialogService: DialogService, private _navigationService:
-    NavigationService, private _dynamicTypesService: DynamicTypesService) {
+  public constructor(
+    route: ActivatedRoute,
+    dialogService: DialogService,
+    private title : Title,
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _itemRepository: ItemRepository,
+    private _navigationService: NavigationService,
+    private _dynamicTypesService: DynamicTypesService) {
     super(route, dialogService);
   }
 
@@ -266,8 +273,9 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
 
   protected rowFocused(row: TreeRow): void {
     let path: Array<string> = (row.object as Array<string>);
-    let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
-      path.length - 1]);
+    let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[path.length - 1]);
+    let selectedProxyTitle: string = proxy.item.name;
+    this.title.setTitle('References | ' + selectedProxyTitle);
     if (proxy) {
       this._navigationService.navigate('Explore', { id: proxy.item.id });
     }

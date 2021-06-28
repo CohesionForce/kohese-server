@@ -28,6 +28,7 @@ export class AnalysisComponent extends NavigatableComponent
   @Output() analysisView: boolean = true;
 
   /* Data */
+  analysisTitle: string = ('');
   itemProxyId: string;
   itemProxy: ItemProxy;
   filter: string;
@@ -51,9 +52,7 @@ export class AnalysisComponent extends NavigatableComponent
     private title : Title
     ) {
     super(NavigationService);
-
-    let analysisTitle: string = ("Analysis");
-    this.title.setTitle(analysisTitle);
+    this.title.setTitle("Analysis");
 
     this.filterSubject = new BehaviorSubject({
       filter: '',
@@ -74,6 +73,8 @@ export class AnalysisComponent extends NavigatableComponent
         if (newConfig) {
           this.treeConfig = newConfig.config;
           this.itemProxy = this.treeConfig.getProxyFor(this.itemProxyId);
+          this.analysisTitle = this.itemProxy.item.name;
+          this.title.setTitle('Analysis | ' + this.analysisTitle);
           this.proxyStream = new BehaviorSubject(this.itemProxy);
           if (this.itemProxy) {
             this.AnalysisService.fetchAnalysis(this.itemProxy).then(() => {

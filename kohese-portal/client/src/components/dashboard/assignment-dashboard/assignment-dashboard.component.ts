@@ -73,7 +73,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     private sessionService : SessionService,
     private title : Title
     ) {
-      this.title.setTitle("My Dashboard");
+      this.title.setTitle('Dashboard');
     this.assignmentTypes = DashboardSelections;
     console.log(this.assignmentTypes)
   }

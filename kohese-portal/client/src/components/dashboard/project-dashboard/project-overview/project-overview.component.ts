@@ -1,7 +1,12 @@
+// Angular
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { ProjectInfo } from '../../../../services/project-service/project.service';
+import { Title } from '@angular/platform-browser';
+
+// NPM
 import { Observable, Subscription } from 'rxjs';
 
+// Kohese
+import { ProjectInfo } from '../../../../services/project-service/project.service';
 import { ItemProxy} from '../../../../../../common/src/item-proxy';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../../details/details.component';
@@ -20,15 +25,18 @@ export class ProjectOverviewComponent implements OnInit, OnDestroy {
   lostProjectItems : Array<ItemProxy>;
   activityList: Array<ItemProxy> = [];
 
-  constructor(private dialogService: DialogService) {
-
-  }
+  constructor(
+    private dialogService: DialogService,
+    private title : Title
+    ) {}
 
   ngOnInit() {
     this.projectStreamSub = this.projectStream.subscribe((newProject: ProjectInfo) => {
       if (newProject) {
+        let projectTitle: string = newProject.proxy.item.name;
+        this.title.setTitle('Project Overview | ' + projectTitle);
         this.lostProjectItems = [];
-        
+
         this.projectItems = newProject.projectItems;
         if (newProject.lostProjectItems) {
           this.lostProjectItems = newProject.lostProjectItems;

@@ -61,7 +61,7 @@ export class ReportsComponent implements OnInit {
     private _itemRepository: ItemRepository,
     private title : Title
     ) {
-      this.title.setTitle("Reports");
+      this.title.setTitle('Reports');
     }
 
   public ngOnInit(): void {

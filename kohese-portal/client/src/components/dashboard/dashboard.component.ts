@@ -51,7 +51,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
               private title : Title
               ) {
     super(navigationService);
-    this.title.setTitle("My Dashboard");
+    this.title.setTitle('Dashboard');
     this.selectedProject = projectService.savedProject;
   }
 
