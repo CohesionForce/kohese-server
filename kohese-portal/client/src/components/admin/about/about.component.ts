@@ -31,10 +31,10 @@ import { CacheManager } from '../../../../cache-worker/CacheManager';
 export class AboutComponent implements OnInit {
 
   // Data
-  scripts: Array<string> = [];
-  cacheWorkerAttributes: Array<string>;
-  commitInfo: Array<string> = [];
+  @Input() buildComponents: any;
   @Input() gitCommitInfo: any = {};
+  @Input() bundleInfo: Array<string> = [];
+
 
   constructor(
     private changeRef : ChangeDetectorRef,
@@ -46,7 +46,8 @@ export class AboutComponent implements OnInit {
       this.changeRef.detectChanges();
     });
 
-    // this.scripts = this.buildInfo();
+    this.buildComponents = this.getBundleInfo();
+    this.changeRef.detectChanges();
   }
 
   //////////////////////////////////////////////////////////
@@ -60,28 +61,22 @@ export class AboutComponent implements OnInit {
   /////////////////////////////////////////////////////
   // Returns current Angular build info
   /////////////////////////////////////////////////////
-  // buildInfo(){
-  //   let scripts: any = document.scripts;
-  //   let cacheWorkerBundle: string;
+  private getBundleInfo(): Array<any> {
+    // scripts contains the entirety of the HtmlCollectionElement Array of scripts
+    let scripts: any = document.scripts;
+    for (let scriptIdx in scripts) {
+      let script: any = scripts[scriptIdx];
+      // [0]=type [1]=src
+      if (script.attributes && script.attributes[1]) {
+        let attribute: any = script.attributes[1];
+        // value contains bundle info "runtime", "polyfills", "scripts", and "main" '.js' files.
+        if (attribute.value) {
+          this.bundleInfo.push(attribute.value);
+        }
+      }
+    }
 
-  //   scriptLoop: for (let scriptIdx in scripts) {
-  //     let script: any = scripts[scriptIdx];
-  //     if (script.attributes) {
-  //       for (let idx in script.attributes) {
-  //         let attribute: any = script.attributes[idx];
-  //         if (attribute.value) {
-  //           cacheWorkerBundle = attribute.value;
-  //           this.cacheWorkerAttributes[scriptIdx] = cacheWorkerBundle;
-  //           if (attribute.value.match(/^scripts/)) {
-  //             break scriptLoop;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   return this.cacheWorkerAttributes;
-  // }
-
+    return this.bundleInfo;
+  }
 
 }

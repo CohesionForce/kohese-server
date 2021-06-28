@@ -38,23 +38,13 @@ limitations under the License.
         <div><pre>{{gitCommitInfo.modifiedFiles}}</pre></div>
       </div>
     </div>
-
-
-
-    <!-- <mat-list role=list>
-      <div class=git-info *ngFor="let info of gitCommitInfo">
-        <mat-list-item>{{info}}</mat-list-item>
-      </div>
-    </mat-list> -->
   </div>
 
   <div class=right-content-grid>
-    <h2>Build Information</h2>
-    <!-- <mat-list role=list>
-      <div class=angular-info *ngFor="let script of cacheWorkerAttributes">
-        <mat-list-item>{{script}}</mat-list-item>
-      </div>
-    </mat-list> -->
+    <div class=build-header><h2>Bundle Information</h2></div>
+    <mat-list *ngFor="let bundle of bundleInfo">
+      <mat-list-item>{{bundle}}</mat-list-item>
+    </mat-list>
   </div>
 
 
