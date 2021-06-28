@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { TreeConfiguration } from './../../../../../../common/src/tree-configuration';
 import { ItemRepository, RepoStates } from './../../../../services/item-repository/item-repository.service';
 import { Subscription, Observable, BehaviorSubject } from 'rxjs';
@@ -18,7 +35,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   set tableDefinition(tableDefinition: any) {
     this._tableDefinition = tableDefinition;
   }
-  
+
   private _kind: any;
   get kind() {
     return this._kind;
@@ -27,7 +44,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   set kind(kind: any) {
     this._kind = kind;
   }
-  
+
   private _attributes: Array<any>;
   get attributes() {
     return this._attributes;
@@ -36,7 +53,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   set attributes(attributes: Array<any>) {
     this._attributes = attributes;
   }
-  
+
   private _isDisabled: boolean = false;
   get isDisabled() {
     return this._isDisabled;
@@ -45,11 +62,11 @@ export class TableEditorComponent implements OnInit, OnDestroy {
   set isDisabled(isDisabled: boolean) {
     this._isDisabled = isDisabled;
   }
-  
+
   repoStatusSubscription: Subscription;
   treeConfigurationSubscription: Subscription;
   treeConfiguration: TreeConfiguration;
-  
+
   get Object() {
     return Object;
   }
@@ -98,7 +115,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
         options[this._attributes[j].name] = this._attributes[j].name;
       }
     }
-    
+
     let newColumn: any = await this.dialogService.openDropdownDialog(
       'Add Column', '', 'Attribute', Object.keys(options)[0], undefined,
       options);
@@ -107,7 +124,7 @@ export class TableEditorComponent implements OnInit, OnDestroy {
       this.changeDetectorRef.markForCheck();
     }
   }
-  
+
   public moveAttribute(attributeName: string, moveUp: boolean): void {
     let attributeIndex: number = this._tableDefinition.columns.indexOf(
       attributeName);

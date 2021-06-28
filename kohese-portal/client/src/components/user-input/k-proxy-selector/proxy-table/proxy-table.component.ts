@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 import { DetailsComponent } from './../../../details/details.component';
 import { DialogService } from './../../../../services/dialog/dialog.service';
 import { ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
@@ -51,7 +68,7 @@ export class ProxyTableComponent implements OnInit {
     }
 
     dataSource: Array<ItemProxy>;
-    
+
     private _selection: Array<any> = [];
     get selection() {
       return this._selection;
@@ -60,9 +77,9 @@ export class ProxyTableComponent implements OnInit {
     expandedItem: ItemProxy;
     treeConfigSub: Subscription;
     treeConfig: TreeConfiguration;
-    
+
     public static readonly CHECKBOX_COLUMN_WIDTH: number = 40;
-    
+
     constructor(private itemRepository: ItemRepository,
                 private changeRef: ChangeDetectorRef,
                 private dialogService: DialogService) {
@@ -84,7 +101,7 @@ export class ProxyTableComponent implements OnInit {
                 }
               }
             }
-            
+
             this.changeRef.markForCheck();
             console.log(this);
           });
@@ -126,7 +143,7 @@ export class ProxyTableComponent implements OnInit {
           // Probably need to do something here to spin off an update
           });
     }
-  
+
   public checkStateChanged(itemProxy: ItemProxy): void {
     let elementIndex: number = this._selection.indexOf(itemProxy);
       if (elementIndex === -1) {
@@ -135,13 +152,13 @@ export class ProxyTableComponent implements OnInit {
       this._selection.splice(elementIndex, 1);
     }
   }
-  
+
   public getCheckboxColumnWidth(): object {
     return {
       'min-width': ProxyTableComponent.CHECKBOX_COLUMN_WIDTH + 'px'
     };
   }
-  
+
   public getColumnWidthStyle(tableDivWidth: number): object {
     let columnWidthStyle: any = {
       'min-width': '100px'
@@ -153,10 +170,10 @@ export class ProxyTableComponent implements OnInit {
     if (equalWidth > 100) {
       columnWidthStyle['min-width'] = equalWidth + 'px';
     }
-    
+
     return columnWidthStyle;
   }
-  
+
   public getRowWidthStyle(tableDivWidth: number): object {
     return {
       'min-width': (((this._columns.length - (this._disabled ? 0 : 1)) *

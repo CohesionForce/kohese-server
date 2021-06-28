@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -45,26 +62,28 @@ export class ReferenceTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    let stagedVersionComparisonAction: Action = new Action('Compare ' +
-      'Against Staged Version', 'Compare this Item against the staged ' +
-      'version of this Item', 'fa fa-exchange', (object: any) => {
-      let enable: boolean = false;
-      let path: Array<string> = (object as Array<string>);
-      let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
-        path.length - 1]);
-      if (proxy) {
-        enable = (proxy.vcStatus.statusArray.filter((status: string) => {
-          return status.startsWith('INDEX');
-        }).length > 0);
-      }
+    // TODO: Reimplement when "User can stage tree" task is completed
 
-      return enable;
-      }, (object: any) => {
-      this.openComparisonDialog((object as Array<string>), VersionDesignator.
-        STAGED_VERSION);
-    });
-    this.rootMenuActions.push(stagedVersionComparisonAction);
-    this.menuActions.push(stagedVersionComparisonAction);
+    // let stagedVersionComparisonAction: Action = new Action('Compare ' +
+    //   'Against Staged Version', 'Compare this Item against the staged ' +
+    //   'version of this Item', 'fa fa-exchange', (object: any) => {
+    //   let enable: boolean = false;
+    //   let path: Array<string> = (object as Array<string>);
+    //   let proxy: ItemProxy = this._selectedTreeConfiguration.getProxyFor(path[
+    //     path.length - 1]);
+    //   if (proxy) {
+    //     enable = (proxy.vcStatus.statusArray.filter((status: string) => {
+    //       return status.startsWith('INDEX');
+    //     }).length > 0);
+    //   }
+
+    //   return enable;
+    //   }, (object: any) => {
+    //   this.openComparisonDialog((object as Array<string>), VersionDesignator.
+    //     STAGED_VERSION);
+    // });
+    // this.rootMenuActions.push(stagedVersionComparisonAction);
+    // this.menuActions.push(stagedVersionComparisonAction);
 
     let lastCommittedVersionComparisonAction: Action = new Action(
       'Compare Against Last Committed Version', 'Compares this Item against ' +
