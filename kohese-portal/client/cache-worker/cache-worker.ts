@@ -464,6 +464,15 @@ let _workingTree = TreeConfiguration.getWorkingTree();
         }) });
         break;
 
+      case 'Repository/refreshRepositories':
+        port.postMessage({ id: request.id, data: await new Promise<any>(
+          (resolve: (refreshedRepositories: boolean) => void, reject: () => void) => {
+          socket.emit('Repository/refreshRepositories', {}, (refreshedRepositories: boolean) => {
+            resolve(refreshedRepositories);
+          });
+        }) });
+        break;
+
       case 'Repository/unMountRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
           (resolve: () => void, reject:

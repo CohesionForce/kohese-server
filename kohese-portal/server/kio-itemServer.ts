@@ -155,6 +155,59 @@ retrieveVCStatus.then((status) => {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function refreshRepoStatus() {
+  let retrieveAllRepoStatus = KDBRepo.getStatus();
+  retrieveAllRepoStatus.then((status) => {
+    console.log('::: Processing all repo status for refresh', status);
+    var idStatusArray = [];
+    let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
+    let currentVCStatus = workingTree.getVCStatus();
+    // TODO: Future is to update Item in the tree if the VC Status of
+    // of an item changed.  For example new and then deleted
+    for (var x = 0; x<currentVCStatus.length; x++) {
+      let itemVCStatus = currentVCStatus[x];
+      let found: boolean = false;
+      for (let repoID in status) {
+        if (status[repoID].some(y => y.itemId === itemVCStatus.id)) {
+          found = true;
+        }
+      }
+      if (found === false) {
+        let proxy = workingTree.getProxyFor(itemVCStatus.id);
+        if (proxy) {
+          proxy.deleteVCStatus();
+        }
+      }
+    }
+    for (var id in status) {
+      for (var j = 0; j < status[id].length; j++) {
+        let statusRecord = status[id][j];
+
+        if (statusRecord.itemId) {
+          idStatusArray.push({
+            id: statusRecord.itemId,
+            status: statusRecord.status
+          });
+
+          // Create lost item to represent the item if it does not exist
+          let proxy = workingTree.getProxyFor(statusRecord.itemId);
+          if (!proxy) {
+            // TODO: Need to evaluate and remove the creation of missing proxies from this location
+            proxy = ItemProxy.createMissingProxy('Item', 'id', statusRecord.itemId, workingTree);
+          }
+          proxy.updateVCStatus(statusRecord.status, false);
+        }
+      }
+      console.log('::: Refresh Status length (Initial):' + idStatusArray.length);
+    }
+    let myTestStatus = workingTree.getVCStatus();
+  });
+  return retrieveAllRepoStatus
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function processRepoStatus(repoID) {
   let retrieveRepoStatus = KDBRepo.getRepoStatus(repoID);
   retrieveRepoStatus.then((status) => {
@@ -1106,6 +1159,27 @@ function KIOItemServer(socket){
       socket.id, socket.koheseUser.username, socket.handshake.address);
     let repositoryData = kdb.getAvailableRepositories();
     respond(repositoryData);
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('Repository/refreshRepositories', async (request: any, respond: Function) => {
+    console.log('::: session %s: Received refreshRepositories for user %s at %s',
+      socket.id, socket.koheseUser.username, socket.handshake.address);
+    let repositoryRefreshStatus: boolean = false;
+    let status = await refreshRepoStatus();
+    if (status) {
+      let workingTree: TreeConfiguration = ItemProxy.getWorkingTree();
+      var idStatusArray = workingTree.getVCStatus();
+      let repoStatusNotification = {
+        id: request.id,
+        status: idStatusArray
+      };
+      kio.server.emit('Repository/updateRepoStatus', repoStatusNotification);
+      repositoryRefreshStatus = true;
+    }
+    respond(repositoryRefreshStatus);
   });
 
   //////////////////////////////////////////////////////////////////////////
