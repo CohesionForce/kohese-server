@@ -45,6 +45,7 @@ export class CacheManager {
   private static cacheWorker: SharedWorker.SharedWorker;
 
   private static callbackMap : CallbackMapType = {};
+  private static lastRequestNumber: number = 0;
   private static pendingRequestMap : PendingRequestsMapType = {};
 
   private static suppressWorkerRequestAnnouncement = {
@@ -178,7 +179,8 @@ export class CacheManager {
       () => void) => {
 
       let requestTime = Date.now();
-      let id: number = requestTime;
+
+      let id: number = ++CacheManager.lastRequestNumber;
 
       if (!CacheManager.suppressWorkerRequestAnnouncement[message]) {
         console.log('^^^ Send message to worker: ' + message + ' - ' + id);
