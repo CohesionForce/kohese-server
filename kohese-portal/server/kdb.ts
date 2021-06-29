@@ -398,7 +398,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     if (isNewItem) {
       var parentRepo = proxy.parentProxy.getRepositoryProxy();
       var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
-      repoFilePath = parentRepoStoragePath + '/Repository';
+      repoFilePath = path.join(kdbDirPath, modelInstance.name)
       kdbFS.createDirIfMissing(repoFilePath);
     } else {
       repoFilePath = mountList[modelInstance.id + '-mount'].repoStoragePath.substring
@@ -430,6 +430,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     }
 
+    repoStoragePath = path.join(kdbDirPath, modelInstance.name)
     mountList[repoMountData.id] = {
       repoStoragePath : repoStoragePath,
       name: repoMountData.name,
@@ -438,7 +439,6 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
     updateMountFile();
 
-    repoStoragePath = determineRepoStoragePath(proxy);
     console.log('::: rSP: ' + repoStoragePath);
 
     filePath = repoStoragePath + '/Root.json';
@@ -484,29 +484,51 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
           console.log('*** No GIT Folder Exists - Invalid Repository for ' + repoMountData.id + ' repo ' + repoStoragePath)
         }
       }
-      var repoId = KDBRepo.getRepoId(repoStoragePath);
-      if (repoId === undefined) {
-        repoId = ItemProxy.getWorkingTree().getRootProxy().item.id;
-        // TODO: Investigate If This Is Still Needed After Split or if it needs to change
-        // Close and reopen Root repo to Fix Error when creating Item after Repo creation
-        if (kdbFS.pathExists(filePath)) {
-            KDBRepo.closeRepo(repoId);
-            await KDBRepo.openRepo(repoId, koheseKDBDirPath)
-        }
-      } else {
-        repoId = repoId + '-mount'
-      }
-
       var finalRepositoryPath;
       var repositoryPath;
-      var filePath2 = KDBRepo.getFilePath(repoStoragePath)
-      if (filePath2 === undefined) {
-        repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
-        repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
-        finalRepositoryPath = repositoryPath;
+      var repoId = KDBRepo.getRepoId(repoStoragePath);
+      if (repoId === undefined) {
+        if (kdbFS.pathExists(path.join(repoStoragePath, 'Root.json')) &&
+            kdbFS.pathExists(path.join(repoStoragePath, '.git'))) {
+          let repoRoot = kdbFS.loadJSONDoc(path.join(repoStoragePath, 'Root.json'));
+          if (mountList[repoRoot.id + '-mount']) {
+            repoId = repoRoot.id + '-mount'
+            repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repoStoragePath)[1];
+            finalRepositoryPath = repositoryPath.substring(1);
+          } else {
+            repoId = ItemProxy.getWorkingTree().getRootProxy().item.id;
+            // TODO: Investigate If This Is Still Needed After Split or if it needs to change
+            // Close and reopen Root repo to Fix Error when creating Item after Repo creation
+            if (kdbFS.pathExists(filePath)) {
+              KDBRepo.closeRepo(repoId);
+              await KDBRepo.openRepo(repoId, koheseKDBDirPath)
+            }
+            repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
+            repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
+            finalRepositoryPath = repositoryPath;
+          }
+        } else {
+          repoId = ItemProxy.getWorkingTree().getRootProxy().item.id;
+            // TODO: Investigate If This Is Still Needed After Split or if it needs to change
+            // Close and reopen Root repo to Fix Error when creating Item after Repo creation
+            if (kdbFS.pathExists(filePath)) {
+              KDBRepo.closeRepo(repoId);
+              await KDBRepo.openRepo(repoId, koheseKDBDirPath)
+            }
+            repositoryPath = ItemProxy.getWorkingTree().getRootProxy().repoPath.split('Root.json')[0];
+            repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repositoryPath)[1];
+            finalRepositoryPath = repositoryPath;
+        }
       } else {
-        repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(filePath2)[1];
-        finalRepositoryPath = repositoryPath.substring(1);
+        if (kdbFS.pathExists(path.join(repoStoragePath, 'Root.json')) &&
+            kdbFS.pathExists(path.join(repoStoragePath, '.git'))) {
+          let repoRoot = kdbFS.loadJSONDoc(path.join(repoStoragePath, 'Root.json'));
+          if (mountList[repoRoot.id + '-mount']) {
+            repoId = repoRoot.id + '-mount'
+            repositoryPath = ItemProxy.getWorkingTree().getProxyFor(modelInstance.id).repoPath.split(repoStoragePath)[1];
+            finalRepositoryPath = repositoryPath.substring(1);
+          }
+        }
       }
       return KDBRepo.getItemStatus(repoId, finalRepositoryPath);
   }).then((status) => {

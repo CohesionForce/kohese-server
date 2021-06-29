@@ -652,22 +652,4 @@ export class KDBRepo {
       return id;
     }
   }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  //////////////////////////////////////////////////////////////////////////
-  static getFilePath(filePath) {
-    if (filePath !== '') {
-      var id: any = path.parse(filePath).base;
-      if (repoList[id + '-mount']) {
-        return filePath;
-      } else {
-        let repopath = filePath.substring(0, filePath.lastIndexOf('/'));
-        return this.getFilePath(repopath)
-      }
-    } else {
-      filePath = undefined
-      return filePath;
-    }
-  }
 }
