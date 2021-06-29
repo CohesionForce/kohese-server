@@ -762,7 +762,9 @@ export class ItemRepository {
 	  }
 
     let globalTypeNames: Array<string> = [];
-    this.currentTreeConfigSubject.getValue().config.getRootProxy().visitTree(
+    // TODO: Need to replace working tree with a better solution for obtaining KoheseModels
+    // TODO: When we begin versioning the KoheseModels the following will no longer be required
+    TreeConfiguration.getWorkingTree().getRootProxy().visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
       if (itemProxy.kind === 'KoheseModel') {
         globalTypeNames.push(itemProxy.item.name);
