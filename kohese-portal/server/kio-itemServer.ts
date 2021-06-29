@@ -1638,6 +1638,16 @@ function KIOItemServer(socket){
       sendResponse({err:err});
     }
   });
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  socket.on('About/getCommitInfo', function (request: any, sendResponse) {
+    console.log('::: session %s: Received About/getCommitInfo for user %s at %s',
+        socket.id, socket.koheseUser.username, socket.handshake.address);
+    let gitInfo = kdbFS.loadJSONDocIfItExists('./git-version.json');
+    sendResponse(gitInfo);
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////

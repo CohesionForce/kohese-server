@@ -35,6 +35,7 @@ import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeEditorComponent } from './components/type-editor/type-editor.component';
 import { DevToolsComponent } from './components/admin/dev-tools/dev-tools.component';
+import { AboutComponent } from './components/admin/about/about.component';
 import { DocumentOutlineComponent } from './components/document-view/document-outline/document-outline.component';
 import { ReportsComponent } from './components/reports/reports.component';
 
@@ -130,6 +131,7 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
       { path: 'analysis', component: AnalysisComponent },
       { path: 'typeeditor', component: TypeEditorComponent},
       { path: 'devtools', component: DevToolsComponent},
+      { path: 'about', component: AboutComponent},
       { path: 'outline', component: DocumentOutlineComponent },
       { path: 'document', component: DocumentRouteComponent },
       { path: 'reports', component: ReportsComponent }

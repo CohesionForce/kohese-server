@@ -18,13 +18,16 @@
 import { NgModule } from "@angular/core/";
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from "../../material.module";
-import {MatDialogModule} from "@angular/material";
-import { AngularSplitModule} from 'angular-split';
 
+// NPM
+import { AngularSplitModule } from 'angular-split';
+
+// Kohese
 import { AdminComponent} from './admin.component';
 import { RepositoriesComponent } from './repositories/repositories.component'
-import {RepositoryContentDialog } from './repositories/repositories.component'
+import { RepositoryContentDialog } from './repositories/repositories.component'
 import { DevToolsComponent} from './dev-tools/dev-tools.component';
+import { AboutComponent } from './about/about.component';
 
 import { ServicesModule } from '../../services/services.module';
 import { UserModule } from '../../services/user/user.module'
@@ -38,7 +41,8 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     AdminComponent,
     RepositoryContentDialog,
     RepositoriesComponent,
-    DevToolsComponent
+    DevToolsComponent,
+    AboutComponent
   ],
   entryComponents: [
     RepositoryContentDialog
@@ -46,7 +50,6 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
   imports : [
     CommonModule,
     MaterialModule,
-    MatDialogModule,
     ServicesModule,
     UserModule,
     FormsModule,

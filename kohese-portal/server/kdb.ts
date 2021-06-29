@@ -25,6 +25,8 @@ console.log('::: Begin KDB File Load');
 
 var kdbFS = require('./kdb-fs');
 var fs = require('fs');
+const childProcess = require('child_process');
+const { writeFileSync } = require('fs');
 
 var kdbModel = require('./kdb-model');
 
@@ -36,6 +38,7 @@ import { KoheseModel } from '../common/src/KoheseModel';
 import { KoheseView } from '../common/src/KoheseView';
 import { KDBCache } from './kdb-cache';
 import { KDBRepo } from './kdb-repo';
+import { generate } from 'rxjs';
 
 module.exports.ItemProxy = ItemProxy;
 
@@ -43,6 +46,7 @@ var mountList = {};
 var kdbDirPath = 'kdb';
 
 let availableRepositories: any = [];
+// TODO: place userLockoutList and update here
 
 var koheseKDBDirPath;
 var mountFilePath;
@@ -87,6 +91,9 @@ async function initialize (koheseKdbPath, indexAndExit) {
   mountFilePath = path.join(koheseKDBDirPath, 'mounts.json');
 
   checkAndCreateDir(kdbDirPath);
+
+  // Returns versioning information
+  generateGitCommitInfo();
 
   // TODO: Need to remove storage of modelDef.json
   kdbFS.storeJSONDoc(kdbDirPath + '/modelDef.json', kdbModel.modelDefinitions);
@@ -161,6 +168,36 @@ async function initialize (koheseKdbPath, indexAndExit) {
   }
 }
 module.exports.initialize = initialize;
+
+/////////////////////////////////////////////////////
+// Returns current git versioning
+/////////////////////////////////////////////////////
+function generateGitCommitInfo() {
+  const longSHA    = childProcess.execSync("git rev-parse HEAD").toString().trim();
+  const shortSHA   = childProcess.execSync("git rev-parse --short HEAD").toString().trim();
+  const branch     = childProcess.execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+  const authorName = childProcess.execSync("git log -1 --pretty=format:'%an'").toString().trim();
+  const commitTime = childProcess.execSync("git log -1 --pretty=format:'%cd'").toString().trim();
+  const commitMsg  = childProcess.execSync("git log -1 --pretty=%B").toString().trim();
+  const totalCommitCount = childProcess.execSync("git rev-list --count HEAD").toString().trim();
+  const changedFiles     = childProcess.execSync("git status -sb").toString();
+
+  const versionInfo = {
+      shortSHA: shortSHA,
+      SHA :     longSHA,
+      branch:   branch,
+      lastCommitAuthor:  authorName,
+      lastCommitTime:    commitTime,
+      lastCommitMessage: commitMsg,
+      lastCommitNumber:  totalCommitCount,
+      modifiedFiles:     changedFiles
+  }
+
+  const versionInfoJson = JSON.stringify(versionInfo, null, 2);
+  let gitVersion = writeFileSync('./git-version.json', versionInfoJson);
+
+  return gitVersion;
+}
 
 
 //////////////////////////////////////////////////////////////////////////

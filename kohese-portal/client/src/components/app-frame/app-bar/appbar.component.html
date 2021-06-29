@@ -96,6 +96,10 @@ limitations under the License.
             <mat-icon class="fa fa-code"></mat-icon>
             <span>Dev Tools</span>
           </button>
+          <button mat-menu-item (click)="navigate('About', {})">
+            <mat-icon class="fa fa-question"></mat-icon>
+            <span>About</span>
+          </button>
           <button mat-menu-item (click)="logout();">
             <mat-icon class="fa fa-sign-out fa-fw"></mat-icon>
             <span>Logout</span>

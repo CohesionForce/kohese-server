@@ -86,6 +86,12 @@ export var LocationMap = {
     'params' : [],
     'route' : '/devtools'
   },
+  'About' : {
+    'type' : 'single',
+    'title' : 'About',
+    'params' : [],
+    'route' : '/about'
+  },
   'Outline': {
     params: ['id'],
     route: 'outline'
