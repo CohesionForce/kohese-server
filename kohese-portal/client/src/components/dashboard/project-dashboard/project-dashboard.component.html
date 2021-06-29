@@ -16,14 +16,16 @@ limitations under the License.
 
 
 <div *ngIf="!project" style="padding: 20px;">
-  <h1> Please select a project :
-    <button mat-raised-button (click)="openProjectSelection()"> Select </button>
+  <h1> Select a Project :
+    <button class="btn btn-primary" style="margin-left: 2em;" (click)="openProjectSelection()"> Select </button>
   </h1>
 </div>
 <div *ngIf="project" style="padding: 20px;">
   <h1>{{ project.proxy.item.name }}
-    <button mat-raised-button (click)="openProjectSelection()"> Change Project</button>
-    <button mat-raised-button (click)="editProject()"> Edit Project</button>
+    <button class="btn btn-primary" style="margin-left: 2em; margin-right: 2em;" (click)="openProjectSelection()">
+      Change Project
+    </button>
+    <button class="btn btn-primary" (click)="editProject()">Edit Project</button>
   </h1>
 
 </div>
