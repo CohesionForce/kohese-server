@@ -15,15 +15,19 @@
  */
 
 
+// Angular
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { MatTableDataSource } from '@angular/material';
+import { Title } from '@angular/platform-browser';
 
-import { ProjectInfo } from '../../../../services/project-service/project.service';
+// NPM
 import { Subscription, Observable } from 'rxjs';
 
+// Kohese
+import { ProjectInfo } from '../../../../services/project-service/project.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
-import { MatTableDataSource } from '@angular/material';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../../details/details.component';
 import { StateInfo, StateFilterService } from '../../state-filter.service';
@@ -51,9 +55,12 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
   origin : string;
 
-  constructor(protected navigationService: NavigationService,
+  constructor(
+    protected navigationService: NavigationService,
     protected dialogService: DialogService,
-    private stateFilterService : StateFilterService) {
+    private stateFilterService : StateFilterService,
+    private title : Title
+    ) {
     super(navigationService)
   }
 
@@ -62,6 +69,8 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
+        let projectTitle = this.project.proxy.item.name;
+        this.title.setTitle('User Statistics | ' + projectTitle);
         this.deselectAll();
         this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
       }

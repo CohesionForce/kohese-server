@@ -15,26 +15,29 @@
  */
 
 
+// Angular
+import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy,
+         ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Title } from '@angular/platform-browser';
+
+// NPM
+import { Parser, HtmlRenderer } from 'commonmark';
+import * as commonmark from 'commonmark';
+import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
+
+// Kohese
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
-import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy,
-         ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
-import { Parser, HtmlRenderer } from 'commonmark';
-import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
-
-import { ItemProxy } from '../../../../common/src/item-proxy';
-import { NavigatableComponent } from '../../classes/NavigationComponent.class';
-
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
-
-import * as commonmark from 'commonmark';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Router, NavigationEnd } from '@angular/router';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { trigger, state, style, transition, animate } from '@angular/animations';
 
 export interface DocumentInfo {
   proxy: ItemProxy;
@@ -80,6 +83,7 @@ implements OnInit, OnDestroy {
   @ViewChild('docView') docView: ElementRef;
 
   /* Data */
+  proxyTitle: string = '';
   itemProxy: ItemProxy;
   itemLength: number;
   selectedRow: number;
@@ -127,12 +131,15 @@ implements OnInit, OnDestroy {
   selectedProxySubscription: Subscription;
   changeSubjectSubscription: Subscription;
 
-  constructor(navigationService: NavigationService,
+  constructor(
+    navigationService: NavigationService,
     private changeRef: ChangeDetectorRef,
     private router: Router,
     private itemRepository: ItemRepository,
     private dialogService: DialogService,
-    private typeService: DynamicTypesService) {
+    private typeService: DynamicTypesService,
+    private title : Title
+    ) {
     super(navigationService);
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({
@@ -159,7 +166,9 @@ implements OnInit, OnDestroy {
 
     if (this.selectedProxyStream) {
       this.selectedProxySubscription = this.selectedProxyStream.subscribe((newSelection) => {
-        if (newSelection) {
+        if (newSelection && (this.outlineView === false)) {
+          this.proxyTitle = newSelection.item.name;
+          this.title.setTitle('Explorer | ' + this.proxyTitle);
           this.rowMap[newSelection.item.id].nativeElement.scrollIntoView();
         }
       });
@@ -211,6 +220,8 @@ implements OnInit, OnDestroy {
           let parentProxy = this.itemProxy.treeConfig.getProxyFor(this.itemProxy.item.parentId);
           this.itemProxy = parentProxy;
           // Sets the id param in the URL to the new itemProxy id (if there is one) and therefore redraws the page
+          this.proxyTitle = this.itemProxy.item.name;
+          this.title.setTitle('Explorer | ' + this.proxyTitle);
           this.NavigationService.navigate('Explore', {'id': ( (this.itemProxy.item.id) ? this.itemProxy.item.id : '')});
         }
       }

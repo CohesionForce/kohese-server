@@ -15,14 +15,17 @@
  */
 
 
-
-import {tap} from 'rxjs/operators';
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  OnDestroy } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+
+// NPM
 import { Observable ,  Subscription } from 'rxjs';
+import {tap} from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
@@ -31,13 +34,13 @@ import { VersionControlService } from '../../../services/version-control/version
 import { NotificationService } from '../../../services/notifications/notification.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
-import { CompareItemsComponent,
-  VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
+import { CompareItemsComponent, VersionDesignator } from '../../compare-items/item-comparison/compare-items.component';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, Action } from '../tree-row/tree-row.component';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
 @Component({
   selector: 'version-control-tree',
@@ -82,14 +85,18 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
 
-  public constructor(private _changeDetectorRef: ChangeDetectorRef, route:
-    ActivatedRoute, private _itemRepository: ItemRepository, dialogService:
-    DialogService, private _navigationService: NavigationService,
+  public constructor(
+    route: ActivatedRoute,
+    dialogService: DialogService,
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _itemRepository: ItemRepository,
+    private _navigationService: NavigationService,
     private _versionControlService: VersionControlService,
     private _toastrService: ToastrService,
     private _notificationService: NotificationService,
-    private _dynamicTypesService:
-    DynamicTypesService) {
+    private _dynamicTypesService: DynamicTypesService,
+    private title : Title
+    ) {
     super(route, dialogService);
   }
 
@@ -317,6 +324,8 @@ export class VersionControlTreeComponent extends Tree implements OnInit,
   }
 
   protected rowFocused(row: TreeRow): void {
+    let selectedProxyTitle = TreeConfiguration.getWorkingTree().getProxyFor(this.getId(row.object));
+    this.title.setTitle('Version Control | ' + selectedProxyTitle);
     this._navigationService.navigate('Explore', {
       id: this.getId(row.object)
     });

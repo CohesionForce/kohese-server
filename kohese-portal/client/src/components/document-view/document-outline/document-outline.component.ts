@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
+// Angular
+import { Component, OnInit, Output } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
+// NPM
+import { BehaviorSubject, Subscription } from 'rxjs';
+
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ActivatedRoute } from '@angular/router';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { Component, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'document-outline',
@@ -37,7 +42,13 @@ export class DocumentOutlineComponent implements OnInit {
 
   @Output() outlineView: boolean = true;
 
-  constructor(private router : ActivatedRoute, private itemRepository: ItemRepository) { }
+  constructor(
+    private router : ActivatedRoute,
+    private itemRepository : ItemRepository,
+    private title : Title
+    ) {
+      this.title.setTitle('Outline');
+    }
 
   ngOnInit() {
     this.paramSubscription = this.router.params.subscribe(params => {
@@ -49,12 +60,16 @@ export class DocumentOutlineComponent implements OnInit {
     this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
       if (newConfig) {
         this.documentRoot = newConfig.config.getProxyFor(this.documentRootId);
+        let documentRootTitle: string = this.documentRoot.item.name;
+        this.title.setTitle('Outline | ' + documentRootTitle);
         this.proxyStream.next(this.documentRoot);
       }
-    })
+    });
   }
 
   setRoot(newRoot: ItemProxy) {
+    let newRootTitle: string = newRoot.item.name;
+    this.title.setTitle('Outline | ' + newRootTitle)
     this.proxyStream.next(newRoot)
   }
 

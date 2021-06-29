@@ -22,7 +22,7 @@ import { MatExpansionPanel, MAT_DIALOG_DATA } from '@angular/material';
 // NPM
 import { Subscription } from 'rxjs';
 
-// Custom
+// Kohese
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../../../../services/navigation/navigation.service';
 import { DialogService } from '../../../../../../services/dialog/dialog.service';

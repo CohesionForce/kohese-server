@@ -15,17 +15,20 @@
  */
 
 
-import { Subscription ,  BehaviorSubject } from 'rxjs';
-import { CurrentUserService } from './../../services/user/current-user.service';
+// Angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { NavigationService } from '../../services/navigation/navigation.service';
 
-import { ItemProxy } from '../../../../common/src/item-proxy';
+// NPM
+import { Subscription ,  BehaviorSubject } from 'rxjs';
 
+// Kohese
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { CurrentUserService } from './../../services/user/current-user.service';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { SessionService } from '../../services/user/session.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-
 import { DashboardSelections, DashboardSelectionInfo, DashboardTypes } from './dashboard-selector/dashboard-selector.component';
 import { ProjectInfo, ProjectService } from '../../services/project-service/project.service';
 
@@ -61,8 +64,11 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
   constructor(protected navigationService : NavigationService,
               private projectService : ProjectService,
               private itemRepository : ItemRepository,
-              private currentUserService : CurrentUserService) {
+              private currentUserService : CurrentUserService,
+              private title : Title
+              ) {
     super(navigationService);
+    this.title.setTitle('Dashboard');
     this.selectedProject = projectService.savedProject;
   }
 

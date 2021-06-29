@@ -15,10 +15,15 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+// Angular
 
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { Title } from '@angular/platform-browser';
+
+// NPM
+
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
@@ -66,11 +71,16 @@ export class ReportsComponent implements OnInit {
     return Array;
   }
 
-  public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
+  public constructor(
+    @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<ReportsComponent>,
-    private _changeDetectorRef: ChangeDetectorRef, private _dialogService:
-    DialogService, private _itemRepository: ItemRepository) {
-  }
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _dialogService: DialogService,
+    private _itemRepository: ItemRepository,
+    private title : Title
+    ) {
+      this.title.setTitle('Reports');
+    }
 
   public ngOnInit(): void {
     this.updateReportList();

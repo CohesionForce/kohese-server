@@ -15,14 +15,19 @@
  */
 
 
+// Angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
+// NPM
+import { Subscription } from 'rxjs';
+
+// Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { ActivatedRoute, Params } from '@angular/router';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector : 'explore-view',
@@ -41,8 +46,11 @@ export class ExploreComponent extends NavigatableComponent
 
   constructor (protected NavigationService : NavigationService,
                private itemRepository : ItemRepository,
-               private router : ActivatedRoute) {
+               private router : ActivatedRoute,
+               private title : Title
+               ) {
     super(NavigationService);
+    this.title.setTitle('Explorer');
   }
 
   ngOnInit () {

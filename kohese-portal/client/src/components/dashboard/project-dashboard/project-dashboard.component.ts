@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
+// Angular
+import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { ActivatedRoute, Params } from '@angular/router';
 
+// NPM
+import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+
+// Kohese
 import { ProjectService } from './../../../services/project-service/project.service';
 import { DetailsComponent } from './../../details/details.component';
-import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
-import { ItemProxy} from '../../../../../common/src/item-proxy';
-
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
-import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+import { ItemProxy} from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ProjectSelectorComponent } from './project-selector/project-selector.component'
@@ -60,7 +64,11 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
     private router: ActivatedRoute,
     private navigationService: NavigationService,
     private itemRepository: ItemRepository,
-    private projectService : ProjectService) { }
+    private projectService : ProjectService,
+    private title : Title
+    ) {
+      this.title.setTitle('Project Dashboard');
+    }
 
   ngOnInit() {
     this.projectStream = new BehaviorSubject<ProjectInfo>(undefined);
@@ -97,6 +105,8 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
 
     if (this.savedProject) {
       this.project = this.savedProject;
+      let projectName: string = this.project.proxy.item.name;
+      this.title.setTitle('Project Dashboard | ' + projectName);
       this.projectStream.next(this.project);
     }
 
@@ -110,6 +120,8 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
         if (project !== this.project) {
           // Update the project based on params if it is different
           this.project = project;
+          let projectTitle: string = this.project.proxy.item.name;
+          this.title.setTitle('Project Dashboard | ' + projectTitle);
           this.projectStream.next(this.project);
           this.projectSelected.emit(this.project);
           this.navigationService.navigate('Dashboard', {
@@ -135,6 +147,8 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
         console.log(selection);
         if (selection) {
           this.project = selection;
+          let projectTitle: string = this.project.proxy.item.name;
+          this.title.setTitle('Project Dashboard | ' + projectTitle);
           this.projectStream.next(this.project);
           this.projectSelected.emit(this.project);
           this.navigationService.navigate('Dashboard', {

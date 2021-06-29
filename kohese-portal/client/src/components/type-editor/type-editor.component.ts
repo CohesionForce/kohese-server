@@ -15,25 +15,26 @@
  */
 
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy,
-  OnInit } from '@angular/core';
+// Angular
+// Angular
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+
+// NPM
 import { Subscription } from 'rxjs';
 import * as Uuid from 'uuid';
 
-import { FormatContainer,
-  FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
+// Kohese
+import { FormatContainer, FormatContainerKind } from '../../../../common/src/FormatContainer.interface';
+import { FormatDefinition, FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { Metatype } from '../../../../common/src/Type.interface';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { ItemRepository,
-  TreeConfigInfo } from '../../services/item-repository/item-repository.service';
-import { InputDialogComponent,
-  InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
+import { ItemRepository, TreeConfigInfo } from '../../services/item-repository/item-repository.service';
+import { InputDialogComponent, InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
 import { NamespaceEditorComponent } from '../object-editor/namespace-editor/namespace-editor.component';
 
 @Component({
@@ -90,10 +91,15 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     return FormatDefinitionType;
   }
 
-  public constructor(private _dynamicTypesService: DynamicTypesService,
-    private dialogService: DialogService, private _itemRepository:
-    ItemRepository, private _changeDetectorRef: ChangeDetectorRef) {
-  }
+  public constructor(
+    private _dynamicTypesService : DynamicTypesService,
+    private dialogService : DialogService,
+    private _itemRepository : ItemRepository,
+    private _changeDetectorRef : ChangeDetectorRef,
+    private title : Title
+    ) {
+      this.title.setTitle('Kind Editor');
+    }
 
   public ngOnInit(): void {
     this._treeConfigSubscription = this._itemRepository.getTreeConfig().

@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-
+// Angular
 import { Component, OnInit, OnDestroy, Input, ChangeDetectorRef } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+
+// NPM
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subscription } from 'rxjs';
 
+// Kohese
 import { DetailsComponent } from '../../details/details.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -75,9 +79,11 @@ export class RepositoriesComponent extends NavigatableComponent implements
     private _sessionService: SessionService,
     private dialogueService: DialogService,
     private dialog: MatDialog,
-    private _changeDetectorRef: ChangeDetectorRef
+    private _changeDetectorRef: ChangeDetectorRef,
+    private title : Title
   ) {
     super(_navigationService);
+    this.title.setTitle('Repositories');
     // TODO update this file to do the repo status sequence
     // leaving it out since it is currently in flux on another branch
   }
