@@ -110,7 +110,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     private _navigationService: NavigationService,
     private title : Title
     ) {
-      this.title.setTitle("Users");
+      this.title.setTitle('Users');
     }
 
   public ngOnInit(): void {

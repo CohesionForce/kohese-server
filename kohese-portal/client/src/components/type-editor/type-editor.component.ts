@@ -98,7 +98,7 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     private _changeDetectorRef : ChangeDetectorRef,
     private title : Title
     ) {
-      this.title.setTitle("Kind Editor");
+      this.title.setTitle('Kind Editor');
     }
 
   public ngOnInit(): void {

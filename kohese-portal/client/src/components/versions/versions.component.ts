@@ -52,7 +52,7 @@ export class VersionsComponent {
     private title : Title,
     private _changeDetectorRef: ChangeDetectorRef
     ) {
-      this.title.setTitle("Versions");
+      this.title.setTitle('Versions');
     }
 
   public commitTreeRowSelected(object: any): void {

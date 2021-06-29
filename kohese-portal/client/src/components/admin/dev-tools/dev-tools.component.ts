@@ -36,7 +36,7 @@ export class DevToolsComponent implements OnInit {
     private logService : LogService,
     private title : Title
     ) {
-      this.title.setTitle("Dev Tools");
+      this.title.setTitle('Dev Tools');
     }
 
   ngOnInit() {

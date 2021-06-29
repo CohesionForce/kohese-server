@@ -69,7 +69,7 @@ export class AnalysisComponent extends NavigatableComponent
     private title : Title
     ) {
     super(NavigationService);
-    this.title.setTitle("Analysis");
+    this.title.setTitle('Analysis');
 
     this.filterSubject = new BehaviorSubject({
       filter: '',

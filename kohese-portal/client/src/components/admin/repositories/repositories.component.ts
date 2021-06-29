@@ -83,7 +83,7 @@ export class RepositoriesComponent extends NavigatableComponent implements
     private title : Title
   ) {
     super(_navigationService);
-    this.title.setTitle("Repositories");
+    this.title.setTitle('Repositories');
     // TODO update this file to do the repo status sequence
     // leaving it out since it is currently in flux on another branch
   }
