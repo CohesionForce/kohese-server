@@ -78,8 +78,39 @@ function Server(httpsServer, options){
             any) => void) => {
             sendResponse(kio.sessions);
           });
+
+          socket.on('Admin/lockoutUser', function(request, sendResponse) {
+            console.log('::: session %s: Received lockoutUser for %s for user %s at %s',
+              socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+            console.log(request);
+            let userLockoutAdded = lockoutUser(request.username);
+            sendResponse({
+              username: request.username,
+              userLockoutAdded: userLockoutAdded
+            });
+          });
+
+          socket.on('Admin/reinstateUser', function(request, sendResponse) {
+            console.log('::: session %s: Received reinstateUser for %s for user %s at %s',
+              socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+            console.log(request);
+            let userLockoutRemoved = reinstateUser(request.username);
+            sendResponse({
+              username: request.username,
+              userLockoutRemoved: userLockoutRemoved
+            });
+          });
+
+          socket.on('Admin/getUserLockoutList', function(request, sendResponse) {
+            console.log('::: session %s: Received getUserLockoutList for %s for user %s at %s',
+              socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
+            sendResponse({
+              userLockoutList: userLockoutList
+            });
+          });
         }
       });
+
       socket.on('disconnect', function () {
         var username = 'Unknown';
         if (socket.koheseUser){
@@ -89,36 +120,6 @@ function Server(httpsServer, options){
         if(kio.sessions[socket.id]){
           delete kio.sessions[socket.id];
         }
-      });
-
-      socket.on('Admin/lockoutUser', function(request, sendResponse) {
-        console.log('::: session %s: Received lockoutUser for %s for user %s at %s',
-          socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
-        console.log(request);
-        let userLockoutAdded = lockoutUser(request.username);
-        sendResponse({
-          username: request.username,
-          userLockoutAdded: userLockoutAdded
-        });
-      });
-
-      socket.on('Admin/reinstateUser', function(request, sendResponse) {
-        console.log('::: session %s: Received reinstateUser for %s for user %s at %s',
-          socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
-        console.log(request);
-        let userLockoutRemoved = reinstateUser(request.username);
-        sendResponse({
-          username: request.username,
-          userLockoutRemoved: userLockoutRemoved
-        });
-      });
-
-      socket.on('Admin/getUserLockoutList', function(request, sendResponse) {
-        console.log('::: session %s: Received getUserLockoutList for %s for user %s at %s',
-          socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
-        sendResponse({
-          userLockoutList: userLockoutList
-        });
       });
   });
 
