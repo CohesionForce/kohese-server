@@ -415,7 +415,7 @@
               "propertyName": "description",
               "customLabel": "Description",
               "labelOrientation": "Top",
-              "kind": "text",
+              "kind": "markdown",
               "tableDefinition": "",
               "visible": true,
               "editable": true
