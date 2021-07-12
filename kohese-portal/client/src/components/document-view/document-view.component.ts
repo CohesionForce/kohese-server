@@ -166,9 +166,7 @@ implements OnInit, OnDestroy {
 
     if (this.selectedProxyStream) {
       this.selectedProxySubscription = this.selectedProxyStream.subscribe((newSelection) => {
-        if (newSelection && (this.outlineView === false)) {
-          this.proxyTitle = newSelection.item.name;
-          this.title.setTitle('Explorer | ' + this.proxyTitle);
+        if (newSelection) {
           this.rowMap[newSelection.item.id].nativeElement.scrollIntoView();
         }
       });
