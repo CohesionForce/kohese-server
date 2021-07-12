@@ -218,45 +218,58 @@ export class KDBRepo {
     var commitIdMap = {};
     var signature = nodegit.Signature.now(userName, eMail);
     var promises = [];
-    for (var i = 0; i < repositoryIds.length; i++) {
-      var repo = repoList[repositoryIds[i]];
-      (function (iIndex) {
-        promises.push(repo.getHeadCommit().then(function (commit) {
-          return repo.refreshIndex().then(function (index) {
-            return index.writeTree().then(function (treeId) {
-              var parentCommits = [];
-              if (commit) {
-                parentCommits.push(commit);
-              }
-              return repo.getStatusExt().then(function (statuses) {
-                var filePaths = [];
-                for (var j = 0; j < statuses.length; j++) {
-                  var status = statuses[j];
-                  if (status.inIndex()) {
-                    filePaths.push(status.path());
-                  }
+    async function commitARepo (repo, repositoryId, iIndex) {
+      promises.push(repo.getHeadCommit().then(function (commit) {
+        return repo.refreshIndex().then(function (index) {
+          return index.writeTree().then(function (treeId) {
+            let parentCommits = [];
+            if (commit) {
+              parentCommits.push(commit);
+            }
+            return repo.getStatusExt().then(function (statuses) {
+              let filePaths = [];
+              for (let j = 0; j < statuses.length; j++) {
+                let status = statuses[j];
+                if (status.inIndex()) {
+                  filePaths.push(status.path());
                 }
-
+              }
+              if (filePaths.length > 0) {
                 return repo.createCommit('HEAD', signature, signature, message,
-                    treeId, parentCommits).then(function (commitId) {
-                  commitIdMap[repositoryIds[iIndex]] = {
-                    commitId: commitId,
-                    filesCommitted: filePaths
-                  };
-                  return repo.getCommit(commitId).then(function (c) {
-                    return Promise.resolve(true);
+                  treeId, parentCommits).then(function (commitId) {
+                    commitIdMap[repositoryId] = {
+                      commitId: commitId,
+                      filesCommitted: filePaths
+                    };
+                    return repo.getCommit(commitId).then(function (c) {
+                      return Promise.resolve(true);
+                    }).catch(function (err) {
+                      console.log(err.stack);
+                    });
+                  }).catch(function (err) {
+                    console.log(err.stack);
                   });
-                });
-              });
+              } else {
+                return Promise.resolve(true);
+              }
+            }).catch(function (err) {
+              console.log(err.stack);
             });
           }).catch(function (err) {
             console.log(err.stack);
           });
-        }));
-      })(i);
+        }).catch(function (err) {
+          console.log(err.stack);
+        });
+      }));
+    }
+    for (let repositoryId in repoList) {
+      var repo = repoList[repositoryId];
+      await commitARepo (repo, repositoryId, repositoryId)
     }
 
     return Promise.all(promises).then(function () {
+      console.log('*** Commit Id map ', commitIdMap);
       return commitIdMap;
     });
   }
@@ -374,7 +387,11 @@ export class KDBRepo {
   //
   //////////////////////////////////////////////////////////////////////////
   static async getRemotes(repositoryId) {
-    return nodegit.Remote.list(repoList[repositoryId]);
+    if (repositoryId !== 'ROOT') {
+      return nodegit.Remote.list(repoList[repositoryId + '-mount']);
+    } else {
+      return nodegit.Remote.list(repoList[repositoryId]);
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -650,6 +667,16 @@ export class KDBRepo {
     } else {
       id = undefined
       return id;
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //////////////////////////////////////////////////////////////////////////
+  static isRepo(id) {
+    if (repoList[id + '-mount']) {
+       return true;
+    } else {
+      return false;
     }
   }
 }

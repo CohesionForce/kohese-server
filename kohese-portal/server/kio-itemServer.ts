@@ -39,7 +39,7 @@ var serverAuthentication = require('./server-enableAuth');
 const Path = require('path');
 const importer = require('./directory-ingest');
 var _ = require('underscore');
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(\-mount)?$/i;
 const _ICONS_FILE_PATH = Path.resolve(fs.realpathSync(__dirname), '..', '..',
   'icons.txt');
 const _REPORTS_DIRECTORY_PATH = Path.resolve(fs.realpathSync(__dirname), '..',
@@ -1401,7 +1401,7 @@ function KIOItemServer(socket){
       var repositoryInformation = getRepositoryInformation(proxy);
 
       try {
-        await KDBRepo.add(repositoryInformation.repositoryProxy.item.id,
+        await KDBRepo.add(repositoryInformation.repoID,
           repositoryInformation.relativeFilePath);
       } catch (error) {
         console.log(error.stack);
@@ -1426,6 +1426,8 @@ function KIOItemServer(socket){
   //
   //////////////////////////////////////////////////////////////////////////
   socket.on('VersionControl/commit', function (request, sendResponse) {
+    console.log('::: session %s: Received VersionControl/commit for %s for user %s at %s',
+    socket.id, request.id, socket.koheseUser.username, socket.handshake.address);
     var idsArray : Array<string> = Array.from(request.proxyIds);
 
     KDBRepo.commit(idsArray, request.username, request.email,
@@ -1439,11 +1441,15 @@ function KIOItemServer(socket){
             if (filePaths[j].endsWith('.json')) {
               var fileName = Path.basename(filePaths[j], '.json');
               var foundId = true;
-              if (!UUID_REGEX.test(fileName)) {
+              if (!UUID_REGEX.test(fileName) && (fileName !== 'Root')) {
                 fileName = Path.basename(Path.dirname(filePaths[j]));
                 if (!UUID_REGEX.test(fileName)) {
                   foundId = false;
                 }
+              }
+              // If file is Root.json then this is a Repo so the Repo ID needs to be used to get the proxy
+              if (fileName === 'Root') {
+                fileName = KDBRepo.getMountId(repositoryId);
               }
 
               if (foundId) {
@@ -1525,7 +1531,7 @@ function KIOItemServer(socket){
       var proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
       proxies.push(proxy);
       var repositoryInformation = getRepositoryInformation(proxy);
-      let repositoryId = repositoryInformation.repositoryProxy.item.id;
+      let repositoryId = repositoryInformation.repoID;
       if (!repositoryPathMap[repositoryId]) {
         repositoryPathMap[repositoryId] = [];
       }
@@ -1562,7 +1568,7 @@ function KIOItemServer(socket){
     for (let i = 0; i < idsArray.length; i++) {
       let proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
       let repositoryInformation = getRepositoryInformation(proxy);
-      let repositoryId = repositoryInformation.repositoryProxy.item.id;
+      let repositoryId = repositoryInformation.repoID;
 
       // jshint -W083
       // eslint-disable-next-line no-unused-vars
@@ -1608,7 +1614,7 @@ function KIOItemServer(socket){
       for (let i = 0; i < idsArray.length; i++) {
         let proxy = ItemProxy.getWorkingTree().getProxyFor(idsArray[i]);
         let repositoryInformation = getRepositoryInformation(proxy);
-        let repositoryId = repositoryInformation.repositoryProxy.item.id;
+        let repositoryId = repositoryInformation.repoID;
         var status = statusArray[i];
 
         var isNewUnstagedFile = false;
@@ -1786,7 +1792,7 @@ function updateStatus(proxies) {
   var promises = [];
   for (let i = 0; i < proxies.length; i++) {
     var repositoryInformation = getRepositoryInformation(proxies[i]);
-    let promise = KDBRepo.getItemStatus(repositoryInformation.repositoryProxy.item.id,
+    let promise = KDBRepo.getItemStatus(repositoryInformation.repoID,
         repositoryInformation.relativeFilePath);
     promises.push(promise.then((status) => {
       statusMap[proxies[i].item.id] = status;
@@ -1805,14 +1811,22 @@ function updateStatus(proxies) {
 //////////////////////////////////////////////////////////////////////////
 function getRepositoryInformation(proxy) {
   var repositoryProxy = proxy.getRepositoryProxy();
-  while(repositoryProxy.parentProxy) {
-    repositoryProxy = repositoryProxy.parentProxy.getRepositoryProxy();
+  var pathToRepo;
+  var relativeFilePath;
+  if (!KDBRepo.isRepo(repositoryProxy.item.id)) {
+    while(repositoryProxy.parentProxy) {
+      repositoryProxy = repositoryProxy.parentProxy.getRepositoryProxy();
+    }
   }
-
-  var pathToRepo = repositoryProxy.repoPath.split('Root.json')[0];
-  var relativeFilePath = proxy.repoPath.split(pathToRepo)[1];
+  var repoId = repositoryProxy.item.id;
+  if (repoId !== 'ROOT') {
+    repoId = repoId + '-mount'
+  }
+  pathToRepo = repositoryProxy.repoPath.split('Root.json')[0];
+  relativeFilePath = proxy.repoPath.split(pathToRepo)[1];
 
   return {
+    repoID: repoId,
     repositoryProxy: repositoryProxy,
     pathToRepo: pathToRepo,
     relativeFilePath: relativeFilePath

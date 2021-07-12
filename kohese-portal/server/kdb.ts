@@ -457,15 +457,18 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       modifiedBy: modelInstance.modifiedBy,
       modifiedOn: modelInstance.modifiedOn,
       repoId: {id: modelInstance.id},
-      mountPoint: {id: modelInstance.parentId}
+      mountPoint: {id: modelInstance.parentId},
+      repoPath: repoMountFilePath
     };
 
+    delete repoMountData.repoPath;
     console.log('::: Repo Mount Information -- StoreModelInstance');
     console.log(repoMountData);
     if (enable === false) {
       kdbFS.createDirIfMissing(path.dirname(repoMountFilePath));
       kdbFS.storeJSONDoc(repoMountFilePath, repoMountData);
     }
+    repoMountData.repoPath = repoMountFilePath;
 
     repoStoragePath = path.join(kdbDirPath, modelInstance.name)
     mountList[repoMountData.id] = {
@@ -720,7 +723,7 @@ function mountRepository(mountData, enable: boolean = false) {
             proxy = new ItemProxy('Repository', repoRoot);
             proxy.repoPath = path.join(mountData.repoStoragePath, 'Root.json');
             let mountedRepoProxy = new ItemProxy('RepoMount', repoMountData);
-            mountedRepoProxy.repoPath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMountData.id));
+            mountedRepoProxy.repoPath = path.join(koheseKDBDirPath, path.join('RepoMount', repoMountData.id + '.json'));
             console.log('::: Validating mounted repository: ' + repoRoot.name)
             if (enable === true) {
               proxy.mountRepository(proxy.item.id, 'Repository')
