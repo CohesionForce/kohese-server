@@ -86,41 +86,43 @@ export class FormatObjectEditorComponent implements OnInit {
     this._selectedType = selectedType;
 
     if (this._enclosingType) {
+      // there is a local data model
       let definedInKind = this._enclosingType.classLocalTypes[this._selectedType.name].definedInKind;
+      // returns the model for the object's kind
       let modelProxy = TreeConfiguration.getWorkingTree().getModelProxyFor(definedInKind);
+      // returns the viewModel for the object's local type
       this._viewModel = modelProxy.view.item.localTypes[this._selectedType.name];
     } else {
+      // there is an enclosingDataModel with a top-level "kind"
       let selectedTypeModelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor(this._selectedType.name);
       this._viewModel = selectedTypeModelProxy.view.item;
     }
 
-    this._formatDefinition = this._viewModel.formatDefinitions[this._viewModel.
-      defaultFormatKey[this._formatDefinitionType]];
+    // returns the object's format definition from the view-model's format definition
+    this._formatDefinition = this._viewModel.formatDefinitions[this._viewModel.defaultFormatKey[this._formatDefinitionType]];
     if (!this._formatDefinition) {
-      this._formatDefinition = this._viewModel.formatDefinitions[this.
-        _viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
+      // returns the default definition if there is none specified in the view model
+      this._formatDefinition = this._viewModel.formatDefinitions[this._viewModel.defaultFormatKey[FormatDefinitionType.DEFAULT]];
     }
 
-    this._formatDefinition = JSON.parse(JSON.stringify(this.
-      _formatDefinition));
+    // returns the name of the format definition as a string
+    this._formatDefinition = JSON.parse(JSON.stringify(this._formatDefinition));
+    // loads the kind and contents (called the propertyDefinition) to the beginning of the format definition container array
     this._formatDefinition.containers.unshift({
       kind: FormatContainerKind.VERTICAL,
       contents: [...this._formatDefinition.header.contents]
     });
     // Adjust PropertyDefinitions for references that are typed 'string'
-    for (let j: number = 0; j < this._formatDefinition.containers.length;
-      j++) {
-      let formatContainer: FormatContainer = this._formatDefinition.containers[
-        j];
+    for (let j: number = 0; j < this._formatDefinition.containers.length; j++) {
+      let formatContainer: FormatContainer = this._formatDefinition.containers[j];
       for (let k: number = 0; k < formatContainer.contents.length; k++) {
-        let propertyDefinition: PropertyDefinition = formatContainer.contents[
-          k];
-        if ((propertyDefinition.kind === 'string') || (propertyDefinition.kind
-          === 'text')) {
-          let attribute: any = this._selectedType.classProperties[
-            propertyDefinition.propertyName].definition;
-          if (attribute.relation && (attribute.relation.foreignKey ===
-            'username')) {
+        let propertyDefinition: PropertyDefinition = formatContainer.contents[k];
+        if ((propertyDefinition.kind === 'string') || (propertyDefinition.kind === 'text')) {
+          // handles inheritence
+          // i.e. if a task is subclassed, its properties will always be contained within classProperties
+          let attribute: any = this._selectedType.classProperties[propertyDefinition.propertyName].definition;
+          if (attribute.relation && (attribute.relation.foreignKey === 'username')) {
+            // transforms the kind to user-selector if it has a foreignKey of username
             propertyDefinition.kind = 'user-selector';
           }
         }
@@ -242,8 +244,7 @@ export class FormatObjectEditorComponent implements OnInit {
     TreeConfiguration.getWorkingTree().getProxyFor(
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
       ItemProxy) => {
-      if ((itemProxy.kind === 'Namespace') && (this.getNamespaceTypes(
-        itemProxy.item).length > 0)) {
+      if ((itemProxy.kind === 'Namespace') && (this.getNamespaceTypes(itemProxy.item).length > 0)) {
         namespaces.push(itemProxy.item);
       }
     }, undefined);
@@ -262,12 +263,10 @@ export class FormatObjectEditorComponent implements OnInit {
    */
   public getNamespaceTypes(namespace: any): Array<any> {
     let types: Array<any> = [];
-    TreeConfiguration.getWorkingTree().getProxyFor(
-      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
-      ItemProxy) => {
-      if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.
-        restrictInstanceEditing !== true) && (itemProxy.item.namespace.id
-        === namespace.id)) {
+    TreeConfiguration.getWorkingTree().getProxyFor('Model-Definitions').visitTree(
+      { includeOrigin: false }, (itemProxy: ItemProxy) => {
+      if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.restrictInstanceEditing !== true)
+                                             && (itemProxy.item.namespace.id === namespace.id)) {
         if (this._allowKindNarrowingOnly) {
           let modelItemProxy: any = itemProxy;
           while (modelItemProxy) {
@@ -291,29 +290,35 @@ export class FormatObjectEditorComponent implements OnInit {
     return types;
   }
 
-  public getReverseReferenceTableHeaderContent(formatContainer:
-    FormatContainer): string {
-    return formatContainer.contents.map((propertyDefinition:
-      PropertyDefinition) => {
-      return propertyDefinition.propertyName.kind + '\'s ' +
-        propertyDefinition.propertyName.attribute;
+  public getReverseReferenceTableHeaderContent(formatContainer: FormatContainer): string {
+    return formatContainer.contents.map((propertyDefinition: PropertyDefinition) => {
+      // e.g. "issue's resolutionAction"
+      return propertyDefinition.propertyName.kind + '\'s ' + propertyDefinition.propertyName.attribute;
     }).join(', ');
   }
 
   public getReverseReferences(formatContainer: FormatContainer): Array<any> {
     let references: Array<any> = [];
-    let reverseReferencesObject: any = TreeConfiguration.getWorkingTree().
-      getProxyFor(this._object.id).relations.referencedBy;
+    // FOE works on the items, not their proxies. Retrieval of the proxy is necessary to get reverse references
+    let itemProxyBeingReferenced: any = TreeConfiguration.getWorkingTree().getProxyFor(this._object.id);
+    // itemRelations contains the observation type (ie issue/observation) and its contextual proxies
+    let itemRelations: any = itemProxyBeingReferenced.relations.referencedBy;
     for (let j: number = 0; j < formatContainer.contents.length; j++) {
       let propertyDefinition: PropertyDefinition = formatContainer.contents[j];
-      if (reverseReferencesObject[propertyDefinition.propertyName.kind]) {
-        references.push(...reverseReferencesObject[propertyDefinition.
-          propertyName.kind][propertyDefinition.propertyName.attribute].map(
+      if (itemRelations[propertyDefinition.propertyName.kind] &&
+          itemRelations[propertyDefinition.propertyName.kind][propertyDefinition.propertyName.attribute]) {
+        // propertyDefinition.propertyName.attribute equates to "analysisAction" or something similar like "requiresAction"
+        references.push(...itemRelations[propertyDefinition.propertyName.kind][propertyDefinition.propertyName.attribute].map(
           (itemProxy: ItemProxy) => {
+          // execution:   Returns the items contained in itemRelations.relations.referencedBy
+          // explanation: Since we are pushing to the references array from itemRelations,
+          //              we still have the items associated with its "context". These items are found by
+          //              specifying the index into the double array (kind | attribute) for the propertyName.
           return itemProxy.item;
         }));
       }
     }
+
 
     return references;
   }
@@ -342,14 +347,12 @@ export class FormatObjectEditorComponent implements OnInit {
     if (isMultivalued) {
       return this._multivaluedFieldComponentQueryList.toArray().find(
         (multivaluedFieldComponent: MultivaluedFieldComponent) => {
-        return (multivaluedFieldComponent.propertyDefinition.propertyName ===
-          attributeName);
+        return (multivaluedFieldComponent.propertyDefinition.propertyName === attributeName);
       });
     } else {
       return this._singlevaluedFieldComponentQueryList.toArray().find(
         (singlevaluedFieldComponent: SinglevaluedFieldComponent) => {
-        return (singlevaluedFieldComponent.propertyDefinition.propertyName ===
-          attributeName);
+        return (singlevaluedFieldComponent.propertyDefinition.propertyName === attributeName);
       });
     }
   }
