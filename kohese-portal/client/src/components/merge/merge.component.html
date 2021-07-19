@@ -36,8 +36,8 @@ limitations under the License.
     (elementSelected)="differenceSelected($event)">
   </tree>
   <div style="height: 40%;">
-    <split direction="horizontal">
-      <split-area [size]="50">
+    <as-split unit=percent direction="horizontal">
+      <as-split-area [size]="50">
         <ng-container *ngIf="selectedDifference">
           <div style="height: 20%; display: flex; flex-direction: row;">
             <h3>
@@ -55,8 +55,8 @@ limitations under the License.
             <markdown [data]="selectedDifference.localValue"></markdown>
           </div>
         </ng-container>
-      </split-area>
-      <split-area [size]="50">
+      </as-split-area>
+      <as-split-area [size]="50">
         <ng-container *ngIf="selectedDifference">
           <div style="height: 20%; display: flex; flex-direction: row;">
             <h3>
@@ -74,8 +74,8 @@ limitations under the License.
             <markdown [data]="selectedDifference.remoteValue"></markdown>
           </div>
         </ng-container>
-      </split-area>
-    </split>
+      </as-split-area>
+    </as-split>
   </div>
 </div>
 <ng-container *ngIf="isDialogInstance()">

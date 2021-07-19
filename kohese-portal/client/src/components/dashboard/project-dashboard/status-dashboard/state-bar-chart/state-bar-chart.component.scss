@@ -17,7 +17,7 @@
 
 @import '../../../../../app.component';
 
-/deep/ .mat-expansion-panel-content {
+::ng-deep .mat-expansion-panel-content {
   height: 300px;
   overflow: auto !important;
 }

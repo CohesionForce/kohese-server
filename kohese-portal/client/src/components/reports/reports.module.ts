@@ -37,7 +37,7 @@ import { TreeViewModule } from '../tree/tree.module';
   imports: [
     CommonModule,
     FormsModule,
-    AngularSplitModule,
+    AngularSplitModule.forRoot(),
     MarkdownModule.forChild(),
     MaterialModule,
     PipesModule,

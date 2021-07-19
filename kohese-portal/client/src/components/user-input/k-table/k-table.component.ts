@@ -15,9 +15,8 @@
  */
 
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
 import { OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { ItemProxy } from './../../../../../common/src/item-proxy';
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

@@ -116,7 +116,7 @@ export class KMarkdownComponent extends UserInput
         'image/jpeg')) {
         let fileReader: FileReader = new FileReader();
         fileReader.onload = () => {
-          this._images.push(fileReader.result);
+          this._images.push(fileReader.result as string);
           let imageReference: string = '![' + images[j].name + '](' +
             (this._images.length - 1) + ')';
           this._formattedValue = (this._formattedValue ? this._formattedValue.

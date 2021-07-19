@@ -132,7 +132,7 @@ export class TextEditorComponent implements OnInit {
         for (let j: number = 0; j < fileInput.files.length; j++) {
           let fileReader: FileReader = new FileReader();
           fileReader.onload = () => {
-            callback(fileReader.result, {
+            callback(fileReader.result as string, {
               alt: fileInput.files[j].name,
               title: fileInput.files[j].name
             });
