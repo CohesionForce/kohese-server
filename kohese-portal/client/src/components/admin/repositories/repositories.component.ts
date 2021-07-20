@@ -155,18 +155,21 @@ export class RepositoriesComponent extends NavigatableComponent implements
     if (this.commitMessageInput === '') {
       this.commitMessageInput = '<No message supplied>';
     }
-
-    this.versionControlService.commitItems([this.rootProxy], this.
-      _sessionService.user, this.commitMessageInput).subscribe((statusMap:
-        any) => {
-        if (statusMap.error) {
-          this._toastrService.error('Commit Failed', 'Version Control');
-          this._notificationService.addNotifications('ERROR: Version Control - Commit Failed');
-        } else {
-          this._toastrService.success('Commit Succeeded', 'Version Control');
-          this._notificationService.addNotifications('COMPLETED: Version Control - Commit Succeeded');
-        }
-      });
+    if (!this._sessionService.user.email) {
+      this.dialogueService.openInformationDialog('Commit Not Allowed: Email Required For :', this._sessionService.user.username);
+    } else {
+      this.versionControlService.commitItems([this.rootProxy], this.
+        _sessionService.user, this.commitMessageInput).subscribe((statusMap:
+          any) => {
+          if (statusMap.error) {
+            this._toastrService.error('Commit Failed', 'Version Control');
+            this._notificationService.addNotifications('ERROR: Version Control - Commit Failed');
+          } else {
+            this._toastrService.success('Commit Succeeded', 'Version Control');
+            this._notificationService.addNotifications('COMPLETED: Version Control - Commit Succeeded');
+          }
+        });
+    }
   }
 
   push() {
