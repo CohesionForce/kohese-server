@@ -61,7 +61,7 @@ describe('Component: Action Table', ()=>{
     actionTableFixture = TestBed.createComponent(ActionTableComponent);
     actionTableComponent = actionTableFixture.componentInstance;
 
-    let itemRepository: any = TestBed.get(ItemRepository);
+    let itemRepository: any = TestBed.inject(ItemRepository);
     let proxy: ItemProxy = itemRepository.getRootProxy();
 
     actionTableComponent.proxyStream = new BehaviorSubject<any>(proxy);

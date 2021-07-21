@@ -17,7 +17,7 @@
 
 console.log('$$$ Loading Cache Worker');
 
-import * as SocketIoClient from 'socket.io-client';
+import {io , Socket} from 'socket.io-client';
 import * as LevelJs from 'level-js';
 import * as _ from 'underscore';
 
@@ -29,7 +29,7 @@ import { KoheseView } from '../../common/src/KoheseView';
 import { LevelCache } from '../../common/src/level-cache';
 import { Workspace } from '../../common/src/kohese-commit';
 
-let socket: SocketIOClient.Socket;
+let socket: Socket;
 let clientMap = {};
 let _authRequest = {};
 let kioListenersInitialized: boolean = false;
@@ -101,7 +101,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     switch (request.type) {
       case 'connect':
         if (!socket) {
-          socket = SocketIoClient({
+          socket = io({
             rejectUnauthorized: false
           });
           socket.on('connect_error', (err) => {
@@ -376,7 +376,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'importMarkdown':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject: () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('importMarkdown', { fileName: request.data.fileName,
             markdown: request.data.markdown, parentId: request.data.parentId },
             () => {
@@ -387,7 +387,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'produceReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject: () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('Item/generateReport', { reportName: request.data.
             reportName, format: request.data.format, content: request.data.
             content }, () => {
@@ -408,7 +408,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'renameReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject: () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('renameReport', { oldReportName: request.data.
           oldReportName, newReportName: request.data.newReportName }, () => {
             resolve();
@@ -428,7 +428,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'removeReport':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject: () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('removeReport', { reportName: request.data.reportName },
             () => {
             resolve();
@@ -475,8 +475,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'Repository/unMountRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject:
-          () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('Repository/unMountRepository', { repoId: request.data.id }, () => {
             resolve();
           });
@@ -485,8 +484,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'Repository/disableRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject:
-          () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('Repository/disableRepository', { repoId: request.data.id }, () => {
             resolve();
           });
@@ -505,8 +503,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'Repository/enableRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject:
-          () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('Repository/enableRepository', {repoId: request.data.id}, () => {
             resolve();
           });
@@ -515,8 +512,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'Repository/mountRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject:
-          () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('Repository/mountRepository', {kind: request.data.kind, id: request.data.id}, () => {
             resolve();
           });
@@ -525,8 +521,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
 
       case 'Repository/addRepository':
         port.postMessage({ id: request.id, data: await new Promise<any>(
-          (resolve: () => void, reject:
-          () => void) => {
+          (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
           socket.emit('Repository/addRepository',
             {repoId: request.data.id,
              parentId: request.data.parentId,
@@ -952,8 +947,7 @@ function synchronizeModels(): Promise<any> {
 //////////////////////////////////////////////////////////////////////////
 async function fetchMissingCacheInformation(missingCacheData){
   const requestTime = Date.now();
-  let promise = new Promise<any>((resolve: () => void, reject:
-  () => void) => {
+  let promise = new Promise<any>((resolve: (value?: any) => void, reject: (reason?: any) => void) => {
     socket.emit('Item/getMissingCacheInfo', {
       timestamp: {
         requestTime: requestTime
@@ -1039,8 +1033,7 @@ async function populateCache(): Promise<any> {
   //////////////////////////////////////////////////////////////////////////
   async function fetchItemCache() {
     console.log('$$$ Fetching Item Cache');
-    return new Promise<any>((resolve: () => void, reject:
-    () => void) => {
+    return new Promise<any>((resolve: (value?: any) => void, reject: (reason?: any) => void) => {
       socket.emit('Item/getItemCache', {
         timestamp: {
           requestTime: requestTime
@@ -1069,8 +1062,7 @@ async function populateCache(): Promise<any> {
     });
   }
 
-  return new Promise<any>(async (resolve: () => void, reject:
-    () => void) => {
+  return new Promise<any>(async (resolve: (value?: any) => void, reject: (reason?: any) => void) => {
     if (incrementalCacheLoad) {
       console.log('$$$ Calling fetchItemCache incremental');
       await fetchItemCache();

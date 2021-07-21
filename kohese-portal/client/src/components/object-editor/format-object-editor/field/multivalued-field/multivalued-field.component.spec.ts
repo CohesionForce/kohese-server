@@ -74,7 +74,7 @@ describe('MultivaluedFieldComponent', () => {
       TestBed.createComponent(MultivaluedFieldComponent);
     component = componentFixture.componentInstance;
 
-    let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
+    let treeConfiguration: TreeConfiguration = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config;
     let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
     component.koheseObject = modelProxy.item;

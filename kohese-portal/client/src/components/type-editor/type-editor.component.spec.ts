@@ -83,7 +83,7 @@ describe('Component: Type Editor', ()=>{
   });
 
   it('adds Structures', async () => {
-    let openComponentsDialogSpy: jasmine.Spy = spyOn(TestBed.get(
+    let openComponentsDialogSpy: jasmine.Spy = spyOn(TestBed.inject(
       DialogService), 'openComponentsDialog');
     let matDialogRefPlaceholder: MatDialogRef<ComponentDialogComponent> = {
       updateSize: (width: string, height: string) => {

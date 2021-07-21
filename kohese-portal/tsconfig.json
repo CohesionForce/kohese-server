@@ -13,7 +13,7 @@
     "removeComments": false,
     "noImplicitAny": false,
     "types": [
-      "core-js",
+      // "core-js",
       "socket.io",
       "socket.io-client",
       "node",
@@ -21,7 +21,7 @@
       "underscore",
       "jasmine",
       "jssha",
-      "sharedworker",
+      // "sharedworker",
     ],
     "typeRoots": [
       "./node_modules/@types"

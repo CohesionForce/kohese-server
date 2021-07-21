@@ -17,7 +17,7 @@
 
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { from } from 'rxjs/observable/from';
+import { from } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'

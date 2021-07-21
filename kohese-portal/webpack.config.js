@@ -16,6 +16,7 @@
 
 
 const path = require('path');
+const { flattenDiagnosticMessageText } = require('typescript');
 
 module.exports = {
   mode: 'development',
@@ -28,12 +29,38 @@ module.exports = {
         test: /\.ts?$/,
         use: 'ts-loader',
         exclude: [/node_modules/, /.+spec.ts$/ ]
-      }
+      },
+      { // sass / scss loader for webpack
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          'style-loader',
+          // Translates CSS into CommonJS
+          'css-loader',
+          // Resolves relative references for all linked assets to provide url rewriting
+          'resolve-url-loader',
+          {
+            // Compiles Sass to CSS
+            loader: 'sass-loader',
+            options: {
+              // Prefer `dart-sass`
+              implementation: require("sass"),
+              sassOptions: {
+                fiber: false
+              }
+            }
+          }
+        ],
+      },
     ]
   },
-  // devtool : 'inline-source-map',
   resolve: {
-    extensions: ['.ts', '.js' ]
+    extensions: ['.ts', '.js' ],
+    fallback: {
+      "buffer": false,
+      "util": false,
+      "assert": false
+    }
   },
   output: {
     filename: 'cache-bundle.js',

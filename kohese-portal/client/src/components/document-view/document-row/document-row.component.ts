@@ -48,7 +48,6 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   /* Variable Declarations */
   docReader: Parser;
   docWriter: HtmlRenderer;
-  upsertComplete: Subject<any> = new Subject();
   observationsPresent: boolean = false;
   private treeConfig;
   private treeConfigSub;
@@ -127,7 +126,6 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     if(proxy.dirty === true) {
       this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
         docInfo.proxy = newProxy;
-        this.upsertComplete.next();
       });
     }
     row.editable = false;

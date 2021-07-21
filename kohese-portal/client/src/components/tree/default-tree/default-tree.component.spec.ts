@@ -21,7 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 import { MaterialModule } from '../../../material.module';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

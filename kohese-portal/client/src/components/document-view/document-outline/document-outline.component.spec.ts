@@ -18,7 +18,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';

@@ -18,8 +18,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 
 import { MaterialModule } from '../../../material.module';

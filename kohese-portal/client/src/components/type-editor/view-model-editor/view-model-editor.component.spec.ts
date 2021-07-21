@@ -65,7 +65,7 @@ describe('ViewModelEditorComponent', () => {
       createComponent(ViewModelEditorComponent);
     component = componentFixture.componentInstance;
 
-    let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
+    let treeConfiguration: TreeConfiguration = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config;
     let koheseModelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
     component.dataModel = koheseModelProxy.item;

@@ -18,7 +18,7 @@
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
@@ -61,7 +61,7 @@ describe('Component: attribute-editor', ()=>{
 
     fixture = TestBed.createComponent(AttributeEditorComponent);
     component = fixture.componentInstance;
-    component.contextualGlobalType = TestBed.get(ItemRepository).
+    component.contextualGlobalType = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config.getProxyFor('KoheseModel').item;
 
     fixture.detectChanges();
