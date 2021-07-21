@@ -56,11 +56,11 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js' ],
-    // fallback: {
-    //   "buffer": false,
-    //   "util": false,
-    //   "assert": false
-    // }
+    fallback: {
+      "buffer": false,
+      "util": false,
+      "assert": false
+    }
   },
   output: {
     filename: 'cache-bundle.js',
