@@ -217,61 +217,45 @@ export class KDBRepo {
     // TODO Does 'HEAD' need to be a variable?
     var commitIdMap = {};
     var signature = nodegit.Signature.now(userName, eMail);
-    var promises = [];
-    async function commitARepo (repo, repositoryId, iIndex) {
-      promises.push(repo.getHeadCommit().then(function (commit) {
-        return repo.refreshIndex().then(function (index) {
-          return index.writeTree().then(function (treeId) {
-            let parentCommits = [];
-            if (commit) {
-              parentCommits.push(commit);
-            }
-            return repo.getStatusExt().then(function (statuses) {
-              let filePaths = [];
-              for (let j = 0; j < statuses.length; j++) {
-                let status = statuses[j];
-                if (status.inIndex()) {
-                  filePaths.push(status.path());
-                }
-              }
-              if (filePaths.length > 0) {
-                return repo.createCommit('HEAD', signature, signature, message,
-                  treeId, parentCommits).then(function (commitId) {
-                    commitIdMap[repositoryId] = {
-                      commitId: commitId,
-                      filesCommitted: filePaths
-                    };
-                    return repo.getCommit(commitId).then(function (c) {
-                      return Promise.resolve(true);
-                    }).catch(function (err) {
-                      console.log(err.stack);
-                    });
-                  }).catch(function (err) {
-                    console.log(err.stack);
-                  });
-              } else {
-                return Promise.resolve(true);
-              }
-            }).catch(function (err) {
-              console.log(err.stack);
-            });
-          }).catch(function (err) {
-            console.log(err.stack);
-          });
-        }).catch(function (err) {
-          console.log(err.stack);
-        });
-      }));
-    }
     for (let repositoryId in repoList) {
       var repo = repoList[repositoryId];
-      await commitARepo (repo, repositoryId, repositoryId)
+      try {
+        let commit = await repo.getHeadCommit();
+        let index = await repo.refreshIndex();
+        let treeId = await index.writeTree();
+        let parentCommits = [];
+        if (commit) {
+          parentCommits.push(commit);
+        }
+        let statuses = await repo.getStatusExt();
+        let filePaths = [];
+        for (let j = 0; j < statuses.length; j++) {
+          let status = statuses[j];
+          if (status.inIndex()) {
+            filePaths.push(status.path());
+          }
+        }
+        if (filePaths.length > 0) {
+          let commitId = await repo.createCommit('HEAD', signature, signature, message, treeId, parentCommits);
+          commitIdMap[repositoryId] = {
+            commitId: commitId,
+            filesCommitted: filePaths
+          };
+          let c = await repo.getCommit(commitId)
+          if (!c) {
+            console.log('*** Commit Not Sucessful');
+          }
+        } else {
+          console.log('))))) No File to Commit');
+        }
+      } catch (err) {
+        console.log('*** Error:  ' + err);
+        console.log(err.stack);
+      }
     }
 
-    return Promise.all(promises).then(function () {
       console.log('*** Commit Id map ', commitIdMap);
       return commitIdMap;
-    });
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -489,6 +473,8 @@ export class KDBRepo {
             itemId = undefined;
             if (path === 'Root.json') {
               itemId = KDBRepo.getMountId(repositoryId);
+            } else if (path.includes('KoheseModel') || path.includes('KoheseView') || path.includes('Namespace')) {
+              itemId = Path.basename(path, '.json')
             }
 
           }
@@ -549,6 +535,8 @@ export class KDBRepo {
               itemId = undefined;
               if (path === 'Root.json') {
                 itemId = repoId;
+              } else if (path.includes('KoheseModel') || path.includes('KoheseView') || path.includes('Namespace')) {
+                itemId = Path.basename(path, '.json')
               }
             }
           }
