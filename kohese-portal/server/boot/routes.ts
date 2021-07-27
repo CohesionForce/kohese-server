@@ -19,6 +19,7 @@
  * Created by josh on 9/8/15.
  */
 module.exports = function (app) {
+    require('dotenv').config();
     var jwt = require('jsonwebtoken');
     var jwtSecret = 'ij2ijo32iro2i3jrod111223';
     var expressJwt = require('express-jwt');
@@ -93,9 +94,7 @@ module.exports = function (app) {
           }
 
           console.log('::: Authenticated: ' + user.name + ' - ' + user.description);
-          var token = jwt.sign({
-            username: req.body.username
-          }, jwtSecret);
+          var token = jwt.sign({ username: req.body.username }, process.env.ACCESS_TOKEN_SECRET);
           res.send(token);
         });
     }
@@ -105,8 +104,8 @@ module.exports = function (app) {
       console.log('Request: ' + req.url);
       console.log('Method:  ' + req.method);
       console.log('Query:   ' + util.inspect(req.query,false,null));
-//      console.log('Headers:  ');
-//      console.log(req.headers);
+      // console.log('Headers:  ');
+      // console.log(req.headers);
 
       // check to see if the authorization header is missing, but an auth_token was provided
 
@@ -121,10 +120,11 @@ module.exports = function (app) {
       next();
     });
 
-    app.use(expressJwt({secret: jwtSecret}).unless({path: ngRoutes}));
+    var expressJwtConstructor = expressJwt({secret: process.env.ACCESS_TOKEN_SECRET, algorithms: ['sha1', 'RS256', 'HS256']})
+    app.use(expressJwtConstructor.unless({path: ngRoutes}));
 
     function decodeAuthToken(authToken){
-      var decodedToken = jwt.verify(authToken, jwtSecret);
+      var decodedToken = jwt.verify(authToken, process.env.ACCESS_TOKEN_SECRET);
       return decodedToken;
     }
     module.exports.decodeAuthToken = decodeAuthToken;
@@ -134,7 +134,15 @@ module.exports = function (app) {
 
       if (authHeader) {
         var header = authHeader.replace('Bearer ', '');
-        req.headers.koheseUser = jwt.verify(header, jwtSecret);
+        var koheseUserHeader = req.headers.koheseUser;
+        koheseUserHeader = jwt.verify(header, process.env.ACCESS_TOKEN_SECRET, (err, koheseUserHeader) => {
+          if (err) {
+            console.log('!!! koheseUserHeader: %s is unverified', koheseUserHeader);
+            console.log('!!! request authorization header error: %s', err);
+            // status: token is no longer valid; user does not have access
+            return res.sendStatus(403);
+          }
+        });
       } else {
         console.log('*** Authorization header is missing');
       }

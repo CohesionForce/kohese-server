@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2016",
     "allowJs": false,
     "outDir": "../build/",
     "module": "commonjs",
@@ -21,13 +21,13 @@
       "underscore",
       "jasmine",
       "jssha",
-      // "sharedworker",
     ],
     "typeRoots": [
       "../node_modules/@types"
     ],
     "lib": [
       "es2016",
+      "ES2020",
       "dom"
     ]
   },

@@ -139,7 +139,8 @@ function hasPassword(proxy, plainPassword, fn) {
 function hashPassword(plainPassword) {
   validatePassword(plainPassword);
   var salt = bcrypt.genSaltSync(SALT_WORK_FACTOR);
-  return bcrypt.hashSync(plainPassword, salt);
+  var hash = bcrypt.hashSync(plainPassword, salt);
+  return hash;
 }
 module.exports.hashPassword = hashPassword;
 
