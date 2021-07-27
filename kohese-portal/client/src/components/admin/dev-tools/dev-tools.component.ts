@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+
 // Angular
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
 // NPM

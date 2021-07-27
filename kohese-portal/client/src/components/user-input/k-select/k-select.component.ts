@@ -15,7 +15,12 @@
  */
 
 
+// Angular
 import { Component, Input } from '@angular/core';
+
+// NPM
+
+// Kohese
 import { UserInput } from '../user-input.class';
 
 @Component({

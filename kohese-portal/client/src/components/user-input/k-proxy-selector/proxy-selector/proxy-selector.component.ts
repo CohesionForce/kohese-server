@@ -15,14 +15,19 @@
  */
 
 
-import { map, startWith} from 'rxjs/operators';
+// Angular
 import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy } from '@angular/core';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { map, startWith} from 'rxjs/operators';
+
+// NPM
+
+// Kohese
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
-import { FormControl } from '@angular/forms';
-import { MatAutocompleteSelectedEvent } from '@angular/material';
-import { Subscription } from 'rxjs';
 
 interface RelationInfo {
   proxy: ItemProxy;

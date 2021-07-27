@@ -15,10 +15,14 @@
  */
 
 
+// Angular
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input,
   OnInit, Optional, QueryList, ViewChildren } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
+// NPM
+
+// Kohese
 import { FormatContainer, FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
 import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';

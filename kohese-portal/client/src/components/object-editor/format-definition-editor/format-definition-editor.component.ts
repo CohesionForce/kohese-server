@@ -15,14 +15,15 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
-  Input, OnInit } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, OnInit } from '@angular/core';
 
+// NPM
+
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
-import { FormatContainer,
-  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { FormatContainer, FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';

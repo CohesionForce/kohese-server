@@ -15,8 +15,13 @@
  */
 
 
-import { Subject ,  Subscription, BehaviorSubject } from 'rxjs';
+// Angular
 import { Injectable } from "@angular/core";
+import { Subscription, BehaviorSubject } from 'rxjs';
+
+// NPM
+
+// Kohese
 import { KLogger, LoggingEventRecord } from "../../../../common/src/k-logger";
 
 export interface LogCategory {

@@ -15,20 +15,23 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-         ViewChild, ViewChildren, QueryList } from '@angular/core';
+         ViewChildren, QueryList } from '@angular/core';
+import { MatExpansionPanel } from '@angular/material/expansion';
 
+// NPM
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { SessionService } from '../../../services/user/session.service';
-import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DetailsComponent } from '../details.component';
-import { MatExpansionPanel, MatAccordion, MatExpansionPanelActionRow, MatExpansionModule } from '@angular/material'
-
 
 // TODO: Change Component to use selectedOrdering instead of exporting enumeration with Ordering getter
 export enum JournalOrdering {

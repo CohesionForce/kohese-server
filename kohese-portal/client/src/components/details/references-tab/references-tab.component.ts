@@ -15,14 +15,15 @@
  */
 
 
+// Angular
 import { Component, Input, ChangeDetectionStrategy, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-
-import { NavigationService } from '../../../services/navigation/navigation.service';
-import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
-
-import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { MatTableDataSource } from '@angular/material/table';
 import { Subscription, Observable } from 'rxjs';
-import { MatTableDataSource } from '@angular/material';
+
+// NPM
+
+// Kohese
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'references-tab',

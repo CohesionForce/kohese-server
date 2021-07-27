@@ -15,14 +15,16 @@
  */
 
 
-import { JwtHelperService } from '@auth0/angular-jwt';
-
-import {mergeMap} from 'rxjs/operators';
+// Angular
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
-
 import { BehaviorSubject } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
+
+// NPM
+import { JwtHelperService } from '@auth0/angular-jwt';
+
+// Kohese
 import { CurrentUserService } from '../user/current-user.service';
 
 @Injectable()

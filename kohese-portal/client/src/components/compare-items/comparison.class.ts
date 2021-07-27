@@ -15,8 +15,13 @@
  */
 
 
+// Angular
+
+// NPM
 import * as JsDiff from 'diff';
 import * as jsSHA_Import from 'jssha';
+
+// Kohese
 
 //
 // Adjust for the differences in CommonJS and ES6 for jssha

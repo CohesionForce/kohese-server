@@ -15,14 +15,16 @@
  */
 
 
-import { Injectable } from '@angular/core'
-
-import { ItemProxy } from '../../../../common/src/item-proxy.js';
-
-import { ItemRepository } from '../item-repository/item-repository.service';
-
-import * as _ from 'underscore';
+// Angular
+import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs';
+
+// NPM
+import * as _ from 'underscore';
+
+// Kohese
+import { ItemProxy } from '../../../../common/src/item-proxy.js';
+import { ItemRepository } from '../item-repository/item-repository.service';
 
 @Injectable()
 export class AnalysisService {

@@ -15,12 +15,16 @@
  */
 
 
-
-import {tap} from 'rxjs/operators';
-import { EventEmitter, Output, Input } from '@angular/core';
-import { ChangeDetectorRef } from '@angular/core';
-import { KoheseType } from '../../../classes/UDT/KoheseType.class';
+// Angular
+import { Component, OnInit, OnDestroy, EventEmitter, Output, Input, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Observable ,  Subscription } from 'rxjs';
+import {tap} from 'rxjs/operators';
+
+// NPM
+
+// Kohese
+import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Image, DisplayableEntity, Action, ActionGroup } from '../tree-row/tree-row.component';
 import { ReportSpecificationComponent, ReportSpecifications } from '../../reports/report-specification/report-specification.component';
@@ -33,8 +37,6 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { ActivatedRoute } from '@angular/router';
-import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Tree, TargetPosition } from '../tree.class';
 import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';

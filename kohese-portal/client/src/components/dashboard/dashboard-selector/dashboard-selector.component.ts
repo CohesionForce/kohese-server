@@ -15,10 +15,14 @@
  */
 
 
+// Angular
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { ItemProxy } from '../../../../../common/src/item-proxy';
 
+// NPM
+
+// Kohese
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 // Used to determine specific component dashboard being loaded
 export enum DashboardSelections {

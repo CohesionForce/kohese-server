@@ -15,11 +15,14 @@
  */
 
 
+// Angular
 import { ChangeDetectorRef, Input } from '@angular/core';
 
+// NPM
+
+// Kohese
 import { Attribute } from '../../../../../../common/src/Attribute.interface';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../../../common/src/FormatDefinition.interface';
+import { FormatDefinition, FormatDefinitionType } from '../../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../../../common/src/KoheseModel';
 import { KoheseDataModel, KoheseViewModel } from '../../../../../../common/src/KoheseModel.interface';
@@ -30,8 +33,7 @@ import { TreeComponent } from '../../../../components/tree/tree.component';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../../services/user/session.service';
-import { FormatContainer,
-  FormatContainerKind } from '../../../../../../common/src/FormatContainer.interface';
+import { FormatContainer, FormatContainerKind } from '../../../../../../common/src/FormatContainer.interface';
 
 /**
  * Displays an attribute based on the given PropertyDefinition

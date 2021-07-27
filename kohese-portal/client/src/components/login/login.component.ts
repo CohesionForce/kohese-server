@@ -15,9 +15,13 @@
  */
 
 
+// Angular
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
+// NPM
+
+// Kohese
 import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DialogService } from '../../services/dialog/dialog.service';

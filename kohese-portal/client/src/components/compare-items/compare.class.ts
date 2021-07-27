@@ -15,6 +15,12 @@
  */
 
 
+// Angular
+
+// NPM
+import * as _ from 'underscore';
+
+// Kohese
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { Comparison, ChangeType } from './comparison.class';
 import { ItemProxyComparison } from './item-proxy-comparison.class';
@@ -22,7 +28,7 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { ItemCache } from '../../../../common/src/item-cache';
 import { TreeHashMap, TreeHashEntryDifference, TreeHashMapDifference, ItemIdType } from '../../../../common/src/tree-hash';
-import * as _ from 'underscore';
+
 
 export class Compare {
 

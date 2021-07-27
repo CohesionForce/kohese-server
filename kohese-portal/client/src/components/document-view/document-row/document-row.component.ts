@@ -15,23 +15,28 @@
  */
 
 
+// Angular
 import { ChangeDetectorRef, EventEmitter, Output, Input, AfterViewInit,
   Component, OnInit, OnDestroy, ElementRef, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatMenuTrigger } from '@angular/material/menu'
 import { Subject } from 'rxjs';
+
+// NPM
+import { Parser, HtmlRenderer } from 'commonmark';
+import * as commonmark from 'commonmark';
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DetailsComponent } from '../../details/details.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { DocumentInfo } from '../document-view.component';
-import { Parser, HtmlRenderer } from 'commonmark';
-import * as commonmark from 'commonmark';
 import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
-import { MatDialog, MatDialogConfig, MatExpansionPanel, MatMenuTrigger } from '@angular/material';
 import { NavigationService } from "../../../services/navigation/navigation.service";
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { SessionService } from '../../../services/user/session.service';
-import { JournalComponent, JournalOrdering } from '../../details/journal/journal.component';
 
 @Component({
   selector: 'document-row',

@@ -16,11 +16,10 @@
 
 
 // Angular
-
 import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
 
 // NPM
-import { BehaviorSubject ,  Subscription } from 'rxjs';
 
 // Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

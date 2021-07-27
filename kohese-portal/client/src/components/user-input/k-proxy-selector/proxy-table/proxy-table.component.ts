@@ -15,14 +15,18 @@
  */
 
 
+// Angular
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Observable ,  Subscription } from 'rxjs';
+
+// NPM
+
+// Kohese
 import { DetailsComponent } from './../../../details/details.component';
 import { DialogService } from './../../../../services/dialog/dialog.service';
-import { ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { Observable ,  Subscription } from 'rxjs';
 import { ItemRepository } from './../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from './../../../../../../common/src/item-proxy';
-import { Component, OnInit, Input } from '@angular/core';
-import { trigger, state, style, transition, animate } from '@angular/animations';
 import { TreeConfiguration } from './../../../../../../common/src/tree-configuration';
 
 @Component({

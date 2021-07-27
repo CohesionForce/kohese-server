@@ -15,9 +15,13 @@
  */
 
 
+// Angular
 import { Input, Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
+// NPM
+
+// Kohese
 import { UserInput } from '../user-input.class';
 import { MarkdownCheatSheetComponent } from './markdown-cheat-sheet.component';
 import { DialogService } from '../../../services/dialog/dialog.service';

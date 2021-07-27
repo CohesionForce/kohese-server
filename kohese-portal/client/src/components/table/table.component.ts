@@ -17,7 +17,7 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, ViewChild, ElementRef} from '@angular/core';
-import { Sort } from '@angular/material';
+import { Sort } from '@angular/material/sort';
 
 // NPM
 

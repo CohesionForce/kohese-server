@@ -15,7 +15,12 @@
  */
 
 
+// Angular
 import { Component } from '@angular/core';
+
+// NPM
+
+// Kohese
 
 @Component({
   selector : 'markdown-cheat',

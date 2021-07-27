@@ -15,11 +15,14 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, Optional, Inject,
-  ChangeDetectorRef, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
+// Angular
+import { Component, Optional, Inject, ChangeDetectorRef, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
 
+// NPM
+
+// Kohese
 import { Filter, FilterCriteriaConnection } from './filter.class';
 
 @Component({

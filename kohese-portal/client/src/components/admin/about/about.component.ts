@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+
 // Angular
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
 // NPM

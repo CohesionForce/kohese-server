@@ -19,9 +19,9 @@
 // Angular
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
 
 // NPM
-import { Subscription } from 'rxjs';
 import * as Uuid from 'uuid';
 
 // Kohese

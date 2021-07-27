@@ -15,11 +15,15 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
+  Optional, Inject, Input } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+// NPM
 import { ToastrService } from 'ngx-toastr';
 
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { NotificationService } from '../../../services/notifications/notification.service';

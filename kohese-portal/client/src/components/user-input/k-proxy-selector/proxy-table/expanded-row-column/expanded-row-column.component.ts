@@ -15,10 +15,14 @@
  */
 
 
-import { PropertyDefinition } from '../../../../../../../common/src/PropertyDefinition.interface';
+// Angular
+import { Component, OnInit, Input } from '@angular/core';
+
+// NPM
+
+// Kohese
 import { DynamicTypesService } from './../../../../../services/dynamic-types/dynamic-types.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
-import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'expanded-row-column',

@@ -18,16 +18,15 @@
 // Angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { NavigationService } from '../../services/navigation/navigation.service';
+import { Subscription ,  BehaviorSubject } from 'rxjs';
 
 // NPM
-import { Subscription ,  BehaviorSubject } from 'rxjs';
 
 // Kohese
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { CurrentUserService } from './../../services/user/current-user.service';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
-import { SessionService } from '../../services/user/session.service';
+import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DashboardSelections, DashboardSelectionInfo, DashboardTypes } from './dashboard-selector/dashboard-selector.component';
 import { ProjectInfo, ProjectService } from '../../services/project-service/project.service';

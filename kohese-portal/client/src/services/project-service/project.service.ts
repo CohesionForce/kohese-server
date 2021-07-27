@@ -15,11 +15,16 @@
  */
 
 
+// Angular
 import { Injectable } from "@angular/core";
+import { Subscription } from "rxjs";
+
+// NPM
+
+// Kohese
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from "../item-repository/item-repository.service";
-import { Subscription, Subject } from "rxjs";
 
 export interface ProjectInfo {
   proxy: ItemProxy,

@@ -15,11 +15,15 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, ViewChildren,
   QueryList, Input, OnInit, OnDestroy } from '@angular/core';
-import { MatExpansionPanel } from '@angular/material';
+import { MatExpansionPanel } from '@angular/material/expansion';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
+// NPM
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { CompareItemsComponent } from '../item-comparison/compare-items.component';
 import { Comparison, Property } from '../comparison.class';

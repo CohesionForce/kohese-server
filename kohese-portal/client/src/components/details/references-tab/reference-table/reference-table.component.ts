@@ -15,14 +15,17 @@
  */
 
 
+// Angular
 import { Component, Input, OnInit, ViewChild, ViewChildren, QueryList } from "@angular/core";
+
+// NPM
+
+// Kohese
 import { ReferenceTableInfo } from "../references-tab.component";
 import { NavigationService } from "../../../../services/navigation/navigation.service";
-import { NavigatableComponent } from "../../../../classes/NavigationComponent.class";
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../../details/details.component';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
-import { MatMenuTrigger } from "@angular/material";
 
 @Component({
   selector: "reference-table",

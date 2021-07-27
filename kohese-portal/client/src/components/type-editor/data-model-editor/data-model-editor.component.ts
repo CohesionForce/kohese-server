@@ -18,7 +18,7 @@
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   ViewChild, Output, EventEmitter, ElementRef } from '@angular/core';
-import { MatTable } from '@angular/material';
+import { MatTable } from '@angular/material/table';
 
 // NPM
 import * as Uuid from 'uuid';

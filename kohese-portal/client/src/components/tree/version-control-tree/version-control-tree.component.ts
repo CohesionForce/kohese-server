@@ -16,13 +16,13 @@
 
 
 // Angular
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-
-// NPM
 import { Observable ,  Subscription } from 'rxjs';
 import {tap} from 'rxjs/operators';
+
+// NPM
 import { ToastrService } from 'ngx-toastr';
 
 // Kohese

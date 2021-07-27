@@ -15,22 +15,24 @@
  */
 
 
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-
-import { AnalysisViewComponent, AnalysisFilter, AnalysisViews } from '../AnalysisViewComponent.class';
-import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
-import { NavigationService } from '../../../services/navigation/navigation.service';
-
-import { ItemProxy } from '../../../../../common/src/item-proxy'
+// Angular
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter,
+  ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { MatTableDataSource } from '@angular/material';
 import { BehaviorSubject ,  Subscription ,  Observable } from 'rxjs';
+
+// NPM
+
+// Kohese
+import { AnalysisViewComponent, AnalysisFilter, AnalysisViews } from '../AnalysisViewComponent.class';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
-import * as $ from 'jquery';
-import { FormControl } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material';
 @Component({
   selector: 'term-view',
   templateUrl : './term-view.component.html',

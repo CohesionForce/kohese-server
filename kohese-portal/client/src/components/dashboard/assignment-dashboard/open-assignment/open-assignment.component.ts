@@ -15,8 +15,13 @@
  */
 
 
+// Angular
+import { Component, Input, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, OnInit } from '@angular/core';
+
+// NPM
+
+// Kohese
 import { DialogService } from './../../../../services/dialog/dialog.service';
-import { Component, Input, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, OnInit } from '@angular/core'
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { AssignmentCard } from '../AssignmentCard.class';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';

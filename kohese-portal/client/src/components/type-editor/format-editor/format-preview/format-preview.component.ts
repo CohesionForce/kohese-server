@@ -15,8 +15,13 @@
  */
 
 
-import { MAT_DIALOG_DATA } from '@angular/material';
-import { Component, OnInit, Optional, Inject, ElementRef } from '@angular/core';
+// Angular
+import { Component, OnInit, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+// NPM
+
+// Kohese
 import { FormatDefinition } from '../../../../../../common/src/FormatDefinition.interface';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 

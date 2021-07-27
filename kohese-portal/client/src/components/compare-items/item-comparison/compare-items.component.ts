@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-
-import {
-  Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
-  ChangeDetectorRef
-  } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
+// Angular
+import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
 
+// NPM
+
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';

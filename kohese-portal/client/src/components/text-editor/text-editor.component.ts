@@ -18,7 +18,7 @@
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
          Inject, Input, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 // NPM
 import { EditorComponent } from '@tinymce/tinymce-angular';

@@ -15,11 +15,15 @@
  */
 
 
+// Angular
+import { Component, OnInit, Input } from '@angular/core';
+
+// NPM
+
+// Kohese
 import { MarkdownCheatSheetComponent } from './../markdown-cheat-sheet.component';
 import { PropertyDefinition } from '../../../../../../common/src/PropertyDefinition.interface';
-import { Input } from '@angular/core';
 import { ItemProxy } from './../../../../../../common/src/item-proxy';
-import { Component, OnInit } from '@angular/core';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 
 @Component({

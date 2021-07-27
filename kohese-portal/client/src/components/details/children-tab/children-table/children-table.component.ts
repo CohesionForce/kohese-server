@@ -15,15 +15,18 @@
  */
 
 
-import { Component, OnInit, OnDestroy, Input, EventEmitter, OnChanges,
-  ChangeDetectionStrategy, ChangeDetectorRef, ViewChild } from '@angular/core';
+// Angular
+import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { Subscription, BehaviorSubject } from 'rxjs';
 
-import { NavigatableComponent } from '../../../../classes/NavigationComponent.class'
+// NPM
+
+// Kohese
+import { NavigatableComponent } from '../../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { Subscription, BehaviorSubject, Observable } from 'rxjs';
-import { MatMenuTrigger, MatTableDataSource } from '@angular/material'
 import { DetailsComponent } from '../../../details/details.component';
 
 @Component({

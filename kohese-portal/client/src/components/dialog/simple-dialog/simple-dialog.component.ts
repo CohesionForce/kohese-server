@@ -15,9 +15,12 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
-  Input } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 
+// NPM
+
+// Kohese
 import { Dialog } from '../Dialog.interface';
 
 @Component({

@@ -18,11 +18,11 @@
 // Angular
 import { ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
+import {tap} from 'rxjs/operators';
 
 // NPM
 import { VirtualScrollComponent } from 'angular2-virtual-scroll';
-import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
-import {tap} from 'rxjs/operators';
 
 // Kohese
 import { DialogService } from '../../services/dialog/dialog.service';

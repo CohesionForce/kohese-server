@@ -15,10 +15,14 @@
  */
 
 
+// Angular
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { ComponentType } from '@angular/cdk/portal';
 
+// NPM
+
+// Kohese
 import { SimpleDialogComponent } from '../../components/dialog/simple-dialog/simple-dialog.component';
 import { InputDialogComponent, InputDialogKind, KindInputDialogConfiguration,
   DropdownDialogConfiguration } from '../../components/dialog/input-dialog/input-dialog.component';

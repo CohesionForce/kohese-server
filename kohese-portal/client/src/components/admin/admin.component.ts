@@ -17,12 +17,12 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy,
-         ViewChild, ViewChildren, QueryList } from '@angular/core';
-import { MatExpansionPanel } from '@angular/material';
+         ViewChildren, QueryList } from '@angular/core';
+import { MatExpansionPanel } from '@angular/material/expansion';
 import { Title } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
 
 // NPM
-import { Subscription } from 'rxjs';
 
 // Kohese
 import { SessionService } from '../../services/user/session.service';

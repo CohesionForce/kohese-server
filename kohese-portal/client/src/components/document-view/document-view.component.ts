@@ -19,24 +19,23 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy,
          ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Router, NavigationEnd } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
 
 // NPM
 import { Parser, HtmlRenderer } from 'commonmark';
 import * as commonmark from 'commonmark';
-import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
 
 // Kohese
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { DialogService } from '../../services/dialog/dialog.service';
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
+import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';
-import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { Router, NavigationEnd } from '@angular/router';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 
 export interface DocumentInfo {

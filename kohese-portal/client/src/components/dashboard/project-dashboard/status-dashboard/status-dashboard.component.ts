@@ -17,11 +17,11 @@
 
 // Angular
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
 import { Title } from '@angular/platform-browser';
+import { Observable ,  Subscription } from 'rxjs';
 
 // NPM
-import { Observable ,  Subscription } from 'rxjs';
 
 // Kohese
 import { StateInfo, StateFilterService } from '../../state-filter.service';
@@ -30,7 +30,6 @@ import { DialogService } from './../../../../services/dialog/dialog.service';
 import { ItemProxy } from './../../../../../../common/src/item-proxy';
 import { DynamicTypesService } from './../../../../services/dynamic-types/dynamic-types.service';
 import { ProjectInfo } from './../../../../services/project-service/project.service';
-import { StateService } from '../../../../services/state/state.service';
 
 @Component({
   selector: 'status-dashboard',

@@ -15,10 +15,13 @@
  */
 
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, QueryList,
-  ViewChildren } from '@angular/core';
-import { MatExpansionPanel } from '@angular/material';
+// Angular
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, QueryList, ViewChildren } from '@angular/core';
+import { MatExpansionPanel } from '@angular/material/expansion';
 
+// NPM
+
+// Kohese
 import { Attribute } from '../../../../../../../common/src/Attribute.interface';
 import { ItemProxy } from '../../../../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../../../../common/src/KoheseModel';

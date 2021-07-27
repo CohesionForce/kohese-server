@@ -15,7 +15,12 @@
  */
 
 
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+// Angular
+import { Component } from '@angular/core';
+
+// NPM
+
+// Kohese
 
 @Component({
   selector: 'navigator',

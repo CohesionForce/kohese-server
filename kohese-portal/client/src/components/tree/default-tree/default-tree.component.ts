@@ -17,12 +17,12 @@
 
 
 // Angular
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
 // NPM
-import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
+import { Observable ,  Subscription } from 'rxjs';
 import {tap} from 'rxjs/operators';
 
 // Kohese
@@ -30,7 +30,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';

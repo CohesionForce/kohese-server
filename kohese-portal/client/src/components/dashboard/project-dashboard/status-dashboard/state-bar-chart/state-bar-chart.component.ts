@@ -15,22 +15,19 @@
  */
 
 
+// Angular
+import { Component, AfterViewInit, ViewChild, ElementRef, Input } from '@angular/core';
+import { Subscription, BehaviorSubject } from 'rxjs';
+
+// NPM
+import * as d3 from 'd3';
+
+// Kohese
 import { StateSummaryDialogComponent } from './state-summary-dialog/state-summary-dialog.component';
 import { DialogService } from './../../../../../services/dialog/dialog.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
-import { Subscription, BehaviorSubject } from 'rxjs';
-import {
-  Component,
-  AfterViewInit,
-  ViewChild,
-  ElementRef,
-  Input
-} from '@angular/core';
-import * as d3 from 'd3';
-import {
-  ProjectInfo
-} from '../../../../../services/project-service/project.service';
+import { ProjectInfo } from '../../../../../services/project-service/project.service';
 
 @Component({
   selector: 'state-bar-chart',

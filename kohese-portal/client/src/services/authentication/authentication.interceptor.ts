@@ -15,9 +15,14 @@
  */
 
 
+// Angular
 import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+// NPM
+
+// Kohese
 import { AuthenticationService } from './authentication.service';
 
 @Injectable()

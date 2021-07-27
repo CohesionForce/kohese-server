@@ -15,15 +15,19 @@
  */
 
 
-import { Component, OnInit, OnDestroy, Input, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+// Angular
+import { Component, OnInit, OnDestroy, Input, EventEmitter,
+  ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
 
-import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
+// NPM
+
+// Kohese
+import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
 
 @Component({
   selector : 'children-tab',

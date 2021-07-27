@@ -15,23 +15,24 @@
  */
 
 
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+// Angular
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter,
+  ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
 import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
+
+// NPM
 import * as Mark from 'mark.js';
 
+// Kohese
 import { AnalysisViewComponent, AnalysisFilter, AnalysisViews, DataFormat } from '../AnalysisViewComponent.class';
-import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-
-import { ItemProxy } from '../../../../../common/src/item-proxy'
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
-import { MatTableDataSource } from '@angular/material';
-
-import * as $ from 'jquery';
 
 @Component({
   selector: 'sentence-view',

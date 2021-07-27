@@ -15,12 +15,14 @@
  */
 
 
-import { Component, Input, OnInit, OnDestroy } from "@angular/core";
-import { LensService, ApplicationLens } from "../../services/lens-service/lens.service";
+// Angular
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
-import { ItemProxy } from '../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+// NPM
+
+// Kohese
+import { LensService, ApplicationLens } from "../../services/lens-service/lens.service";
 import { ItemRepository, RepoStates } from "../../services/item-repository/item-repository.service";
 
 @Component({

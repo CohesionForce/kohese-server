@@ -15,7 +15,12 @@
  */
 
 
+// Angular
 import { Injectable } from '@angular/core';
+
+// NPM
+
+// Kohese
 
 @Injectable()
 export class DataProcessingService {

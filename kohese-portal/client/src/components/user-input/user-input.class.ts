@@ -15,8 +15,13 @@
  */
 
 
-import { Inject, Input } from '@angular/core';
+// Angular
+import { Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+
+// NPM
+
+// Kohese
 
 export class UserInput {
   @Input()

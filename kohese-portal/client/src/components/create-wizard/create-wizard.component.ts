@@ -16,10 +16,10 @@
 
 // Angular
 import { Component, OnInit, Input, Optional, Inject, ViewChild, ElementRef} from '@angular/core';
-import { MAT_DIALOG_DATA, MatStepper, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { BehaviorSubject } from 'rxjs';
 
 //NPM
-import { BehaviorSubject } from 'rxjs';
 
 // Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
@@ -30,7 +30,6 @@ import { FormatObjectEditorComponent } from '../object-editor/format-object-edit
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-
 
 @Component({
   selector: 'create-wizard',

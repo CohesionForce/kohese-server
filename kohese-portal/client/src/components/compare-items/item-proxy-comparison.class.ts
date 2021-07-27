@@ -15,6 +15,11 @@
  */
 
 
+// Angular
+
+// NPM
+
+// Kohese
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';
 import { Comparison, Property } from './comparison.class';

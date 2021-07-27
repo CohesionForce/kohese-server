@@ -15,9 +15,13 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, Input,
-  Output, EventEmitter } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
+  OnInit, Input, Output, EventEmitter } from '@angular/core';
 
+// NPM
+
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
 import { MarkdownCheatSheetComponent } from '../user-input/k-markdown/markdown-cheat-sheet.component';
 

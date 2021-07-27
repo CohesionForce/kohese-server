@@ -19,7 +19,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   Optional, Inject, OnInit, Output, EventEmitter, ViewChild,
   AfterViewInit, ElementRef} from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 // NPM
 

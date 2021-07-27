@@ -15,12 +15,15 @@
  */
 
 
-import { Component, OnInit, OnDestroy, Input, Output, Inject, Optional } from '@angular/core';
+// Angular
+import { Component, OnInit, OnDestroy, Inject, Optional } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-import { ItemProxy } from '../../../../../../common/src/item-proxy';
+// NPM
 import * as $ from 'jquery'
 
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+// Kohese
+import { ItemProxy } from '../../../../../../common/src/item-proxy';
 
 @Component({
   selector: 'proxy-selector-dialog',

@@ -18,10 +18,10 @@
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, Input, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 
 // NPM
-import { Subscription } from 'rxjs';
 import { MarkdownService } from 'ngx-markdown';
 
 // Kohese
@@ -35,12 +35,9 @@ import { TextEditorComponent } from '../text-editor/text-editor.component';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { AttributeInsertionComponent, AttributeInsertionSpecification,
-  InsertionLocation,
-  HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
-import { ReportSpecificationComponent,
-  ReportSpecifications } from '../reports/report-specification/report-specification.component';
-import { MergeComponent, Difference,
-  VersionSelection } from '../merge/merge.component';
+  InsertionLocation, HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
+import { ReportSpecificationComponent, ReportSpecifications } from '../reports/report-specification/report-specification.component';
+import { MergeComponent, Difference, VersionSelection } from '../merge/merge.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { LocationMap } from '../../constants/LocationMap.data';

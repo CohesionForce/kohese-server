@@ -15,9 +15,12 @@
  */
 
 
-import { Component, OnInit, Input, ChangeDetectionStrategy,
-  ChangeDetectorRef } from '@angular/core';
+// Angular
+import { Component, OnInit, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
+// NPM
+
+// Kohese
 import { TreeRow } from './tree-row.class';
 
 @Component({

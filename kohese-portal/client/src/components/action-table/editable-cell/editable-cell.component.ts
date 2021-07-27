@@ -15,8 +15,13 @@
  */
 
 
-import { Input, Component, OnInit, OnDestroy, OnChanges, SimpleChange, SimpleChanges } from '@angular/core';
+// Angular
+import { Input, Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { Observable ,  Subscription } from 'rxjs';
+
+// NPM
+
+// Kohese
 
 @Component({
   selector: 'editable-cell',
