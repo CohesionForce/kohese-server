@@ -15,13 +15,16 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+
+// NPM
 import { of } from 'rxjs';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 
+// Kohese
 import { MaterialModule } from '../../../material.module';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';

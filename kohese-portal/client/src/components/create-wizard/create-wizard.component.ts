@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-
-import { Component, OnInit, Input, Optional, Inject,
-  ViewChild } from '@angular/core';
+// Angular
+import { Component, OnInit, Input, Optional, Inject, ViewChild, ElementRef} from '@angular/core';
 import { MAT_DIALOG_DATA, MatStepper, MatDialogRef } from '@angular/material';
 
+//NPM
+import { BehaviorSubject } from 'rxjs';
+
+// Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { SessionService } from '../../services/user/session.service';
@@ -27,7 +30,7 @@ import { FormatObjectEditorComponent } from '../object-editor/format-object-edit
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { BehaviorSubject } from 'rxjs';
+
 
 @Component({
   selector: 'create-wizard',
@@ -55,7 +58,7 @@ export class CreateWizardComponent extends NavigatableComponent
     return this._proxyPlaceholderStream;
   }
 
-  @ViewChild('formatObjectEditor')
+  @ViewChild('formatObjectEditor', {static: false}) 'formatObjectEditor' !: ElementRef;
   private _formatObjectEditor: FormatObjectEditorComponent;
 
   get FormatDefinitionType() {

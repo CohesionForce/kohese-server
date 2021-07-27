@@ -80,7 +80,7 @@ export interface DocumentInfo {
 export class DocumentViewComponent extends NavigatableComponent
 implements OnInit, OnDestroy {
   /* UI Toggles */
-  @ViewChild('docView') docView: ElementRef;
+  @ViewChild('docView', {static: false}) docView: ElementRef;
 
   /* Data */
   proxyTitle: string = '';

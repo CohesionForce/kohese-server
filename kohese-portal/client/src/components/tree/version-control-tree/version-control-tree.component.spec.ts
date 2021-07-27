@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
+
+// NPM
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { ToastrModule } from 'ngx-toastr';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
+// Kohese
 import { MaterialModule } from '../../../material.module';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';

@@ -15,14 +15,17 @@
  */
 
 
-import { TestBed, ComponentFixture, fakeAsync,
-  tick } from '@angular/core/testing';
+// Angular
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
-import { VirtualScrollModule } from 'angular2-virtual-scroll';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+// NPM
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
+import { BehaviorSubject } from 'rxjs';
+
+// Kohese
 import { MaterialModule } from '../../../material.module';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';

@@ -15,30 +15,29 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  ViewChild, Output, EventEmitter } from '@angular/core';
+  ViewChild, Output, EventEmitter, ElementRef } from '@angular/core';
 import { MatTable } from '@angular/material';
+
+// NPM
 import * as Uuid from 'uuid';
 
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { AttributeEditorComponent } from '../attribute-editor/attribute-editor.component';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
-import { FormatContainer,
-  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { FormatContainer, FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
-import { InputDialogKind,
-  InputDialogComponent } from '../../dialog/input-dialog/input-dialog.component';
+import { InputDialogKind, InputDialogComponent } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { Type, Metatype } from '../../../../../common/src/Type.interface';
-import { KoheseDataModel,
-  KoheseViewModel } from '../../../../../common/src/KoheseModel.interface';
-import { Enumeration,
-  EnumerationValue } from '../../../../../common/src/Enumeration.interface';
+import { KoheseDataModel, KoheseViewModel } from '../../../../../common/src/KoheseModel.interface';
+import { Enumeration, EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 
 @Component({
   selector: 'data-model-editor',
@@ -182,7 +181,7 @@ export class DataModelEditorComponent {
     this.dataModel = this._dataModel;
   }
 
-  @ViewChild('attributeTable')
+  @ViewChild('attributeTable', {static: false}) 'attributeTable' !: ElementRef;
   private _attributeTable: MatTable<any>;
 
   private _attributes: Array<any>;

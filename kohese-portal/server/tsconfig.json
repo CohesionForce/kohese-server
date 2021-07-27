@@ -21,7 +21,6 @@
       "underscore",
       "jasmine",
       "jssha",
-      "sharedworker",
     ],
     "typeRoots": [
       "../node_modules/@types"

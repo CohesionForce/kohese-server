@@ -54,7 +54,7 @@ export class StateSummaryDialogComponent implements OnInit {
     this._proxies = proxies;
   }
 
-  @ViewChild('proxyTable') table;
+  @ViewChild('proxyTable', {static: false}) table;
   color;
 
   private _kindName: string;

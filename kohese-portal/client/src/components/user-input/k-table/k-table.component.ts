@@ -15,10 +15,14 @@
  */
 
 
+// Angular
+
+import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+
+// NPM
 import { BehaviorSubject ,  Subscription } from 'rxjs';
-import { OnDestroy } from '@angular/core';
-import { ItemProxy } from './../../../../../common/src/item-proxy';
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { TreeConfiguration } from './../../../../../common/src/tree-configuration';
@@ -59,7 +63,7 @@ export class KTableComponent implements OnInit, OnDestroy {
 
   tableDataStream: BehaviorSubject<Array<any>>;
 
-  @ViewChild('proxyTable')
+  @ViewChild('proxyTable', {static: false}) 'proxyTable' !: ElementRef;
   private _table: ProxyTableComponent;
 
   get selection() {

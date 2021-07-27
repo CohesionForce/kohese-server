@@ -15,12 +15,16 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit, OnDestroy, ViewChild } from '@angular/core';
+  Inject, Input, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+
+// NPM
 import { Subscription } from 'rxjs';
 import { MarkdownService } from 'ngx-markdown';
 
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -214,10 +218,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return this._outlineActions;
   }
 
-  @ViewChild('outlineTree')
+  @ViewChild('outlineTree', {static: false}) 'outlineTree' !: ElementRef;
   private _outlineTree: TreeComponent;
 
-  @ViewChild('textEditor')
+  @ViewChild('textEditor', {static: false}) 'textEditor' !: ElementRef;
   private _textEditor: TextEditorComponent;
 
   private _document: string = '';
@@ -233,7 +237,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
 
   private _selectedAttributeName: string;
 
-  @ViewChild('objectEditor')
+  @ViewChild('objectEditor', {static: false}) 'objectEditor' !: ElementRef;
   private _objectEditor: FormatObjectEditorComponent;
 
   get matDialogRef() {

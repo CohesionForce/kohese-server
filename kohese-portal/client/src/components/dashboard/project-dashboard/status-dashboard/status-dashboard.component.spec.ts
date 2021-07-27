@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+// NPM
+import { BehaviorSubject } from 'rxjs';
+
+// Kohese
 import { MaterialModule } from '../../../../material.module';
 import { PipesModule } from '../../../../pipes/pipes.module';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';

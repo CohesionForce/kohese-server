@@ -15,12 +15,15 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit, ViewChild, EventEmitter,
-  Output } from '@angular/core';
+         Inject, Input, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+
+// NPM
 import { EditorComponent } from '@tinymce/tinymce-angular';
 
+// Kohese
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 @Component({
@@ -68,7 +71,7 @@ export class TextEditorComponent implements OnInit {
     this._save = save;
   }
 
-  @ViewChild('editor')
+  @ViewChild('editor', {static: false})
   private _editor: EditorComponent;
   get editor() {
     return this._editor;

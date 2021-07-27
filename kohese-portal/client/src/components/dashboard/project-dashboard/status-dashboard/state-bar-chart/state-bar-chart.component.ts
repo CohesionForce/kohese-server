@@ -38,7 +38,7 @@ import {
   styleUrls: ['./state-bar-chart.component.scss']
 })
 export class StateBarChartComponent implements AfterViewInit {
-  @ViewChild('chart')
+  @ViewChild('chart', {static: false}) 'chart' !: ElementRef;
   private _svgElement: ElementRef;
   svg;
   legend;

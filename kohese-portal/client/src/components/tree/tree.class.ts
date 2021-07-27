@@ -15,18 +15,20 @@
  */
 
 
-
-import {tap} from 'rxjs/operators';
-import { ViewChild } from '@angular/core';
+// Angular
+import { ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+
+// NPM
 import { VirtualScrollComponent } from 'angular2-virtual-scroll';
 import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
+import {tap} from 'rxjs/operators';
 
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
 import { TreeRow } from './tree-row/tree-row.class';
-import { DisplayableEntity, Action,
-  ActionGroup } from './tree-row/tree-row.component';
-import { Filter, FilterCriterion } from '../filter/filter.class';
+import { DisplayableEntity, Action, ActionGroup } from './tree-row/tree-row.component';
+import { Filter } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
 export enum TargetPosition {
@@ -244,7 +246,7 @@ export abstract class Tree {
     return this._filterSubject;
   }
 
-  @ViewChild(VirtualScrollComponent)
+  @ViewChild(VirtualScrollComponent, {static: false}) VirtualScrollComponent !: ElementRef;
   private _virtualScrollComponent: VirtualScrollComponent;
 
   private _rootSubscription: Subscription;

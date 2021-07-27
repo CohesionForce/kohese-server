@@ -15,10 +15,14 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, OnInit, Input, ViewChild } from '@angular/core';
+  Inject, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
+// NPM
+
+// Kohese
 import { TreeComponent } from '../tree/tree.component';
 
 export enum VersionSelection {
@@ -99,7 +103,7 @@ export class MergeComponent implements OnInit {
     return this._selectedDifference;
   }
 
-  @ViewChild('differenceTree')
+  @ViewChild('differenceTree', {static: false}) 'differenceTree' !: ElementRef;
   private _differenceTree: TreeComponent;
 
   get matDialogRef() {

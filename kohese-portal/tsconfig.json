@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "es2015",
+    "downlevelIteration": true,
+    "target": "es2015",
+    "module": "esnext",
     "baseUrl": ".",
     "paths": {
       "common" : ["./common/models/"]
@@ -21,7 +22,6 @@
       "underscore",
       "jasmine",
       "jssha",
-      "sharedworker",
     ],
     "typeRoots": [
       "./node_modules/@types"
