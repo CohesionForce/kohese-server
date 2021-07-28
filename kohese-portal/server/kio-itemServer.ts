@@ -88,10 +88,14 @@ ItemProxy.getWorkingTree().getChangeSubject().subscribe(async change => {
           status: status
         };
         kio.server.emit('Item/' + change.type, createNotification);
-        // Update RepoMountData based on Repo Mount Point Change (move)
-        if (change.kind === 'Repository' && change.type === 'update' && !change.enableRepo && change.modifications.parentId) {
+        // Update RepoMountData based on Repo Mount Point Change (move, name)
+        if (change.kind === 'Repository' && change.type === 'update' && !change.enableRepo && change.modifications) {
           let mountedRepoProxy = ItemProxy.getWorkingTree().getProxyFor(proxy.item.id + '-mount');
-          mountedRepoProxy.item.mountPoint = change.modifications.parentId.to;
+          if (change.modifications.parentId) {
+            mountedRepoProxy.item.mountPoint = change.modifications.parentId.to;
+          } else if (change.modifications.name) {
+            mountedRepoProxy.item.name = change.modifications.name.to;
+          }
           mountedRepoProxy.updateItem('RepoMount', mountedRepoProxy.item);
         }
         break;
@@ -1438,23 +1442,26 @@ function KIOItemServer(socket){
           returnMap[repositoryId] = commitIdMap[repositoryId].commitId;
           var filePaths = commitIdMap[repositoryId].filesCommitted;
           for (var j = 0; j < filePaths.length; j++) {
-            if (filePaths[j].endsWith('.json')) {
-              var fileName = Path.basename(filePaths[j], '.json');
-              var foundId = true;
-              if (!UUID_REGEX.test(fileName) && (fileName !== 'Root')) {
-                fileName = Path.basename(Path.dirname(filePaths[j]));
+            if (filePaths[j] === 'Root.json') {
+              // if File is a base Root.json then this is a new repo directory structure repo
+              // Use the Repo ID to to get the proxy to add to the update status list
+              fileName = KDBRepo.getMountId(repositoryId);
+              foundId = true;
+            } else {
+              if (filePaths[j].endsWith('.json')) {
+                var fileName = Path.basename(filePaths[j], '.json');
+                var foundId = true;
                 if (!UUID_REGEX.test(fileName)) {
-                  foundId = false;
+                  fileName = Path.basename(Path.dirname(filePaths[j]));
+                  if (!UUID_REGEX.test(fileName)) {
+                    foundId = false;
+                  }
                 }
               }
-              // If file is Root.json then this is a Repo so the Repo ID needs to be used to get the proxy
-              if (fileName === 'Root') {
-                fileName = KDBRepo.getMountId(repositoryId);
-              }
+            }
 
-              if (foundId) {
-                proxies.push(ItemProxy.getWorkingTree().getProxyFor(fileName));
-              }
+            if (foundId) {
+              proxies.push(ItemProxy.getWorkingTree().getProxyFor(fileName));
             }
           }
         }
