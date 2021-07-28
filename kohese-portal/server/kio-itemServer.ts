@@ -1447,6 +1447,9 @@ function KIOItemServer(socket){
               // Use the Repo ID to to get the proxy to add to the update status list
               fileName = KDBRepo.getMountId(repositoryId);
               foundId = true;
+            } else if (filePaths[j].includes('KoheseModel') || filePaths[j].includes('KoheseView') || filePaths[j].includes('Namespace')) {
+              fileName = Path.basename(filePaths[j], '.json')
+              foundId = true;
             } else {
               if (filePaths[j].endsWith('.json')) {
                 var fileName = Path.basename(filePaths[j], '.json');
