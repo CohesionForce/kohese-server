@@ -15,13 +15,18 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 
-import { MaterialModule } from '../../../material.module';
+import { MaterialModule } from '../../../material.module'; // deprecated
+
+// Kohese
 import { TreeRowComponent } from './tree-row.component';
 import { TreeRow } from './tree-row.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+
+// Mocks
 
 describe('Component: tree-row', () => {
   let component: TreeRowComponent;

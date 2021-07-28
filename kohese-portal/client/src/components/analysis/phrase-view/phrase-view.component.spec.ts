@@ -15,30 +15,35 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../material.module';
-import { PhraseViewComponent } from './phrase-view.component';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { BehaviorSubject } from 'rxjs';
+
+// Kohese
+import { PhraseViewComponent } from './phrase-view.component';
+import { AnalysisViews } from '../AnalysisViewComponent.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { MockItem } from '../../../../mocks/data/MockItem';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
-import { MockAnalysisService } from '../../../../mocks/services/MockAnalysisService';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+import { PipesModule } from '../../../pipes/pipes.module';
+import { MaterialModule } from '../../../material.module'; // deprecated
+
+// Mocks
+import { MockItem } from '../../../../mocks/data/MockItem';
+import { MockAnalysisService } from '../../../../mocks/services/MockAnalysisService';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { MockDataProcessingService } from '../../../../mocks/services/MockDataProcessingService';
-import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
-import { PipesModule } from '../../../pipes/pipes.module';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockAnalysis } from '../../../../mocks/data/MockAnalysis';
-import { AnalysisViews } from '../AnalysisViewComponent.class';
 
 describe('Component: Phrase View', ()=>{
   let phraseComponent: PhraseViewComponent;

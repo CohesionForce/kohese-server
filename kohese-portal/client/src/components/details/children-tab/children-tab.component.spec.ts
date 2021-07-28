@@ -15,24 +15,28 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
+import { BehaviorSubject } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../material.module'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MaterialModule } from '../../../material.module'; // deprecated
 
+// Kohese
 import { ChildrenTabComponent } from './children-tab.component';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
+
+// Mocks
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
-import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { BehaviorSubject } from 'rxjs';
 
 describe('Component: Children Tab', ()=>{
   let childrenTabComponent: ChildrenTabComponent;

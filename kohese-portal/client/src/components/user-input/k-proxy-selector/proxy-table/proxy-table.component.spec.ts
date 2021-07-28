@@ -15,17 +15,22 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of as ObservableOf } from 'rxjs';
 
-import { MaterialModule } from '../../../../material.module';
+import { of as ObservableOf } from 'rxjs';
+import { MaterialModule } from '../../../../material.module'; // deprecated
+
+// Kohese
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 import { ProxyTableComponent } from './proxy-table.component';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
+
+// Mocks
+import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 
 describe('Component: proxy-table', () => {
   let component: ProxyTableComponent;

@@ -15,18 +15,22 @@
  */
 
 
+// Angular
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { MaterialModule } from '../../../../../../material.module';
 import { MAT_DIALOG_DATA } from '@angular/material';
+import { MaterialModule } from '../../../../../../material.module'; // deprecated
 
+// Kohese
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../../../../mocks/services/MockItemRepository';
 import { NavigationService } from '../../../../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../../../../mocks/services/MockNavigationService';
 import { DialogService } from '../../../../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../../../../mocks/services/MockDialogService';
 import { StateSummaryDialogComponent } from './state-summary-dialog.component';
+
+// Mocks
+import { MockNavigationService } from '../../../../../../../mocks/services/MockNavigationService';
+import { MockDialogService } from '../../../../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../../../../mocks/services/MockItemRepository';
 
 describe('StateSummaryDialogComponent', () => {
   let component: StateSummaryDialogComponent;

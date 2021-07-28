@@ -15,15 +15,20 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 
-import { MaterialModule } from '../../../material.module';
+import { BehaviorSubject } from 'rxjs';
+import { MaterialModule } from '../../../material.module'; // deprecated
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { ChangeSummaryComponent } from './change-summary.component';
 import { Comparison } from '../comparison.class';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 
 describe('Component: change-summary', () => {
   let component: ChangeSummaryComponent;

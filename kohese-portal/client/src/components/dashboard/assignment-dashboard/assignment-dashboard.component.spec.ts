@@ -15,25 +15,28 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../material.module'
-
-import { AssignmentDashboardComponent } from './assignment-dashboard.component';
 import { BehaviorSubject } from 'rxjs';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MaterialModule } from '../../../material.module'; // deprecated
+
+// Kohese
+import { AssignmentDashboardComponent } from './assignment-dashboard.component';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+
+// Mocks
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;

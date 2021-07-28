@@ -15,19 +15,25 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../../material.module';
+import { MaterialModule } from '../../../material.module'; // deprecated
 import { PipesModule } from '../../../pipes/pipes.module';
+
+// Kohese
 import { StateService } from '../../../services/state/state.service';
-import { MockStateService } from '../../../../mocks/services/MockStateService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
-import { MockItem } from '../../../../mocks/data/MockItem';
 import { KStateEditorComponent } from './k-state-editor.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+
+// Mocks
+import { MockItem } from '../../../../mocks/data/MockItem';
+import { MockStateService } from '../../../../mocks/services/MockStateService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('k-state-editor', () => {
   let stateEditor: ComponentFixture<KStateEditorComponent>;

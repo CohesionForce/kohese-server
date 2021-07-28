@@ -15,7 +15,7 @@
  */
 
 
-/// <reference path=".\shared-worker.d.ts" />
+/// <reference path="./shared-worker.d.ts" />
 
 (<any>self).onconnect = (connectEvent: MessageEvent) => {
   const messagePort: MessagePort = (connectEvent.ports as MessagePort[])[0];

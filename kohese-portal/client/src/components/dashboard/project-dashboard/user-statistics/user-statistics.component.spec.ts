@@ -15,18 +15,22 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of as ObservableOf } from 'rxjs';
 
+// Kohese
 import { DashboardModule } from '../../dashboard.module';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { StateFilterService } from '../../state-filter.service';
+import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
+import { UserStatisticsComponent } from './user-statistics.component';
+
+// Mocks
 import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { MockStateFilterService } from '../../../../../mocks/services/MockStateFilterService';
-import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
-import { UserStatisticsComponent } from './user-statistics.component';
 
 describe('UserStatisticsComponent', () => {
   let component: UserStatisticsComponent;

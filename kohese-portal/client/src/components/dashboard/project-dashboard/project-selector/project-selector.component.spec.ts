@@ -15,13 +15,17 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material';
 
+// Kohese
 import { DashboardModule } from '../../dashboard.module';
 import { ProjectService } from '../../../../services/project-service/project.service';
-import { MockProjectService } from '../../../../../mocks/services/MockProjectService';
 import { ProjectSelectorComponent } from './project-selector.component';
+
+// Mocks
+import { MockProjectService } from '../../../../../mocks/services/MockProjectService';
 
 describe('ProjectSelectorComponent', () => {
   let component: ProjectSelectorComponent;

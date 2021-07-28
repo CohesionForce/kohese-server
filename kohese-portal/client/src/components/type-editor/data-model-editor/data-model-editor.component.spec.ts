@@ -15,24 +15,27 @@
  */
 
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MaterialModule } from '../../../material.module';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+
+import { MaterialModule } from '../../../material.module'; // deprecated
 import { MatDialogRef } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of as observableOf } from 'rxjs';
 
-import { Enumeration,
-  EnumerationValue } from '../../../../../common/src/Enumeration.interface';
+// Kohese
+import { Enumeration, EnumerationValue } from '../../../../../common/src/Enumeration.interface';
 import { KoheseDataModel } from '../../../../../common/src/KoheseModel.interface';
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { Metatype, Type } from '../../../../../common/src/Type.interface';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { ComponentDialogComponent } from '../../dialog/component-dialog/component-dialog.component';
 import { DataModelEditorComponent } from './data-model-editor.component';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('DataModelEditorComponent', () => {
   let component: DataModelEditorComponent;

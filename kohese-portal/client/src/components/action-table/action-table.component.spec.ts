@@ -15,27 +15,26 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../material.module'
-
-import { NavigationService } from '../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
-import { ActionTableComponent } from './action-table.component';
-import { PipesModule } from '../../pipes/pipes.module';
 import { BehaviorSubject } from 'rxjs';
-import { ItemProxy } from '../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../common/src/tree-configuration';
-import { KoheseModel } from '../../../../common/src/KoheseModel';
-import { DialogService } from '../../services/dialog/dialog.service';
 
-import { MockDialogService } from '../../../mocks/services/MockDialogService';
-import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
-import { MockKoheseType } from '../../../mocks/data/MockKoheseType';
+// Kohese
+import { NavigationService } from '../../services/navigation/navigation.service';
+import { ActionTableComponent } from './action-table.component';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { DialogService } from '../../services/dialog/dialog.service';
+import { PipesModule } from '../../pipes/pipes.module';
+import { MaterialModule } from '../../material.module'; // deprecated
+
+// Mocks
+import { MockDialogService } from '../../../mocks/services/MockDialogService';
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
+import { MockItemRepository} from '../../../mocks/services/MockItemRepository';
 
 describe('Component: Action Table', ()=>{
   let actionTableComponent: ActionTableComponent;

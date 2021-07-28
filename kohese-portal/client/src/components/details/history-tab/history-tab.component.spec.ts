@@ -15,23 +15,26 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
+import { BehaviorSubject } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../material.module'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MaterialModule } from '../../../material.module'; // deprecated
 
+// Kohese
 import { HistoryTabComponent} from './history-tab.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { MockItem } from '../../../../mocks/data/MockItem';
-
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { BehaviorSubject } from 'rxjs';
+
+// Mocks
+import { MockItem } from '../../../../mocks/data/MockItem';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 
 describe('Component: History Tab', ()=>{
   let historyComponent: HistoryTabComponent;

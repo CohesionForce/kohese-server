@@ -17,24 +17,25 @@
 // Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-// NPM
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BehaviorSubject } from 'rxjs';
+import { MaterialModule } from '../../../../material.module'; // deprecated
 
 // Kohese
-import { MaterialModule } from '../../../../material.module';
 import { PipesModule } from '../../../../pipes/pipes.module';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 import { StateFilterService } from '../../state-filter.service';
-import { MockStateFilterService } from '../../../../../mocks/services/MockStateFilterService';
 import { ProjectInfo } from '../../../../services/project-service/project.service';
-import { MockProjectService } from '../../../../../mocks/services/MockProjectService';
 import { StatusDashboardComponent } from './status-dashboard.component';
+
+// Mocks
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
+import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
+import { MockStateFilterService } from '../../../../../mocks/services/MockStateFilterService';
+import { MockProjectService } from '../../../../../mocks/services/MockProjectService';
 
 describe('Component: StatusDashboardComponent', () => {
   let component: StatusDashboardComponent;

@@ -15,24 +15,27 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../../material.module'
-import { PipesModule } from '../../../../pipes/pipes.module';
-
-import { ChildrenTableComponent } from './children-table.component';
-import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
-
-import { DialogService } from '../../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
-import { NavigationService } from '../../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 import { BehaviorSubject } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MaterialModule } from '../../../../material.module'; // deprecated
+
+// Kohese
+import { PipesModule } from '../../../../pipes/pipes.module';
+import { ChildrenTableComponent } from './children-table.component';
+import { DialogService } from '../../../../services/dialog/dialog.service';
+import { NavigationService } from '../../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
+
+// Mocks
 import { MockItem } from '../../../../../mocks/data/MockItem';
+import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../../../mocks/services/MockNavigationService';
 
 describe('Component: Children Table', ()=>{
   let childrenTableComponent: ChildrenTableComponent;

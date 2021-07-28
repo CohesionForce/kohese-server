@@ -15,14 +15,18 @@
  */
 
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+// Angular
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { MaterialModule } from '../../../material.module';
+// Kohese
 import { LogService } from '../../../services/log/log.service';
-import { MockLogService } from '../../../../mocks/services/MockLogService';
 import { DevToolsComponent } from './dev-tools.component';
+import { MaterialModule } from '../../../material.module'; // deprecated
+
+// Mocks
+import { MockLogService } from '../../../../mocks/services/MockLogService';
 
 describe('DevToolsComponent', () => {
   let component: DevToolsComponent;

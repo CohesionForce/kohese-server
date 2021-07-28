@@ -15,21 +15,22 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture, async} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, SimpleChanges, SimpleChange } from '@angular/core';
-
+import { CUSTOM_ELEMENTS_SCHEMA, SimpleChange } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../material.module'
-import { EditableCellComponent } from './editable-cell.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BehaviorSubject, Subject } from 'rxjs';
 
+// Kohese
+import { EditableCellComponent } from './editable-cell.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { KoheseModel } from '../../../../../common/src/KoheseModel';
+import { MaterialModule } from '../../../material.module'; //deprecated
+
+// Mocks
 import { MockItem } from '../../../../mocks/data/MockItem';
-import { MockDataModel } from '../../../../mocks/data/MockDataModel';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+
 
 describe('Component: Editable Cell ', ()=>{
   let editableCellComponent: EditableCellComponent;

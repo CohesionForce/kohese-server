@@ -15,23 +15,25 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from '../../../../../material.module';
+import { MaterialModule } from '../../../../../material.module'; // deprecated
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
+
+// NPM
 import { MarkdownModule } from 'ngx-markdown';
 
+// Kohese
 import { MarkdownEditorModule } from '../../../../../components/markdown-editor/markdown-editor.module';
 import { KoheseModel } from '../../../../../../../common/src/KoheseModel';
 import { KoheseViewModel } from '../../../../../../../common/src/KoheseModel.interface';
 import { FormatDefinitionType } from '../../../../../../../common/src/FormatDefinition.interface';
 import { PropertyDefinition } from '../../../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
-import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../../../../mocks/services/MockItemRepository';
-import { MockSessionService } from '../../../../../../mocks/services/MockSessionService';
 import { DialogService } from '../../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../../../services/user/session.service';
@@ -40,6 +42,11 @@ import { MultivaluedFieldComponent } from '../multivalued-field/multivalued-fiel
 import { SinglevaluedFieldComponent } from './singlevalued-field.component';
 import { TableModule } from '../../../../../components/table/table.module';
 import { TreeViewModule } from '../../../../tree/tree.module';
+
+// Mocks
+import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../../../mocks/services/MockItemRepository';
+import { MockSessionService } from '../../../../../../mocks/services/MockSessionService';
 
 describe('SinglevaluedFieldComponent', () => {
   let component: SinglevaluedFieldComponent;

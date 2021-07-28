@@ -15,23 +15,26 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../material.module'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MaterialModule } from '../../../material.module'; // deprecated
 
+// Kohese
 import { SideBarComponent } from './sidebar.component';
-
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { CurrentUserService } from '../../../services/user/current-user.service';
+import { LensService } from '../../../services/lens-service/lens.service';
+
+// Mocks
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockCurrentUserService } from '../../../../mocks/services/MockCurrentUserService';
-import { LensService } from '../../../services/lens-service/lens.service';
 import { MockLensService } from '../../../../mocks/services/MockLensService';
 
 describe('Component: SideBar', ()=>{
