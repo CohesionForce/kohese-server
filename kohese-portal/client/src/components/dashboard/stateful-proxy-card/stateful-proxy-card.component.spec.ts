@@ -18,7 +18,7 @@
 // Angular
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { MaterialModule } from '../../../material.module'; // deprecated
+import { MaterialModule } from '../../../material.module';
 
 // Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';

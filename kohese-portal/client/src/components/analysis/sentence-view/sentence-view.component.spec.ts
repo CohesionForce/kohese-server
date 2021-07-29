@@ -34,7 +34,7 @@ import { DataProcessingService } from '../../../services/data/data-processing.se
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { PipesModule } from '../../../pipes/pipes.module';
-import { MaterialModule } from '../../../material.module'; // deprecated
+import { MaterialModule } from '../../../material.module';
 
 // Mocks
 import { MockItem } from '../../../../mocks/data/MockItem';

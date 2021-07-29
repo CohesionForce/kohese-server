@@ -20,7 +20,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from '../../material.module'; // deprecated
+import { MaterialModule } from '../../material.module';
 
 // Kohese
 import { NavigatorComponent } from './navigator.component';

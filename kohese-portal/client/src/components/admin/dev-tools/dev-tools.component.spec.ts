@@ -23,7 +23,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // Kohese
 import { LogService } from '../../../services/log/log.service';
 import { DevToolsComponent } from './dev-tools.component';
-import { MaterialModule } from '../../../material.module'; // deprecated
+import { MaterialModule } from '../../../material.module';
 
 // Mocks
 import { MockLogService } from '../../../../mocks/services/MockLogService';

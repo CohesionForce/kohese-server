@@ -29,7 +29,7 @@ import { ItemProxy } from '../../../../common/src/item-proxy';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { PipesModule } from '../../pipes/pipes.module';
-import { MaterialModule } from '../../material.module'; // deprecated
+import { MaterialModule } from '../../material.module';
 
 // Mocks
 import { MockDialogService } from '../../../mocks/services/MockDialogService';

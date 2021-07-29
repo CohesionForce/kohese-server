@@ -22,7 +22,7 @@ import { QueryList } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
-import { MaterialModule } from '../../../../../material.module'; // deprecated
+import { MaterialModule } from '../../../../../material.module';
 import { MatExpansionPanel } from '@angular/material/expansion';
 
 // Other External Dependencies

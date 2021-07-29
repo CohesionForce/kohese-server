@@ -20,7 +20,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../../material.module'; // deprecated
+import { MaterialModule } from '../../../material.module';
 import { PipesModule } from '../../../pipes/pipes.module';
 
 // Kohese

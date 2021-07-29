@@ -22,7 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { MaterialModule } from '../../../material.module'; // deprecated
+import { MaterialModule } from '../../../material.module';
 
 // Kohese
 import { HistoryTabComponent} from './history-tab.component';

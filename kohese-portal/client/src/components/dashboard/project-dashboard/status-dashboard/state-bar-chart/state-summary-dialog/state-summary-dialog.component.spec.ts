@@ -19,7 +19,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { MaterialModule } from '../../../../../../material.module'; // deprecated
+import { MaterialModule } from '../../../../../../material.module';
 
 // Kohese
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';

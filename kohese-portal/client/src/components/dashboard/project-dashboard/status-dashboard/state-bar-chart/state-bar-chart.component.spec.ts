@@ -22,7 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BehaviorSubject } from 'rxjs';
-import { MaterialModule } from '../../../../../material.module'; // deprecated
+import { MaterialModule } from '../../../../../material.module';
 
 // Kohese
 import { DialogService } from '../../../../../services/dialog/dialog.service';

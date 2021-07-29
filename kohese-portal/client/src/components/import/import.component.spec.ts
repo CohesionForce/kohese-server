@@ -20,7 +20,7 @@ import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MaterialModule } from '../../material.module'; // deprecated
+import { MaterialModule } from '../../material.module';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 // Other External Dependencies

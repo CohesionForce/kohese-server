@@ -20,7 +20,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { of as ObservableOf } from 'rxjs';
-import { MaterialModule } from '../../../../material.module'; // deprecated
+import { MaterialModule } from '../../../../material.module';
 
 // Kohese
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';

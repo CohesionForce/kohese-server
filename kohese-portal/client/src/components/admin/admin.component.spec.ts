@@ -33,7 +33,7 @@ import { DialogService } from '../../services/dialog/dialog.service';
 import { AdminComponent } from './admin.component';
 import { CacheManager } from '../../../../client/cache-worker/CacheManager';
 import { PipesModule } from '../../pipes/pipes.module';
-import { MaterialModule } from '../../material.module'; // deprecated
+import { MaterialModule } from '../../material.module';
 
 // Mocks
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';

@@ -23,7 +23,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MaterialModule } from '../../../../material.module'; // deprecated
+import { MaterialModule } from '../../../../material.module';
 
 // Kohese
 import { ProxySelectorComponent } from './proxy-selector.component';

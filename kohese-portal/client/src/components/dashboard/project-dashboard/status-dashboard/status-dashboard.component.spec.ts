@@ -20,7 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BehaviorSubject } from 'rxjs';
-import { MaterialModule } from '../../../../material.module'; // deprecated
+import { MaterialModule } from '../../../../material.module';
 
 // Kohese
 import { PipesModule } from '../../../../pipes/pipes.module';

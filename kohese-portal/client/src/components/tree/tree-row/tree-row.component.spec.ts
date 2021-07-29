@@ -18,7 +18,7 @@
 // Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 
-import { MaterialModule } from '../../../material.module'; // deprecated
+import { MaterialModule } from '../../../material.module';
 
 // Kohese
 import { TreeRowComponent } from './tree-row.component';

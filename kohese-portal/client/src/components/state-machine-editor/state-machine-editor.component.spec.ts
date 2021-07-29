@@ -22,7 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
-import { MaterialModule } from '../../material.module'; // deprecated
+import { MaterialModule } from '../../material.module';
 
 // Kohese
 import { DialogService } from '../../services/dialog/dialog.service';

@@ -24,7 +24,7 @@ import { BehaviorSubject } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { of as ObservableOf } from 'rxjs';
-import { MaterialModule } from '../../material.module'; // deprecated
+import { MaterialModule } from '../../material.module';
 
 // Other External Dependencies
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';

@@ -30,7 +30,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { AnalysisService } from '../../services/analysis/analysis.service';
 import { DialogService } from '../../services/dialog/dialog.service';
-import { MaterialModule } from '../../material.module'; // deprecated
+import { MaterialModule } from '../../material.module';
 
 // Mocks
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';

@@ -21,7 +21,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { MaterialModule } from '../../../material.module'; // deprecated
+import { MaterialModule } from '../../../material.module';
 
 // Kohese
 import { DashboardSelectorComponent } from './dashboard-selector.component';
