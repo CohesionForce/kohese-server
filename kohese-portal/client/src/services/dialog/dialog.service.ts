@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { ComponentType } from '@angular/cdk/portal';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { SimpleDialogComponent } from '../../components/dialog/simple-dialog/simple-dialog.component';

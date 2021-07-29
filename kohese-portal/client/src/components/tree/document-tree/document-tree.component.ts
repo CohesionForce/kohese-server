@@ -21,7 +21,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable ,  Subscription } from 'rxjs';
 import {tap} from 'rxjs/operators';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';

@@ -18,7 +18,7 @@
 // Angular
 import { Component, OnInit, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemRepository } from './../../../services/item-repository/item-repository.service';

@@ -25,7 +25,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { MaterialModule } from '../../../../../material.module'; // deprecated
 import { MatExpansionPanel } from '@angular/material/expansion';
 
-// NPM
+// Other External Dependencies
 import { MarkdownModule } from 'ngx-markdown';
 
 // Kohese

@@ -18,7 +18,7 @@
 // Angular
 import { Injectable } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';

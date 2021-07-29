@@ -18,7 +18,7 @@
 // Angular
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DialogService } from '../../../../../services/dialog/dialog.service';

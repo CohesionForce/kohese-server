@@ -22,7 +22,7 @@ import { Directive, Input, ViewContainerRef, Component,
 import { ComponentType } from '@angular/cdk/portal';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 

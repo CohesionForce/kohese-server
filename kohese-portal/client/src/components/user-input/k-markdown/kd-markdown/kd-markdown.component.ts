@@ -18,7 +18,7 @@
 // Angular
 import { Component, OnInit, Input } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { MarkdownCheatSheetComponent } from './../markdown-cheat-sheet.component';

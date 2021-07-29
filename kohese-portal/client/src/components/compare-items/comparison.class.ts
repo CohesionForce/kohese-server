@@ -17,7 +17,7 @@
 
 // Angular
 
-// NPM
+// Other External Dependencies
 import * as JsDiff from 'diff';
 import * as jsSHA_Import from 'jssha';
 

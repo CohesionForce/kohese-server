@@ -23,7 +23,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import { Parser, HtmlRenderer } from 'commonmark';
 import * as commonmark from 'commonmark';
 

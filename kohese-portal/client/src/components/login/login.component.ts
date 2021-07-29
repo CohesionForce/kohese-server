@@ -19,7 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { AuthenticationService } from '../../services/authentication/authentication.service';

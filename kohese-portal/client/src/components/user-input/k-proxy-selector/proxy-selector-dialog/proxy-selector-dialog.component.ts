@@ -19,7 +19,7 @@
 import { Component, OnInit, OnDestroy, Inject, Optional } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 import * as $ from 'jquery'
 
 // Kohese

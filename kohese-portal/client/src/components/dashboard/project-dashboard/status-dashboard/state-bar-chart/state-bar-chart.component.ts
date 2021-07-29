@@ -19,7 +19,7 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, Input } from '@angular/core';
 import { Subscription, BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import * as d3 from 'd3';
 
 // Kohese
@@ -35,7 +35,7 @@ import { ProjectInfo } from '../../../../../services/project-service/project.ser
   styleUrls: ['./state-bar-chart.component.scss']
 })
 export class StateBarChartComponent implements AfterViewInit {
-  @ViewChild('chart', {static: false}) 'chart' !: ElementRef;
+  @ViewChild('chart', {static: false})
   private _svgElement: ElementRef;
   svg;
   legend;

@@ -18,7 +18,7 @@
 // Angular
 import { ChangeDetectorRef, Input } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { Attribute } from '../../../../../../common/src/Attribute.interface';

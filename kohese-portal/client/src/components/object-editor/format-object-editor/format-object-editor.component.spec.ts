@@ -25,7 +25,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
-// NPM
+// Other External Dependencies
 import { MarkdownModule, MarkdownService, MarkedOptions } from 'ngx-markdown';
 
 // Kohese

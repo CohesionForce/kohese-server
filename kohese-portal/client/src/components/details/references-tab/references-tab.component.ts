@@ -20,7 +20,7 @@ import { Component, Input, ChangeDetectionStrategy, OnInit, OnDestroy, ChangeDet
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription, Observable } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemProxy } from '../../../../../common/src/item-proxy';

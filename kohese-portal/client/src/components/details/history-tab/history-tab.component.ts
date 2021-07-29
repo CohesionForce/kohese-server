@@ -21,7 +21,7 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'

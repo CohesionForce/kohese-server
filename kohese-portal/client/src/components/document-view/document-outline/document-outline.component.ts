@@ -20,7 +20,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

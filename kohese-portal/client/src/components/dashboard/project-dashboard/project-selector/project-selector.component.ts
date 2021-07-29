@@ -19,7 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ProjectInfo, ProjectService } from '../../../../services/project-service/project.service';

@@ -21,7 +21,7 @@ import { Title } from '@angular/platform-browser';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { Observable, Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { NavigationService } from '../../../services/navigation/navigation.service';

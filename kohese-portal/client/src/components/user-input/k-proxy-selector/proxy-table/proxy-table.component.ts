@@ -20,7 +20,7 @@ import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Observable ,  Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DetailsComponent } from './../../../details/details.component';

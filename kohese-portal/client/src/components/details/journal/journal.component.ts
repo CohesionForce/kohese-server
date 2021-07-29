@@ -20,7 +20,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
          ViewChildren, QueryList } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material/expansion';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';

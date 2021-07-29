@@ -19,7 +19,7 @@ import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy, ChangeDet
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

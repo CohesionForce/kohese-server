@@ -20,7 +20,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input,
   OnInit, Optional, QueryList, ViewChildren } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { FormatContainer, FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';

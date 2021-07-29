@@ -20,7 +20,7 @@ import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { AuthenticationService } from './authentication.service';

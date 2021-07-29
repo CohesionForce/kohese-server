@@ -19,7 +19,7 @@ import { Component, OnInit, Input, Optional, Inject, ViewChild, ElementRef} from
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
 
-//NPM
+// Other External Dependencies
 
 // Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
@@ -57,7 +57,7 @@ export class CreateWizardComponent extends NavigatableComponent
     return this._proxyPlaceholderStream;
   }
 
-  @ViewChild('formatObjectEditor', {static: false}) 'formatObjectEditor' !: ElementRef;
+  @ViewChild('formatObjectEditor', {static: false})
   private _formatObjectEditor: FormatObjectEditorComponent;
 
   get FormatDefinitionType() {

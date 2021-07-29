@@ -26,7 +26,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { of as ObservableOf } from 'rxjs';
 import { MaterialModule } from '../../material.module'; // deprecated
 
-// NPM
+// Other External Dependencies
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 // Kohese

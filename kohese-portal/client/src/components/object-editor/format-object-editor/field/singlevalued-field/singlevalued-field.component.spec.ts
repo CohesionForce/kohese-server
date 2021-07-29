@@ -24,7 +24,7 @@ import { MaterialModule } from '../../../../../material.module'; // deprecated
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
-// NPM
+// Other External Dependencies
 import { MarkdownModule } from 'ngx-markdown';
 
 // Kohese

@@ -21,7 +21,7 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { Title } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import { ToastrService } from 'ngx-toastr';
 
 // Kohese

@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import * as _ from 'underscore';
 
 // Kohese

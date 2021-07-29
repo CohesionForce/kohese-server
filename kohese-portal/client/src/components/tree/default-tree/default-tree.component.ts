@@ -20,8 +20,6 @@
 import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-
-// NPM
 import { Observable ,  Subscription } from 'rxjs';
 import {tap} from 'rxjs/operators';
 
@@ -330,8 +328,10 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
           if (this._synchronizeWithSelection) {
             if(parameters) {
               let focusedItem = TreeConfiguration.getWorkingTree().getProxyFor(parameters.id);
-              let proxyTitle = focusedItem.item.name;
-              this.title.setTitle('Explorer | ' + proxyTitle);
+              if (focusedItem) {
+                let proxyTitle = focusedItem.item.name;
+                this.title.setTitle('Explorer | ' + proxyTitle);
+              }
             }
             this.showFocus();
           }

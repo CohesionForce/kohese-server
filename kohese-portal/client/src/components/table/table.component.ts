@@ -19,7 +19,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, ViewChild, ElementRef} from '@angular/core';
 import { Sort } from '@angular/material/sort';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { Dialog } from '../dialog/Dialog.interface';

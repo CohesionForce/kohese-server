@@ -23,7 +23,7 @@ import { MaterialModule } from '../../../material.module'; // deprecated
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import { AngularSplitModule } from 'angular-split';
 
 // Kohese

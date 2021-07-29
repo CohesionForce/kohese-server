@@ -20,7 +20,7 @@ import { Component, Input, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Observable ,  Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { UserInput } from '../user-input.class';

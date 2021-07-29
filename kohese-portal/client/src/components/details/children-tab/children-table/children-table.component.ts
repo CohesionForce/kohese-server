@@ -20,7 +20,7 @@ import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy, ChangeDet
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription, BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { NavigatableComponent } from '../../../../classes/NavigationComponent.class';

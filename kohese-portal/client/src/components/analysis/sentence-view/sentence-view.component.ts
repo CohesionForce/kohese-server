@@ -21,7 +21,7 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter,
 import { MatTableDataSource } from '@angular/material/table';
 import { Observable ,  BehaviorSubject ,  Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import * as Mark from 'mark.js';
 
 // Kohese

@@ -18,7 +18,7 @@
 // Angular
 import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { UserInput } from '../user-input.class';

@@ -20,7 +20,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, ViewChild, ElementRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';

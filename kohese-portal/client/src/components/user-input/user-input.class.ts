@@ -19,7 +19,7 @@
 import { Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 

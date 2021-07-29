@@ -20,7 +20,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
   Optional, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 import { ToastrService } from 'ngx-toastr';
 
 // Kohese

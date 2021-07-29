@@ -19,7 +19,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { FormatDefinition } from '../../../../../../common/src/FormatDefinition.interface';

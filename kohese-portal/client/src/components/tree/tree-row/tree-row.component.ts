@@ -18,7 +18,7 @@
 // Angular
 import { Component, OnInit, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { TreeRow } from './tree-row.class';

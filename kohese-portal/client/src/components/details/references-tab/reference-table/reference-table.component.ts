@@ -18,7 +18,7 @@
 // Angular
 import { Component, Input, OnInit, ViewChild, ViewChildren, QueryList } from "@angular/core";
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ReferenceTableInfo } from "../references-tab.component";

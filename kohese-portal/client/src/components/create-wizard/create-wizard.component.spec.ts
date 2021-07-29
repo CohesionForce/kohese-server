@@ -21,12 +21,11 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { async } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../material.module'; // deprecated
 
-// NPM
+// Other External Dependencies
 import { MarkdownService, MarkedOptions } from 'ngx-markdown';
 
 // Kohese
@@ -51,14 +50,14 @@ describe('Component: Create Wizard', ()=>{
   beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [CreateWizardComponent],
-      imports : [CommonModule,
-         MaterialModule,
-         PipesModule,
-         ServicesModule,
-         MatDialogModule,
-         BrowserAnimationsModule,
-         ObjectEditorModule
-         ],
+      imports : [
+        CommonModule,
+        PipesModule,
+        ServicesModule,
+        MatDialogModule,
+        BrowserAnimationsModule,
+        ObjectEditorModule
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers : [
         {provide: ItemRepository, useClass: MockItemRepository},

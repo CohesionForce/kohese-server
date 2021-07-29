@@ -19,7 +19,7 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { BehaviorSubject ,  Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

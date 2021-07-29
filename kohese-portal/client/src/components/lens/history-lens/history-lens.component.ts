@@ -19,7 +19,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemCache } from "../../../../../common/src/item-cache";

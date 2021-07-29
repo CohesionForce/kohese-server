@@ -19,7 +19,7 @@
 import { ChangeDetectorRef } from "@angular/core";
 import { Subscription, BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DetailsComponent } from './../../details/details.component';

@@ -19,7 +19,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { CacheManager } from '../../../../cache-worker/CacheManager';

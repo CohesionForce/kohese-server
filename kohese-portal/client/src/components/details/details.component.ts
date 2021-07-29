@@ -21,7 +21,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subscription,  BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { NavigationService } from '../../services/navigation/navigation.service';

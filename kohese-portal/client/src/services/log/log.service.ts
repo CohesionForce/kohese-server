@@ -19,7 +19,7 @@
 import { Injectable } from "@angular/core";
 import { Subscription, BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { KLogger, LoggingEventRecord } from "../../../../common/src/k-logger";

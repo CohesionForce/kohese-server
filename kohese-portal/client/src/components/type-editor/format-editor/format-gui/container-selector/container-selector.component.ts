@@ -19,7 +19,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 

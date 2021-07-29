@@ -17,7 +17,7 @@
 
 // Angular
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';

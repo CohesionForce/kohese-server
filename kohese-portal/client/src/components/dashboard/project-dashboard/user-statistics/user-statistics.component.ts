@@ -21,7 +21,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Title } from '@angular/platform-browser';
 import { Subscription, Observable } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ProjectInfo } from '../../../../services/project-service/project.service';

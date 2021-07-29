@@ -19,7 +19,7 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy, Input } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { TreeConfiguration } from './../../../../../../common/src/tree-configuration';

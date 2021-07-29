@@ -22,7 +22,7 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 import { Title } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { SessionService } from '../../services/user/session.service';

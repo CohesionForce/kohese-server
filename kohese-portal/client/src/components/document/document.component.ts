@@ -21,7 +21,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import { MarkdownService } from 'ngx-markdown';
 
 // Kohese

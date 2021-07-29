@@ -20,7 +20,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { Commit } from '../tree/commit-tree/commit-tree.component';

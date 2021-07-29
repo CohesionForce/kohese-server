@@ -24,7 +24,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MaterialModule } from '../../../material.module'; // deprecated
 import { BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 
 // Kohese

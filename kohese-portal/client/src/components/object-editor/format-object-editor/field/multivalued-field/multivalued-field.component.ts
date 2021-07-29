@@ -19,7 +19,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, QueryList, ViewChildren } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material/expansion';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { Attribute } from '../../../../../../../common/src/Attribute.interface';

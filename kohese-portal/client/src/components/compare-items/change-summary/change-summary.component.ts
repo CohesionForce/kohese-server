@@ -21,7 +21,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, ViewChildren,
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';

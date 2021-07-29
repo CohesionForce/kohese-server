@@ -22,7 +22,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-// NPM
+// Other External Dependencies
 import { ToastrModule } from 'ngx-toastr';
 
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

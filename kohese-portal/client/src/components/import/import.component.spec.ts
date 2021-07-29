@@ -23,7 +23,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MaterialModule } from '../../material.module'; // deprecated
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-// NPM
+// Other External Dependencies
 import { MarkdownModule } from 'ngx-markdown';
 import { ToastrModule } from 'ngx-toastr';
 

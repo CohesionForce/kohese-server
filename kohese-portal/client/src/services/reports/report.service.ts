@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject ,  Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemRepository } from './../item-repository/item-repository.service';

@@ -21,7 +21,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   AfterViewInit, ElementRef} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { Dialog } from '../dialog/Dialog.interface';
@@ -282,7 +282,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
 
   private _searchTimeoutIdentifier: any;
 
-  @ViewChild('elementContainer', {static: false}) 'elementContainer' !: ElementRef;
+  @ViewChild('elementContainer', {static: false})
   private _elementContainer: any;
 
   get matDialogRef() {

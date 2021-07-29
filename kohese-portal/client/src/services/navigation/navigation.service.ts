@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { NavigationUpdate } from './NavigationUpdate.class';

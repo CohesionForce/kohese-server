@@ -22,7 +22,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject ,  Subscription ,  Observable } from 'rxjs';
 import { FormControl } from '@angular/forms';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { AnalysisViewComponent, AnalysisViews, AnalysisFilter } from '../AnalysisViewComponent.class';

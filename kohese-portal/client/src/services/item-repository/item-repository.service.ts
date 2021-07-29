@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import * as _ from 'underscore';
 import { ToastrService } from 'ngx-toastr';
 import { MarkdownService } from 'ngx-markdown';

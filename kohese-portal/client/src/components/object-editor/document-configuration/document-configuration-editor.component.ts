@@ -20,7 +20,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
   Inject, OnInit, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';

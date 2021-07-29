@@ -17,7 +17,7 @@
 // Angular
 import { BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 

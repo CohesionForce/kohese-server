@@ -19,7 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { LoggingEventRecord } from './../../../../../common/src/k-logger';

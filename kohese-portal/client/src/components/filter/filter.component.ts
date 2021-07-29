@@ -20,7 +20,7 @@ import { Component, Optional, Inject, ChangeDetectorRef, OnInit } from '@angular
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { Filter, FilterCriteriaConnection } from './filter.class';

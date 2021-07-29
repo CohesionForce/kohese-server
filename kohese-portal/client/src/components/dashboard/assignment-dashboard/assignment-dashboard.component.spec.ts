@@ -31,12 +31,14 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { SessionService } from '../../../services/user/session.service';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
 // Mocks
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;
@@ -54,7 +56,8 @@ describe('Component: ', ()=>{
       providers: [
         { provide: NavigationService, useClass: MockNavigationService },
         { provide: ItemRepository, useClass: MockItemRepository },
-        { provide: DialogService, useClass: MockDialogService }
+        { provide: DialogService, useClass: MockDialogService },
+        { provide: SessionService, useClass: MockSessionService}
       ]
     }).compileComponents();
 

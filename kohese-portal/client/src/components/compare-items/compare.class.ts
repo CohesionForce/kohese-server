@@ -17,7 +17,7 @@
 
 // Angular
 
-// NPM
+// Other External Dependencies
 import * as _ from 'underscore';
 
 // Kohese

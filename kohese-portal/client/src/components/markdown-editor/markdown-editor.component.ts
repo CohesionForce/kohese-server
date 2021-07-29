@@ -19,7 +19,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
   OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DialogService } from '../../services/dialog/dialog.service';

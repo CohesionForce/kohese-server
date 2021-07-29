@@ -21,7 +21,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
 import {tap} from 'rxjs/operators';
 
-// NPM
+// Other External Dependencies
 import { VirtualScrollComponent } from 'angular2-virtual-scroll';
 
 // Kohese

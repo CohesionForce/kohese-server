@@ -25,11 +25,13 @@ import { MaterialModule } from '../../../../../../material.module'; // deprecate
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../../../../services/navigation/navigation.service';
 import { DialogService } from '../../../../../../services/dialog/dialog.service';
+import { SessionService } from '../../../../../../services/user/session.service';
 import { StateSummaryDialogComponent } from './state-summary-dialog.component';
 
 // Mocks
 import { MockNavigationService } from '../../../../../../../mocks/services/MockNavigationService';
 import { MockDialogService } from '../../../../../../../mocks/services/MockDialogService';
+import { MockSessionService } from '../../../../../../../mocks/services/MockSessionService';
 import { MockItemRepository } from '../../../../../../../mocks/services/MockItemRepository';
 
 describe('StateSummaryDialogComponent', () => {
@@ -52,7 +54,8 @@ describe('StateSummaryDialogComponent', () => {
         },
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: NavigationService, useClass: MockNavigationService },
-        { provide: DialogService, useClass: MockDialogService }
+        { provide: DialogService, useClass: MockDialogService },
+        { provide: SessionService, useClass: MockSessionService }
       ],
       schemas: [ NO_ERRORS_SCHEMA ]
     }).compileComponents();

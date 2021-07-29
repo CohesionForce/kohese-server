@@ -19,7 +19,7 @@
 import { Input, Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { Observable ,  Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 

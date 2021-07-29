@@ -22,7 +22,7 @@ import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { map, startWith} from 'rxjs/operators';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';

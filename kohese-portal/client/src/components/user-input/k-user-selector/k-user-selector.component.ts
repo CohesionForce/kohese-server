@@ -20,7 +20,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { UserInput } from '../user-input.class';

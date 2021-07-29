@@ -21,7 +21,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-// NPM
+// Other External Dependencies
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 // Kohese

@@ -18,7 +18,7 @@
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, Input } from '@angular/core';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';

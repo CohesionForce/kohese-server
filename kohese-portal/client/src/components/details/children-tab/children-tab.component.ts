@@ -20,7 +20,7 @@ import { Component, OnInit, OnDestroy, Input, EventEmitter,
   ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';

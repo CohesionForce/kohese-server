@@ -19,7 +19,7 @@ import { NgModule } from "@angular/core/";
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from "../../material.module";
 
-// NPM
+// Other External Dependencies
 import { AngularSplitModule } from 'angular-split';
 
 // Kohese

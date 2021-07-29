@@ -19,7 +19,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { ItemProxy } from '../../../../../common/src/item-proxy';

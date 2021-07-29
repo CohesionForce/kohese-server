@@ -22,7 +22,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu'
 import { Subject } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import { Parser, HtmlRenderer } from 'commonmark';
 import * as commonmark from 'commonmark';
 

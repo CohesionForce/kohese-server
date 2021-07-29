@@ -20,7 +20,7 @@ import { Component, ChangeDetectorRef, OnInit, OnDestroy, EventEmitter, Output, 
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 
 // Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
