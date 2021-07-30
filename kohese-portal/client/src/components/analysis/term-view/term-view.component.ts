@@ -19,7 +19,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter,
   ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject ,  Subscription ,  Observable } from 'rxjs';
 
 // Other External Dependencies

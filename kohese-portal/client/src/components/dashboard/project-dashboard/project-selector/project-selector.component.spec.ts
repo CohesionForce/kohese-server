@@ -17,7 +17,7 @@
 
 // Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 
 // Kohese
 import { DashboardModule } from '../../dashboard.module';

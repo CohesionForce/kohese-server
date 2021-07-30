@@ -16,7 +16,7 @@
 
 
 import { ComponentType } from '@angular/cdk/portal';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import { of as observableOf } from 'rxjs';
 
 import { TreeConfiguration } from '../../../common/src/tree-configuration';
