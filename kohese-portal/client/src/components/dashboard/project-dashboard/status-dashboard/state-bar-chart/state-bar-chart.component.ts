@@ -35,7 +35,7 @@ import { ProjectInfo } from '../../../../../services/project-service/project.ser
   styleUrls: ['./state-bar-chart.component.scss']
 })
 export class StateBarChartComponent implements AfterViewInit {
-  @ViewChild('chart', {static: false})
+  @ViewChild('chart')
   private _svgElement: ElementRef;
   svg;
   legend;

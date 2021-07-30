@@ -16,7 +16,7 @@
 
 
 // Angular
-import { ChangeDetectorRef, Input } from '@angular/core';
+import { ChangeDetectorRef, Input, Directive } from '@angular/core';
 
 // Other External Dependencies
 
@@ -38,6 +38,7 @@ import { FormatContainer, FormatContainerKind } from '../../../../../../common/s
 /**
  * Displays an attribute based on the given PropertyDefinition
  */
+@Directive()
 export class Field {
   protected _koheseObject: any;
   get koheseObject() {

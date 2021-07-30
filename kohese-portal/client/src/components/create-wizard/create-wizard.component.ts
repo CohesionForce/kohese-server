@@ -57,7 +57,7 @@ export class CreateWizardComponent extends NavigatableComponent
     return this._proxyPlaceholderStream;
   }
 
-  @ViewChild('formatObjectEditor', {static: false})
+  @ViewChild('formatObjectEditor')
   private _formatObjectEditor: FormatObjectEditorComponent;
 
   get FormatDefinitionType() {

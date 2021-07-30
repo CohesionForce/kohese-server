@@ -215,10 +215,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return this._outlineActions;
   }
 
-  @ViewChild('outlineTree', {static: false}) 'outlineTree' !: ElementRef;
+  @ViewChild('outlineTree') 'outlineTree' !: ElementRef;
   private _outlineTree: TreeComponent;
 
-  @ViewChild('textEditor', {static: false}) 'textEditor' !: ElementRef;
+  @ViewChild('textEditor') 'textEditor' !: ElementRef;
   private _textEditor: TextEditorComponent;
 
   private _document: string = '';
@@ -234,7 +234,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
 
   private _selectedAttributeName: string;
 
-  @ViewChild('objectEditor', {static: false}) 'objectEditor' !: ElementRef;
+  @ViewChild('objectEditor') 'objectEditor' !: ElementRef;
   private _objectEditor: FormatObjectEditorComponent;
 
   get matDialogRef() {

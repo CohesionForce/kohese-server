@@ -16,13 +16,14 @@
 
 
 // Angular
-import { Input } from '@angular/core';
+import { Input, Directive } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 // Other External Dependencies
 
 // Kohese
 
+@Directive()
 export class UserInput {
   @Input()
   public formGroup: FormGroup;

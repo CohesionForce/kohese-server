@@ -282,7 +282,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
 
   private _searchTimeoutIdentifier: any;
 
-  @ViewChild('elementContainer', {static: false})
+  @ViewChild('elementContainer')
   private _elementContainer: any;
 
   get matDialogRef() {

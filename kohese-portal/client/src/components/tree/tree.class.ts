@@ -16,7 +16,7 @@
 
 
 // Angular
-import { ElementRef, ViewChild } from '@angular/core';
+import { ElementRef, ViewChild, Directive } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
 import {tap} from 'rxjs/operators';
@@ -35,6 +35,7 @@ export enum TargetPosition {
   BEFORE = 'Before', AFTER = 'After', CHILD = 'Child'
 }
 
+@Directive()
 export abstract class Tree {
   private _rowMap: Map<any, TreeRow> = new Map<any, TreeRow>();
 
@@ -246,7 +247,7 @@ export abstract class Tree {
     return this._filterSubject;
   }
 
-  @ViewChild(VirtualScrollComponent, {static: false}) VirtualScrollComponent !: ElementRef;
+  @ViewChild(VirtualScrollComponent) VirtualScrollComponent !: ElementRef;
   private _virtualScrollComponent: VirtualScrollComponent;
 
   private _rootSubscription: Subscription;

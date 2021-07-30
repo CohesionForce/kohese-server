@@ -71,7 +71,7 @@ export class TextEditorComponent implements OnInit {
     this._save = save;
   }
 
-  @ViewChild('editor', {static: false})
+  @ViewChild('editor')
   private _editor: EditorComponent;
   get editor() {
     return this._editor;

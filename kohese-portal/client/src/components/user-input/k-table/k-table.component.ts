@@ -62,7 +62,7 @@ export class KTableComponent implements OnInit, OnDestroy {
 
   tableDataStream: BehaviorSubject<Array<any>>;
 
-  @ViewChild('proxyTable', {static: false}) 'proxyTable' !: ElementRef;
+  @ViewChild('proxyTable') 'proxyTable' !: ElementRef;
   private _table: ProxyTableComponent;
 
   get selection() {

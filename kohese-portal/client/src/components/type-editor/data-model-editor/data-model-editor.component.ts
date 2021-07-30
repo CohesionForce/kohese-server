@@ -181,7 +181,7 @@ export class DataModelEditorComponent {
     this.dataModel = this._dataModel;
   }
 
-  @ViewChild('attributeTable', {static: false}) 'attributeTable' !: ElementRef;
+  @ViewChild('attributeTable') 'attributeTable' !: ElementRef;
   private _attributeTable: MatTable<any>;
 
   private _attributes: Array<any>;

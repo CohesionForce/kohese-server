@@ -171,7 +171,7 @@ export class AttributeInsertionComponent {
     return this._getTargetText;
   }
 
-  @ViewChild('targetTree', {static: false}) 'targetTree' !: ElementRef;
+  @ViewChild('targetTree') 'targetTree' !: ElementRef;
   private _targetTree: TreeComponent;
 
   get changeDetectorRef() {
