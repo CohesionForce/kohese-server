@@ -25,8 +25,8 @@ declare module SharedWorker {
   }
 }
 declare var SharedWorker: {
-  prototype: SharedWorker;
-  new(scriptURL: string, options?: string | WorkerOptions): SharedWorker;
+  prototype: SharedWorker.SharedWorker;
+  new(stringUrl: string, name?: string): SharedWorker.SharedWorker;
 };
 // Merely added the onconnect() method to the file provied via:
 // npm install --save-dev retyped-sharedworker-tsd-ambient
