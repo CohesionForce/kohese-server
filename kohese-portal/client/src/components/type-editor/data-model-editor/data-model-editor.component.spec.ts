@@ -57,7 +57,7 @@ describe('DataModelEditorComponent', () => {
     let componentFixture: ComponentFixture<DataModelEditorComponent> = TestBed.
       createComponent(DataModelEditorComponent);
     component = componentFixture.componentInstance;
-    component.dataModel = TestBed.get(ItemRepository).getTreeConfig().
+    component.dataModel = TestBed.inject(ItemRepository).getTreeConfig().
       getValue().config.getProxyFor('KoheseModel').item;
 
     componentFixture.detectChanges();
@@ -83,7 +83,7 @@ describe('DataModelEditorComponent', () => {
         }]);
       }
     } as MatDialogRef<ComponentDialogComponent>);
-    spyOn(TestBed.get(DialogService), 'openComponentsDialog').and.returnValue(
+    spyOn(TestBed.inject(DialogService), 'openComponentsDialog').and.returnValue(
       matDialogRefPlaceholder);
     await component.addLocalType(Metatype.STRUCTURE);
     let localTypeNames: Array<string> = Object.keys(component.dataModel.

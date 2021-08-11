@@ -91,12 +91,12 @@ describe('Component: Create Wizard', ()=>{
     let closeSpy;
 
     beforeEach(()=>{
-      closeSpy = spyOn(TestBed.get(MatDialogRef), 'close');
+      closeSpy = spyOn(TestBed.inject(MatDialogRef), 'close');
 
     })
 
     it('closes the window when an item is built', async(()=>{
-      let buildSpy = spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve());
+      let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve());
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();
@@ -105,7 +105,7 @@ describe('Component: Create Wizard', ()=>{
     }))
 
     it('displays an error when a build fails', async(()=>{
-      let buildSpy = spyOn(TestBed.get(ItemRepository), 'upsertItem').and.returnValue(Promise.reject('Incorrect Fields'));
+      let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.reject('Incorrect Fields'));
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();

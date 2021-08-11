@@ -135,7 +135,7 @@ describe('Component: default-tree', () => {
     }
     expect(index).toEqual(-1);
 
-    TestBed.get(ActivatedRoute).params.next({ id: 'Item' });
+    TestBed.inject(ActivatedRoute).snapshot.params.next({ id: 'Item' });
     tick();
 
     for (let j: number = 0; j < component.visibleRows.length; j++) {
@@ -147,12 +147,12 @@ describe('Component: default-tree', () => {
     expect(index).not.toEqual(-1);
   }));
 
-  it('does not produce an error when the value of selectedIdSubject is ' +
-    'invalid', fakeAsync(() => {
+  it('does not produce an error when the value of selectedIdSubject is invalid', fakeAsync(() => {
+
     let id: string = '-1';
-    expect(TreeConfiguration.getWorkingTree().getProxyFor(id)).not.
-      toBeDefined();
-    TestBed.get(ActivatedRoute).params.next({ id: id });
+    expect(TreeConfiguration.getWorkingTree().getProxyFor(id)).not.toBeDefined();
+
+    TestBed.inject(ActivatedRoute).snapshot.params.next({ id: id });
     tick();
     /* Since the selection is to be synchronized by default, call the
     toggleSelectionSynchronization function twice to trigger showing the

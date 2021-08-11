@@ -81,7 +81,7 @@ describe('FormatObjectEditorComponent', () => {
       TestBed.createComponent(FormatObjectEditorComponent);
     component = componentFixture.componentInstance;
 
-    let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
+    let treeConfiguration: TreeConfiguration = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config;
     component.object = treeConfiguration.getProxyFor('KoheseModel').item;
     component.formatDefinitionType = FormatDefinitionType.DEFAULT;
