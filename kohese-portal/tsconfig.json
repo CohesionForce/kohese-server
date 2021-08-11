@@ -32,6 +32,9 @@
       "dom"
     ]
   },
+  "angularCompilerOptions": {
+    "enableIvy": false
+  },
   "exclude": [
     "scripts",
     "server",

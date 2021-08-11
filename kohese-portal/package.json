@@ -9,7 +9,6 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "ngcc",
     "build-all": "npm run build-server && npm run build-client",
     "server": "node --max_old_space_size=2048 .",
     "index": "node build/scripts/index-commits.js",
