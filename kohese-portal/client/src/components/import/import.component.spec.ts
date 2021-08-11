@@ -17,7 +17,7 @@
 
 // Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, SecurityContext } from '@angular/core';
 
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MaterialModule } from '../../material.module';
@@ -44,7 +44,9 @@ describe('Component: ', ()=>{
       declarations: [ImportComponent],
       imports: [
         BrowserAnimationsModule,
-        MarkdownModule,
+        MarkdownModule.forRoot({
+          sanitize: SecurityContext.NONE
+        }),
         ToastrModule.forRoot(),
         MaterialModule,
         TreeViewModule

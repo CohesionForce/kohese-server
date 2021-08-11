@@ -17,7 +17,7 @@
 
 // Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, SecurityContext } from '@angular/core';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -26,7 +26,7 @@ import { async } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 
 // Other External Dependencies
-import { MarkdownService, MarkedOptions } from 'ngx-markdown';
+import { MarkdownModule, MarkdownService, MarkedOptions } from 'ngx-markdown';
 
 // Kohese
 import { CreateWizardComponent } from './create-wizard.component';
@@ -55,6 +55,9 @@ describe('Component: Create Wizard', ()=>{
         PipesModule,
         ServicesModule,
         MatDialogModule,
+        MarkdownModule.forRoot({
+          sanitize: SecurityContext.NONE
+        }),
         BrowserAnimationsModule,
         ObjectEditorModule
       ],

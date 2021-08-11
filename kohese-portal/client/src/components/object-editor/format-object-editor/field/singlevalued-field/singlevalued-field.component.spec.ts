@@ -47,6 +47,7 @@ import { TreeViewModule } from '../../../../tree/tree.module';
 import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../../../../mocks/services/MockSessionService';
+import { SecurityContext } from '@angular/core';
 
 describe('SinglevaluedFieldComponent', () => {
   let component: SinglevaluedFieldComponent;
@@ -63,7 +64,9 @@ describe('SinglevaluedFieldComponent', () => {
         FormsModule,
         BrowserAnimationsModule,
         MaterialModule,
-        MarkdownModule,
+        MarkdownModule.forRoot({
+          sanitize: SecurityContext.NONE
+        }),
         MarkdownEditorModule,
         TableModule,
         TreeViewModule

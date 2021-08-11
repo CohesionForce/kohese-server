@@ -17,6 +17,7 @@
 
 // Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SecurityContext } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -62,7 +63,9 @@ describe('FormatObjectEditorComponent', () => {
         FormsModule,
         BrowserAnimationsModule,
         MaterialModule,
-        MarkdownModule,
+        MarkdownModule.forRoot({
+          sanitize: SecurityContext.NONE
+        }),
         TableModule,
         MarkdownEditorModule,
         TreeViewModule
