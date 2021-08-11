@@ -38,6 +38,7 @@
     "@angular/router": "^9.1.13",
     "@angular/service-worker": "^9.1.13",
     "@auth0/angular-jwt": "^4.2.0",
+    "@schematics/angular": "^9.1.12",
     "@tinymce/tinymce-angular": "^3.6.1",
     "@types/socket.io-client": "^1.4.36",
     "angular-split": "^3.0.3",
