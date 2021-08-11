@@ -42,7 +42,7 @@ import { ProjectOverviewComponent } from "./project-dashboard/project-overview/p
 import { StatusDashboardComponent } from './project-dashboard/status-dashboard/status-dashboard.component';
 import { UserStatisticsComponent } from "./project-dashboard/user-statistics/user-statistics.component";
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
-import { TreeModule } from "angular-tree-component";
+import { TreeModule } from "@circlon/angular-tree-component";
 import { StateFilterService } from './state-filter.service';
 import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy-card.component';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
@@ -84,7 +84,7 @@ import { DirectivesModule } from '../../directives/directives.module'
     PipesModule,
     UserInputModule,
     LensModule,
-    TreeModule.forRoot(),
+    TreeModule,
     VirtualScrollModule,
     FormsModule,
     ReactiveFormsModule,

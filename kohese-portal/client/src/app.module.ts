@@ -16,7 +16,7 @@
 
 
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, SecurityContext } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -54,7 +54,7 @@ import { CopyModule } from './components/copy/copy.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
-import { TreeModule } from 'angular-tree-component';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
 import { EditorModule } from '@tinymce/tinymce-angular';
@@ -76,6 +76,7 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     ServiceWorkerModule.register('/ngsw-worker.js', {enabled : true}),
     ToastrModule.forRoot(),
     MarkdownModule.forRoot({
+      sanitize: SecurityContext.NONE,
       markedOptions: {
         provide: MarkedOptions,
         useFactory: () => {
@@ -107,7 +108,7 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     DocumentViewModule,
     ActionTableModule,
     TypeEditorModule,
-    TreeModule.forRoot(),
+    TreeModule,
     CreateWizardModule,
     AppFrameModule,
     AuthenticationModule,
