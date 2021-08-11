@@ -86,7 +86,7 @@
     "string-replace-async": "^1.2.1",
     "subleveldown": "^3.0.1",
     "tinymce": "^5.8.2",
-    "tslib": "^1.10.0",
+    "tslib": "^1.14.1",
     "underscore": "^1.13.1",
     "uuid": "^3.4.0",
     "zone.js": "~0.10.2"
