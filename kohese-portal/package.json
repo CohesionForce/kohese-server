@@ -66,7 +66,7 @@
     "ng2-tree": "^2.0.0-rc.11",
     "ngx-infinite-scroll": "^6.9.1",
     "ngx-markdown": "^10.1.1",
-    "ngx-toastr": "^10.2.0",
+    "ngx-toastr": "^11.3.3",
     "node-fetch": "^2.6.1",
     "node-uuid": "^1.4.7",
     "nodegit": "^0.27.0",
