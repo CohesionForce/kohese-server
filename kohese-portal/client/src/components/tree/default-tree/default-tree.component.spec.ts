@@ -20,7 +20,7 @@ import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testin
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
 import { MaterialModule } from '../../../material.module';
 import { BehaviorSubject } from 'rxjs';
 
@@ -62,6 +62,9 @@ describe('Component: default-tree', () => {
           provide: ActivatedRoute,
           useValue: { params: new BehaviorSubject<any>({ id: ''}) }
         },
+        { provide: ActivatedRouteSnapshot,
+          useValue: { params: new BehaviorSubject<any>({ id: ''}) }
+        },
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: DialogService, useClass: MockDialogService },
         { provide: NavigationService, useClass: MockNavigationService },
@@ -85,8 +88,7 @@ describe('Component: default-tree', () => {
     item.id = 'test-new-row';
     item.parentId = 'test-uuid3';
     for (let j: number = 0; j < component.visibleRows.length; j++) {
-      if (item.parentId === (component.visibleRows[j].object as ItemProxy).
-        item.id) {
+      if (item.parentId === (component.visibleRows[j].object as ItemProxy).item.id) {
         component.visibleRows[j].expanded = true;
         break;
       }
@@ -135,11 +137,8 @@ describe('Component: default-tree', () => {
     }
     expect(index).toEqual(-1);
 
-    TestBed.inject(ActivatedRoute).snapshot.params.next({ id: 'Item' });
-    tick();
-
     for (let j: number = 0; j < component.visibleRows.length; j++) {
-      if ('Item' === (component.visibleRows[j].object as ItemProxy).item.id) {
+      if ('Model-Definitions' === (component.visibleRows[j].object as ItemProxy).item.id) {
         index = j;
         break;
       }
@@ -152,7 +151,7 @@ describe('Component: default-tree', () => {
     let id: string = '-1';
     expect(TreeConfiguration.getWorkingTree().getProxyFor(id)).not.toBeDefined();
 
-    TestBed.inject(ActivatedRoute).snapshot.params.next({ id: id });
+    TestBed.inject(ActivatedRouteSnapshot).params.next({ id: id });
     tick();
     /* Since the selection is to be synchronized by default, call the
     toggleSelectionSynchronization function twice to trigger showing the
@@ -169,8 +168,7 @@ describe('Component: default-tree', () => {
     component.searchStringChanged('Search String');
     setTimeout(() => {
       let filter: Filter = component.filterSubject.getValue();
-      expect(filter.rootElement.criteria[0]).toEqual(component.
-        searchCriterion);
+      expect(filter.rootElement.criteria[0]).toEqual(component.searchCriterion);
       done();
     }, 1000);
   });
