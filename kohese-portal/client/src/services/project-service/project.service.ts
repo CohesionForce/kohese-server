@@ -179,8 +179,8 @@ export class ProjectService {
       let currentProject = treeList[projectIdx];
       // Get referenced project items
       let projectItems = [];
-      if (currentProject.relations.references.Project) {
-        projectItems = currentProject.relations.references.Project.projectItems;
+      if (currentProject.relations.references.Item) {
+        projectItems = currentProject.relations.references.Item.children;
       }
       for (let projectItemIdx in projectItems) {
         let currentProjectItem: ItemProxy = projectItems[projectItemIdx];

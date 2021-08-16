@@ -155,10 +155,9 @@ export class ItemBoardComponent {
 
   public getBoardKinds(): Array<any> {
     let kinds: Array<any> = [];
-    for (let j: number = 0; j < this._project.projectItems.length; j++) {
-      TreeConfiguration.getWorkingTree().getProxyFor(this._project.
-        projectItems[j].id).visitTree({ includeOrigin: true }, (itemProxy:
-          ItemProxy) => {
+    for (let j: number = 0; j < this._project.children.length; j++) {
+      TreeConfiguration.getWorkingTree().getProxyFor(
+        this._project.children[j].id).visitTree({ includeOrigin: true }, (itemProxy: ItemProxy) => {
           let kind: any = itemProxy.model.item;
           if (kinds.indexOf(kind) === -1) {
             kinds.push(kind);
@@ -215,9 +214,9 @@ export class ItemBoardComponent {
         }
       }
 
-      for (let j: number = 0; j < this._project.projectItems.length; j++) {
+      for (let j: number = 0; j < this._project.children.length; j++) {
         TreeConfiguration.getWorkingTree().getProxyFor(this._project.
-          projectItems[j].id).visitTree({ includeOrigin: true },
+          children[j].id).visitTree({ includeOrigin: true },
             (itemProxy: ItemProxy) => {
               if ((itemProxy.model.item === this._selectedKind) && (itemProxy.item[
                 this._selectedAttribute.name])) {
@@ -228,9 +227,9 @@ export class ItemBoardComponent {
             }, undefined);
       }
     } else {
-      for (let j: number = 0; j < this._project.projectItems.length; j++) {
+      for (let j: number = 0; j < this._project.children.length; j++) {
         TreeConfiguration.getWorkingTree().getProxyFor(this._project.
-          projectItems[j].id).visitTree({ includeOrigin: true },
+          children[j].id).visitTree({ includeOrigin: true },
             (itemProxy: ItemProxy) => {
               if ((itemProxy.model.item === this._selectedKind) && (itemProxy.
                 item[this._selectedAttribute.name])) {
