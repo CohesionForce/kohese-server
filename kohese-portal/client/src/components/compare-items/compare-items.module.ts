@@ -47,7 +47,7 @@ import { ComparisonComponent } from './comparison.component';
   imports: [
     CommonModule,
     FormsModule,
-    AngularSplitModule.forRoot(),
+    AngularSplitModule,
     VirtualScrollModule,
     MaterialModule,
     PipesModule,

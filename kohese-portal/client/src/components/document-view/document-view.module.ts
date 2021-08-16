@@ -52,7 +52,7 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     TreeViewModule,
     UserInputModule,
     ObjectEditorModule,
-    AngularSplitModule.forRoot()
+    AngularSplitModule
   ],
   exports : [
     DocumentViewComponent,

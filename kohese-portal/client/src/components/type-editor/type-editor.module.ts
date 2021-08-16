@@ -47,7 +47,7 @@ import { TreeViewModule } from '../tree/tree.module';
     FormsModule,
     MaterialModule,
     PipesModule,
-    AngularSplitModule.forRoot(),
+    AngularSplitModule,
     StateMachineEditorModule,
     FormatModule,
     ObjectEditorModule,

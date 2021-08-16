@@ -41,7 +41,7 @@ import { AttributeInsertionComponent } from './attribute-insertion/attribute-ins
     FormsModule,
     MarkdownModule,
     EditorModule,
-    AngularSplitModule.forRoot(),
+    AngularSplitModule,
     MaterialModule,
     TreeViewModule
   ],

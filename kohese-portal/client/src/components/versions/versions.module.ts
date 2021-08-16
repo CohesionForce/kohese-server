@@ -29,7 +29,7 @@ import { VersionsComponent } from './versions.component';
   declarations: [VersionsComponent],
   imports: [
     CommonModule,
-    AngularSplitModule.forRoot(),
+    AngularSplitModule,
     LensModule,
     TreeViewModule,
     CompareItemsModule,

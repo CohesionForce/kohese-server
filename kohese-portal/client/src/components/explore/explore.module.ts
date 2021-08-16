@@ -45,7 +45,7 @@ import { PipesModule } from "../../pipes/pipes.module";
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    AngularSplitModule.forRoot(),
+    AngularSplitModule,
     NavigatorModule,
     DetailsModule,
     PipesModule,

@@ -47,7 +47,7 @@ describe('NamespaceEditorComponent', () => {
         FormsModule,
         BrowserAnimationsModule,
         MaterialModule,
-        AngularSplitModule.forRoot()
+        AngularSplitModule
       ],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },

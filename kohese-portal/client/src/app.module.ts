@@ -102,7 +102,7 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     EditorModule,
     PipesModule,
     MaterialModule,
-    AngularSplitModule.forRoot(),
+    AngularSplitModule,
     AnalysisModule,
     DetailsModule,
     DocumentViewModule,
