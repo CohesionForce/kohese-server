@@ -54,14 +54,14 @@ limitations under the License.
           </ng-container>
         </mat-menu>
       </ng-container>
-      <button mat-button [matMenuTriggerFor]="notificationMenu">
+      <button mat-button [matMenuTriggerFor]="notificationMenu" class=notification-bell>
         <mat-icon class="fa fa-bell fa-2.0x" matBadgeSize="medium" matBadge="{{messageCount}}"
-          [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn'>
+          [matBadgeHidden]="(!(messageCount>0))" matBadgeColor='warn' style="padding-top: 0.3em">
         </mat-icon>
         <mat-menu #notificationMenu="matMenu" [overlapTrigger]="false">
           <div style="text-align:center">Notifications</div>
           <div *ngFor=" let message of messages">
-            <mat-list-item style='font-size: 10pt'>
+            <mat-list-item style='font-size: 12pt'>
               {{message}}
               <button mat-icon-button matTooltip="Delete Notification"
                 (click)="deleteMessage(message); $event.stopPropagation()">
@@ -73,8 +73,14 @@ limitations under the License.
         </mat-menu>
       </button>
       <button mat-button [matMenuTriggerFor]="userMenu">
-        <mat-icon class="fa fa-user fa-fw"></mat-icon>
-        <span>{{userName}}</span>
+        <div class=float-container>
+          <div class=float-child-left>
+            <mat-icon class="fa fa-user fa-fw"></mat-icon>
+          </div>
+          <div class=float-child-right>
+            <span><b>{{userName}}</b></span>
+          </div>
+        </div>
         <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
           <button mat-menu-item (click)="navigate('Admin', {})">
             <mat-icon class="fa fa-user-plus"></mat-icon>
