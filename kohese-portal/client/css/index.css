@@ -26,6 +26,7 @@ components/
 pages/
 themes/
 */
+@import '~@circlon/angular-tree-component/css/angular-tree-component.css';
 @import url(~@angular/material/prebuilt-themes/deeppurple-amber.css);
 .btn-outline {
   color: inherit;
