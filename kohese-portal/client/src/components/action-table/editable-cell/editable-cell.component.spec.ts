@@ -77,6 +77,7 @@ describe('Component: Editable Cell ', ()=>{
     expect(editableCellComponent).toBeTruthy();
   })
 
+  // Missing Expectation
   it('updates when a new action is provided', waitForAsync(()=>{
     let newProxy = new ItemProxy('Item', MockItem());
     newProxy.item.name = 'New Action';

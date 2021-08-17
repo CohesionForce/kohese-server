@@ -41,6 +41,7 @@ import { PipesModule } from '../../pipes/pipes.module';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 
 describe('Component: Create Wizard', ()=>{
@@ -99,7 +100,8 @@ describe('Component: Create Wizard', ()=>{
     })
 
     it('closes the window when an item is built', waitForAsync(()=>{
-      let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve());
+      let value: Promise<ItemProxy>;
+      let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve(value));
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();
