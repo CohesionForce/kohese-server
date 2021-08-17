@@ -48,8 +48,6 @@ import { TreeViewModule } from './components/tree/tree.module'
 import { VersionsModule } from './components/versions/versions.module';
 import { ReportsModule } from './components/reports/reports.module';
 import { ImportModule } from './components/import/import.module';
-import { TextEditorModule } from './components/text-editor/text-editor.module';
-import { DocumentModule } from './components/document/document.module';
 import { CopyModule } from './components/copy/copy.module';
 
 import { ToastrModule } from 'ngx-toastr';
@@ -127,8 +125,6 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     LensModule,
     ReportsModule,
     ImportModule,
-    TextEditorModule,
-    DocumentModule,
     CopyModule,
     ItemBoardModule
   ],

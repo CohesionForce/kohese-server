@@ -96,10 +96,6 @@ export var LocationMap = {
     params: ['id'],
     route: 'outline'
   },
-  'Document' : {
-    'params' : ['id'],
-    'route' : 'document'
-  },
   'Reports': {
     route: 'reports'
   }

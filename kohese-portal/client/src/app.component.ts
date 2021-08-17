@@ -24,10 +24,5 @@ import { AuthenticationService } from './services/authentication/authentication.
   styles: ['./app.component.scss']
 })
 export class AppComponent {
-  constructor(private authenticationService: AuthenticationService) {
-    window['tinyMCE'].overrideDefaults({
-      base_url: '/tinymce/',
-      suffix: '.min'
-    });
-  }
+  constructor(private authenticationService: AuthenticationService) {}
 }

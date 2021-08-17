@@ -15,17 +15,11 @@
  */
 
 
-import { NgModule, Component, ChangeDetectionStrategy,
-  ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
-import { RouterModule, Routes, ActivatedRoute, Params } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 import { AnalysisModule } from './components/analysis/analysis.module'
-import { DocumentModule } from './components/document/document.module';
 import { ServicesModule } from './services/services.module';
-import { ItemRepository } from './services/item-repository/item-repository.service';
-import { ItemProxy } from '../../common/src/item-proxy';
-import { TreeConfiguration } from '../../common/src/tree-configuration';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { LoginComponent } from './components/login/login.component';
@@ -39,86 +33,9 @@ import { AboutComponent } from './components/admin/about/about.component';
 import { DocumentOutlineComponent } from './components/document-view/document-outline/document-outline.component';
 import { ReportsComponent } from './components/reports/reports.component';
 
-@Component({
-  selector: 'document-route',
-  template: `
-    <document [documentConfiguration]="documentConfiguration"></document>
-  `,
-  styleUrls: [],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class DocumentRouteComponent implements OnInit, OnDestroy {
-  private _documentConfiguration: any;
-  get documentConfiguration() {
-    return this._documentConfiguration;
-  }
-
-  private _treeConfigurationSubscription: Subscription;
-
-  public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _route: ActivatedRoute, private _itemRepository: ItemRepository) {
-  }
-
-  public ngOnInit(): void {
-    this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
-      subscribe((treeConfigurationObject: any) => {
-      if (treeConfigurationObject) {
-        this._route.params.subscribe((parameters: Params) => {
-          let itemProxy: ItemProxy = (parameters['id'] ? TreeConfiguration.
-            getWorkingTree().getProxyFor(parameters['id']) : undefined);
-          if (itemProxy) {
-            if (itemProxy.kind === 'DocumentConfiguration') {
-              this._documentConfiguration = itemProxy.item;
-            } else {
-              let components: any = {};
-              let process: (proxy: ItemProxy) => void = (proxy: ItemProxy) => {
-                let documentComponent: any = {
-                  id: proxy.item.id,
-                  attributeMap: {
-                    description: proxy.item.description
-                  },
-                  parentId: proxy.item.parentId,
-                  childIds: []
-                };
-
-                components[proxy.item.id] = documentComponent;
-
-                for (let j: number = 0; j < proxy.children.length; j++) {
-                  let child: ItemProxy = proxy.children[j];
-                  process(child);
-                  documentComponent.childIds.push(child.item.id);
-                }
-              };
-              process(itemProxy);
-              components[itemProxy.item.id].parentId = null;
-
-              this._documentConfiguration = {
-                name: itemProxy.item.name,
-                description: 'Document Configuration for ' + itemProxy.item.
-                  name,
-                id: itemProxy.item.id,
-                parentId: itemProxy.item.parentId,
-                components: components,
-                delineated: false
-              };
-            }
-          } else {
-            this._documentConfiguration = undefined;
-          }
-
-          this._changeDetectorRef.markForCheck();
-        });
-      }
-    });
-  }
-
-  public ngOnDestroy(): void {
-    this._treeConfigurationSubscription.unsubscribe();
-  }
-}
 
 @NgModule({
-  declarations: [DocumentRouteComponent],
+  declarations: [],
   imports: [
     RouterModule.forRoot([
     { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -133,11 +50,9 @@ export class DocumentRouteComponent implements OnInit, OnDestroy {
     { path: 'devtools', component: DevToolsComponent },
     { path: 'about', component: AboutComponent },
     { path: 'outline', component: DocumentOutlineComponent },
-    { path: 'document', component: DocumentRouteComponent },
     { path: 'reports', component: ReportsComponent }
 ], { relativeLinkResolution: 'legacy' }),
     AnalysisModule,
-    DocumentModule,
     ServicesModule
   ],
   exports: [RouterModule]
