@@ -29,6 +29,13 @@
   padding: unset;
   background: #3b9670;
 
+  .navbar-header {
+    img {
+      border-radius: 30px;
+      padding: 2px;
+    }
+  }
+
   .navbar-brand {
     display: unset;
     color: white;
