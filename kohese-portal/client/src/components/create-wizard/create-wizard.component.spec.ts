@@ -22,7 +22,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, SecurityContext } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialogRef } from '@angular/material/dialog';
-import { async } from '@angular/core/testing';
+import { waitForAsync } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 
 // Other External Dependencies
@@ -98,7 +98,7 @@ describe('Component: Create Wizard', ()=>{
 
     })
 
-    it('closes the window when an item is built', async(()=>{
+    it('closes the window when an item is built', waitForAsync(()=>{
       let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve());
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
@@ -107,7 +107,7 @@ describe('Component: Create Wizard', ()=>{
       })
     }))
 
-    it('displays an error when a build fails', async(()=>{
+    it('displays an error when a build fails', waitForAsync(()=>{
       let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.reject('Incorrect Fields'));
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{

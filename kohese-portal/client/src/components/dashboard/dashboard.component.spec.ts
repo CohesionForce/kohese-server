@@ -70,7 +70,7 @@ describe('Component: Dashboard', ()=>{
 
       ],
       imports: [
-        RouterModule.forRoot([]),
+        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
         CommonModule,
         FormsModule,
         BrowserAnimationsModule,

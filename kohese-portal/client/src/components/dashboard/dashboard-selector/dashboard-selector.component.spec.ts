@@ -39,7 +39,7 @@ describe('Component: Dashboard Selector', ()=>{
     TestBed.configureTestingModule({
       declarations: [DashboardSelectorComponent],
       imports : [
-        RouterModule.forRoot([]),
+        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
         CommonModule,
         MaterialModule,
         BrowserAnimationsModule

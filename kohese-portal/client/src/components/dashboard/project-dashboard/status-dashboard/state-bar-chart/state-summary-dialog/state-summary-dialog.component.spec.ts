@@ -16,7 +16,7 @@
 
 
 // Angular
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../../material.module';
@@ -38,7 +38,7 @@ describe('StateSummaryDialogComponent', () => {
   let component: StateSummaryDialogComponent;
   let fixture: ComponentFixture<StateSummaryDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ StateSummaryDialogComponent ],
       imports: [
