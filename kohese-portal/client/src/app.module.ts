@@ -55,7 +55,6 @@ import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from '@circlon/angular-tree-component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
-import { EditorModule } from '@tinymce/tinymce-angular';
 
 import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
@@ -97,7 +96,6 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
       }
     }),
     InfiniteScrollModule,
-    EditorModule,
     PipesModule,
     MaterialModule,
     AngularSplitModule,
