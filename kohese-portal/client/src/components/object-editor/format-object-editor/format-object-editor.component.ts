@@ -52,6 +52,10 @@ export class FormatObjectEditorComponent implements OnInit {
     }
 
     this._object = object;
+    if(this._defferedType) {
+      this.selectedType = this._defferedType;
+      delete this._defferedType;
+    }
   }
 
   private _enclosingType: any;
@@ -87,6 +91,10 @@ export class FormatObjectEditorComponent implements OnInit {
     return this._selectedType;
   }
   set selectedType(selectedType: any) {
+    if(!this._object) {
+      this._defferedType = selectedType;
+      return
+    }
     this._selectedType = selectedType;
 
     if (this._enclosingType) {
@@ -171,6 +179,7 @@ export class FormatObjectEditorComponent implements OnInit {
     this._allowKindNarrowingOnly = allowKindNarrowingOnly;
   }
 
+  private _defferedType: any;
   private _type: any;
   get type() {
     return this._type;
