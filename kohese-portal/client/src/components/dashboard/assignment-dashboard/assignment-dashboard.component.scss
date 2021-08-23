@@ -21,6 +21,11 @@
   ::ng-deep .mat-expansion-indicator:after {
   color: whitesmoke;
   }
+
+  ::ng-deep .mat-badge-content {
+    background-color: transparent;
+    color: whitesmoke;
+  }
 }
 
 mat-expansion-panel {
@@ -39,9 +44,4 @@ mat-panel-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.mat-badge-content {
-  background-color: transparent;
-  color: whitesmoke;
 }

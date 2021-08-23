@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+:host {
+  ::ng-deep .mat-badge-content {
+    background-color: transparent;
+    color: black;
+  }
+}
 
 .document-row:hover #menuWrapper {
   visibility: visible;
@@ -34,9 +40,4 @@
 
 .document-row:hover {
   background-color: rgb(248, 248, 248);
-}
-
-.mat-badge-content {
-  background-color: transparent;
-  color: black;
 }
