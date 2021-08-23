@@ -18,20 +18,28 @@
 @import '../../app.component';
 
 :host {
+
+  .reports-page {
+    height: 100%;
+    width: 100%;
+    padding: 3px;
+  }
+
   ::ng-deep .mat-expansion-panel-content {
       height: 300px;
-      overflow: hidden;
+      overflow: auto;
     }
 
-    ::ng-deep .mat-expansion-panel-body {
-      height: 100%;
-      width: 100%;
-    }
+  ::ng-deep .mat-expansion-panel-body {
+    height: 100%;
+    width: 100%;
+  }
 
   .reports-container {
     height: 95%;
 
     .reports-content {
+      height:99%;
       overflow: auto;
     }
 

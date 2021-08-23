@@ -15,7 +15,7 @@ limitations under the License.
 -->
 
 
-<div style="height: 100%; width: 100%; padding: 3px;">
+<div class=reports-page>
   <h3 style="height: 5%;">Reports</h3>
   <div class=reports-container>
     <div class=reports-content>
@@ -51,7 +51,9 @@ limitations under the License.
             <ng-template matExpansionPanelContent>
               <ng-container *ngIf="reports.get(reportObject).isExpanded else retrievingPreview">
                 <ng-container *ngIf="reportObject.name.endsWith('.md') else notMarkdownReport">
-                  <pre style="font-family: Roboto, 'Helvetica Neue',sans-serif;">{{reports.get(reportObject).preview}}</pre>
+                  <pre style="font-family: Roboto, 'Helvetica Neue',sans-serif;">
+                    {{reports.get(reportObject).preview}}
+                  </pre>
                 </ng-container>
                 <ng-template #notMarkdownReport>
                   <markdown [data]="reports.get(reportObject).preview">
