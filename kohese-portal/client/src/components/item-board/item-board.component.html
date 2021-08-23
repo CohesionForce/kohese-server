@@ -60,7 +60,7 @@ limitations under the License.
           &nbsp;({{categoryItems.items.length}})
         </h3>
       </div>
-      <div style="height: calc(100% - 50px); overflow: auto; display: flex; flex-direction: column;">
+      <div style="height: calc(100% - 50px); overflow: auto;">
         <ng-container *ngFor="let item of categoryItems.items">
           <mat-expansion-panel #panel>
             <mat-expansion-panel-header draggable="{{mayDrag(item)}}"
