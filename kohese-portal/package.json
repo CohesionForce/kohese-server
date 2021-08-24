@@ -59,6 +59,7 @@
     "level-js": "^6.0.0",
     "leveldown": "^6.0.1",
     "levelup": "^5.0.1",
+    "license-checker": "^25.0.1",
     "mark.js": "^8.11.1",
     "morgan": "^1.10.0",
     "ng2-dragula": "^1.5.0",
