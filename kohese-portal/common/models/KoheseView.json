@@ -21,6 +21,10 @@
         "foreignKey": "id"
       }
     },
+    "repositoryId": {
+      "name": "repositoryId",
+      "type": "string"
+    },
     "modelName": {
       "type": "string",
       "required": true,

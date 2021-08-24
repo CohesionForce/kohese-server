@@ -684,7 +684,6 @@ function KIOItemServer(socket){
             proxy = new ItemProxy(kind, item);
         }
       }
-
       sendResponse({
         kind: request.kind,
         item: proxy.cloneItemAndStripDerived()
@@ -1820,7 +1819,12 @@ function updateStatus(proxies) {
 //
 //////////////////////////////////////////////////////////////////////////
 function getRepositoryInformation(proxy) {
-  var repositoryProxy = proxy.getRepositoryProxy();
+  var repositoryProxy;
+  if (proxy.item.repositoryId && proxy.item.repositoryId.id !== 'ROOT') {
+    repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(proxy.item.repositoryId.id)
+  } else {
+    repositoryProxy = proxy.getRepositoryProxy();
+  }
   var pathToRepo;
   var relativeFilePath;
   if (!KDBRepo.isRepo(repositoryProxy.item.id)) {

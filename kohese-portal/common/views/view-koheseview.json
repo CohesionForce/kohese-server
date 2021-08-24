@@ -175,6 +175,14 @@
               "editable": false
             },
             {
+              "propertyName": "repositoryId",
+              "customLabel": "RepositoryId",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": false
+            },
+            {
               "propertyName": "modelName",
               "customLabel": "Model Name",
               "labelOrientation": "Top",

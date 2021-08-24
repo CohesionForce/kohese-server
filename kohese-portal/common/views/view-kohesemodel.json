@@ -388,6 +388,14 @@
               "editable": true
             },
             {
+              "propertyName": "repositoryId",
+              "customLabel": "RepositoryId",
+              "labelOrientation": "Top",
+              "kind": "text",
+              "visible": true,
+              "editable": true
+            },
+            {
               "propertyName": "base",
               "customLabel": "Base",
               "labelOrientation": "Top",
