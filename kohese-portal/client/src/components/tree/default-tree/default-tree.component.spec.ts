@@ -137,8 +137,10 @@ describe('Component: default-tree', () => {
     }
     expect(index).toEqual(-1);
 
+    let paramsValue = TestBed.inject(ActivatedRoute).params;
+    (paramsValue as BehaviorSubject<any>).next({ id: 'Item' });
     for (let j: number = 0; j < component.visibleRows.length; j++) {
-      if ('Model-Definitions' === (component.visibleRows[j].object as ItemProxy).item.id) {
+      if ('Item' === (component.visibleRows[j].object as ItemProxy).item.id) {
         index = j;
         break;
       }
