@@ -15,9 +15,13 @@
  */
 
 
+// Angular
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { ItemCache } from "../../../../../common/src/item-cache";
 import { ItemRepository } from "../../../services/item-repository/item-repository.service";
 import { DialogService } from "../../../services/dialog/dialog.service";

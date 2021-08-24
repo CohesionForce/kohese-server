@@ -58,7 +58,7 @@ import { TreeComponent } from './tree.component';
     ServicesModule,
     BrowserModule,
     FormsModule,
-    AngularSplitModule,
+    AngularSplitModule.forRoot(),
     VirtualScrollModule,
     PipesModule
   ],

@@ -15,12 +15,15 @@
  */
 
 
+// Angular
 import { Injectable } from '@angular/core';
-
-import { NavigationUpdate } from './NavigationUpdate.class';
-import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
+import { NavigationUpdate } from './NavigationUpdate.class';
 import { LocationMap } from '../../constants/LocationMap.data'
 
 @Injectable()

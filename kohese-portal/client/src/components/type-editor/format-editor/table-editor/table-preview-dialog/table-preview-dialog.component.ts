@@ -15,13 +15,17 @@
  */
 
 
+// Angular
+import { Component, OnInit, Optional, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+// Other External Dependencies
+
+// Kohese
 import { DialogService } from './../../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Component, OnInit, Optional, Inject } from '@angular/core';
-
 import { TreeComponent } from '../../../../tree/tree.component';
 
 @Component({

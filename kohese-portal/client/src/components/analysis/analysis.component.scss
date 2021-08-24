@@ -17,7 +17,7 @@
 
 @import '../../app.component';
 
-/deep/ mark {
+::ng-deep mark {
   padding: unset;
   background-color: yellow;
 }

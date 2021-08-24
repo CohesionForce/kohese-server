@@ -15,10 +15,14 @@
  */
 
 
+// Angular
 import { Injectable } from '@angular/core';
-
-import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { Subscription } from 'rxjs';
+
+// Other External Dependencies
+
+// Kohese
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { KoheseType } from '../../classes/UDT/KoheseType.class';

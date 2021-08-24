@@ -13,6 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "build/client/bundle",
             "index": "client/index.html",
             "main": "client/bootstrap.ts",
@@ -51,6 +52,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "client/environments/environment.ts",
@@ -62,13 +69,19 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
+              "aot": false,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true,
+              "buildOptimizer": false,
               "serviceWorker": true
             },
             "development": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": false,
               "outputHashing": "all",
               "sourceMap": true,
@@ -107,7 +120,10 @@
             "tsConfig": "client/tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "styles": [
-              "client/styles.css"
+              "./client/css/index.css",
+              "./node_modules/bootstrap/dist/css/bootstrap.css",
+              "./node_modules/font-awesome/css/font-awesome.css",
+              "./node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [],
             "assets": [

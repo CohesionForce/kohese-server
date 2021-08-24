@@ -15,10 +15,15 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   Optional, Inject, OnInit, Output, EventEmitter, ViewChild,
-  AfterViewInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  AfterViewInit, ElementRef} from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+// Other External Dependencies
+
+// Kohese
 import { Dialog } from '../dialog/Dialog.interface';
 
 class ElementMapValue {

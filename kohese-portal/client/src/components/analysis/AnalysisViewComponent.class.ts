@@ -15,7 +15,12 @@
  */
 
 
+// Angular
 import { Injectable } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { AnalysisService } from '../../services/analysis/analysis.service';

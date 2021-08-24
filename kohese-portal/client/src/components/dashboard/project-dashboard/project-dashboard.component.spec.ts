@@ -15,18 +15,23 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 import { of as ObservableOf } from 'rxjs';
 
+// Kohese
 import { DashboardModule } from '../dashboard.module';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { ProjectDashboardComponent } from './project-dashboard.component';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('ProjectDashboardComponent', () => {
   let projectDashboardComponent: ProjectDashboardComponent;

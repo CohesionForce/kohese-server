@@ -15,13 +15,18 @@
  */
 
 
+// Angular
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
 
+import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../material.module';
+
+// Kohese
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 import { CreationRowComponent } from './creation-row.component';
+
+// Mocks
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 
 describe('CreationRowComponent', () => {
   let component: CreationRowComponent;

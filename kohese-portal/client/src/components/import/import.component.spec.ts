@@ -15,18 +15,25 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MaterialModule } from '../../material.module';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+
+// Other External Dependencies
 import { MarkdownModule } from 'ngx-markdown';
 import { ToastrModule } from 'ngx-toastr';
 
-import { MaterialModule } from '../../material.module'
+// Kohese
 import { TreeViewModule } from '../tree/tree.module';
 import { ImportComponent } from './import.component';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+
+// Mocks
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
-import { MAT_DIALOG_DATA } from '@angular/material';
 
 describe('Component: ', ()=>{
   let importComponent: ImportComponent;

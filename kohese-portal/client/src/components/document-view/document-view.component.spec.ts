@@ -15,30 +15,35 @@
  */
 
 
-import { TestBed, ComponentFixture} from '@angular/core/testing';
+// Angular
+import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
+import { BehaviorSubject } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { of as ObservableOf } from 'rxjs';
+import { MaterialModule } from '../../material.module';
 
-import { MaterialModule } from '../../material.module'
+// Other External Dependencies
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
+// Kohese
 import { DocumentViewComponent } from './document-view.component';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
-import { BehaviorSubject } from 'rxjs';
-import { MockItem, MockDocument } from '../../../mocks/data/MockItem';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { AnalysisViews } from '../analysis/AnalysisViewComponent.class';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { RouterTestingModule } from '@angular/router/testing';
+
+// Mocks
+import { MockItem } from '../../../mocks/data/MockItem';
+import { MockDialogService } from '../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 
 
 describe('Component: Document View', ()=>{

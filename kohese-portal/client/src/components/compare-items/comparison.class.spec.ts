@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
+// Angular
 
+// Kohese
 import { Comparison, ChangeType, Property } from './comparison.class';
+
+// Mocks
 
 describe('Class: Comparison', () => {
   let comparison: Comparison;

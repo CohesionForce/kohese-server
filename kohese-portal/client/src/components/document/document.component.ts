@@ -15,12 +15,16 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  Inject, Input, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+
+// Other External Dependencies
 import { MarkdownService } from 'ngx-markdown';
 
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -31,12 +35,9 @@ import { TextEditorComponent } from '../text-editor/text-editor.component';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { AttributeInsertionComponent, AttributeInsertionSpecification,
-  InsertionLocation,
-  HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
-import { ReportSpecificationComponent,
-  ReportSpecifications } from '../reports/report-specification/report-specification.component';
-import { MergeComponent, Difference,
-  VersionSelection } from '../merge/merge.component';
+  InsertionLocation, HeadingStyle } from '../text-editor/attribute-insertion/attribute-insertion.component';
+import { ReportSpecificationComponent, ReportSpecifications } from '../reports/report-specification/report-specification.component';
+import { MergeComponent, Difference, VersionSelection } from '../merge/merge.component';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { LocationMap } from '../../constants/LocationMap.data';
@@ -214,10 +215,10 @@ export class DocumentComponent implements OnInit, OnDestroy {
     return this._outlineActions;
   }
 
-  @ViewChild('outlineTree')
+  @ViewChild('outlineTree') 'outlineTree' !: ElementRef;
   private _outlineTree: TreeComponent;
 
-  @ViewChild('textEditor')
+  @ViewChild('textEditor') 'textEditor' !: ElementRef;
   private _textEditor: TextEditorComponent;
 
   private _document: string = '';
@@ -233,7 +234,7 @@ export class DocumentComponent implements OnInit, OnDestroy {
 
   private _selectedAttributeName: string;
 
-  @ViewChild('objectEditor')
+  @ViewChild('objectEditor') 'objectEditor' !: ElementRef;
   private _objectEditor: FormatObjectEditorComponent;
 
   get matDialogRef() {

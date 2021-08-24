@@ -15,15 +15,18 @@
  */
 
 
-
-import {map, startWith} from 'rxjs/operators';
+// Angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
+
+// Other External Dependencies
+
+// Kohese
 import { UserInput } from '../user-input.class';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
-
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { Subscription ,  Observable } from 'rxjs';
 
 @Component({
   selector: 'k-user-selector',

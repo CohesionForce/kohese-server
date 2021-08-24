@@ -16,12 +16,12 @@
 
 
 // Angular
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-
-// NPM
 import { Subscription } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';

@@ -15,21 +15,26 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-
-import { DetailsComponent } from './details.component';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../material.module';
+
+// Kohese
+import { DetailsComponent } from './details.component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ServicesModule } from '../../services/services.module';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
-import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+
+// Mocks
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 
 describe('Component: Details', ()=>{
   let detailsComponent: DetailsComponent;

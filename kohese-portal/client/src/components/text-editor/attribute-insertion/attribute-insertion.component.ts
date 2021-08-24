@@ -15,10 +15,14 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  Inject, ViewChild, ElementRef } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
+// Other External Dependencies
+
+// Kohese
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -167,7 +171,7 @@ export class AttributeInsertionComponent {
     return this._getTargetText;
   }
 
-  @ViewChild('targetTree')
+  @ViewChild('targetTree') 'targetTree' !: ElementRef;
   private _targetTree: TreeComponent;
 
   get changeDetectorRef() {

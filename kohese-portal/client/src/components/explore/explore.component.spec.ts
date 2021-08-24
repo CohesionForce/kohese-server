@@ -15,22 +15,24 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { from as ObservableFrom } from 'rxjs';
-
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../material.module'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MaterialModule } from '../../material.module';
 
+// Kohese
 import { ExploreComponent } from './explore.component';
-
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { ActivatedRoute } from '@angular/router';
-import { LensModule } from '../lens/lens.module';
+
+// Mocks
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 
 describe('Component: Explore', ()=>{
   let exploreComponent: ExploreComponent;

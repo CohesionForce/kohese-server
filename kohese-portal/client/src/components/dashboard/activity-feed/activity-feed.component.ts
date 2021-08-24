@@ -15,9 +15,14 @@
  */
 
 
+// Angular
+import { Component, OnInit, Input } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
 import { DetailsComponent } from './../../details/details.component';
 import { DialogService } from './../../../services/dialog/dialog.service';
-import { Component, OnInit, Input } from '@angular/core';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 @Component({

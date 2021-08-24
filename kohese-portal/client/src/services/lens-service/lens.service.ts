@@ -15,8 +15,13 @@
  */
 
 
+// Angular
 import { Injectable } from '@angular/core';
 import { Observable ,  BehaviorSubject } from 'rxjs';
+
+// Other External Dependencies
+
+// Kohese
 import { ItemRepository, TreeConfigType } from '../item-repository/item-repository.service';
 
 @Injectable()

@@ -39,7 +39,7 @@
   }
 }
 
-/deep/ .mat-tab-body-wrapper {
+::ng-deep .mat-tab-body-wrapper {
   height: 100%;
   width: 100%;
 }
@@ -71,7 +71,7 @@ tab {
 }
 
 .active-state {
-  background-color: $primaryColor + 100;
+  background-color: #007541;
   color: white;
 }
 

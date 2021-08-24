@@ -15,10 +15,13 @@
  */
 
 
-import { Component, ChangeDetectionStrategy,
-  ChangeDetectorRef, Input } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { Comparison } from './comparison.class';
 
 @Component({

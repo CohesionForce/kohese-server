@@ -15,25 +15,30 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MaterialModule } from '../../material.module';
+import { MatDialogRef } from '@angular/material/dialog';
 import { of } from 'rxjs';
 
-import { MaterialModule } from '../../material.module';
+// Kohese
 import { TypeEditorComponent } from './type-editor.component';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { MockDialogService } from '../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { PipesModule } from '../../pipes/pipes.module';
 import { TreeViewModule } from '../tree/tree.module';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ComponentDialogComponent } from '../dialog/component-dialog/component-dialog.component';
-import { MatDialogRef } from '@angular/material';
+
+// Mocks
+import { MockDialogService } from '../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 
 describe('Component: Type Editor', ()=>{
   let typeEditorComponent: TypeEditorComponent;

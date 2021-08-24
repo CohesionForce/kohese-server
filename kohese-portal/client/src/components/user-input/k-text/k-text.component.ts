@@ -15,7 +15,12 @@
  */
 
 
+// Angular
 import { Component, Input } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
 import { UserInput } from '../user-input.class';
 
 @Component({

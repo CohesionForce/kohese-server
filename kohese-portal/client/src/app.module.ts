@@ -18,7 +18,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FlexLayoutModule, ShowHideDirective } from '@angular/flex-layout';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { AppComponent } from './app.component';
@@ -73,7 +72,6 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    FlexLayoutModule,
     BrowserAnimationsModule,
     ServiceWorkerModule.register('/ngsw-worker.js', {enabled : true}),
     ToastrModule.forRoot(),
@@ -103,7 +101,7 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     EditorModule,
     PipesModule,
     MaterialModule,
-    AngularSplitModule,
+    AngularSplitModule.forRoot(),
     AnalysisModule,
     DetailsModule,
     DocumentViewModule,

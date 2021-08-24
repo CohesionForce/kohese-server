@@ -15,14 +15,19 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import { MaterialModule } from '../../material.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+// Kohese
 import { FilterComponent } from './filter.component';
 import { Filter, FilterCriterion } from './filter.class';
+
+// Mocks
 
 describe('Component: filter', () => {
   let component: FilterComponent;

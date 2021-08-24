@@ -15,24 +15,29 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import { MaterialModule } from '../../../material.module';
 import { of } from 'rxjs';
+
+// Other External Dependencies
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 
-import { MaterialModule } from '../../../material.module';
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { LensService } from '../../../services/lens-service/lens.service';
-import { MockLensService } from '../../../../mocks/services/MockLensService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { CommitTreeComponent } from './commit-tree.component';
+
+// Mocks
+import { MockLensService } from '../../../../mocks/services/MockLensService';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
-import { CommitTreeComponent } from './commit-tree.component';
 
 describe('Component: commit-tree', () => {
   let component: CommitTreeComponent;

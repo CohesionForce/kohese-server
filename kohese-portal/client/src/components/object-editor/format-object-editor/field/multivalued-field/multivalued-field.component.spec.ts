@@ -15,22 +15,24 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { QueryList } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule } from '../../../../../material.module';
-import { MatExpansionPanel } from '@angular/material';
-import { MarkdownModule } from 'ngx-markdown';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
+import { MaterialModule } from '../../../../../material.module';
+import { MatExpansionPanel } from '@angular/material/expansion';
 
+// Other External Dependencies
+import { MarkdownModule } from 'ngx-markdown';
+
+// Kohese
 import { FormatDefinitionType } from '../../../../../../../common/src/FormatDefinition.interface';
 import { PropertyDefinition } from '../../../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../../../../common/src/KoheseModel';
-import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../../../../mocks/services/MockItemRepository';
-import { MockSessionService } from '../../../../../../mocks/services/MockSessionService';
 import { DialogService } from '../../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../../../services/user/session.service';
@@ -41,6 +43,11 @@ import { SinglevaluedFieldComponent } from '../singlevalued-field/singlevalued-f
 import { MultivaluedFieldComponent } from './multivalued-field.component';
 import { TreeViewModule } from '../../../../tree/tree.module';
 import { DirectivesModule } from '../../../../../directives/directives.module'
+
+// Mocks
+import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../../../mocks/services/MockItemRepository';
+import { MockSessionService } from '../../../../../../mocks/services/MockSessionService';
 
 describe('MultivaluedFieldComponent', () => {
   let component: MultivaluedFieldComponent;

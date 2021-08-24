@@ -15,14 +15,14 @@
  */
 
 
+// Angular
 import { Component, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 
+// Other External Dependencies
+
+// Kohese
 import { ProjectInfo, ProjectService } from '../../../../services/project-service/project.service';
-
-import { ItemProxy} from '../../../../../../common/src/item-proxy';
-import { MatDialogRef } from '@angular/material';
-
-
 
 @Component({
   selector: 'project-selector',

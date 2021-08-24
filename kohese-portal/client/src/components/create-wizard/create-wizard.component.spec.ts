@@ -15,33 +15,32 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CreateWizardComponent } from './create-wizard.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { async } from '@angular/core/testing';
-
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../material.module';
-import { PipesModule } from '../../pipes/pipes.module';
-import { ServicesModule } from '../../services/services.module';
-import { MatDialogModule } from '@angular/material';
-import { MatDialogRef } from '@angular/material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
-import { MatStepper } from '@angular/material';
+// Other External Dependencies
+import { MarkdownService, MarkedOptions } from 'ngx-markdown';
 
-
-/* Mocks */
-import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
-import { MockSessionService } from '../../../mocks/services/MockSessionService';
-import { MockItem } from '../../../mocks/data/MockItem';
-
+// Kohese
+import { CreateWizardComponent } from './create-wizard.component';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { SessionService } from '../../services/user/session.service';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
-import { MarkdownService, MarkedOptions } from 'ngx-markdown';
+import { ServicesModule } from '../../services/services.module';
+import { PipesModule } from '../../pipes/pipes.module';
+
+// Mocks
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockSessionService } from '../../../mocks/services/MockSessionService';
 
 
 describe('Component: Create Wizard', ()=>{
@@ -51,14 +50,14 @@ describe('Component: Create Wizard', ()=>{
   beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [CreateWizardComponent],
-      imports : [CommonModule,
-         MaterialModule,
-         PipesModule,
-         ServicesModule,
-         MatDialogModule,
-         BrowserAnimationsModule,
-         ObjectEditorModule
-         ],
+      imports : [
+        CommonModule,
+        PipesModule,
+        ServicesModule,
+        MatDialogModule,
+        BrowserAnimationsModule,
+        ObjectEditorModule
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers : [
         {provide: ItemRepository, useClass: MockItemRepository},

@@ -27,10 +27,10 @@
   width: 100%;
   margin-bottom: 0;
   padding: unset;
-  background: -webkit-linear-gradient(right, $primaryColor + 100, $primaryColor);
-  background-image: -moz-linear-gradient(right, $primaryColor + 100, $primaryColor);
-  background-image: -ms-linear-gradient(right, $primaryColor + 100, $primaryColor);
-  background-image: -o-linear-gradient(right, $primaryColor + 100, $primaryColor);
+  background: -webkit-linear-gradient(right, #007541, $primaryColor);
+  background-image: -moz-linear-gradient(right, #007541, $primaryColor);
+  background-image: -ms-linear-gradient(right, #007541, $primaryColor);
+  background-image: -o-linear-gradient(right, #007541, $primaryColor);
   .navbar-brand {
     display: unset;
     color: white;

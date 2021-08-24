@@ -29,7 +29,7 @@ import { MergeComponent } from './merge.component';
   entryComponents: [MergeComponent],
   imports: [
     CommonModule,
-    AngularSplitModule,
+    AngularSplitModule.forRoot(),
     MarkdownModule.forChild(),
     MaterialModule,
     TreeViewModule

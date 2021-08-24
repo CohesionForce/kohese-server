@@ -17,10 +17,11 @@
 
 // Angular
 import { Component, OnInit, Input, Inject, ViewChild, ViewChildren, QueryList, ChangeDetectorRef } from '@angular/core';
-import { MatExpansionPanel, MAT_DIALOG_DATA } from '@angular/material';
-
-// NPM
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatExpansionPanel } from '@angular/material/expansion';
 import { Subscription } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';

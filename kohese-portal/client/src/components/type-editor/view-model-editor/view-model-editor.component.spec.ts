@@ -15,22 +15,34 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatTooltipModule, MatExpansionModule, MatIconModule, MatInputModule,
-  MatBadgeModule, MatTableModule, MatSelectModule, MatDividerModule,
-  MatListModule } from '@angular/material';
 
+import { MatListModule } from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatTableModule } from '@angular/material/table';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+
+// Kohese
 import { ObjectEditorModule } from '../../object-editor/object-editor.module';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { ViewModelEditorComponent } from './view-model-editor.component';
 import { TableEditorComponent } from '../format-editor/table-editor/table-editor.component';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('ViewModelEditorComponent', () => {
   let component: ViewModelEditorComponent;

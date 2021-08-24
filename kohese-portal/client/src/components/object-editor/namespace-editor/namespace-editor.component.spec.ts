@@ -15,20 +15,27 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AngularSplitModule } from 'angular-split';
 import { of } from 'rxjs';
 
+// Other External Dependencies
+import { AngularSplitModule } from 'angular-split';
+
+// Kohese
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NamespaceEditorComponent } from './namespace-editor.component';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('NamespaceEditorComponent', () => {
   let component: NamespaceEditorComponent;
@@ -40,7 +47,7 @@ describe('NamespaceEditorComponent', () => {
         FormsModule,
         BrowserAnimationsModule,
         MaterialModule,
-        AngularSplitModule
+        AngularSplitModule.forRoot()
       ],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },

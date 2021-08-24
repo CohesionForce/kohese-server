@@ -50,7 +50,7 @@ import { PipesModule } from "../../pipes/pipes.module";
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    AngularSplitModule,
+    AngularSplitModule.forRoot(),
     TreeViewModule,
     DetailsModule,
     PipesModule

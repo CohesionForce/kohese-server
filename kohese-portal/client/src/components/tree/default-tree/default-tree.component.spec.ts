@@ -15,21 +15,22 @@
  */
 
 
-import { TestBed, ComponentFixture, fakeAsync,
-  tick } from '@angular/core/testing';
+// Angular
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
-import { VirtualScrollModule } from 'angular2-virtual-scroll';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-
 import { MaterialModule } from '../../../material.module';
+import { BehaviorSubject } from 'rxjs';
+
+// Other External Dependencies
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
+
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DefaultTreeComponent } from './default-tree.component';
 import { TreeRow } from '../tree-row/tree-row.class';
@@ -37,7 +38,12 @@ import { ActionGroup } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { Filter } from '../../filter/filter.class';
+
+// Mocks
 import { MockItem } from '../../../../mocks/data/MockItem';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 
 describe('Component: default-tree', () => {
   let component: DefaultTreeComponent;

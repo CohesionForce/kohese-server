@@ -14,32 +14,37 @@
  * limitations under the License.
  */
 
-
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
+import { MaterialModule } from '../../../material.module';
+import { BehaviorSubject } from 'rxjs';
+
+// Other External Dependencies
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { ToastrModule } from 'ngx-toastr';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { MaterialModule } from '../../../material.module';
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
-import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { NotificationService } from '../../../services/notifications/notification.service';
-import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
 import { VersionControlTreeComponent } from './version-control-tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { TreeRow } from '../tree-row/tree-row.class';
 import { Filter } from '../../filter/filter.class';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
+import { MockVersionControlService } from '../../../../mocks/services/MockVersionControlService';
 
 describe('Component: version-control-tree', () => {
   let component: VersionControlTreeComponent;

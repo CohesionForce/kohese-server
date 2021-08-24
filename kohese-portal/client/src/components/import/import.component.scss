@@ -17,12 +17,12 @@
 
 @import '../../app.component';
 
-/deep/ .mat-expansion-panel-content {
+::ng-deep .mat-expansion-panel-content {
   height: 300px;
   overflow: auto !important;
 }
 
-/deep/ .mat-expansion-panel-body {
+::ng-deep .mat-expansion-panel-body {
   height: 100%;
   width: 100%;
 }

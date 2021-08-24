@@ -15,15 +15,23 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogModule, MatIconModule, MatInputModule, MatSidenavModule,
-  MatTooltipModule } from '@angular/material';
+
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+// Kohese
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { TreeComponent } from './tree.component';
+
+// Mocks
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 
 describe('TreeComponent', () => {
   let component: TreeComponent;

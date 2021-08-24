@@ -15,19 +15,21 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  ViewChild, Output, EventEmitter } from '@angular/core';
-import * as Uuid from 'uuid/v1';
-import { MatTable } from '@angular/material';
+  ViewChild, Output, EventEmitter, ElementRef } from '@angular/core';
+import { MatTable } from '@angular/material/table';
 
+// Other External Dependencies
+import * as Uuid from 'uuid/v1';
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { FormatPreviewComponent } from '../format-editor/format-preview/format-preview.component';
 import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
-import { FormatDefinition,
-  FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
-import { FormatContainer,
-  FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
+import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
+import { FormatContainer, FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
 import { PropertyDefinition } from '../../../../../common/src/PropertyDefinition.interface';
 import { InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -151,7 +153,7 @@ export class ViewModelEditorComponent {
   private _filter: string;
   private _iconFilterTimeoutIdentifier: any;
 
-  @ViewChild('attributeTable')
+  @ViewChild('attributeTable') 'attributeTable' !: ElementRef;
   private _attributeTable: MatTable<any>;
 
   private _attributes: Array<any>;

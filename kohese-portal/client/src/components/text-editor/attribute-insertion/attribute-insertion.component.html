@@ -31,16 +31,16 @@ limitations under the License.
   <h3 style="height: 10%;">
     Attributes
   </h3>
-  <split direction="horizontal" style="height: 80%;">
-    <split-area [size]="35">
+  <as-split unit=percent direction="horizontal" style="height: 80%;">
+    <as-split-area [size]="35">
       <div style="height: 5%; width: 100%;">
       </div>
       <tree #sourceTree [root]="undefined" [getChildren]="getSourceChildren"
         [getText]="getSourceText" (elementSelected)="addAttribute(sourceTree.
         getTreePath($event))" style="height: 95%; width: 100%;">
       </tree>
-    </split-area>
-    <split-area [size]="35">
+    </as-split-area>
+    <as-split-area [size]="35">
       <div style="height: 5%; width: 100%; display: flex;
         flex-direction: row;">
         <button mat-icon-button matTooltip="Remove this attribute"
@@ -55,8 +55,8 @@ limitations under the License.
         (elementSelected)="changeDetectorRef.markForCheck()"
         style="height: 95%; width: 100%;">
       </tree>
-    </split-area>
-    <split-area [size]="30">
+    </as-split-area>
+    <as-split-area [size]="30">
       <ng-container *ngIf="targetTree.selection[0]">
         <h3>
           {{targetTree.selection[0].key}}
@@ -97,8 +97,8 @@ limitations under the License.
           </ng-container>
         </ng-template>
       </ng-container>
-    </split-area>
-  </split>
+    </as-split-area>
+  </as-split>
 </div>
 <ng-container *ngIf="isDialogInstance()">
   <mat-dialog-actions style="height: 40px; display: flex; flex-direction:

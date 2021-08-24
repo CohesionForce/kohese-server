@@ -22,7 +22,6 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
 import { NgModule } from "@angular/core/";
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 import { CommonModule } from "@angular/common";
 import { KMarkdownComponent } from "../user-input/k-markdown/k-markdown.component";
@@ -89,7 +88,6 @@ import { DirectivesModule } from '../../directives/directives.module'
     VirtualScrollModule,
     FormsModule,
     ReactiveFormsModule,
-    NgxDatatableModule,
     ObjectEditorModule,
     ItemBoardModule,
     DirectivesModule

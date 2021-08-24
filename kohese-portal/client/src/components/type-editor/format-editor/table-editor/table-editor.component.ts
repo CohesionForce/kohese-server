@@ -15,11 +15,16 @@
  */
 
 
+// Angular
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, Input } from '@angular/core';
+import { Subscription } from 'rxjs';
+
+// Other External Dependencies
+
+// Kohese
 import { TreeConfiguration } from './../../../../../../common/src/tree-configuration';
 import { ItemRepository, RepoStates } from './../../../../services/item-repository/item-repository.service';
-import { Subscription, Observable, BehaviorSubject } from 'rxjs';
 import { DialogService } from './../../../../services/dialog/dialog.service';
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, Input } from '@angular/core';
 
 @Component({
   selector: 'table-editor',

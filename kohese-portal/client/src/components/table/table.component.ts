@@ -15,10 +15,13 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  ViewChild } from '@angular/core';
-import { Sort } from '@angular/material';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, ViewChild, ElementRef} from '@angular/core';
+import { Sort } from '@angular/material/sort';
 
+// Other External Dependencies
+
+// Kohese
 import { Dialog } from '../dialog/Dialog.interface';
 
 @Component({
@@ -146,7 +149,7 @@ export class TableComponent implements Dialog {
     this._isDisabled = isDisabled;
   }
 
-  @ViewChild('table')
+  @ViewChild('table') 'table' !: ElementRef;
   private _table: any;
 
   get changeDetectorRef() {

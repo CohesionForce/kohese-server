@@ -20,7 +20,7 @@ import { Component, OnInit, OnDestroy, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
-// NPM
+// Other External Dependencies
 import { BehaviorSubject ,  Subscription } from 'rxjs';
 
 // Kohese

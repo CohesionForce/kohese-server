@@ -15,17 +15,19 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  Input } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, Input } from '@angular/core';
 
+// Other External Dependencies
+
+// Kohese
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { Dialog } from '../../dialog/Dialog.interface';
 import { KoheseType } from '../../../classes/UDT/KoheseType.class';
 import { StateMachineEditorComponent } from '../../state-machine-editor/state-machine-editor.component';
 import { Metatype } from '../../../../../common/src/Type.interface';
-import { Attribute,
-  ContainmentReferenceSpecification } from '../../../../../common/src/Attribute.interface';
+import { Attribute, ContainmentReferenceSpecification } from '../../../../../common/src/Attribute.interface';
 
 @Component({
   selector: 'attribute-editor',

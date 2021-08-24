@@ -15,14 +15,19 @@
  */
 
 
+// Angular
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+import { ActivatedRoute } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DocumentOutlineComponent } from './document-outline.component';
+
+// Mocks
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('DocumentOutlineComponent', () => {
   let component: DocumentOutlineComponent;

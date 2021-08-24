@@ -15,12 +15,15 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, Input, OnInit, ViewChild, EventEmitter,
-  Output } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+         Inject, Input, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+// Other External Dependencies
 import { EditorComponent } from '@tinymce/tinymce-angular';
 
+// Kohese
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 
 @Component({
@@ -132,7 +135,7 @@ export class TextEditorComponent implements OnInit {
         for (let j: number = 0; j < fileInput.files.length; j++) {
           let fileReader: FileReader = new FileReader();
           fileReader.onload = () => {
-            callback(fileReader.result, {
+            callback(fileReader.result as string, {
               alt: fileInput.files[j].name,
               title: fileInput.files[j].name
             });
