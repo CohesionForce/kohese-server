@@ -16,7 +16,7 @@
 
 
 // Angular
-import { TestBed, ComponentFixture, async} from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync, fakeAsync} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, SimpleChange } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
@@ -26,7 +26,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 // Kohese
 import { EditableCellComponent } from './editable-cell.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { MaterialModule } from '../../../material.module'; //deprecated
+import { MaterialModule } from '../../../material.module';
 
 // Mocks
 import { MockItem } from '../../../../mocks/data/MockItem';
@@ -40,7 +40,7 @@ describe('Component: Editable Cell ', ()=>{
 
   let actionProxy = new ItemProxy('Action', MockItem())
 
-  beforeEach(async(()=>{
+  beforeEach(fakeAsync(()=>{
     TestBed.configureTestingModule({
       declarations: [EditableCellComponent],
       imports : [CommonModule,
@@ -50,8 +50,6 @@ describe('Component: Editable Cell ', ()=>{
          ReactiveFormsModule
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [
-      ]
     }).compileComponents();
 
     editableCellFixture = TestBed.createComponent(EditableCellComponent);
@@ -79,7 +77,7 @@ describe('Component: Editable Cell ', ()=>{
     expect(editableCellComponent).toBeTruthy();
   })
 
-  it('updates when a new action is provided', async(()=>{
+  it('updates when a new action is provided', waitForAsync(()=>{
     let newProxy = new ItemProxy('Item', MockItem());
     newProxy.item.name = 'New Action';
     editableCellComponent.action = {

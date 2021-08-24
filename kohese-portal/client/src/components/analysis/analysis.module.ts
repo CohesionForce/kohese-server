@@ -37,7 +37,7 @@ import { MaterialModule } from '../../material.module';
     TermViewComponent
   ],
   imports : [
-    AngularSplitModule.forRoot(),
+    AngularSplitModule,
     DocumentViewModule,
     CommonModule,
     FormsModule,

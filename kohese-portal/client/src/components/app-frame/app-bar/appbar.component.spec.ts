@@ -73,21 +73,21 @@ describe('Component: App Bar', ()=>{
   })
 
   it('displays a syncing message', ()=>{
-    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+    spyOn(TestBed.inject(ItemRepository), 'getRepoStatusSubject').and.returnValue(
       new BehaviorSubject<any>({state : RepoStates.SYNCHRONIZING}))
     appBarFixture.detectChanges();
     expect(appBarComponent.syncStatusString).toBe('Syncing');
   })
 
   it('displays a sync failed message', ()=>{
-    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+    spyOn(TestBed.inject(ItemRepository), 'getRepoStatusSubject').and.returnValue(
       new BehaviorSubject<any>({state : RepoStates.SYNCHRONIZATION_FAILED}))
       appBarFixture.detectChanges();
       expect(appBarComponent.syncStatusString).toBe('Synchronization Failed');
   })
 
   it('displays a disconnected message', ()=>{
-    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+    spyOn(TestBed.inject(ItemRepository), 'getRepoStatusSubject').and.returnValue(
       new BehaviorSubject<any>({state : RepoStates.DISCONNECTED}))
       appBarFixture.detectChanges();
       expect(appBarComponent.syncStatusString).toBe('Disconnected');

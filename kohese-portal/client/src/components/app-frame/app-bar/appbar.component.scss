@@ -27,10 +27,15 @@
   width: 100%;
   margin-bottom: 0;
   padding: unset;
-  background: -webkit-linear-gradient(right, #007541, $primaryColor);
-  background-image: -moz-linear-gradient(right, #007541, $primaryColor);
-  background-image: -ms-linear-gradient(right, #007541, $primaryColor);
-  background-image: -o-linear-gradient(right, #007541, $primaryColor);
+  background: #3b9670;
+
+  .navbar-header {
+    img {
+      border-radius: 30px;
+      padding: 2px;
+    }
+  }
+
   .navbar-brand {
     display: unset;
     color: white;
@@ -89,5 +94,21 @@
     i {
       margin-right: 15px;
     }
+  }
+
+  .notification-bell {
+    color: white;
+  }
+
+  .float-child-left {
+    float: left;
+
+    mat-icon {
+      color: white;
+    }
+  }
+  .float-child-right {
+    float: right;
+    color: white;
   }
 }

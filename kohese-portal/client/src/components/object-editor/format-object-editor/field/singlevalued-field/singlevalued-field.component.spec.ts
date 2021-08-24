@@ -47,6 +47,7 @@ import { TreeViewModule } from '../../../../tree/tree.module';
 import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../../../../mocks/services/MockSessionService';
+import { SecurityContext } from '@angular/core';
 
 describe('SinglevaluedFieldComponent', () => {
   let component: SinglevaluedFieldComponent;
@@ -63,7 +64,9 @@ describe('SinglevaluedFieldComponent', () => {
         FormsModule,
         BrowserAnimationsModule,
         MaterialModule,
-        MarkdownModule,
+        MarkdownModule.forRoot({
+          sanitize: SecurityContext.NONE
+        }),
         MarkdownEditorModule,
         TableModule,
         TreeViewModule
@@ -80,7 +83,7 @@ describe('SinglevaluedFieldComponent', () => {
       TestBed.createComponent(SinglevaluedFieldComponent);
     component = componentFixture.componentInstance;
 
-    let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
+    let treeConfiguration: TreeConfiguration = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config;
     let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
     component.koheseObject = modelProxy.item;

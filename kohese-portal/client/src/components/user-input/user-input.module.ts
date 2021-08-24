@@ -35,7 +35,7 @@ import { KMarkdownComponent } from './k-markdown/k-markdown.component';
 import { MarkdownModule } from 'ngx-markdown';
 import { MarkdownCheatSheetComponent } from './k-markdown/markdown-cheat-sheet.component';
 import { ProxySelectorComponent } from './k-proxy-selector/proxy-selector/proxy-selector.component';
-import { TreeModule } from 'angular-tree-component';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { PipesModule } from '../../pipes/pipes.module';
 import { ProxySelectorDialogComponent } from './k-proxy-selector/proxy-selector-dialog/proxy-selector-dialog.component';
 import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/kd-proxy-selector.component';
@@ -65,7 +65,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ReactiveFormsModule,
     MaterialModule,
     MarkdownModule.forChild(),
-    TreeModule.forRoot(),
+    TreeModule,
     PipesModule,
     BrowserAnimationsModule
   ],

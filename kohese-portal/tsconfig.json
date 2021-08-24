@@ -2,7 +2,7 @@
   "compilerOptions": {
     "downlevelIteration": true,
     "target": "es2015",
-    "module": "esnext",
+    "module": "es2020",
     "baseUrl": ".",
     "paths": {
       "common" : ["./common/models/"]

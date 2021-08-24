@@ -47,7 +47,7 @@ describe('NamespaceEditorComponent', () => {
         FormsModule,
         BrowserAnimationsModule,
         MaterialModule,
-        AngularSplitModule.forRoot()
+        AngularSplitModule
       ],
       providers: [
         { provide: ItemRepository, useClass: MockItemRepository },
@@ -158,7 +158,7 @@ describe('NamespaceEditorComponent', () => {
         return of([[namespaceItemProxy]]);
       }
     };
-    spyOn(TestBed.get(DialogService), 'openComponentsDialog').and.returnValue(
+    spyOn(TestBed.inject(DialogService), 'openComponentsDialog').and.returnValue(
       matDialogRefPlaceholder);
     await component.addSubcomponent(true);
     expect(namespaceItemProxy.item.parentId).toBe(component.selectedNamespace.

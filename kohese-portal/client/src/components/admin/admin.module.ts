@@ -57,7 +57,7 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
     PipesModule,
     LensModule,
     ObjectEditorModule,
-    AngularSplitModule.forRoot()
+    AngularSplitModule
   ],
   exports : [
     AdminComponent,

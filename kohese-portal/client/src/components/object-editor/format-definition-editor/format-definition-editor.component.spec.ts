@@ -58,7 +58,7 @@ describe('FormatDefinitionEditorComponent', () => {
     let componentFixture: ComponentFixture<FormatDefinitionEditorComponent> =
       TestBed.createComponent(FormatDefinitionEditorComponent);
     component = componentFixture.componentInstance;
-    let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
+    let treeConfiguration: TreeConfiguration = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config;
     let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseModel');
     component.dataModel = modelProxy.item;

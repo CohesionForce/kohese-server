@@ -156,9 +156,8 @@ export class ItemBoardComponent {
   public getBoardKinds(): Array<any> {
     let kinds: Array<any> = [];
     for (let j: number = 0; j < this._project.projectItems.length; j++) {
-      TreeConfiguration.getWorkingTree().getProxyFor(this._project.
-        projectItems[j].id).visitTree({ includeOrigin: true }, (itemProxy:
-          ItemProxy) => {
+      TreeConfiguration.getWorkingTree().getProxyFor(
+        this._project.projectItems[j].id).visitTree({ includeOrigin: true }, (itemProxy: ItemProxy) => {
           let kind: any = itemProxy.model.item;
           if (kinds.indexOf(kind) === -1) {
             kinds.push(kind);

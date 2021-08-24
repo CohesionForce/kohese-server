@@ -50,7 +50,7 @@ import { NamespaceEditorComponent } from './namespace-editor/namespace-editor.co
   imports: [
     CommonModule,
     FormsModule,
-    AngularSplitModule.forRoot(),
+    AngularSplitModule,
     MarkdownModule.forChild(),
     MaterialModule,
     PipesModule,

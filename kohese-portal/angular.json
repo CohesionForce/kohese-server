@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "aot": true,
+            "aot": false,
             "outputPath": "build/client/bundle",
             "index": "client/index.html",
             "main": "client/bootstrap.ts",
@@ -47,6 +47,7 @@
             ],
             "scripts": [
               "./build/client/cache-worker/cache-bundle.js",
+              "node_modules/marked/lib/marked.js",
               "./node_modules/tinymce/tinymce.min.js"
             ]
           },

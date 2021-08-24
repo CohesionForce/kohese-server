@@ -59,7 +59,7 @@ describe('Component: attribute-editor', ()=>{
 
     fixture = TestBed.createComponent(AttributeEditorComponent);
     component = fixture.componentInstance;
-    component.contextualGlobalType = TestBed.get(ItemRepository).
+    component.contextualGlobalType = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config.getProxyFor('KoheseModel').item;
 
     fixture.detectChanges();
