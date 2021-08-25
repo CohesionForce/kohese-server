@@ -77,7 +77,6 @@ describe('Component: Editable Cell ', ()=>{
     expect(editableCellComponent).toBeTruthy();
   })
 
-  // Missing Expectation
   it('updates when a new action is provided', waitForAsync(()=>{
     let newProxy = new ItemProxy('Item', MockItem());
     newProxy.item.name = 'New Action';
@@ -88,6 +87,9 @@ describe('Component: Editable Cell ', ()=>{
     editableCellComponent.ngOnChanges({
       name: new SimpleChange(null, newProxy, true)
     })
+
+    // TODO: Missing Expectation
+
   }))
   it('disables when details editability changes', ()=>{
     editableStream.next(false);
