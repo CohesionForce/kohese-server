@@ -247,8 +247,7 @@ export abstract class Tree {
     return this._filterSubject;
   }
 
-  @ViewChild(VirtualScrollComponent) VirtualScrollComponent !: ElementRef;
-  private _virtualScrollComponent: VirtualScrollComponent;
+  @ViewChild(VirtualScrollComponent) private _virtualScrollComponent: VirtualScrollComponent;
 
   private _rootSubscription: Subscription;
   private _updateVisibleRowsSubscriptionMap: any = {};

@@ -35,7 +35,7 @@ limitations under the License.
                   <mat-icon class="fa fa-i-cursor"></mat-icon>
                 </button>
                 <a #reportDownloadAnchor style="display: none;"
-                  download="{{reportObject.name}}" href="{{'/producedReports/' +reportObject.name}}"
+                  download="{{reportObject.name}}" href="{{'/producedReports/' + reportObject.name}}"
                   (click)="$event.stopPropagation()">
                 </a>
                 <button mat-icon-button matTooltip="Download this report"
