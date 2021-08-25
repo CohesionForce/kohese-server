@@ -40,7 +40,7 @@ describe('ProjectDashboardComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterModule.forRoot([]),
+        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
         DashboardModule
       ],
       providers: [

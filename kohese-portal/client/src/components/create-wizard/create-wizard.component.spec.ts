@@ -22,7 +22,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, SecurityContext } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialogRef } from '@angular/material/dialog';
-import { async } from '@angular/core/testing';
+import { waitForAsync } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 
 // Other External Dependencies
@@ -41,6 +41,7 @@ import { PipesModule } from '../../pipes/pipes.module';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 
 describe('Component: Create Wizard', ()=>{
@@ -98,8 +99,9 @@ describe('Component: Create Wizard', ()=>{
 
     })
 
-    it('closes the window when an item is built', async(()=>{
-      let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve());
+    it('closes the window when an item is built', waitForAsync(()=>{
+      let value: Promise<ItemProxy>;
+      let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.resolve(value));
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{
         expect(buildSpy).toHaveBeenCalled();
@@ -107,7 +109,7 @@ describe('Component: Create Wizard', ()=>{
       })
     }))
 
-    it('displays an error when a build fails', async(()=>{
+    it('displays an error when a build fails', waitForAsync(()=>{
       let buildSpy = spyOn(TestBed.inject(ItemRepository), 'upsertItem').and.returnValue(Promise.reject('Incorrect Fields'));
       createWizardComponent.createItem();
       createWizardFixture.whenStable().then(()=>{

@@ -58,7 +58,7 @@ describe('FormatObjectEditorComponent', () => {
         SinglevaluedFieldComponent
       ],
       imports: [
-        RouterModule.forRoot([]),
+        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
         CommonModule,
         FormsModule,
         BrowserAnimationsModule,

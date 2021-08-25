@@ -16,7 +16,7 @@
 
 
 // Angular
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
@@ -33,7 +33,7 @@ describe('DocumentOutlineComponent', () => {
   let component: DocumentOutlineComponent;
   let fixture: ComponentFixture<DocumentOutlineComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ DocumentOutlineComponent ],
       providers: [ {

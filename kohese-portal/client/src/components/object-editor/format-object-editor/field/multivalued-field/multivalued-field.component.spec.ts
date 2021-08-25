@@ -60,7 +60,7 @@ describe('MultivaluedFieldComponent', () => {
         SinglevaluedFieldComponent
       ],
       imports: [
-        RouterModule.forRoot([]),
+        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
         FormsModule,
         MaterialModule,
         MarkdownModule.forRoot({

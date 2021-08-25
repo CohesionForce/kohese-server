@@ -87,6 +87,9 @@ describe('Component: Editable Cell ', ()=>{
     editableCellComponent.ngOnChanges({
       name: new SimpleChange(null, newProxy, true)
     })
+
+    // TODO: Missing Expectation
+
   }))
   it('disables when details editability changes', ()=>{
     editableStream.next(false);

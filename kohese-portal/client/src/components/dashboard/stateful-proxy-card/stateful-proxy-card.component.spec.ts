@@ -16,7 +16,7 @@
 
 
 // Angular
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { MaterialModule } from '../../../material.module';
 
@@ -33,7 +33,7 @@ describe('StatefulProxyCardComponent', () => {
   let component: StatefulProxyCardComponent;
   let fixture: ComponentFixture<StatefulProxyCardComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ StatefulProxyCardComponent ],
       imports: [ MaterialModule ],
