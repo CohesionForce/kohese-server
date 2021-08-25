@@ -39,7 +39,6 @@
     "@auth0/angular-jwt": "^4.2.0",
     "@circlon/angular-tree-component": "^11.0.4",
     "@schematics/angular": "^9.1.15",
-    "@tinymce/tinymce-angular": "^4.2.4",
     "@types/socket.io-client": "^1.4.36",
     "angular-split": "^5.0.0",
     "angular2-virtual-scroll": "^0.4.16",
@@ -85,7 +84,6 @@
     "source-map": "^0.7.3",
     "string-replace-async": "^1.2.1",
     "subleveldown": "^3.0.1",
-    "tinymce": "^5.8.2",
     "underscore": "^1.13.1",
     "uuid": "^3.4.0",
     "zone.js": "~0.10.2"

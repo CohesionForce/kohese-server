@@ -35,7 +35,6 @@ import { ActionTableModule } from "../action-table/action-table.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
 import { UserInputModule } from '../user-input/user-input.module';
-import { TextEditorModule } from '../text-editor/text-editor.module';
 import { CompareItemsModule } from '../compare-items/compare-items.module';
 import { TreeViewModule } from '../tree/tree.module';
 import { MarkdownEditorModule } from '../markdown-editor/markdown-editor.module';
@@ -66,7 +65,6 @@ import { DirectivesModule } from '../../directives/directives.module';
     UserInputModule,
     TreeModule,
     MarkdownModule,
-    TextEditorModule,
     CompareItemsModule,
     TreeViewModule,
     MarkdownEditorModule,

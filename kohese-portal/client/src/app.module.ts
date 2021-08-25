@@ -48,8 +48,6 @@ import { TreeViewModule } from './components/tree/tree.module'
 import { VersionsModule } from './components/versions/versions.module';
 import { ReportsModule } from './components/reports/reports.module';
 import { ImportModule } from './components/import/import.module';
-import { TextEditorModule } from './components/text-editor/text-editor.module';
-import { DocumentModule } from './components/document/document.module';
 import { CopyModule } from './components/copy/copy.module';
 
 import { ToastrModule } from 'ngx-toastr';
@@ -57,7 +55,6 @@ import { AngularSplitModule } from 'angular-split';
 import { TreeModule } from '@circlon/angular-tree-component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
-import { EditorModule } from '@tinymce/tinymce-angular';
 
 import { MaterialModule } from './material.module';
 import { environment } from '../environments/environment.prod';
@@ -99,7 +96,6 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
       }
     }),
     InfiniteScrollModule,
-    EditorModule,
     PipesModule,
     MaterialModule,
     AngularSplitModule,
@@ -127,8 +123,6 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     LensModule,
     ReportsModule,
     ImportModule,
-    TextEditorModule,
-    DocumentModule,
     CopyModule,
     ItemBoardModule
   ],
