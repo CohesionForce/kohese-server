@@ -450,11 +450,6 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       var parentRepoStoragePath = determineRepoStoragePath(parentRepo);
       repoFilePath = path.join(kdbDirPath, modelInstance.name)
       kdbFS.createDirIfMissing(repoFilePath);
-      kdbFS.createDirIfMissing(repoFilePath + path.sep + 'Namespace');
-      let repoModelFileDir = repoFilePath + '/KoheseModel';
-      kdbFS.createDirIfMissing(repoModelFileDir);
-      let repoViewFileDir = repoFilePath + '/KoheseView';
-      kdbFS.createDirIfMissing(repoViewFileDir);
     } else {
       repoFilePath = repoStoragePath;
       kdbFS.createDirIfMissing(repoFilePath)
@@ -950,15 +945,22 @@ async function openRepositories(indexAndExit) {
   // Validate the repositories listed inside the mount file
   console.log('>>> Mounting and Validating External Repos');
   for(let id in mountList) {
-    if(!mountList[id].mounted && mountList[id].repoStoragePath && !mountList[id].disabled) {
-      loadModelInstances('Namespace', mountList[id].repoStoragePath + path.sep + 'Namespace',
-        true);
+    if (!mountList[id].mounted && mountList[id].repoStoragePath && !mountList[id].disabled) {
+
+      let repoNamespaceFileDir = mountList[id].repoStoragePath + '/Namespace';
+      if (kdbFS.pathExists(repoNamespaceFileDir)) {
+        loadModelInstances('Namespace', repoNamespaceFileDir, true);
+      }
 
       let repoModelFileDir = mountList[id].repoStoragePath + '/KoheseModel';
-      loadModelInstances('KoheseModel', repoModelFileDir, true);
+      if (kdbFS.pathExists(repoModelFileDir)) {
+        loadModelInstances('KoheseModel', repoModelFileDir, true);
+      }
 
       let repoViewFileDir = mountList[id].repoStoragePath + '/KoheseView';
-      loadModelInstances('KoheseView', repoViewFileDir, true);
+      if (kdbFS.pathExists(repoViewFileDir)) {
+        loadModelInstances('KoheseView', repoViewFileDir, true);
+      }
 
       mountRepository({
         'id': id, name: mountList[id].name,
@@ -1020,14 +1022,20 @@ async function openRepository(id, indexAndExit){
     console.log('*** No GIT Folder Exists - Invalid Repository for ' + id + ' repo ' + mountList[id].repoStoragePath)
   }
 
-  loadModelInstances('Namespace', mountList[id].repoStoragePath + path.sep + 'Namespace',
-    true, enable);
+  let repoNamespaceFileDir = mountList[id].repoStoragePath + '/Namespace';
+  if (kdbFS.pathExists(repoNamespaceFileDir)) {
+    loadModelInstances('Namespace', repoNamespaceFileDir, true, enable);
+  }
 
   let repoModelFileDir = mountList[id].repoStoragePath + '/KoheseModel';
-  loadModelInstances('KoheseModel', repoModelFileDir, true, enable);
+  if (kdbFS.pathExists(repoModelFileDir)) {
+    loadModelInstances('KoheseModel', repoModelFileDir, true, enable);
+  }
 
   let repoViewFileDir = mountList[id].repoStoragePath + '/KoheseView';
-  loadModelInstances('KoheseView', repoViewFileDir, true, enable);
+  if (kdbFS.pathExists(repoViewFileDir)) {
+    loadModelInstances('KoheseView', repoViewFileDir, true, enable);
+  }
 
   // Mount Repository
   mountRepository({
