@@ -15,9 +15,7 @@ limitations under the License.
 -->
 
 
-<div style="width: 100%; display: flex; flex-direction: column; overflow: auto;
-  padding: 7px;" [ngStyle]="{ 'height': isDialogInstance() ?
-  'calc(100% - 40px)' : '100%' }">
+<div class=FOE-template [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 44px)' : '100%' }">
   <ng-container *ngIf="isDisabled else enabled">
     <markdown [data]="itemRepository.getMarkdownRepresentation(object,
       (enclosingType ? enclosingType : selectedType), selectedType, viewModel,
@@ -52,16 +50,14 @@ limitations under the License.
       <ng-container *ngIf="(container.kind === FormatContainerKind.
         REVERSE_REFERENCE_TABLE) else notReverseReferencesTable">
         <h3>
-          Reverse References For {{getReverseReferenceTableHeaderContent(
-            container)}}
+          Reverse References For {{getReverseReferenceTableHeaderContent(container)}}
         </h3>
         <table_ [rows]="getReverseReferences(container)" [columns]="['name']"
           [getText]="getTableCellTextRetrievalFunction()" [disabled]="true">
         </table_>
       </ng-container>
       <ng-template #notReverseReferencesTable>
-        <div style="display: flex;" [ngStyle]="{ 'flex-direction': ((container.
-          kind === 'list') ? 'column' : 'row') }">
+        <div style="display: flex;" [ngStyle]="{ 'flex-direction': ((container.kind === 'list') ? 'column' : 'row') }">
           <ng-container *ngFor="let attributeDefinition of container.contents">
             <ng-container *ngIf="attributeDefinition.visible">
               <div style="display: flex; flex-direction: row;">
@@ -105,13 +101,11 @@ limitations under the License.
   </ng-template>
 </div>
 <ng-container *ngIf="isDialogInstance()">
-  <mat-dialog-actions style="height: 40px; width: 100%; display: flex;
-    flex-direction: row;">
-    <button mat-raised-button [disabled]="!isObjectValid()" (click)="close(
-      true)" style="margin-left: auto;">
+  <mat-dialog-actions>
+    <button mat-raised-button color=primary [disabled]="!isObjectValid()" (click)="close(true)" style="margin-left: auto;">
       Accept
     </button>
-    <button mat-raised-button (click)="close(false)">
+    <button mat-raised-button color=primary mat-dialog-close>
       Cancel
     </button>
   </mat-dialog-actions>
