@@ -22,12 +22,12 @@ limitations under the License.
   </div>
   <ng-container *ngIf="data">
     <mat-dialog-actions>
-      <button mat-button [disabled]="!isCriterionDefined()"
-        class="flex-right-align mat-raised-button mat-primary"
+      <button mat-raised-button color=primary [disabled]="!isCriterionDefined()"
+        class="flex-right-align"
         [mat-dialog-close]="filterSubject.getValue()">
         Apply
       </button>
-      <button mat-dialog-close class='mat-raised-button mat-primary'>
+      <button mat-raised-button color=primary mat-dialog-close>
         Cancel
       </button>
     </mat-dialog-actions>
