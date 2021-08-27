@@ -2,6 +2,10 @@ name: Node.js CI
 
 on: [push]
 
+defaults:
+  run:
+    working-directory: kohese-portal
+
 jobs:
   build:
 
@@ -13,7 +17,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '12.x'
-        working-directory: kohese-portal
       - run: npm ci
       - run: npm install
       - run: npm run build-all
