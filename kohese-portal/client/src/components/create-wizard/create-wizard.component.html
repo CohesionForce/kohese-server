@@ -32,7 +32,7 @@ limitations under the License.
             isObjectValid()" style="margin-left: auto;">
             Next
           </button>
-          <button mat-button (click)="cancel()">Cancel</button>
+          <button mat-button mat-dialog-close>Cancel</button>
         </mat-card-actions>
       </mat-card>
     </div>
@@ -59,7 +59,7 @@ limitations under the License.
           <button mat-button [disabled]="isDisabled" (click)="createItem()">
             Create
           </button>
-          <button mat-button (click)="cancel()">Cancel</button>
+          <button mat-button mat-dialog-close>Cancel</button>
         </mat-card-actions>
       </mat-card>
     </div>
