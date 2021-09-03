@@ -21,7 +21,7 @@ import { AuthenticationService } from './services/authentication/authentication.
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styles: ['./app.component.scss']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   constructor(private authenticationService: AuthenticationService) {}

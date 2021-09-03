@@ -103,7 +103,7 @@ export class MergeComponent implements OnInit {
     return this._selectedDifference;
   }
 
-  @ViewChild('differenceTree') 'differenceTree' !: ElementRef;
+  @ViewChild('differenceTree')
   private _differenceTree: TreeComponent;
 
   get matDialogRef() {

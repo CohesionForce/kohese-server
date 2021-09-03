@@ -247,7 +247,7 @@ export abstract class Tree {
     return this._filterSubject;
   }
 
-  @ViewChild(VirtualScrollComponent) VirtualScrollComponent !: ElementRef;
+  @ViewChild(VirtualScrollComponent)
   private _virtualScrollComponent: VirtualScrollComponent;
 
   private _rootSubscription: Subscription;

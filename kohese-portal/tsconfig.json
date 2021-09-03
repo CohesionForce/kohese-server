@@ -9,7 +9,6 @@
     },
     "moduleResolution": "node",
     "sourceMap": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": false,
@@ -31,9 +30,6 @@
       "es2017",
       "dom"
     ]
-  },
-  "angularCompilerOptions": {
-    "enableIvy": false
   },
   "exclude": [
     "scripts",

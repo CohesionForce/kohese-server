@@ -149,7 +149,7 @@ export class TableComponent implements Dialog {
     this._isDisabled = isDisabled;
   }
 
-  @ViewChild('table') 'table' !: ElementRef;
+  @ViewChild('table')
   private _table: any;
 
   get changeDetectorRef() {

@@ -153,7 +153,7 @@ export class ViewModelEditorComponent {
   private _filter: string;
   private _iconFilterTimeoutIdentifier: any;
 
-  @ViewChild('attributeTable') 'attributeTable' !: ElementRef;
+  @ViewChild('attributeTable')
   private _attributeTable: MatTable<any>;
 
   private _attributes: Array<any>;

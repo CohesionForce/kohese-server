@@ -15,7 +15,7 @@ limitations under the License.
 -->
 
 
-<div class="title" [ngStyle]="{'background-color' : color}" style="display: flex; flex-direction: row;">
+<div class="title" [ngStyle]="{'background-color' : color}">
   {{kindName}}: {{stateName}}
   <button mat-icon-button matTooltip="Expand all Items" (click)="expandAll()" class="flex-right-align">
     <mat-icon class="fa fa-chevron-down"></mat-icon>
@@ -24,17 +24,15 @@ limitations under the License.
     <mat-icon class="fa fa-chevron-up"></mat-icon>
   </button>
 </div>
-<div style="height: calc(100% - 100px); overflow-y: auto;">
+<div class=state-summary-panels>
   <ng-container *ngFor="let row of proxies">
     <mat-expansion-panel #panel>
-      <mat-expansion-panel-header [ngStyle]="{ 'background-color': (getViewModel(row).color ?
-        getViewModel(row).color : '#000000') }">
-        <mat-panel-title [attr.id]=row showIfTruncated
-          matTooltip="{{row}}">
+      <mat-expansion-panel-header [ngStyle]="{ 'background-color': (getViewModel(row).color ? getViewModel(row).color : '#000000') }">
+        <mat-panel-title [attr.id]=row showIfTruncated matTooltip="{{row}}">
           <mat-icon class="{{getViewModel(row).icon}}" style="margin-right: 3px;"></mat-icon>
           {{ row.item[getHeader(row)] }}
         </mat-panel-title>
-        <mat-panel-description style="color:whitesmoke; font-size: medium; align-items: center; width: 28%">
+        <mat-panel-description>
           <mat-icon class="fa fa-clock-o" style="font-size: x-large"></mat-icon>
           {{row.item.modifiedOn | date : 'short'}}
           <ng-container *ngIf="row.dirty">
@@ -98,7 +96,7 @@ limitations under the License.
     </mat-expansion-panel>
   </ng-container>
 </div>
-<mat-dialog-actions style="height: 40px; display: flex; flex-direction: row;">
+<mat-dialog-actions>
   <button mat-button matTooltip="Close this window" class="flex-right-align" [mat-dialog-close]="">
     Close
   </button>

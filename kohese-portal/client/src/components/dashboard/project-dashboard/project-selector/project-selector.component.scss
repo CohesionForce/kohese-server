@@ -16,3 +16,19 @@
 
 
 @import '../../../../app.component';
+
+:host {
+  ::ng-deep .mat-checkbox-frame {
+    border-color: white
+  }
+}
+
+.float-container {
+  .float-child-left {
+    float: left;
+  }
+  .float-child-right {
+    float: right;
+    padding: 5px;
+  }
+}
