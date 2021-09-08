@@ -23,6 +23,7 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { Dialog } from '../../dialog/Dialog.interface';
 import { TreeComponent } from '../../tree/tree.component';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { InputDialogComponent, InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 
 @Component({
   selector: 'namespace-editor',
@@ -31,6 +32,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NamespaceEditorComponent implements Dialog {
+  public repoId;
   private _selectedNamespace: any;
   get selectedNamespace() {
     return this._selectedNamespace;
@@ -43,6 +45,8 @@ export class NamespaceEditorComponent implements Dialog {
   get itemRepository() {
     return this._itemRepository;
   }
+
+  private _selectedRepository: any;
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
     private _itemRepository: ItemRepository, private _dialogService:
@@ -59,6 +63,14 @@ export class NamespaceEditorComponent implements Dialog {
     }).indexOf(this._selectedNamespace.name) === -1));
   }
 
+  private _editable: boolean = false;
+  get editable() {
+    return this._editable;
+  }
+  set editable(editable: boolean) {
+    this._editable = editable;
+  }
+
   /**
    * @see Dialog.interface.ts
    *
@@ -71,14 +83,85 @@ export class NamespaceEditorComponent implements Dialog {
    * Builds a new Namespace
    */
   public async add(): Promise<void> {
-    let name: string = 'Namespace ' + this.getNamespaces(false).length;
+    // let name: string = 'Namespace ' + this.getNamespaces(false).length;
+    this._selectedNamespace = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('com.kohese').item;
+    this._selectedRepository = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('ROOT').item;
+    let repositoryOptions: { [name: string]: any } = {};
+    repositoryOptions['ROOT'] = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('ROOT').item;
+    this.itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Repo-Mount-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+        ItemProxy) => {
+        if (itemProxy.kind === 'RepoMount') {
+          repositoryOptions[itemProxy.item.name] = itemProxy.item;
+        }
+      }, undefined);
+    let namespaceOptions: { [name: string]: any } = {};
+    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
+      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
+        ItemProxy) => {
+        if ((itemProxy.kind === 'Namespace') && !((itemProxy.item.id ===
+          'com.kohese') || (itemProxy.item.id === 'com.kohese.metamodel'))) {
+          namespaceOptions[itemProxy.item.name] = itemProxy.item;
+        }
+      }, undefined);
+    let inputs: Array<any> = await this._dialogService.openComponentsDialog([{
+      component: InputDialogComponent,
+      matDialogData: {
+        inputDialogConfiguration: {
+          title: 'Add Namespace',
+          text: '',
+          fieldName: 'Name',
+          value: '',
+          validate: (input: any) => {
+            return true;
+          },
+          inputDialogKind: InputDialogKind.STRING
+        }
+      }
+    }, {
+      component: InputDialogComponent,
+      matDialogData: {
+        inputDialogConfiguration: {
+          title: 'Select Repository',
+          text: '',
+          fieldName: 'Repository',
+          value: Object.values(repositoryOptions).find((repository: any) => {
+            return (this._selectedRepository.id === repository.id);
+          }),
+          validate: (input: any) => {
+            return true;
+          },
+          options: repositoryOptions
+        }
+      }
+    }], { data: {} }).updateSize('70%', '40%').afterClosed().toPromise();
+
+    if (inputs[1].id !== 'ROOT') {
+      this.repoId = inputs[1].id.split('-mount')[0];
+    } else {
+      this.repoId = inputs[1].id;
+    }
+
     await this._itemRepository.upsertItem('Namespace', {
-      name: name,
+      name: inputs[0],
       parentId: (this._selectedNamespace ? this._selectedNamespace.id :
         'com.kohese'),
-      alias: name
+      repositoryId: { id: this.repoId },
+      alias: inputs[0]
     });
   }
+
+  public getRepositoryName(): string {
+    let repoProxy;
+    if (this.selectedNamespace.repositoryId) {
+      repoProxy = this.itemRepository.getTreeConfig().getValue().config.getProxyFor(this.selectedNamespace.repositoryId.id).item
+
+    } else {
+      repoProxy = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('ROOT').item
+    }
+    return repoProxy.name;
+  }
+
   /**
    * Returns an Array containing all Namespaces except the selected Namespace
    * should a parameter of ```true``` be passed
@@ -109,27 +192,46 @@ export class NamespaceEditorComponent implements Dialog {
    */
   public getEnclosingNamespaceOptions(): Array<any> {
     let namespaces: Array<any> = [];
+    var isSelectedNamespaceRoot: boolean = false;
+    if (!this._selectedNamespace.repositoryId) {
+      isSelectedNamespaceRoot = true;
+    } else {
+      if (this._selectedNamespace.repositoryId.id === 'ROOT') {
+        isSelectedNamespaceRoot = true;
+      }
+    }
     this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
       'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
-      ItemProxy) => {
-      if ((itemProxy.kind === 'Namespace') && (itemProxy.item.id !==
-        'com.kohese') && (itemProxy.item.id !== 'com.kohese.metamodel')) {
-        let isOption: boolean = true;
-        let namespaceItemProxy: ItemProxy = itemProxy;
-        while (namespaceItemProxy != null) {
-          if (namespaceItemProxy.item === this._selectedNamespace) {
-            isOption = false;
-            break;
+        ItemProxy) => {
+        if ((itemProxy.kind === 'Namespace') && (itemProxy.item.id !==
+          'com.kohese') && (itemProxy.item.id !== 'com.kohese.metamodel')) {
+          let isOption: boolean = true;
+          var itemProxyIsRoot: boolean = false;
+          if (!itemProxy.item.repositoryId ) {
+            itemProxyIsRoot = true;
+          } else {
+            if (itemProxy.item.repositoryId.id === 'ROOT') {
+              itemProxyIsRoot = true;
+            }
           }
-
-          namespaceItemProxy = namespaceItemProxy.parentProxy;
+          if (itemProxy.item === this._selectedNamespace) {
+            isOption = false;
+          } else {
+            if (isSelectedNamespaceRoot && !itemProxyIsRoot) {
+                isOption = false;
+            } else {
+              if (!isSelectedNamespaceRoot) {
+                if (!itemProxyIsRoot && (itemProxy.item.repositoryId.id !== this._selectedNamespace.repositoryId.id)) {
+                  isOption = false;
+                }
+              }
+            }
+          }
+          if (isOption === true) {
+            namespaces.push(itemProxy.item);
+          }
         }
-
-        if (isOption === true) {
-          namespaces.push(itemProxy.item);
-        }
-      }
-    }, undefined);
+      }, undefined);
 
     namespaces.sort((oneNamespace: any, anotherNamespace: any) => {
       return oneNamespace.name.localeCompare(anotherNamespace.name);
@@ -279,17 +381,40 @@ export class NamespaceEditorComponent implements Dialog {
       }
     }], { data: {} }).updateSize('80%', '80%').afterClosed().toPromise();
     if (results) {
+      var moveFailure: Array<string> = [];
       await Promise.all(results[0].map((element: any) => {
         let itemProxy: ItemProxy = (element as ItemProxy);
         if (itemProxy.kind === 'Namespace') {
-          itemProxy.item.parentId = this._selectedNamespace.id;
+          if (!this.selectedNamespace.repositoryId){
+            itemProxy.item.parentId = this._selectedNamespace.id;
+          } else if (itemProxy.item.repositoryId  && (itemProxy.item.repositoryId === this.selectedNamespace.repositoryId.id)) {
+            itemProxy.item.parentId = this._selectedNamespace.id;
+          } else {
+            moveFailure.push(itemProxy.item.name);
+          }
         } else {
-          itemProxy.item.namespace.id = this._selectedNamespace.id;
+          let namespaceProxy = treeConfiguration.getProxyFor(itemProxy.item.namespace.id)
+          if (namespaceProxy.item.repositoryId && this._selectedNamespace.repositoryId) {
+            if (namespaceProxy.item.repositoryId.id === this._selectedNamespace.repositoryId.id) {
+              itemProxy.item.namespace.id = this._selectedNamespace.id;
+              if (itemProxy.kind === 'KoheseModel') {
+                let itemViewProxy = TreeConfiguration.getWorkingTree().getModelProxyFor(itemProxy.item.name).view.item;
+                itemViewProxy.namespace.id = this._selectedNamespace.id;
+                let viewItem = this._itemRepository.upsertItem('KoheseView', itemViewProxy);
+              }
+              return this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+            } else {
+              moveFailure.push(itemProxy.item.name);
+            }
+          } else {
+            moveFailure.push(itemProxy.item.name);
+          }
         }
-
-        return this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
       }));
-
+      if (moveFailure.length) {
+        this._dialogService.openInformationDialog('Kind Move Not Allowed - Moves only allowed to Namespaces in Same Repo',
+            JSON.stringify(moveFailure));
+      }
       this._changeDetectorRef.markForCheck();
     }
   }

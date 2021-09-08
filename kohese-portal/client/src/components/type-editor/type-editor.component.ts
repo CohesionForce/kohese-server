@@ -59,9 +59,6 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  private _selectedRepository: any;
-
-
   private _selectedType: any;
   get selectedType() {
     return this._selectedType;
@@ -110,7 +107,6 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
       if (treeConfigInfo) {
         this._selectedNamespace = treeConfigInfo.config.getProxyFor(
           'com.kohese').item;
-        this._selectedRepository = treeConfigInfo.config.getProxyFor('ROOT').item
         this.selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
       }
     });
@@ -193,15 +189,6 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         namespaceOptions[itemProxy.item.name] = itemProxy.item;
       }
     }, undefined);
-    let repositoryOptions: { [name: string]: any } = {};
-    repositoryOptions['ROOT'] = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('ROOT').item;
-    this.itemRepository.getTreeConfig().getValue().config.getProxyFor(
-      'Repo-Mount-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
-        ItemProxy) => {
-        if (itemProxy.kind === 'RepoMount') {
-          repositoryOptions[itemProxy.item.name] = itemProxy.item;
-        }
-    }, undefined);
     let inputs: Array<any> = await this.dialogService.openComponentsDialog([{
       component: InputDialogComponent,
       matDialogData: {
@@ -245,36 +232,12 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
           options: namespaceOptions
         }
       }
-    }, {
-    component: InputDialogComponent,
-    matDialogData: {
-      inputDialogConfiguration: {
-        title: 'Select Repository',
-        text: '',
-        fieldName: 'Repository',
-        value: Object.values(repositoryOptions).find((repository: any) => {
-            return (this._selectedRepository.id === repository.id);
-        }),
-        validate: (input: any) => {
-          return true;
-        },
-        options: repositoryOptions
-      }
-    }
-  }], { data: {} }).updateSize('70%', '40%').afterClosed().toPromise();
-
-    var repoId;
-    if (inputs[2].id !== 'ROOT') {
-      repoId = inputs[2].id.split('-mount')[0];
-    } else {
-      repoId = inputs[2].id;
-    }
+    }], { data: {} }).updateSize('70%', '40%').afterClosed().toPromise();
 
     if (inputs) {
       let viewModel: any = {
         name: inputs[0],
         namespace: { id: inputs[1].id },
-        repositoryId: { id: repoId },
         modelName: inputs[0],
         parentId: 'view-item',
         icon: '',
@@ -341,7 +304,6 @@ export class TypeEditorComponent implements OnInit, OnDestroy {
         name: inputs[0],
         parentId: 'Item',
         namespace: { id: inputs[1].id },
-        repositoryId: { id: repoId },
         base: 'Item',
         idInjection: true,
         properties: {},

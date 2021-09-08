@@ -228,6 +228,20 @@ module.exports.getDisabledRepositories = getDisabledRepositories;
 //
 //////////////////////////////////////////////////////////////////////////
 function unMountRepository(id) {
+  let repoNamespaceFileDir = mountList[id + '-mount'].repoStoragePath + '/Namespace';
+  if (kdbFS.pathExists(repoNamespaceFileDir)) {
+    unMountModelInstances('Namespace', repoNamespaceFileDir);
+  }
+
+  let repoModelFileDir = mountList[id + '-mount'].repoStoragePath + '/KoheseModel';
+  if (kdbFS.pathExists(repoModelFileDir)) {
+    unMountModelInstances('KoheseModel', repoModelFileDir);
+  }
+
+  let repoViewFileDir = mountList[id + '-mount'].repoStoragePath + '/KoheseView';
+  if (kdbFS.pathExists(repoViewFileDir)) {
+    unMountModelInstances('KoheseView', repoViewFileDir);
+  }
   kdbFS.removeFile(path.join(koheseKDBDirPath, path.join('RepoMount', id + '-mount.json')));
   delete mountList[id + '-mount'];
   updateMountFile();
@@ -235,18 +249,6 @@ function unMountRepository(id) {
   proxy.deleteItem();
   let mountProxy = ItemProxy.getWorkingTree().getProxyFor(id + '-mount')
   mountProxy.deleteItem();
-  let repoProxy;
-  repoProxy = ItemProxy.getWorkingTree().getRootProxy();
-  repoProxy.getChildByName('Model Definitions').visitChildren(null, (modelproxy) => {
-    if (modelproxy.item.repositoryId && (modelproxy.item.repositoryId.id === id)) {
-      modelproxy.deleteItem(true);
-    }
-  });
-  repoProxy.getChildByName('View Model Definitions').visitChildren(null, (viewproxy) => {
-    if (viewproxy.item.repositoryId && (viewproxy.item.repositoryId.id === id)) {
-      viewproxy.deleteItem(false, true)
-    }
-  });
   KDBRepo.closeRepo(id + '-mount');
 }
 module.exports.unMountRepository = unMountRepository;
@@ -512,7 +514,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
         // TODO: Need to call create repo structure once that has been removed from validate
       });
     }
-  } else if (modelName === 'KoheseModel' || modelName === 'KoheseView') {
+  } else if (modelName === 'Namespace') {
     if (modelInstance.repositoryId && modelInstance.repositoryId.id !== 'ROOT') {
       proxy.repoPath = mountList[modelInstance.repositoryId.id + '-mount'].repoStoragePath + path.sep + modelName + path.sep + modelInstance.id + '.json';
       filePath = proxy.repoPath;
@@ -521,6 +523,15 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       proxy.repoPath = filePath;
     }
     delete proxy.repositoryId;
+  } else if (modelName === 'KoheseModel' || modelName === 'KoheseView') {
+      var namespaceProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstance.namespace.id);
+      if (namespaceProxy.item.repositoryId && namespaceProxy.item.repositoryId.id !== 'ROOT') {
+        proxy.repoPath = mountList[namespaceProxy.item.repositoryId.id + '-mount'].repoStoragePath + path.sep + modelName + path.sep + modelInstance.id + '.json';
+        filePath = proxy.repoPath;
+        isnewKind = true;
+      } else {
+        proxy.repoPath = filePath;
+      }
   } else {
     if(modelName !== 'Analysis' && filePath !== proxy.repoPath){
       console.log('}}} Old: ' + proxy.repoPath);
@@ -547,7 +558,12 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       }
       var repositoryProxy;
       if (isnewKind) {
-        repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstance.repositoryId.id)
+        if (modelName == 'Namespace') {
+          repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstance.repositoryId.id)
+        }
+        else {
+          repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(namespaceProxy.item.repositoryId.id);
+        }
       } else {
         repositoryProxy = proxy.getRepositoryProxy();
       }
@@ -765,6 +781,28 @@ function createRepoStructure(repoDirPath) {
     checkAndCreateDir(repoDirPath);
 
     return KDBRepo.initializeRepository(ItemProxy.getWorkingTree().getRootProxy().item.id, repoDirPath);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
+function unMountModelInstances(kind, modelDirPath) {
+  let fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
+  for (var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
+    var itemPath = modelDirPath + '/' + fileList[fileIdx];
+    var itemPayload = kdbFS.loadJSONDoc(itemPath);
+    let proxy = TreeConfiguration.getWorkingTree().getProxyFor(itemPayload.id);
+    switch (kind) {
+      case 'KoheseModel':
+        proxy.deleteItem(true)
+        break;
+      case 'KoheseView':
+      case 'Namespace':
+        proxy.deleteItem(false, true)
+        break;
+      default:
+    }
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////

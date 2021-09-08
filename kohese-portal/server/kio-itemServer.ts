@@ -1820,8 +1820,19 @@ function updateStatus(proxies) {
 //////////////////////////////////////////////////////////////////////////
 function getRepositoryInformation(proxy) {
   var repositoryProxy;
-  if (proxy.item.repositoryId && proxy.item.repositoryId.id !== 'ROOT') {
-    repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(proxy.item.repositoryId.id)
+  if (proxy.kind === 'Namespace') {
+    if (proxy.item.repositoryId && proxy.item.repositoryId.id !== 'ROOT') {
+      repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(proxy.item.repositoryId.id)
+    } else {
+      repositoryProxy = proxy.getRepositoryProxy();
+    }
+  } else if (proxy.kind === 'KoheseModel' || proxy.kind === 'KoheseView') {
+    let namespaceProxy = ItemProxy.getWorkingTree().getProxyFor(proxy.item.namespace.id);
+    if (namespaceProxy.item.repositoryId && namespaceProxy.item.repositoryId.id !== 'ROOT') {
+      repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(namespaceProxy.item.repositoryId.id)
+    } else {
+      repositoryProxy = proxy.getRepositoryProxy();
+    }
   } else {
     repositoryProxy = proxy.getRepositoryProxy();
   }

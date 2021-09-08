@@ -16,6 +16,10 @@
       "type": "string",
       "required": false,
       "default": ""
+    },
+    "repositoryId": {
+      "type": "string",
+      "name": "repositoryId"
     }
   },
   "validations": [],

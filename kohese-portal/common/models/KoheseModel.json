@@ -25,10 +25,6 @@
         "foreignKey": "id"
       }
     },
-    "repositoryId": {
-      "type": "string",
-      "name": "repositoryId"
-    },
     "base": {
       "type": "string",
       "required": true,
