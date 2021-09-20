@@ -46,7 +46,7 @@ import { ReportsComponent } from './components/reports/reports.component';
     { path: 'repositories', component: RepositoriesComponent },
     { path: 'explore', component: ExploreComponent },
     { path: 'analysis', component: AnalysisComponent },
-    { path: 'typeeditor', component: TypeEditorComponent },
+    { path: 'kindeditor', component: TypeEditorComponent },
     { path: 'devtools', component: DevToolsComponent },
     { path: 'about', component: AboutComponent },
     { path: 'outline', component: DocumentOutlineComponent },
