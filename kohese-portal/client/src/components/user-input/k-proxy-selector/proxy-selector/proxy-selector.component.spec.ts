@@ -15,21 +15,25 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MaterialModule } from '../../../../material.module';
 
+// Kohese
 import { ProxySelectorComponent } from './proxy-selector.component';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
-import { MatAutocompleteSelectedEvent } from '@angular/material';
-import { MockItem } from '../../../../../mocks/data/MockItem';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 import { PipesModule } from '../../../../pipes/pipes.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+// Mocks
+import { MockItem } from '../../../../../mocks/data/MockItem';
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 
 describe('Component: Parent Selector', ()=>{
   let proxySelectorComponent: ProxySelectorComponent;

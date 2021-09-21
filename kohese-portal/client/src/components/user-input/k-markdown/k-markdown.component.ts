@@ -15,9 +15,13 @@
  */
 
 
+// Angular
 import { Input, Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { UserInput } from '../user-input.class';
 import { MarkdownCheatSheetComponent } from './markdown-cheat-sheet.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -116,7 +120,7 @@ export class KMarkdownComponent extends UserInput
         'image/jpeg')) {
         let fileReader: FileReader = new FileReader();
         fileReader.onload = () => {
-          this._images.push(fileReader.result);
+          this._images.push(fileReader.result as string);
           let imageReference: string = '![' + images[j].name + '](' +
             (this._images.length - 1) + ')';
           this._formattedValue = (this._formattedValue ? this._formattedValue.

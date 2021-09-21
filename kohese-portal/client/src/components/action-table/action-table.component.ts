@@ -15,15 +15,19 @@
  */
 
 
+// Angular
 import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { Observable, Subscription } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class'
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { DetailsComponent } from '../details/details.component';
-import { ItemProxy } from '../../../../common/src/item-proxy.js'
-import { Observable, Subscription, Subject } from 'rxjs';
-import { MatTableDataSource } from '@angular/material';
+import { ItemProxy } from '../../../../common/src/item-proxy.js';
 
 @Component({
   selector: 'action-table',

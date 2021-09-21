@@ -15,12 +15,15 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, OnInit, Input } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef,
-  MatExpansionPanel } from '@angular/material';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef,
+  Optional, Inject, OnInit, Input } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+// Other External Dependencies
 import { ToastrService } from 'ngx-toastr';
 
+// Kohese
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
@@ -148,7 +151,7 @@ export class ImportComponent implements OnInit {
 
   public addFiles(files: Array<File>): void {
     for (let j: number = 0; j < files.length; j++) {
-      if (Object.values(SupportedTypes).indexOf(files[j].type) !== -1) {
+      if (Object.values(SupportedTypes).indexOf(files[j].type as SupportedTypes) !== -1) {
         let parameters: any;
         if (files[j].type === SupportedTypes.PDF) {
           parameters = new PdfImportParameters();
@@ -174,7 +177,7 @@ export class ImportComponent implements OnInit {
         contentObject.contentType)
     });
 
-    if (Object.values(SupportedTypes).indexOf(file.type) !== -1) {
+    if (Object.values(SupportedTypes).indexOf(file.type as SupportedTypes) !== -1) {
       let parameters: any;
       if (file.type === SupportedTypes.PDF) {
         parameters = new PdfImportParameters();
@@ -213,7 +216,7 @@ export class ImportComponent implements OnInit {
           string) => void, reject: () => void) => {
           let fileReader: FileReader = new FileReader();
           fileReader.onload = () => {
-            resolve(fileReader.result);
+            resolve(fileReader.result as string);
           };
           fileReader.readAsText(file);
         });

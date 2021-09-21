@@ -15,14 +15,17 @@
  */
 
 
-
-import { map} from 'rxjs/operators';
+// Angular
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+
+// Other External Dependencies
 import * as _ from 'underscore';
+import { ToastrService } from 'ngx-toastr';
 import { MarkdownService } from 'ngx-markdown';
 
+// Kohese
 import { CurrentUserService } from '../user/current-user.service';
-import { ToastrService } from 'ngx-toastr';
 import { DialogService } from '../dialog/dialog.service';
 import { VersionControlService } from '../version-control/version-control.service';
 
@@ -32,13 +35,11 @@ import { PropertyDefinition } from '../../../../common/src/PropertyDefinition.in
 import { TableDefinition } from '../../../../common/src/TableDefinition.interface';
 import { LocationMap } from '../../constants/LocationMap.data';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
-import { TreeHashMap, TreeHashEntry } from '../../../../common/src/tree-hash';
+import { TreeHashMap } from '../../../../common/src/tree-hash';
 import { ItemCache } from '../../../../common/src/item-cache';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { KoheseModel } from '../../../../common/src/KoheseModel';
 import { KoheseView } from '../../../../common/src/KoheseView';
-
-import { Subject ,  BehaviorSubject ,  Subscription ,  Observable, bindCallback } from 'rxjs';
 
 import { LogService } from '../log/log.service';
 import { InitializeLogs } from './item-repository.registry';

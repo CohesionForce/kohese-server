@@ -17,13 +17,30 @@
 
 @import '../../../../../app.component';
 
-/deep/ .mat-expansion-panel-content {
-  height: 300px;
-  overflow: auto !important;
+:host {
+
+  .item-chart {
+    height: calc(100% - 50px);
+    padding-top: 10px;
+    display: flex;
+    flex-direction: row;
+
+    .svg-chart {
+      width: 80%;
+      padding-bottom: 40%;
+      height: 1px;
+      overflow: visible;
+    }
+    .svg-chart-if-selection {
+      height: 100%;
+      width: 20%;
+    }
+  }
+
+  ::ng-deep .mat-expansion-panel-content {
+    overflow: auto;
+  }
+
 }
 
-.selected-type {
-  background-color : rgba(106, 168, 106, 0.795);
-  color : whitesmoke;
-}
 

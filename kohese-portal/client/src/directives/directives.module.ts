@@ -18,7 +18,7 @@
 // Angular Imports
 import { NgModule } from '@angular/core';
 
-// NPM Direcives
+// Other External Dependencies Direcives
 
 // Kohese Directives
 import { ShowIfTruncatedDirective } from '../directives/show-if-truncated.directive';

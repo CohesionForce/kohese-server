@@ -47,7 +47,6 @@ module.exports = function (app) {
       /^\/devtools.*/,
       /^\/about.*/,
       /^\/outline.*/,
-      /^\/document.*/,
       /^\/reports.*/
     ];
 

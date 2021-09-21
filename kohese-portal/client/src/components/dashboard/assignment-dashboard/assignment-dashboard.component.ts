@@ -16,12 +16,12 @@
 
 // Angular
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
-         ViewChild, ViewChildren, QueryList } from '@angular/core';
+         ViewChildren, QueryList } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { MatExpansionPanel } from '@angular/material';
-
-// NPM
+import { MatExpansionPanel } from '@angular/material/expansion';
 import { Observable, Subscription } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { NavigationService } from '../../../services/navigation/navigation.service';

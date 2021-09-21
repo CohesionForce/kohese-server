@@ -17,12 +17,22 @@
 
 @import '../../app.component';
 
-/deep/ .mat-expansion-panel-content {
-  height: 300px;
-  overflow: auto !important;
-}
+:host {
 
-/deep/ .mat-expansion-panel-body {
-  height: 100%;
-  width: 100%;
+  ::ng-deep .mat-expansion-panel-content {
+    height: 300px;
+    overflow: auto !important;
+  }
+
+  ::ng-deep .mat-expansion-panel-body {
+    height: 100%;
+    width: 100%;
+  }
+
+  .file-accordion {
+    height: 49%;
+    width: 100%;
+    overflow: auto;
+  }
+
 }

@@ -15,27 +15,25 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../../material.module';
 
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { AttributeEditorComponent } from './attribute-editor.component';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { KoheseType } from '../../../classes/UDT/KoheseType.class'
-import { MockDataModel } from '../../../../mocks/data/MockDataModel';
-import { MockViewData } from '../../../../mocks/data/MockViewData';
-import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { KoheseModel } from '../../../../../common/src/KoheseModel';
 import { PipesModule } from '../../../pipes/pipes.module';
+
+// Mocks
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 
 describe('Component: attribute-editor', ()=>{
   let component: AttributeEditorComponent;
@@ -61,7 +59,7 @@ describe('Component: attribute-editor', ()=>{
 
     fixture = TestBed.createComponent(AttributeEditorComponent);
     component = fixture.componentInstance;
-    component.contextualGlobalType = TestBed.get(ItemRepository).
+    component.contextualGlobalType = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config.getProxyFor('KoheseModel').item;
 
     fixture.detectChanges();

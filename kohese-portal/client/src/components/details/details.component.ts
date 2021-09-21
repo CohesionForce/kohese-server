@@ -15,12 +15,15 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  OnDestroy, Input, ViewChildren, QueryList, Optional,
-  Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  OnDestroy, Input, ViewChildren, QueryList, Optional, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subscription,  BehaviorSubject } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';

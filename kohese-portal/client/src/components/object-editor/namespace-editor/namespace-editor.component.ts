@@ -15,8 +15,12 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 
+// Other External Dependencies
+
+// Kohese
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';

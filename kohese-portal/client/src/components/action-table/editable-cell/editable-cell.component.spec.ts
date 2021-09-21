@@ -15,21 +15,22 @@
  */
 
 
-import { TestBed, ComponentFixture, async} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, SimpleChanges, SimpleChange } from '@angular/core';
-
+// Angular
+import { TestBed, ComponentFixture, waitForAsync, fakeAsync} from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, SimpleChange } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../material.module'
-import { EditableCellComponent } from './editable-cell.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BehaviorSubject, Subject } from 'rxjs';
 
+// Kohese
+import { EditableCellComponent } from './editable-cell.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { KoheseModel } from '../../../../../common/src/KoheseModel';
+import { MaterialModule } from '../../../material.module';
+
+// Mocks
 import { MockItem } from '../../../../mocks/data/MockItem';
-import { MockDataModel } from '../../../../mocks/data/MockDataModel';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+
 
 describe('Component: Editable Cell ', ()=>{
   let editableCellComponent: EditableCellComponent;
@@ -39,7 +40,7 @@ describe('Component: Editable Cell ', ()=>{
 
   let actionProxy = new ItemProxy('Action', MockItem())
 
-  beforeEach(async(()=>{
+  beforeEach(fakeAsync(()=>{
     TestBed.configureTestingModule({
       declarations: [EditableCellComponent],
       imports : [CommonModule,
@@ -49,8 +50,6 @@ describe('Component: Editable Cell ', ()=>{
          ReactiveFormsModule
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [
-      ]
     }).compileComponents();
 
     editableCellFixture = TestBed.createComponent(EditableCellComponent);
@@ -78,7 +77,7 @@ describe('Component: Editable Cell ', ()=>{
     expect(editableCellComponent).toBeTruthy();
   })
 
-  it('updates when a new action is provided', async(()=>{
+  it('updates when a new action is provided', waitForAsync(()=>{
     let newProxy = new ItemProxy('Item', MockItem());
     newProxy.item.name = 'New Action';
     editableCellComponent.action = {
@@ -88,6 +87,9 @@ describe('Component: Editable Cell ', ()=>{
     editableCellComponent.ngOnChanges({
       name: new SimpleChange(null, newProxy, true)
     })
+
+    // TODO: Missing Expectation
+
   }))
   it('disables when details editability changes', ()=>{
     editableStream.next(false);

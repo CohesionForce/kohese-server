@@ -18,9 +18,9 @@
 // Angular
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-
-// NPM
 import { Observable, Subscription } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { ProjectInfo } from '../../../../services/project-service/project.service';

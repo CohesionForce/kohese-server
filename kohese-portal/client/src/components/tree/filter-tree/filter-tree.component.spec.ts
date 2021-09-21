@@ -15,18 +15,22 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-
 import { MaterialModule } from '../../../material.module';
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { FilterTreeComponent } from './filter-tree.component';
 import { Filter, FilterableProperty, ValueInputType, FilterCriterion,
-  FilterCriteriaConnection,
-  FilterCriteriaConnectionType } from '../../filter/filter.class';
+  FilterCriteriaConnection, FilterCriteriaConnectionType } from '../../filter/filter.class';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 
 describe('Component: filter-tree', () => {
   let component: FilterTreeComponent;

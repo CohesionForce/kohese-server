@@ -15,18 +15,20 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit,
-  OnDestroy, Input } from '@angular/core';
+// Angular
+import { Component, ChangeDetectorRef, OnInit, OnDestroy, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject ,  Subscription } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { Tree } from '../tree.class';
 import { TreeRow } from '../tree-row/tree-row.class';
 import { Action } from '../tree-row/tree-row.component';
 import { Filter, FilterElement, FilterCriterion, FilterCriteriaConnection,
-  FilterCriteriaConnectionType,
-  FilterableProperty } from '../../filter/filter.class';
+  FilterCriteriaConnectionType } from '../../filter/filter.class';
 
 class AddRowObject {
   public constructor(public connection: FilterCriteriaConnection) {

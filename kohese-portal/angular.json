@@ -13,6 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": false,
             "outputPath": "build/client/bundle",
             "index": "client/index.html",
             "main": "client/bootstrap.ts",
@@ -21,22 +22,7 @@
             "assets": [
               "client/favicon.ico",
               "client/assets",
-              "client/manifest.json",
-              {
-                "glob": "**/*",
-                "input": "node_modules/tinymce/skins",
-                "output": "/tinymce/skins/"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/tinymce/themes",
-                "output": "/tinymce/themes/"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/tinymce/plugins",
-                "output": "/tinymce/plugins/"
-              }
+              "client/manifest.json"
             ],
             "styles": [
               "./client/css/index.css",
@@ -46,11 +32,23 @@
             ],
             "scripts": [
               "./build/client/cache-worker/cache-bundle.js",
-              "./node_modules/tinymce/tinymce.min.js"
-            ]
+              "node_modules/marked/lib/marked.js"
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "client/environments/environment.ts",
@@ -60,27 +58,26 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true,
               "serviceWorker": true
             },
             "development": {
-              "optimization": false,
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "outputHashing": "all",
-              "sourceMap": true,
-              "extractCss": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": false,
               "serviceWorker": true
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -107,7 +104,10 @@
             "tsConfig": "client/tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "styles": [
-              "client/styles.css"
+              "./client/css/index.css",
+              "./node_modules/bootstrap/dist/css/bootstrap.css",
+              "./node_modules/font-awesome/css/font-awesome.css",
+              "./node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [],
             "assets": [

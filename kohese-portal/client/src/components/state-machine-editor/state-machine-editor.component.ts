@@ -15,11 +15,14 @@
  */
 
 
-import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy,
-  ChangeDetectorRef } from '@angular/core';
-import { MAT_DIALOG_DATA, MatTableDataSource,
-  MatDialogRef } from '@angular/material';
+// Angular
+import { Component, Optional, Inject, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 
+// Other External Dependencies
+
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
 import { InputDialogKind } from '../dialog/input-dialog/input-dialog.component';
 

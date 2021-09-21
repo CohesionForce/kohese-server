@@ -17,14 +17,14 @@ limitations under the License.
 
 <div id="explore-container">
   <lens></lens>
-  <split direction="horizontal">
-    <split-area id="tree-container" [size]="50">
+  <as-split unit=percent direction="horizontal">
+    <as-split-area id="tree-container" [size]="50">
       <navigator></navigator>
-    </split-area>
-    <split-area id="details-container" [size]="50">
+    </as-split-area>
+    <as-split-area id="details-container" [size]="50">
       <ng-container *ngIf="itemProxy">
         <details-view [itemProxy]="itemProxy"></details-view>
       </ng-container>
-    </split-area>
-  </split>
+    </as-split-area>
+  </as-split>
 </div>

@@ -15,14 +15,16 @@
  */
 
 
-import { Component, ChangeDetectorRef, OnInit, OnDestroy, EventEmitter,
-  Output, ViewRef} from '@angular/core';
+// Angular
+import { Component, ChangeDetectorRef, OnInit, OnDestroy, EventEmitter, Output, ViewRef} from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { ItemRepository,
-  TreeConfigType } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, TreeConfigType } from '../../../services/item-repository/item-repository.service';
 import { LensService, ApplicationLens } from '../../../services/lens-service/lens.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';

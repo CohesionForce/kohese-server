@@ -15,6 +15,11 @@
  */
 
 
+// Angular
+
+// Other External Dependencies
+
+// Kohese
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { Filter, ValueInputType, FilterableProperty } from './filter.class';

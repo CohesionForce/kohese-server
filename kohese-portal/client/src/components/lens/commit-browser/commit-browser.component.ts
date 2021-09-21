@@ -15,14 +15,17 @@
  */
 
 
-import { Component, OnInit, OnDestroy } from "@angular/core";
+// Angular
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemCache } from "../../../../../common/src/item-cache";
-import { ItemRepository, RepoStates,
-  TreeConfigType } from "../../../services/item-repository/item-repository.service";
-import { MatDialogRef } from "@angular/material";
+import { ItemRepository, RepoStates, TreeConfigType } from "../../../services/item-repository/item-repository.service";
 
 interface CommitViewItem {
   commitId: string

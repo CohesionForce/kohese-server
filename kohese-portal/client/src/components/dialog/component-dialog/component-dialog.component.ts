@@ -15,11 +15,16 @@
  */
 
 
+// Angular
 import { Directive, Input, ViewContainerRef, Component,
   ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterViewInit, Inject,
   ViewChildren, QueryList, ComponentFactoryResolver } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+// Other External Dependencies
+
+// Kohese
 
 export interface ComponentDialogConfiguration {
   component: ComponentType<any>;

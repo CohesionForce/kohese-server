@@ -17,11 +17,11 @@ limitations under the License.
 
 <div style="height: 100%; width: 100%;">
   <lens></lens>
-  <split direction="horizontal">
-    <split-area [size]="50">
+  <as-split unit=percent direction="horizontal">
+    <as-split-area [size]="50">
       <commit-tree (rowSelected)="commitTreeRowSelected($event)"></commit-tree>
-    </split-area>
-    <split-area [size]="50">
+    </as-split-area>
+    <as-split-area [size]="50">
       <ng-container *ngIf="selectedVersionObject">
         <div style="height: 100%; width: 100%;">
           <ng-container [ngSwitch]="getSelectionType()">
@@ -55,6 +55,6 @@ limitations under the License.
           </ng-container>
         </div>
       </ng-container>
-    </split-area>
-  </split>
+    </as-split-area>
+  </as-split>
 </div>

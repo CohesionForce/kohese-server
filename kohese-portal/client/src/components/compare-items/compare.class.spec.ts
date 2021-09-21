@@ -15,13 +15,16 @@
  */
 
 
+// Angular
+
+// Kohese
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
 import { Compare } from './compare.class';
 import { Comparison } from './comparison.class';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+// Mocks
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 
 describe('Class: Compare', () => {
   let mockItemRepository = new MockItemRepository() as any as ItemRepository;

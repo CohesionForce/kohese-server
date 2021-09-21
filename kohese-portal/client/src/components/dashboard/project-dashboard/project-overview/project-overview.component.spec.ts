@@ -15,16 +15,21 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { of as ObservableOf } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
+// Kohese
 import { DashboardModule } from '../../dashboard.module';
 import { DialogService } from '../../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 import { ProjectOverviewComponent } from './project-overview.component';
+
+// Mocks
+import { MockDialogService } from '../../../../../mocks/services/MockDialogService';
 
 describe('ProjectOverviewComponent', () => {
   let component: ProjectOverviewComponent;
@@ -33,7 +38,7 @@ describe('ProjectOverviewComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterModule.forRoot([]),
+        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
         DashboardModule,
       ],
       providers: [

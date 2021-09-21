@@ -19,13 +19,13 @@
 
 :host {
 
-  .top-bar {
+  ::ng-deep .top-bar {
     height: 7%;
   }
 
 
-  .filter-dialog-container {
-    height: 100%;
+  ::ng-deep .filter-dialog-container {
+    height: 98%;
     width: 100%;
 
     .dialog-title {
@@ -34,7 +34,7 @@
     }
 
     .filter-tree-container {
-      height: calc(93% - 40px);
+      height: calc(93% - 60px);
       width: 100%;
 
       virtual-scroll {
@@ -42,11 +42,6 @@
       }
     }
 
-    mat-dialog-actions {
-      display: flex;
-      flex-direction: row;
-      padding: 0px !important;
-    }
   }
 
 

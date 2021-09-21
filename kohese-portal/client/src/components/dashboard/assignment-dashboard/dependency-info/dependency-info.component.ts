@@ -15,7 +15,12 @@
  */
 
 
+// Angular
 import { Component, Input, OnInit } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
 
 @Component({
   selector: 'dependency-info',

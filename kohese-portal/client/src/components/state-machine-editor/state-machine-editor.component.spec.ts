@@ -15,17 +15,21 @@
  */
 
 
-import { TestBed, ComponentFixture, fakeAsync,
-  tick } from '@angular/core/testing';
+// Angular
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
+
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MAT_DIALOG_DATA, MatDialogRef,
-  MatTableModule } from '@angular/material';
-
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatTableModule } from '@angular/material/table';
 import { MaterialModule } from '../../material.module';
+
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { StateMachineEditorComponent } from './state-machine-editor.component';
+
+// Mocks
+import { MockDialogService } from '../../../mocks/services/MockDialogService';
 
 describe('Component: state-machine-editor', () => {
   let component: StateMachineEditorComponent;

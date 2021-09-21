@@ -15,9 +15,13 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 
+// Kohese
 import { ComparisonComponent } from './comparison.component';
+
+// Mocks
 
 describe('Component: comparison', () => {
   let component: ComparisonComponent;

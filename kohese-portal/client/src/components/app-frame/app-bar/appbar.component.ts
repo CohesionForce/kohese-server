@@ -15,13 +15,17 @@
  */
 
 
+// Angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable ,  Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+
+// Other External Dependencies
+
+// Kohese
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { CurrentUserService } from '../../../services/user/current-user.service';
-import { ItemRepository, RepoStates,
-  TreeConfigInfo } from '../../../services/item-repository/item-repository.service';
+import { ItemRepository, RepoStates, TreeConfigInfo } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
 import { NotificationService } from '../../../services/notifications/notification.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';

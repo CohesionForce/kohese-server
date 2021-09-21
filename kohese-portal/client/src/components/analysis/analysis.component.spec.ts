@@ -15,25 +15,28 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { from } from 'rxjs/observable/from';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
+import { ActivatedRoute } from '@angular/router';
+import { from } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../material.module'
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
+// Kohese
 import { AnalysisComponent } from './analysis.component';
 import { NavigationService } from '../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { AnalysisService } from '../../services/analysis/analysis.service';
-import { ActivatedRoute } from '@angular/router';
-import { MockAnalysisService } from '../../../mocks/services/MockAnalysisService';
 import { DialogService } from '../../services/dialog/dialog.service';
+import { MaterialModule } from '../../material.module';
+
+// Mocks
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockAnalysisService } from '../../../mocks/services/MockAnalysisService';
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
 import { MockDialogService } from '../../../mocks/services/MockDialogService';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 
 describe('Component: Analysis', ()=>{

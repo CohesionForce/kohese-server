@@ -15,10 +15,14 @@
  */
 
 
+// Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, OnInit, Input, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+  Inject, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
+// Other External Dependencies
+
+// Kohese
 import { TreeComponent } from '../tree/tree.component';
 
 export enum VersionSelection {

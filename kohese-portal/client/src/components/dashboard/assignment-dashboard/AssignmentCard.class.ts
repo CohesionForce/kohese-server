@@ -15,15 +15,17 @@
  */
 
 
+// Angular
+import { ChangeDetectorRef } from "@angular/core";
+import { Subscription, BehaviorSubject } from 'rxjs';
+
+// Other External Dependencies
+
+// Kohese
 import { DetailsComponent } from './../../details/details.component';
 import { DialogService } from './../../../services/dialog/dialog.service';
-import { NavigatableComponent } from "../../../classes/NavigationComponent.class";
-import { NavigationService } from "../../../services/navigation/navigation.service";
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { Observable, Subscription, BehaviorSubject } from 'rxjs';
-import { ChangeDetectorRef } from "@angular/core";
 
 export class AssignmentCard {
 

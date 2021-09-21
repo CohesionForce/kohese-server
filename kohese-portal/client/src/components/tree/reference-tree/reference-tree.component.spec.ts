@@ -15,21 +15,28 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { ActivatedRoute } from '@angular/router';
-import { VirtualScrollModule } from 'angular2-virtual-scroll';
+import { MaterialModule } from '../../../material.module';
 import { of as ObservableOf } from 'rxjs';
 
-import { MaterialModule } from '../../../material.module';
+// Other External Dependencies
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
+
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ReferenceTreeComponent } from './reference-tree.component';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 
 describe('Component: reference-tree', () => {
   let component: ReferenceTreeComponent;

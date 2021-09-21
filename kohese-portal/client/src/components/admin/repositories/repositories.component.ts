@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
+
 // Angular
 import { Component, OnInit, OnDestroy, Input, ChangeDetectorRef } from '@angular/core';
+import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
 
-// NPM
+// Other External Dependencies
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subscription } from 'rxjs';
 
 // Kohese
 import { DetailsComponent } from '../../details/details.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MatDialog, MatDialogConfig, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
@@ -36,7 +37,6 @@ import { VersionControlService } from '../../../services/version-control/version
 import { RepositoryService } from '../../../services/repository/repository.service';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../tree/tree.component';
-
 
 @Component({
   selector: 'repositories',

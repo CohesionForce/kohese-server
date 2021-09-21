@@ -15,17 +15,22 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '../../../material.module';
+
+// Kohese
 import { PipesModule } from '../../../pipes/pipes.module';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Comparison, ChangeType } from '../comparison.class';
 import { CommitComparisonComponent } from './commit-comparison.component';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
+
+// Mocks
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('Component: commit-comparison', () => {

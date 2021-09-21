@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "es2015",
+    "downlevelIteration": true,
+    "target": "es2015",
+    "module": "es2020",
     "baseUrl": ".",
     "paths": {
       "common" : ["./common/models/"]
     },
     "moduleResolution": "node",
     "sourceMap": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": false,
@@ -21,7 +21,6 @@
       "underscore",
       "jasmine",
       "jssha",
-      "sharedworker",
     ],
     "typeRoots": [
       "./node_modules/@types"

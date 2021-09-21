@@ -43,8 +43,8 @@
 
 .mat-column-category {
   white-space: unset;
-  flex: 0 0 14%;
-  width: 14%;
+  flex: 0 0 20%;
+  width: 20%;
 }
 .mat-column-type {
   white-space: unset;
@@ -52,8 +52,8 @@
   width: 20%;
 }
 .mat-column-text {
-  flex: 0 0 66%;
-  width: 66%;
+  flex: 0 0 60%;
+  width: 60%;
 }
 
 // Every other row is colored
@@ -89,6 +89,6 @@ mat-header-cell {
 
 .syncOn {
   background-color: whitesmoke;
-  color : green;
+  color : rgb(0,128,0);
   border-radius: 10px;
 }
