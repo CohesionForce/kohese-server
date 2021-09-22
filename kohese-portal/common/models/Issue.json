@@ -23,6 +23,10 @@
             "name": "In Analysis",
             "description": "The issue is In Analysis."
           },
+          "RequiresAnalysis": {
+            "name": "RequiresAnalysis",
+            "description": "The issue requires an analysis Action."
+          },
           "NoAction": {
             "name": "No Action",
             "description": "The issue requires No Action."
@@ -67,6 +71,16 @@
             "target": "Duplicate",
             "guard": {},
             "requires": "relatedIssues"
+          },
+          "Requires Analysis": {
+            "source": "InAnalysis",
+            "target": "RequiresAnalysis",
+            "guard": {}
+          },
+          "Review Analysis": {
+            "source": "RequiresAnalysis",
+            "target": "InAnalysis",
+            "guard": {}
           },
           "Requires Action": {
             "source": "InAnalysis",
