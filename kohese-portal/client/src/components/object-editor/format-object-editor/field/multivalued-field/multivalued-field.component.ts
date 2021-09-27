@@ -204,6 +204,10 @@ export class MultivaluedFieldComponent extends Field {
           getIcon: (element: any) => {
             return (element as ItemProxy).model.view.item.icon;
           },
+          isFavorite: (element: any) => {
+            return (
+              (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
+          },
           selection: references.map((reference: { id: string }) => {
             return TreeConfiguration.getWorkingTree().getProxyFor(reference.
               id);

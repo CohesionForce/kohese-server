@@ -17,9 +17,9 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  Optional, Inject, OnInit, Output, EventEmitter, ViewChild,
-  AfterViewInit, ElementRef} from '@angular/core';
+  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { any } from 'underscore';
 
 // Other External Dependencies
 
@@ -43,6 +43,17 @@ class ElementMapValue {
     this._visible = visible;
   }
 
+  get favorite() {
+    return this._favorite;
+  }
+  set favorite(value: boolean) {
+    if(value === undefined) {
+      this._favorite = false;
+    } else {
+      this._favorite = value;
+    }
+  }
+
   private _expanded: boolean = false;
   get expanded() {
     return this._expanded;
@@ -59,9 +70,13 @@ class ElementMapValue {
     return this._icon;
   }
 
-  public constructor(private _parent: any, private _depth: number,
-    private _text: string, private _icon: string) {
-  }
+  public constructor (
+    private _parent: any,
+    private _depth: number,
+    private _text: string,
+    private _icon: string,
+    private _favorite: boolean
+  ) {}
 }
 
 export class Action {
@@ -147,6 +162,21 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   @Input('getText')
   set getText(getText: (element: any) => string) {
     this._getText = getText;
+  }
+
+  private _isFavorite: (element: any) => boolean;
+  get isFavorite() {
+    return this._isFavorite;
+  }
+  @Input('isFavorite')
+  set isFavorite(isFavorite: (element: any) => boolean) {
+    if(this._isFavorite === undefined) {
+      this._isFavorite = (element: any) => {
+        return false;
+      }
+    } else {
+      this._isFavorite = isFavorite;
+    }
   }
 
   private _maySelect: (element: any) => boolean = (element: any) => {
@@ -309,6 +339,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this.hasChildren = this._data['hasChildren'];
       this.getText = this._data['getText'];
       this.getIcon = this._data['getIcon'];
+      this.isFavorite = this._data['isFavorite'];
       this.maySelect = this._data['maySelect'];
       this.selection = this._data['selection'];
       this.allowMultiselect = this._data['allowMultiselect'];
@@ -591,8 +622,8 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
 
   private processElement(element: any, parent: any, depth: number): void {
-    this._elementMap.set(element, new ElementMapValue(parent, depth, this.
-      _getText(element), this._getIcon(element)));
+    this._elementMap.set(element, new ElementMapValue(
+      parent, depth, this._getText(element), this._getIcon(element), this._isFavorite(element)));
 
     let children: Array<any> = this._getChildren(element);
     for (let j: number = 0; j < children.length; j++) {
@@ -615,6 +646,26 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this._selection.push(element);
       this._elementSelected(element);
       this._elementSelectedEventEmitter.emit(element);
+    }
+  }
+
+  public addToFavorites(element: any) {
+    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    // let quickSelectElementIndex = this._quickSelectElements.indexOf(elementMapValue);
+    if(elementMapValue) {
+      elementMapValue.favorite = true;
+      // this.quickSelectElements[quickSelectElementIndex] = elementMapValue;
+      return this._elementMap;
+    }
+  }
+
+  public removeFromFavorites(element: any) {
+    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    // let quickSelectElementIndex = this._quickSelectElements.indexOf(elementMapValue);
+    if(elementMapValue) {
+      elementMapValue.favorite = false;
+      // this.quickSelectElements[quickSelectElementIndex] = elementMapValue;
+      return this._elementMap
     }
   }
 

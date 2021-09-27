@@ -101,6 +101,10 @@ export class DocumentConfigurationEditorComponent implements OnInit {
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
         },
+        isFavorite: (element: any) => {
+          return (
+            (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
+        },
         selection: (this._copy.parentId ? [TreeConfiguration.getWorkingTree().
           getProxyFor(this._copy.parentId)] : [])
       }
@@ -129,6 +133,10 @@ export class DocumentConfigurationEditorComponent implements OnInit {
         },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
+        },
+        isFavorite: (element: any) => {
+          return (
+            (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         allowMultiselect: true,
         selection: components
