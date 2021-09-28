@@ -40,7 +40,7 @@ limitations under the License.
           <ng-template #favorite>
             <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
               (click)=removeFromFavorites(quickSelectElement)>
-              <mat-icon class="fa fa-star-o"></mat-icon>
+              <mat-icon class="fa fa-star"></mat-icon>
             </button>
           </ng-template>
           <!-- scroll into view in explorer tree -->
@@ -56,12 +56,13 @@ limitations under the License.
     <br>
     <!-- favorites -->
     <h3 style="height: 50px;">Favorites</h3>
-    <div class=favorites style="display: flex; flex-direction: row; height: calc(40% - 50px); overflow-y: auto">
+    <div class=favorites style="height: calc(40% - 100px); overflow-y: auto">
       <ng-container *ngFor="let quickSelectElement of quickSelectElements">
         <div style="display: flex; flex-direction: row;">
-          <ng-container *ngIf="elementMap.get(quickSelectElement).favorite">
+          <!-- <ng-container *ngIf="elementMap.get(quickSelectElement).favorite"> -->
             <!-- favorites list -->
             <button mat-button class=item-button matTooltip="{{elementMap.get(quickSelectElement)?.text}}"
+              *ngIf="elementMap.get(quickSelectElement).favorite"
               [disabled]="!maySelect(quickSelectElement)"
               (click)="changeElementSelection(quickSelectElement)"
               [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !== -1) }">
@@ -70,15 +71,17 @@ limitations under the License.
             </button>
             <!-- remove favorite -->
             <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
+              *ngIf="elementMap.get(quickSelectElement).favorite"
               (click)=removeFromFavorites(quickSelectElement)>
               <mat-icon class="fa fa-star"></mat-icon>
             </button>
             <!-- scroll into view in explorer tree -->
             <button mat-icon-button matTooltip="Display this element in the tree" style="margin-left: auto;"
+              *ngIf="elementMap.get(quickSelectElement).favorite"
               (click)="scrollElementIntoView(quickSelectElement)">
               <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
             </button>
-          </ng-container>
+          <!-- </ng-container> -->
         </div>
       </ng-container>
     </div>

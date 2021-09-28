@@ -651,21 +651,15 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
 
   public addToFavorites(element: any) {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
-    // let quickSelectElementIndex = this._quickSelectElements.indexOf(elementMapValue);
     if(elementMapValue) {
       elementMapValue.favorite = true;
-      // this.quickSelectElements[quickSelectElementIndex] = elementMapValue;
-      return this._elementMap;
     }
   }
 
   public removeFromFavorites(element: any) {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
-    // let quickSelectElementIndex = this._quickSelectElements.indexOf(elementMapValue);
     if(elementMapValue) {
       elementMapValue.favorite = false;
-      // this.quickSelectElements[quickSelectElementIndex] = elementMapValue;
-      return this._elementMap
     }
   }
 
