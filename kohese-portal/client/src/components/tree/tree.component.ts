@@ -19,7 +19,6 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { any } from 'underscore';
 
 // Other External Dependencies
 
@@ -653,6 +652,16 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
     if(elementMapValue) {
       elementMapValue.favorite = true;
+      try {
+        // add element if it is not in the quickSelectElements array
+        let id = element.item.id;
+        let quickSelectElementIndex = this.quickSelectElements.findIndex(t => t.item.id === id);
+        if(quickSelectElementIndex === -1) {
+          this._quickSelectElements.push(element);
+        }
+      } catch (error) {
+        console.log('!!! Add to Favorites Error: %s', error);
+      }
     }
   }
 
@@ -660,6 +669,16 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
     if(elementMapValue) {
       elementMapValue.favorite = false;
+      // try {
+      //   // remove element from quickSelectElements array
+      //   let id = element.item.id;
+      //   let quickSelectElementIndex = this.quickSelectElements.findIndex(t => t.item.id === id);
+      //   if(quickSelectElementIndex !== -1) {
+      //     this._quickSelectElements.splice(quickSelectElementIndex, 1);
+      //   }
+      // } catch (error) {
+      //   console.log('!!! Remove from Favorites Error: %s', error);
+      // }
     }
   }
 

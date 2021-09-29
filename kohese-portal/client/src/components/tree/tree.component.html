@@ -144,14 +144,19 @@ limitations under the License.
                 <mat-icon class="{{elementMap.get(element).icon}}"></mat-icon>
                 {{elementMap.get(element).text}}
               </button>
-              <!-- add favorite -->
-              <button mat-icon-button matTooltip="add to favorites" style="margin-left: auto;"
-                (click)=addToFavorites(elementMap.get(element))>
-                <ng-container *ngIf="!elementMap.get(element).favorite else favorite">
+              <!-- add/remove favorite -->
+              <ng-container *ngIf="!elementMap.get(element).favorite else favorite">
+                <button mat-icon-button matTooltip="add to favorites" style="margin-left: auto;"
+                  (click)=addToFavorites(element)>
                   <mat-icon class="fa fa-star-o"></mat-icon>
-                </ng-container>
-                <ng-template #favorite><mat-icon class="fa fa-star"></mat-icon></ng-template>
-              </button>
+                </button>
+              </ng-container>
+              <ng-template #favorite>
+                <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
+                  (click)=removeFromFavorites(element)>
+                  <mat-icon class="fa fa-star"></mat-icon>
+                </button>
+              </ng-template>
               <ng-container *ngFor="let action of actions; let j = index">
                 <button mat-icon-button matTooltip="{{action.tooltip}}"
                   [disabled]="!action.canExecute(element)"
