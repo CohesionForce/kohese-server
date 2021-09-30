@@ -162,11 +162,7 @@ limitations under the License.
 <ng-container *ngIf="isDialogInstance()">
   <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
     row;">
-    <button mat-button matTooltip="Navigate to this Item" style="margin-left:
-      auto;" (click)="navigate(itemProxy.item.id, true)">
-      Explore
-    </button>
-    <button mat-button matTooltip="Close this dialog box"
+    <button mat-raised-button color=primary matTooltip="Close this dialog box" style="margin-left: auto;"
       (click)="matDialogRef.close(undefined)">
       Close
     </button>
