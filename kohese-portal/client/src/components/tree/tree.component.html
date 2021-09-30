@@ -17,6 +17,38 @@ limitations under the License.
 
 <mat-drawer-container [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 40px)' : '100%' }">
   <mat-drawer #quickSelectDrawer mode="side" disableClose [opened]="(quickSelectElements.length > 0)" style="width: 30%;">
+    <!-- favorites -->
+    <h3 style="height: 50px;">Favorites</h3>
+    <div class=favorites style="height: calc(40% - 100px); overflow-y: auto">
+      <ng-container *ngFor="let quickSelectElement of quickSelectElements">
+        <div style="display: flex; flex-direction: row;">
+          <!-- favorites list -->
+          <button mat-button class=item-button matTooltip="{{elementMap.get(quickSelectElement)?.text}}"
+            *ngIf="elementMap.get(quickSelectElement).favorite"
+            [disabled]="!maySelect(quickSelectElement)"
+            (click)="changeElementSelection(quickSelectElement)"
+            [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !== -1) }">
+            <mat-icon class="{{elementMap.get(quickSelectElement)?.icon}}"></mat-icon>
+            {{elementMap.get(quickSelectElement)?.text}}
+          </button>
+          <!-- remove favorite -->
+          <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
+            *ngIf="elementMap.get(quickSelectElement).favorite"
+            (click)=removeFromFavorites(quickSelectElement)>
+            <mat-icon class="fa fa-star"></mat-icon>
+          </button>
+          <!-- scroll into view in explorer tree -->
+          <button mat-icon-button matTooltip="Display this element in the tree" style="margin-left: auto;"
+            *ngIf="elementMap.get(quickSelectElement).favorite"
+            (click)="scrollElementIntoView(quickSelectElement)">
+            <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
+          </button>
+
+        </div>
+      </ng-container>
+    </div>
+
+    <br>
     <!-- quick select -->
     <h3 style="height: 50px;">Quick Select</h3>
     <div class=quick-select style="height: calc(60% - 50px); overflow-y: auto;">
@@ -53,41 +85,9 @@ limitations under the License.
       </ng-container>
     </div>
 
-    <br>
-    <!-- favorites -->
-    <h3 style="height: 50px;">Favorites</h3>
-    <div class=favorites style="height: calc(40% - 100px); overflow-y: auto">
-      <ng-container *ngFor="let quickSelectElement of quickSelectElements">
-        <div style="display: flex; flex-direction: row;">
-          <!-- <ng-container *ngIf="elementMap.get(quickSelectElement).favorite"> -->
-            <!-- favorites list -->
-            <button mat-button class=item-button matTooltip="{{elementMap.get(quickSelectElement)?.text}}"
-              *ngIf="elementMap.get(quickSelectElement).favorite"
-              [disabled]="!maySelect(quickSelectElement)"
-              (click)="changeElementSelection(quickSelectElement)"
-              [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !== -1) }">
-              <mat-icon class="{{elementMap.get(quickSelectElement)?.icon}}"></mat-icon>
-              {{elementMap.get(quickSelectElement)?.text}}
-            </button>
-            <!-- remove favorite -->
-            <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
-              *ngIf="elementMap.get(quickSelectElement).favorite"
-              (click)=removeFromFavorites(quickSelectElement)>
-              <mat-icon class="fa fa-star"></mat-icon>
-            </button>
-            <!-- scroll into view in explorer tree -->
-            <button mat-icon-button matTooltip="Display this element in the tree" style="margin-left: auto;"
-              *ngIf="elementMap.get(quickSelectElement).favorite"
-              (click)="scrollElementIntoView(quickSelectElement)">
-              <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
-            </button>
-          <!-- </ng-container> -->
-        </div>
-      </ng-container>
-    </div>
-
   </mat-drawer>
   <mat-drawer-content>
+    <!-- Options at the top of the mat-drawer-content section -->
     <div style="height: 70px; width: 100%; display: flex; flex-direction: row;">
       <ng-container *ngIf="(quickSelectElements.length > 0)">
         <button mat-icon-button matTooltip="Toggle display of the Quick Select area"
@@ -119,6 +119,7 @@ limitations under the License.
           (input)="searchTextChanged($event.target.value)"/>
       </mat-form-field>
     </div>
+    <!-- mat-drawer-content Tree -->
     <div #elementContainer style="height: calc(100% - 70px); width: 100%; overflow-y: auto;">
       <ng-container *ngFor="let element of Array.from(elementMap.keys())">
         <ng-container *ngIf="shouldDisplay(element)">
