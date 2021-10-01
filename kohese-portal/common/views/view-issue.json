@@ -460,7 +460,7 @@
               "propertyName": "response",
               "customLabel": "Response",
               "labelOrientation": "Top",
-              "kind": "text",
+              "kind": "markdown",
               "tableDefinition": "",
               "visible": true,
               "editable": true
