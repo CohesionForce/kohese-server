@@ -18,6 +18,7 @@
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
   Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
+  import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 // Other External Dependencies
@@ -648,6 +649,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     }
   }
 
+  favorites: Array<any> = [];
   public addToFavorites(element: any) {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
     if(elementMapValue) {
@@ -659,16 +661,39 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
         if(quickSelectElementIndex === -1) {
           this._quickSelectElements.push(element);
         }
+        this.favorites.push(element);
       } catch (error) {
         console.log('!!! Add to Favorites Error: %s', error);
       }
+
     }
   }
 
   public removeFromFavorites(element: any) {
+    let id = element.item.id;
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
     if(elementMapValue) {
       elementMapValue.favorite = false;
+      try {
+        let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+        this.favorites.splice(favoritesElementIndex, 1);
+      } catch (error) {
+        console.log('!!! Remove from Favorites Error: %s', error);
+      }
+    }
+  }
+
+  /**
+   * @event Drag&Drop connected sorting group
+   */
+  drop(event: CdkDragDrop<any>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(this.favorites, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(event.previousContainer.data,
+                        event.container.data,
+                        event.previousIndex,
+                        event.currentIndex);
     }
   }
 

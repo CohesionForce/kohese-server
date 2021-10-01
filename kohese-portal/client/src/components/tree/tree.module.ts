@@ -17,6 +17,7 @@
 
 import { NgModule } from "@angular/core";
 import { CommonModule } from '@angular/common';
+import { DragDropModule } from "@angular/cdk/drag-drop";
 import { MaterialModule } from "../../material.module";
 
 import { AngularSplitModule} from 'angular-split';
@@ -54,6 +55,7 @@ import { TreeComponent } from './tree.component';
   ],
   imports : [
     CommonModule,
+    DragDropModule,
     MaterialModule,
     ServicesModule,
     BrowserModule,
