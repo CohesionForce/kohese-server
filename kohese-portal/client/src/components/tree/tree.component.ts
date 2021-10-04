@@ -25,6 +25,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 // Kohese
 import { Dialog } from '../dialog/Dialog.interface';
+import { TreeService } from '../../services/tree/tree.service';
 
 class ElementMapValue {
   get parent() {
@@ -327,10 +328,12 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return Array;
   }
 
-  public constructor(private _changeDetectorRef: ChangeDetectorRef,
+  public constructor (
+    private _changeDetectorRef: ChangeDetectorRef,
+    private treeService: TreeService,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<TreeComponent>) {
-  }
+    @Optional() private _matDialogRef: MatDialogRef<TreeComponent>
+  ) {}
 
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
@@ -362,6 +365,16 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
           parentElementMapValue = this._elementMap.get(parentElementMapValue.
             parent);
         }
+      }
+    }
+
+    if(this.isDialogInstance()) {
+      if(this.treeService.favorites.length > 0) {
+        this.favorites = this.treeService.getFavorites();
+        for(let i=0; i < this.favorites.length; i++) {
+          this.addToFavorites(this.favorites[i]);
+        }
+        this.changeDetectorRef.detectChanges();
       }
     }
 
@@ -661,7 +674,10 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
         if(quickSelectElementIndex === -1) {
           this._quickSelectElements.push(element);
         }
-        this.favorites.push(element);
+        let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+        if(favoritesElementIndex === -1) {
+          this.favorites = this.treeService.addFavorite(element);
+        }
       } catch (error) {
         console.log('!!! Add to Favorites Error: %s', error);
       }
@@ -676,7 +692,9 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       elementMapValue.favorite = false;
       try {
         let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
-        this.favorites.splice(favoritesElementIndex, 1);
+        if(favoritesElementIndex) {
+          this.favorites = this.treeService.removeFavorite(element);
+        }
       } catch (error) {
         console.log('!!! Remove from Favorites Error: %s', error);
       }
