@@ -19,9 +19,9 @@ limitations under the License.
   <mat-drawer #quickSelectDrawer mode="side" disableClose [opened]="(quickSelectElements.length > 0)" style="width: 30%;">
     <!-- favorites -->
     <h3 style="height: 50px;">Favorites</h3>
-    <div class=favorites style="height: calc(40% - 100px); overflow-y: auto">
-      <div cdkDropList (cdkDropListDropped)=drop($event)>
-        <div cdkDrag class=favorites-list-container *ngFor="let favorite of favorites" style="display: flex; flex-direction: row;">
+    <div class=favorites style="height: calc(50% - 100px); overflow-y: auto">
+      <div cdkDropList class=favorites-list (cdkDropListDropped)=drop($event)>
+        <div cdkDrag class=favorites-box *ngFor="let favorite of favorites" style="display: flex; flex-direction: row;">
           <!-- favorites list -->
           <button mat-button class=item-button matTooltip="{{elementMap.get(favorite)?.text}}"
             *ngIf="elementMap.get(favorite).favorite"
@@ -50,7 +50,7 @@ limitations under the License.
     <br>
     <!-- quick select -->
     <h3 style="height: 50px;">Quick Select</h3>
-    <div class=quick-select style="height: calc(60% - 50px); overflow-y: auto;">
+    <div class=quick-select style="height: calc(50% - 50px); overflow-y: auto;">
       <ng-container *ngFor="let quickSelectElement of quickSelectElements">
         <div style="display: flex; flex-direction: row;">
           <!-- quick select list -->
