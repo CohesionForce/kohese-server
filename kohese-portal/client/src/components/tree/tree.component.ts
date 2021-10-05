@@ -672,7 +672,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
         let id = element.item.id;
         let quickSelectElementIndex = this.quickSelectElements.findIndex(t => t.item.id === id);
         if(quickSelectElementIndex === -1) {
-          this._quickSelectElements.push(element);
+          this._quickSelectElements.unshift(element);
         }
         let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
         if(favoritesElementIndex === -1) {

@@ -48,7 +48,7 @@ export class TreeService {
       let id = element.item.id;
       let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
       if(favoritesElementIndex === -1) {
-        this.favorites.push(element);
+        this.favorites.unshift(element);
       }
     } catch (error) {
       console.log('!!! Add Favorite Error: %s', error);
