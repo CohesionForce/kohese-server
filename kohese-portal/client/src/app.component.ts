@@ -21,13 +21,8 @@ import { AuthenticationService } from './services/authentication/authentication.
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styles: ['./app.component.scss']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  constructor(private authenticationService: AuthenticationService) {
-    window['tinyMCE'].overrideDefaults({
-      base_url: '/tinymce/',
-      suffix: '.min'
-    });
-  }
+  constructor(private authenticationService: AuthenticationService) {}
 }

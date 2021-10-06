@@ -15,9 +15,12 @@
  */
 
 
-import { ChangeDetectionStrategy, ChangeDetectorRef,
-  Component } from '@angular/core';
+// Angular
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 
+// Other External Dependencies
+
+// Kohese
 import { DialogService } from '../../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../../../services/user/session.service';

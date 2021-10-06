@@ -15,29 +15,33 @@
  */
 
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+// Angular
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../../material.module';
-import { MAT_DIALOG_DATA } from '@angular/material';
 
+// Kohese
 import { ItemRepository } from '../../../../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../../../../mocks/services/MockItemRepository';
 import { NavigationService } from '../../../../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../../../../mocks/services/MockNavigationService';
 import { DialogService } from '../../../../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../../../../mocks/services/MockDialogService';
+import { SessionService } from '../../../../../../services/user/session.service';
 import { StateSummaryDialogComponent } from './state-summary-dialog.component';
+
+// Mocks
+import { MockNavigationService } from '../../../../../../../mocks/services/MockNavigationService';
+import { MockDialogService } from '../../../../../../../mocks/services/MockDialogService';
+import { MockSessionService } from '../../../../../../../mocks/services/MockSessionService';
+import { MockItemRepository } from '../../../../../../../mocks/services/MockItemRepository';
 
 describe('StateSummaryDialogComponent', () => {
   let component: StateSummaryDialogComponent;
   let fixture: ComponentFixture<StateSummaryDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ StateSummaryDialogComponent ],
       imports: [
-        NgxDatatableModule,
         MaterialModule
       ],
       providers: [ {
@@ -50,7 +54,8 @@ describe('StateSummaryDialogComponent', () => {
         },
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: NavigationService, useClass: MockNavigationService },
-        { provide: DialogService, useClass: MockDialogService }
+        { provide: DialogService, useClass: MockDialogService },
+        { provide: SessionService, useClass: MockSessionService }
       ],
       schemas: [ NO_ERRORS_SCHEMA ]
     }).compileComponents();

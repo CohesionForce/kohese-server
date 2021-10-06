@@ -15,19 +15,24 @@
  */
 
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+// Angular
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
+import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../material.module';
+
+// Kohese
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 import { CreationRowComponent } from './creation-row.component';
+
+// Mocks
+import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
 
 describe('CreationRowComponent', () => {
   let component: CreationRowComponent;
   let fixture: ComponentFixture<CreationRowComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ CreationRowComponent ],
       imports: [

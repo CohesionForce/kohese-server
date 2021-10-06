@@ -15,11 +15,15 @@
  */
 
 
+// Angular
+import { Component, OnInit, Input } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
 import { MarkdownCheatSheetComponent } from './../markdown-cheat-sheet.component';
 import { PropertyDefinition } from '../../../../../../common/src/PropertyDefinition.interface';
-import { Input } from '@angular/core';
 import { ItemProxy } from './../../../../../../common/src/item-proxy';
-import { Component, OnInit } from '@angular/core';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 
 @Component({
@@ -85,7 +89,7 @@ export class KdMarkdownComponent implements OnInit {
         'image/jpeg')) {
         let fileReader: FileReader = new FileReader();
         fileReader.onload = () => {
-          this._images.push(fileReader.result);
+          this._images.push(fileReader.result as string);
           let imageReference: string = '![' + images[j].name + '](' +
             (this._images.length - 1) + ')';
           this._formattedValue = (this._formattedValue ? this._formattedValue.

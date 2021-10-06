@@ -15,25 +15,25 @@
  */
 
 
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-
-import { AnalysisViewComponent, AnalysisViews, AnalysisFilter } from '../AnalysisViewComponent.class';
-import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
-import { NavigationService } from '../../../services/navigation/navigation.service';
-
-import { ItemProxy } from '../../../../../common/src/item-proxy'
+// Angular
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter,
+  ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject ,  Subscription ,  Observable } from 'rxjs';
+import { FormControl } from '@angular/forms';
+
+// Other External Dependencies
+
+// Kohese
+import { AnalysisViewComponent, AnalysisViews, AnalysisFilter } from '../AnalysisViewComponent.class';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { AnalysisService } from '../../../services/analysis/analysis.service';
 import { DataProcessingService } from '../../../services/data/data-processing.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MatTableDataSource } from '@angular/material';
-
-import * as $ from 'jquery';
-import { FormControl } from '@angular/forms';
 
 //TODO - implement cross filter comm
-
 @Component({
   selector: 'phrase-view',
   templateUrl: './phrase-view.component.html',

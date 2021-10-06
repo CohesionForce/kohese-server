@@ -15,10 +15,14 @@
  */
 
 
+// Angular
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Input,
   OnInit, Optional, QueryList, ViewChildren } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
+// Other External Dependencies
+
+// Kohese
 import { FormatContainer, FormatContainerKind } from '../../../../../common/src/FormatContainer.interface';
 import { FormatDefinition, FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
@@ -48,6 +52,14 @@ export class FormatObjectEditorComponent implements OnInit {
     }
 
     this._object = object;
+    if(this._defferedType) {
+      this.selectedType = this._defferedType;
+      delete this._defferedType;
+    }
+    if(this._defferedSelectedNamespace) {
+      this.selectedNamespace = this._defferedSelectedNamespace;
+      delete this._defferedSelectedNamespace;
+    }
   }
 
   private _enclosingType: any;
@@ -69,11 +81,16 @@ export class FormatObjectEditorComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
 
+  private _defferedSelectedNamespace: any;
   private _selectedNamespace: any;
   get selectedNamespace() {
     return this._selectedNamespace;
   }
   set selectedNamespace(selectedNamespace: any) {
+    if(!this._object) {
+      this._defferedSelectedNamespace = selectedNamespace;
+      return
+    }
     this._selectedNamespace = selectedNamespace;
     this.selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
   }
@@ -83,6 +100,10 @@ export class FormatObjectEditorComponent implements OnInit {
     return this._selectedType;
   }
   set selectedType(selectedType: any) {
+    if(!this._object) {
+      this._defferedType = selectedType;
+      return
+    }
     this._selectedType = selectedType;
 
     if (this._enclosingType) {
@@ -167,6 +188,7 @@ export class FormatObjectEditorComponent implements OnInit {
     this._allowKindNarrowingOnly = allowKindNarrowingOnly;
   }
 
+  private _defferedType: any;
   private _type: any;
   get type() {
     return this._type;
@@ -265,8 +287,10 @@ export class FormatObjectEditorComponent implements OnInit {
     let types: Array<any> = [];
     TreeConfiguration.getWorkingTree().getProxyFor('Model-Definitions').visitTree(
       { includeOrigin: false }, (itemProxy: ItemProxy) => {
-      if ((itemProxy.kind === 'KoheseModel') && (itemProxy.item.restrictInstanceEditing !== true)
-                                             && (itemProxy.item.namespace.id === namespace.id)) {
+      if ((itemProxy.kind === 'KoheseModel') &&
+        (itemProxy.item.restrictInstanceEditing !== true) &&
+        namespace &&
+        (itemProxy.item.namespace.id === namespace.id)) {
         if (this._allowKindNarrowingOnly) {
           let modelItemProxy: any = itemProxy;
           while (modelItemProxy) {

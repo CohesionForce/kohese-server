@@ -15,17 +15,20 @@
  */
 
 
+// Angular
 import { Component, Input, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { Observable ,  Subscription } from 'rxjs';
+
+// Other External Dependencies
+
+// Kohese
 import { UserInput } from '../user-input.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { TreeComponent } from '../../tree/tree.component';
-import { Observable ,  Subscription } from 'rxjs';
-
-import { MatAutocompleteSelectedEvent } from '@angular/material';
 
 @Component({
   selector: 'k-proxy-selector',

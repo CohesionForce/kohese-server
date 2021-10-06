@@ -19,7 +19,12 @@
     },
     "repositoryId": {
       "type": "string",
-      "name": "repositoryId"
+      "name": "repositoryId",
+      "required": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     }
   },
   "validations": [],

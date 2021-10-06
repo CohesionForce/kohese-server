@@ -33,12 +33,12 @@ mat-card-content {
   overflow: auto;
 }
 
-/deep/ .mat-horizontal-content-container {
+::ng-deep .mat-horizontal-content-container {
   height: 90%;
   width: 100%;
 }
 
-/deep/ .mat-horizontal-stepper-content {
+::ng-deep .mat-horizontal-stepper-content {
   height: 100%;
   width: 100%;
 }

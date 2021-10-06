@@ -54,7 +54,7 @@ body {
 table {
   th {
     .glyphicon-plus {
-      color: green;
+      color: rgb(0,128,0);
       &:hover {
         cursor: pointer;
       }
@@ -63,7 +63,7 @@ table {
 
   td {
     .fa-times {
-      color: $secondaryColor + 100;
+      color: #A30000;
       &:hover {
         cursor: pointer;
       }

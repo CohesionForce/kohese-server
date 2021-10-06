@@ -15,13 +15,15 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output,
-  EventEmitter } from '@angular/core';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { TreeRowComponent } from '../tree-row/tree-row.component';
-import { Filter, FilterCriteriaConnection,
-  FilterCriterion } from '../../filter/filter.class';
+import { Filter, FilterCriteriaConnection, FilterCriterion } from '../../filter/filter.class';
 
 class AddElementEvent {
   get type() {

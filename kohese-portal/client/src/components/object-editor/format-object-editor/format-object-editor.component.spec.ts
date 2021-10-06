@@ -15,20 +15,23 @@
  */
 
 
-import { CommonModule } from '@angular/common';
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SecurityContext } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { MaterialModule} from '../../../material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
+
+// Other External Dependencies
 import { MarkdownModule, MarkdownService, MarkedOptions } from 'ngx-markdown';
 
+// Kohese
 import { FormatDefinitionType } from '../../../../../common/src/FormatDefinition.interface';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
-import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../services/user/session.service';
@@ -38,6 +41,11 @@ import { MultivaluedFieldComponent } from './field/multivalued-field/multivalued
 import { SinglevaluedFieldComponent } from './field/singlevalued-field/singlevalued-field.component';
 import { FormatObjectEditorComponent } from './format-object-editor.component';
 import { TreeViewModule } from '../../tree/tree.module';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
+import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 
 describe('FormatObjectEditorComponent', () => {
   let component: FormatObjectEditorComponent;
@@ -50,12 +58,14 @@ describe('FormatObjectEditorComponent', () => {
         SinglevaluedFieldComponent
       ],
       imports: [
-        RouterModule.forRoot([]),
+        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
         CommonModule,
         FormsModule,
         BrowserAnimationsModule,
         MaterialModule,
-        MarkdownModule,
+        MarkdownModule.forRoot({
+          sanitize: SecurityContext.NONE
+        }),
         TableModule,
         MarkdownEditorModule,
         TreeViewModule
@@ -74,7 +84,7 @@ describe('FormatObjectEditorComponent', () => {
       TestBed.createComponent(FormatObjectEditorComponent);
     component = componentFixture.componentInstance;
 
-    let treeConfiguration: TreeConfiguration = TestBed.get(ItemRepository).
+    let treeConfiguration: TreeConfiguration = TestBed.inject(ItemRepository).
       getTreeConfig().getValue().config;
     component.object = treeConfiguration.getProxyFor('KoheseModel').item;
     component.formatDefinitionType = FormatDefinitionType.DEFAULT;

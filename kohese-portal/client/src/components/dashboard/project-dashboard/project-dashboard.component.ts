@@ -18,15 +18,14 @@
 import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
-
-// NPM
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { ProjectService } from './../../../services/project-service/project.service';
 import { DetailsComponent } from './../../details/details.component';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
-import { ItemProxy} from '../../../../../common/src/item-proxy';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ProjectSelectorComponent } from './project-selector/project-selector.component'

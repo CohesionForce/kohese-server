@@ -15,10 +15,13 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  ViewChild } from '@angular/core';
-import { Sort } from '@angular/material';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input, ViewChild, ElementRef} from '@angular/core';
+import { Sort } from '@angular/material/sort';
 
+// Other External Dependencies
+
+// Kohese
 import { Dialog } from '../dialog/Dialog.interface';
 
 @Component({

@@ -15,20 +15,27 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AngularSplitModule } from 'angular-split';
 import { of } from 'rxjs';
 
+// Other External Dependencies
+import { AngularSplitModule } from 'angular-split';
+
+// Kohese
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NamespaceEditorComponent } from './namespace-editor.component';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('NamespaceEditorComponent', () => {
   let component: NamespaceEditorComponent;
@@ -151,7 +158,7 @@ describe('NamespaceEditorComponent', () => {
         return of([[namespaceItemProxy]]);
       }
     };
-    spyOn(TestBed.get(DialogService), 'openComponentsDialog').and.returnValue(
+    spyOn(TestBed.inject(DialogService), 'openComponentsDialog').and.returnValue(
       matDialogRefPlaceholder);
     await component.addSubcomponent(true);
     expect(namespaceItemProxy.item.parentId).toBe(component.selectedNamespace.

@@ -15,8 +15,12 @@
  */
 
 
-import { Component, Input, OnInit, Output, EventEmitter,
-  OnChanges, SimpleChanges } from '@angular/core';
+// Angular
+import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
 import { UserInput } from '../user-input.class';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';

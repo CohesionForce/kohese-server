@@ -15,44 +15,40 @@ limitations under the License.
 -->
 
 
-<div [ngStyle]="{ 'height': isDialogInstance() ? '40%' : '45%' }"
-  style="width: 100%;">
-  <h3 style="height: 10%;">
-    Parent
-  </h3>
-  <tree #itemProxyTree [root]="TreeConfiguration.getWorkingTree().
-    getRootProxy()" [getChildren]="getChildren" [getText]="getText"
-    [getIcon]="getIcon" [selection]="[TreeConfiguration.getWorkingTree().
-    getProxyFor(parentId)]" style="height: 87%;">
+<div [ngStyle]="{ 'height': isDialogInstance() ? '40%' : '45%' }" style="width: 100%;">
+  <h3 style="height: 10%;">Parent</h3>
+  <tree #itemProxyTree style="height: 87%;"
+    [root]="TreeConfiguration.getWorkingTree().getRootProxy()"
+    [getChildren]="getChildren"
+    [getText]="getText"
+    [getIcon]="getIcon"
+    [selection]="[TreeConfiguration.getWorkingTree().getProxyFor(parentId)]">
   </tree>
 </div>
-<div style="height: 5%; width: 100%; display: flex; flex-direction: row;">
-  <h3>
-    Content
-  </h3>
+<div style="height: 6%; width: 100%; display: flex; flex-direction: row;">
+  <h3>Content</h3>
+
   <mat-form-field class="flex-right-align" style="width: 30%;">
     <input #urlInput matInput type="text" placeholder="URL"/>
   </mat-form-field>
   <button mat-button matTooltip="Retrieve content from the inputted URL"
-    [disabled]="(urlInput.value.length === 0)" (click)="retrieveUrlContent(
-    urlInput.value)">
+    [disabled]="(urlInput.value.length === 0)" (click)="retrieveUrlContent(urlInput.value)">
     Retrieve Content
   </button>
-  <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;">
-  </mat-divider>
-  <input #fileInput type="file" style="display: none;" multiple
-    (change)="addFiles(fileInput.files)"/>
+
+  <mat-divider [vertical]="true" style="margin: 7px 20px 7px 20px;"></mat-divider>
+
+  <input #fileInput type="file" style="display: none;" multiple (change)="addFiles(fileInput.files)"/>
   <button mat-button matTooltip="Select files" (click)="fileInput.click()">
     Select Files...
   </button>
-  <span>
+  <span class=supported-file-types-info>
     <mat-icon class="fa fa-info-circle" style="text-align: center;"
-      matTooltip="{{'The following types of files are supported: ' + Object.
-      keys(SupportedTypes).join(',\n')}}">
+      matTooltip="{{'The following types of files are supported: ' + Object.keys(SupportedTypes).join(',\n')}}">
     </mat-icon>
   </span>
 </div>
-<div style="height: 50%; width: 100%; overflow: auto;">
+<div class=file-accordion>
   <mat-accordion multi="true">
     <ng-container *ngFor="let file of Array.from(selectedFileMap.keys())">
       <mat-expansion-panel (opened)="retrieveImportPreview(file)"
@@ -61,11 +57,10 @@ limitations under the License.
           <mat-panel-title style="align-items: center;">
             {{file.name}}
           </mat-panel-title>
-          <span class="flex-right-align">
+          <span class="button-grouping flex-right-align">
             <ng-container *ngIf="file.name.endsWith('.pdf')">
-              <button mat-icon-button matTooltip="Modify conversion parameters
-                for this file" (click)="openParameterSpecifier(file); $event.
-                stopPropagation()">
+              <button mat-icon-button matTooltip="Modify conversion parameters for this file"
+                (click)="openParameterSpecifier(file); $event.stopPropagation()">
                 <mat-icon class="fa fa-list"></mat-icon>
               </button>
             </ng-container>
@@ -80,13 +75,11 @@ limitations under the License.
           </span>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <ng-container *ngIf="selectedFileMap.get(file).expanded else
-            retrievingPreview">
+          <ng-container *ngIf="selectedFileMap.get(file).expanded else retrievingPreview">
             <markdown [data]="selectedFileMap.get(file).preview"></markdown>
           </ng-container>
           <ng-template #retrievingPreview>
-            <div style="height: 100%; width: 100%; display: flex;
-              justify-content: center; align-items: center;">
+            <div style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center;">
               <mat-spinner mode="indeterminate"></mat-spinner>
             </div>
           </ng-template>
@@ -95,16 +88,14 @@ limitations under the License.
     </ng-container>
   </mat-accordion>
 </div>
-<ng-container *ngIf="isDialogInstance()">
+<ng-container class=file-import-dialog *ngIf="isDialogInstance()">
   <div style="height: 5%; width: 100%; display: flex; flex-direction: row;">
-    <button mat-button matTooltip="Import the selected files"
-      class="flex-right-align" (click)="importSelectedFiles(itemProxyTree.
-      selection[0] ? itemProxyTree.selection[0].item.id : ''); matDialogRef.
-      close()">
+    <button mat-button matTooltip="Import the selected files" class="flex-right-align"
+      (click)="importSelectedFiles(itemProxyTree.selection[0] ? itemProxyTree.selection[0].item.id : '');
+                matDialogRef.close()">
       Import
     </button>
-    <button mat-button matTooltip="Cancel the import process"
-      (click)="matDialogRef.close()">
+    <button mat-button mat-dialog-close matTooltip="Cancel the import process">
       Cancel
     </button>
   </div>

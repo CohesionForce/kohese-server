@@ -21,6 +21,19 @@
   ::ng-deep .mat-expansion-indicator:after {
   color: black;
   }
+
+  ::ng-deep .mat-tab-body-wrapper {
+    height: 100% !important;
+    width: 100%;
+
+    .mat-tab-body {
+      height: inherit;
+
+      .mat-tab-body-content {
+        height: inherit;
+      }
+    }
+  }
 }
 
 .state-item {

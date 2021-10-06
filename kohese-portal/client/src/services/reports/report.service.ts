@@ -15,9 +15,14 @@
  */
 
 
-import { BehaviorSubject ,  Subscription } from 'rxjs';
-import { ItemRepository } from './../item-repository/item-repository.service';
+// Angular
 import { Injectable } from '@angular/core';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
+
+// Other External Dependencies
+
+// Kohese
+import { ItemRepository } from './../item-repository/item-repository.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 
 

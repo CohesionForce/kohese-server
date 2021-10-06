@@ -15,12 +15,16 @@
  */
 
 
+// Angular
+import { Component, OnInit, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
 import { ItemRepository } from './../../../services/item-repository/item-repository.service';
 import { DetailsComponent } from './../../details/details.component';
 import { DialogService } from './../../../services/dialog/dialog.service';
-import { Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ItemProxy } from './../../../../../common/src/item-proxy';
-import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'stateful-proxy-card',

@@ -126,7 +126,7 @@ limitations under the License.
 
   <format-object-editor [disabled]="(
     !row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing)"
-    [type]="docInfo.proxy.model.item" [object]="docInfo.proxy.item"
+    [object]="docInfo.proxy.item" [type]="docInfo.proxy.model.item"
     [formatDefinitionType]="FormatDefinitionType.DOCUMENT">
   </format-object-editor>
 </div>

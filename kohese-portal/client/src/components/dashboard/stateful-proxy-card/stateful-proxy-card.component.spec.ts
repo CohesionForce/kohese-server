@@ -15,21 +15,25 @@
  */
 
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+// Angular
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-
 import { MaterialModule } from '../../../material.module';
+
+// Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { StatefulProxyCardComponent } from './stateful-proxy-card.component';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('StatefulProxyCardComponent', () => {
   let component: StatefulProxyCardComponent;
   let fixture: ComponentFixture<StatefulProxyCardComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ StatefulProxyCardComponent ],
       imports: [ MaterialModule ],

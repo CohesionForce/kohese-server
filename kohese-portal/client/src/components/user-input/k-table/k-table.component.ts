@@ -15,11 +15,13 @@
  */
 
 
-import { BehaviorSubject } from 'rxjs';
-import { OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { ItemProxy } from './../../../../../common/src/item-proxy';
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+// Angular
+import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { BehaviorSubject ,  Subscription } from 'rxjs';
+
+// Other External Dependencies
+
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { TableDefinition } from '../../../../../common/src/TableDefinition.interface';
 import { TreeConfiguration } from './../../../../../common/src/tree-configuration';

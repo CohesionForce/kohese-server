@@ -15,26 +15,19 @@
  */
 
 
-import {
-  DialogService
-} from './../../../../services/dialog/dialog.service';
+// Angular
+import { Component, OnInit, Input } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
+import { DialogService } from './../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
-import {
-  DetailsComponent
-} from '../../../details/details.component';
-import {
-  ItemProxy
-} from './../../../../../../common/src/item-proxy';
-import {
-  PropertyDefinition
-} from '../../../../../../common/src/PropertyDefinition.interface';
+import { DetailsComponent } from '../../../details/details.component';
+import { ItemProxy } from './../../../../../../common/src/item-proxy';
+import { PropertyDefinition } from '../../../../../../common/src/PropertyDefinition.interface';
 import { TreeComponent } from '../../../tree/tree.component';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
-import {
-  Component,
-  OnInit,
-  Input
-} from '@angular/core';
 
 @Component({
   selector: 'kd-proxy-selector',

@@ -17,11 +17,11 @@
 
 // Angular
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
 import { Title } from '@angular/platform-browser';
-
-// NPM
 import { Subscription, Observable } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { ProjectInfo } from '../../../../services/project-service/project.service';

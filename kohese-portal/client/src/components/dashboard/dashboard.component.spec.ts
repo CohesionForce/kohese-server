@@ -15,18 +15,18 @@
  */
 
 
-import { APP_BASE_HREF, CommonModule } from '@angular/common';
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { TreeModule } from 'angular-tree-component';
-
-import { MockCurrentUserService } from '../../../mocks/services/MockCurrentUserService';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
-import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
-import { MockSessionService } from '../../../mocks/services/MockSessionService';
+import { RouterModule } from '@angular/router';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { MaterialModule } from '../../material.module';
+
+
+// Kohese
 import { PipesModule } from '../../pipes/pipes.module';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../services/navigation/navigation.service';
@@ -44,6 +44,12 @@ import { ProjectOverviewComponent } from './project-dashboard/project-overview/p
 import { StateBarChartComponent } from './project-dashboard/status-dashboard/state-bar-chart/state-bar-chart.component';
 import { StatusDashboardComponent } from './project-dashboard/status-dashboard/status-dashboard.component';
 import { UserStatisticsComponent } from './project-dashboard/user-statistics/user-statistics.component';
+
+// Mocks
+import { MockCurrentUserService } from '../../../mocks/services/MockCurrentUserService';
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
+import { MockSessionService } from '../../../mocks/services/MockSessionService';
 
 describe('Component: Dashboard', ()=>{
   let dashboardComponent: DashboardComponent;
@@ -64,7 +70,7 @@ describe('Component: Dashboard', ()=>{
 
       ],
       imports: [
-        RouterModule.forRoot([]),
+        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
         CommonModule,
         FormsModule,
         BrowserAnimationsModule,

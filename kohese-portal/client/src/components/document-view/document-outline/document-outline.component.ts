@@ -16,14 +16,14 @@
 
 // Angular
 import { Component, OnInit, Output } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-
-// NPM
 import { BehaviorSubject, Subscription } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { ActivatedRoute } from '@angular/router';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 @Component({

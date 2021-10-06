@@ -19,9 +19,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-
-// NPM
 import { Subscription } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { NavigatableComponent } from '../../classes/NavigationComponent.class';

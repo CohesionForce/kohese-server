@@ -18,6 +18,18 @@
 'use strict';
 import { Injectable } from '@angular/core';
 
+declare module SharedWorker {
+  interface AbstractWorker extends EventTarget {
+      onerror: (ev: ErrorEvent) => any;
+  }
+  export interface SharedWorker extends AbstractWorker {
+      port: MessagePort;
+  }
+}
+declare var SharedWorker: {
+  prototype: SharedWorker.SharedWorker;
+  new(scriptURL: string, options?: string | WorkerOptions): SharedWorker.SharedWorker;
+};
 
 export type CallbackFunctionType = (messageData: any) => void;
 
@@ -93,7 +105,7 @@ export class CacheManager {
     }
 
     console.log('::: Using cache worker bundle: ' + cacheWorkerBundle);
-    CacheManager.cacheWorker = new SharedWorker(cacheWorkerBundle);
+    CacheManager.cacheWorker = new SharedWorker(cacheWorkerBundle, { name: 'kohese-SharedWorker'} );
 
     // Set up the worker messaging
     CacheManager.cacheWorker.port.addEventListener('message', (messageEvent: any) => {

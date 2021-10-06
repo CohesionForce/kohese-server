@@ -16,7 +16,7 @@
 
 
 import { ComponentType } from '@angular/cdk/portal';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
 import { InputDialogKind } from '../../components/dialog/input-dialog/input-dialog.component';
 import { DialogService } from './dialog.service';

@@ -15,8 +15,8 @@ limitations under the License.
 -->
 
 
-<split horizontal>
-  <split-area [size]="40">
+<as-split unit=percent direction=horizontal>
+  <as-split-area [size]="40">
     <div style="display: flex; flex-direction: row;">
       <button mat-icon-button matTooltip="Add a Namespace" (click)="add()"
         style="margin-left: auto;">
@@ -51,8 +51,8 @@ limitations under the License.
         </div>
       </ng-container>
     </div>
-  </split-area>
-  <split-area [size]="60">
+  </as-split-area>
+  <as-split-area [size]="60">
     <ng-container *ngIf="selectedNamespace">
       <div style="height: 100%; margin: 0px 3px 0px 3px;">
         <div style="display: flex; flex-direction: row;">
@@ -133,5 +133,5 @@ limitations under the License.
         </div>
       </div>
     </ng-container>
-  </split-area>
-</split>
+  </as-split-area>
+</as-split>

@@ -20,9 +20,9 @@ limitations under the License.
   <ng-container *ngIf="sessionMap else initializing">
     <lens></lens>
     <div class="panel-heading">Admin</div>
-    <split direction="horizontal">
+    <as-split unit=percent direction="horizontal">
 
-      <split-area id="session-split" [size]="40">
+      <as-split-area id="session-split" [size]=40>
         <div class="session-container">
           <div class="session-banner">
             <h2>Sessions</h2>
@@ -39,9 +39,9 @@ limitations under the License.
             </ng-container>
           </div>
         </div>
-      </split-area>
+      </as-split-area>
 
-      <split-area id="user-split" [size]="60">
+      <as-split-area id="user-split" [size]="60">
         <div class="user-container">
           <h2 class="user-banner">
             Users
@@ -152,9 +152,9 @@ limitations under the License.
             </ng-container>
           </div>
         </div>
-      </split-area>
+      </as-split-area>
 
-    </split>
+    </as-split>
   </ng-container>
 
   <ng-template #initializing>

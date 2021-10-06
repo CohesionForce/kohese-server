@@ -15,16 +15,19 @@
  */
 
 
+// Angular
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy,
   ChangeDetectorRef, ViewChildren, QueryList } from '@angular/core';
-import { MatExpansionPanel } from '@angular/material';
+import { MatExpansionPanel } from '@angular/material/expansion';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Compare } from '../../compare-items/compare.class';
-import { Comparison } from '../../compare-items/comparison.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { ItemCache } from '../../../../../common/src/item-cache';
 import { KoheseCommit } from '../../../../../common/src/kohese-commit';

@@ -15,11 +15,14 @@
  */
 
 
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional,
-  Inject, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
+// Angular
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
 
+// Other External Dependencies
+
+// Kohese
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { Comparison } from '../comparison.class';
 import { Compare } from '../compare.class';

@@ -15,24 +15,27 @@
  */
 
 
-
-import {tap} from 'rxjs/operators';
-import { ViewChild } from '@angular/core';
+// Angular
+import { ElementRef, ViewChild, Directive } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { VirtualScrollComponent } from 'angular2-virtual-scroll';
 import { BehaviorSubject ,  Observable ,  Subscription } from 'rxjs';
+import {tap} from 'rxjs/operators';
 
+// Other External Dependencies
+import { VirtualScrollComponent } from 'angular2-virtual-scroll';
+
+// Kohese
 import { DialogService } from '../../services/dialog/dialog.service';
 import { TreeRow } from './tree-row/tree-row.class';
-import { DisplayableEntity, Action,
-  ActionGroup } from './tree-row/tree-row.component';
-import { Filter, FilterCriterion } from '../filter/filter.class';
+import { DisplayableEntity, Action, ActionGroup } from './tree-row/tree-row.component';
+import { Filter } from '../filter/filter.class';
 import { FilterComponent } from '../filter/filter.component';
 
 export enum TargetPosition {
   BEFORE = 'Before', AFTER = 'After', CHILD = 'Child'
 }
 
+@Directive()
 export abstract class Tree {
   private _rowMap: Map<any, TreeRow> = new Map<any, TreeRow>();
 

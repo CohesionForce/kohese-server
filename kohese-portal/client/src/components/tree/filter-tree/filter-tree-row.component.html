@@ -61,7 +61,7 @@ limitations under the License.
           </mat-select>
         </mat-form-field>
         <ng-container *ngIf="treeRow.object.property.values.length > 0">
-          <mat-form-field style="padding-right: 20px;">
+          <mat-form-field style="padding-right: 20px; min-width: 150px;">
             <mat-select placeholder="Value" [(ngModel)]="treeRow.object.value" [disabled]="!treeRow.object.isValueShown()">
               <mat-option *ngFor="let value of treeRow.object.property.values"
                 [value]="value">
@@ -91,7 +91,7 @@ limitations under the License.
       </ng-container>
       <ng-container *ngSwitchCase="'AddRowObject'">
         <button mat-icon-button [matMenuTriggerFor]="addMenu">
-          <mat-icon class="fa fa-plus" style="color: green;"></mat-icon>
+          <mat-icon class="fa fa-plus" style="color: rgb(0,128,0);"></mat-icon>
         </button>
         <mat-menu #addMenu="matMenu" [overlapTrigger]="false">
           <button mat-menu-item (click)="addCriterion()">

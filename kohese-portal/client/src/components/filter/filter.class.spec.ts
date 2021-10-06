@@ -15,9 +15,11 @@
  */
 
 
+// Angular
 import { TestBed } from '@angular/core/testing';
-import { Filter, FilterCriteriaConnection, FilterCriteriaConnectionType,
-  FilterCriterion } from './filter.class';
+
+// Kohese
+import { Filter, FilterCriteriaConnection, FilterCriteriaConnectionType, FilterCriterion } from './filter.class';
 
 class EvaluationObject {
   private _numericProperty: number = 3;

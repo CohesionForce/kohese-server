@@ -15,26 +15,29 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 import { CommonModule } from '@angular/common';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
-import { MaterialModule } from '../../../material.module'
-
-import { AppBarComponent } from './appbar.component';
-
-import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository} from '../../../../mocks/services/MockItemRepository';
-import { CurrentUserService } from '../../../services/user/current-user.service';
-import { MockCurrentUserService } from '../../../../mocks/services/MockCurrentUserService';
-import { SessionService } from '../../../services/user/session.service';
-import { MockSessionService } from '../../../../mocks/services/MockSessionService';
-import { NavigationService } from '../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
-import { NotificationService } from '../../../services/notifications/notification.service';
-import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { BehaviorSubject } from 'rxjs';
+import { MaterialModule } from '../../../material.module';
+
+// Kohese
+import { AppBarComponent } from './appbar.component';
+import { ItemRepository, RepoStates } from '../../../services/item-repository/item-repository.service';
+import { CurrentUserService } from '../../../services/user/current-user.service';
+import { SessionService } from '../../../services/user/session.service';
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { NotificationService } from '../../../services/notifications/notification.service';
+
+// Mocks
+import { MockItemRepository} from '../../../../mocks/services/MockItemRepository';
+import { MockCurrentUserService } from '../../../../mocks/services/MockCurrentUserService';
+import { MockSessionService } from '../../../../mocks/services/MockSessionService';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
 
 describe('Component: App Bar', ()=>{
   let appBarComponent: AppBarComponent;
@@ -70,21 +73,21 @@ describe('Component: App Bar', ()=>{
   })
 
   it('displays a syncing message', ()=>{
-    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+    spyOn(TestBed.inject(ItemRepository), 'getRepoStatusSubject').and.returnValue(
       new BehaviorSubject<any>({state : RepoStates.SYNCHRONIZING}))
     appBarFixture.detectChanges();
     expect(appBarComponent.syncStatusString).toBe('Syncing');
   })
 
   it('displays a sync failed message', ()=>{
-    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+    spyOn(TestBed.inject(ItemRepository), 'getRepoStatusSubject').and.returnValue(
       new BehaviorSubject<any>({state : RepoStates.SYNCHRONIZATION_FAILED}))
       appBarFixture.detectChanges();
       expect(appBarComponent.syncStatusString).toBe('Synchronization Failed');
   })
 
   it('displays a disconnected message', ()=>{
-    spyOn(TestBed.get(ItemRepository), 'getRepoStatusSubject').and.returnValue(
+    spyOn(TestBed.inject(ItemRepository), 'getRepoStatusSubject').and.returnValue(
       new BehaviorSubject<any>({state : RepoStates.DISCONNECTED}))
       appBarFixture.detectChanges();
       expect(appBarComponent.syncStatusString).toBe('Disconnected');

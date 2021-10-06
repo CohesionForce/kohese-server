@@ -15,13 +15,20 @@
  */
 
 
+// Angular
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { MatCheckboxModule, MatDatepickerModule, MatInputModule,
-  MatSelectModule } from '@angular/material';
 
+import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+
+// Kohese
 import { MarkdownEditorModule } from '../../markdown-editor/markdown-editor.module';
 import { InputDialogComponent, InputDialogKind } from './input-dialog.component';
+
+// Mocks
 
 describe('InputDialogComponent', () => {
   let component: InputDialogComponent;

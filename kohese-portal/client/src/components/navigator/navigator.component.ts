@@ -15,7 +15,12 @@
  */
 
 
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+// Angular
+import { Component } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
 
 @Component({
   selector: 'navigator',

@@ -8,7 +8,6 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": false,
@@ -21,7 +20,6 @@
       "underscore",
       "jasmine",
       "jssha",
-      "sharedworker",
     ],
     "typeRoots": [
       "../node_modules/@types"

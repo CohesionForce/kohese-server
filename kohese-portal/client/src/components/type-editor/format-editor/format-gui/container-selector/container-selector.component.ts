@@ -15,8 +15,13 @@
  */
 
 
-import { MatDialogRef } from '@angular/material';
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+// Angular
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+
+// Other External Dependencies
+
+// Kohese
 
 @Component({
   selector: 'container-selector',

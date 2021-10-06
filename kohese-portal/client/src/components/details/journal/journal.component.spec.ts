@@ -15,6 +15,7 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
@@ -24,20 +25,19 @@ import { MaterialModule } from '../../../material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PipesModule } from '../../../pipes/pipes.module';
 
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
-import { MockItem } from '../../../../mocks/data/MockItem';
-import { MockDataModel } from '../../../../mocks/data/MockDataModel';
+// Kohese
 import { ItemProxy } from '../../../../../common/src/item-proxy';
-import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
-
 import { JournalComponent, JournalOrdering } from './journal.component';
 import { DialogService } from '../../../services/dialog/dialog.service';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
-import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { SessionService } from '../../../services/user/session.service';
+
+// Mocks
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
+import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 
 // TODO: This needs to be implemented
 describe('Component: Journal', () => {

@@ -15,8 +15,9 @@
  */
 
 
+// Angular
 import { Directive, ElementRef, HostListener } from "@angular/core";
-import { MatTooltip } from "@angular/material";
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Directive({
   selector: '[matTooltip][showIfTruncated]'

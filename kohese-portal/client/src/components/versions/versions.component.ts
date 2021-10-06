@@ -16,11 +16,11 @@
 
 
 // Angular
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-
-// NPM
 import { BehaviorSubject } from 'rxjs';
+
+// Other External Dependencies
 
 // Kohese
 import { Commit } from '../tree/commit-tree/commit-tree.component';
@@ -30,7 +30,6 @@ import { Comparison } from '../compare-items/comparison.class';
   selector: 'versions',
   templateUrl: './versions.component.html',
   styleUrls: ['./versions.component.scss'],
-  //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VersionsComponent {
   private _selectedVersionObject: any;

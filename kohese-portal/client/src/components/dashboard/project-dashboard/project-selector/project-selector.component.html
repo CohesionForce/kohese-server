@@ -15,15 +15,22 @@ limitations under the License.
 -->
 
 
-<div mat-dialog-title style="height: 60px; background-color: rgb(0, 0, 92);
+<div mat-dialog-title style="height: 60px; background-color: #0067D5;
   color: whitesmoke; padding: 10px; position: sticky;">
-  <span style="font-size: large">Project Selection</span>
-  <span class="pull-right">
-    <mat-checkbox *ngIf="historicalMode" (change)="toggleCurrentProjects($event.checked)">
-      Show Current Projects
-    </mat-checkbox>
-  </span>
+
+  <div class=float-container>
+    <div class=float-child-left>
+      <span style="font-size: larger">Project Selection</span>
+    </div>
+    <div class=float-child-right>
+      <mat-checkbox *ngIf="historicalMode" (change)="toggleCurrentProjects($event.checked)">Show Current Projects</mat-checkbox>
+    </div>
+  </div>
+
 </div>
+
+
+
 <div style="height: calc(100% - 120px); width: 100%; display: flex;
   flex-direction: row;">
   <div style="height: 100%; overflow: auto; flex: 1 1 20%;">

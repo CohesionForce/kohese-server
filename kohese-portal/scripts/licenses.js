@@ -26,7 +26,6 @@
 const spawn = require('child_process').spawn;
 const nlc = require('license-checker');
 const nlcProd = require('license-checker');
-const blc = require('bower-license');
 const prompt = require('prompt');
 prompt.start();
 
@@ -89,18 +88,6 @@ var loadData = new Promise(function(resolve, reject) {
         });
     });
 
-    var blcPromise = new Promise(function(resolve, reject) {
-        blc.init({start: __dirname + '/..'}, function(bower, err) {
-            if(err) {
-                console.log(err);
-                process.exit();
-            }
-            licenseStore['bower'] = bower;
-            console.log('bower licenses loaded');
-            resolve();
-        });
-    });
-
     var npmPromise = new Promise(function(resolve, reject) {
         var npmls = spawn('npm', ['ls', '-json']);
         var data = '';
@@ -127,7 +114,7 @@ var loadData = new Promise(function(resolve, reject) {
         })
     });
 
-    Promise.all([nlcPromise, nlcProdPromise, blcPromise, npmPromise, npmProdPromise]).then(function() {
+    Promise.all([nlcPromise, nlcProdPromise, npmPromise, npmProdPromise]).then(function() {
         resolve();
     });
 });

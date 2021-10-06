@@ -1040,8 +1040,7 @@ function KIOItemServer(socket){
           '-s', '-o', reportPath], undefined);
         pandocProcess.stdin.write(reportContent);
         pandocProcess.stdin.end();
-        await new Promise<string>((resolve: () => void, reject:
-          () => void) => {
+        await new Promise<string>((resolve: (value?: any) => void, reject:(reason?: any) => void) => {
           let output: string = '';
           pandocProcess.stdout.on('data', (data: string) => {
             output += data;

@@ -21,7 +21,7 @@ $accentColor: #CBE32D;
 $lightColor: #F3FAB6;
 $secondaryColor: #660000;
 $secondaryFade: $secondaryColor;
-$buttonAccentColor: $primaryColor + 125;
+$buttonAccentColor: #7DD7AE;
 
 //Element Sizes
 $leftNavWidth: 50px;
@@ -84,7 +84,7 @@ body {
 table {
   th {
     .glyphicon-plus {
-      color: green;
+      color: rgb(0,128,0);
       &:hover {
         cursor: pointer;
       }
@@ -93,7 +93,7 @@ table {
 
   td {
     .fa-times {
-      color: $secondaryColor + 100;
+      color: #A30000;
       &:hover {
         cursor: pointer;
       }
@@ -106,12 +106,12 @@ table {
 }
 
 .highlight {
-  background-color: $primaryColor + 100;
+  background-color: #007541;
   color: whitesmoke;
 }
 
 .highlight-foreground {
-  color: $primaryColor + 100;
+  color: #007541;
 }
 
 .flex-right-align {
@@ -119,7 +119,7 @@ table {
 }
 
 .selected-border {
-  border: 3px solid $primaryColor + 100 !important;
+  border: 3px solid #007541 !important;
 }
 
 #pageWrapper {

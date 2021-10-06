@@ -15,12 +15,16 @@
  */
 
 
+// Angular
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { KTableComponent } from './k-table.component';
+
+// Mocks
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('Component: k-table', () => {
   let component: KTableComponent;

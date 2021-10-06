@@ -29,13 +29,12 @@ import { ReferenceTableComponent } from './references-tab/reference-table/refere
 import { CommonModule } from '@angular/common';
 
 import { MaterialModule } from "../../material.module";
-import { TreeModule } from 'angular-tree-component';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { DocumentViewModule } from "../document-view/document-view.module";
 import { ActionTableModule } from "../action-table/action-table.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PipesModule } from "../../pipes/pipes.module";
 import { UserInputModule } from '../user-input/user-input.module';
-import { TextEditorModule } from '../text-editor/text-editor.module';
 import { CompareItemsModule } from '../compare-items/compare-items.module';
 import { TreeViewModule } from '../tree/tree.module';
 import { MarkdownEditorModule } from '../markdown-editor/markdown-editor.module';
@@ -64,9 +63,8 @@ import { DirectivesModule } from '../../directives/directives.module';
     ReactiveFormsModule,
     PipesModule,
     UserInputModule,
-    TreeModule.forRoot(),
+    TreeModule,
     MarkdownModule,
-    TextEditorModule,
     CompareItemsModule,
     TreeViewModule,
     MarkdownEditorModule,

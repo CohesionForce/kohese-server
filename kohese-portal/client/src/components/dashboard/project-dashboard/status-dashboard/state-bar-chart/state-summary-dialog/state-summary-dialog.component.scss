@@ -17,49 +17,67 @@
 
 @import '../../../../../../app.component';
 
-.selector {
-  padding-left : 10px;
-}
-
-.title {
-  padding : 10px 5px 0 10px;
-  color : white;
-  font-size: x-large;
-  height: 50px;
-  vertical-align: auto;
-  margin-bottom: 10px;
-}
-
 :host {
-  ::ng-deep .mat-expansion-panel-content {
-    height: unset;
+
+  .title {
+    display: flex;
+    flex-direction: row;
+    padding : 10px 5px 0 10px;
+    color : white;
+    font-size: x-large;
+    height: 50px;
+    vertical-align: auto;
+    margin-bottom: 10px;
   }
 
-  ::ng-deep .mat-expansion-indicator:after {
-    color: whitesmoke;
+  .state-summary-panels {
+    height: calc(100% - 100px);
+    overflow-y: auto;
+
+    ::ng-deep .mat-expansion-panel-content {
+      height: unset;
+    }
+
+    mat-expansion-panel {
+      width: 100%;
+      box-shadow: 0 3px 1px -2px rgba(0,0,0,.8),
+                  0 2px 2px 0 rgba(0,0,0,.84),
+                  0 1px 5px 0 rgba(0,0,0,.72);
+    }
+
+    mat-panel-title {
+      align-items:center;
+      color: whitesmoke;
+      font-size: x-large;
+      width: 68%;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    mat-panel-description {
+      color:whitesmoke;
+      font-size: medium;
+      align-items: center;
+      width: 28%
+    }
+
+    ::ng-deep .mat-expansion-indicator:after {
+      color: whitesmoke;
+    }
+
+    ::ng-deep .mat-badge-content {
+      background-color: transparent;
+      color: whitesmoke;
+    }
   }
-}
 
-mat-expansion-panel {
-  width: 100%;
-  box-shadow: 0 3px 1px -2px rgba(0,0,0,.8),
-              0 2px 2px 0 rgba(0,0,0,.84),
-              0 1px 5px 0 rgba(0,0,0,.72);
-}
+  mat-dialog-actions {
+    display: flex;
+    flex-direction: row;
+    height: 40px;
+  }
 
-mat-panel-title {
-  align-items:center;
-  color: whitesmoke;
-  font-size: x-large;
-  width: 68%;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mat-badge-content {
-  background-color: transparent;
-  color: whitesmoke;
 }
 
