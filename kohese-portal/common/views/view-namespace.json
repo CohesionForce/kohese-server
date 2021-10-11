@@ -9,7 +9,24 @@
   "icon": "",
   "color": "#000000",
   "localTypes": {},
-  "viewProperties": {},
+  "viewProperties": {
+    "alias": {
+      "name": "alias",
+      "displayName": "alias",
+      "inputType": {
+        "type": "text",
+        "options": {}
+      }
+    },
+    "repositoryId": {
+      "name": "repositoryId",
+      "displayName": "repositoryId",
+      "inputType": {
+        "type": "",
+        "options": {}
+      }
+    }
+  },
   "formatDefinitions": {
     "0f4e5a00-d293-11ea-ab22-8724512ce3f8": {
       "id": "0f4e5a00-d293-11ea-ab22-8724512ce3f8",
@@ -179,7 +196,7 @@
               "propertyName": "repositoryId",
               "customLabel": "RepositoryId",
               "labelOrientation": "Top",
-              "kind": "text",
+              "kind": "",
               "visible": true,
               "editable": true
             }

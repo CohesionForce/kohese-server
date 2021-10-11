@@ -18,7 +18,7 @@
       "default": ""
     },
     "repositoryId": {
-      "type": "string",
+      "type": "Repository",
       "name": "repositoryId",
       "required": false,
       "relation": {
