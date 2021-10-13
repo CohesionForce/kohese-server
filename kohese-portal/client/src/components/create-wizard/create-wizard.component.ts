@@ -81,8 +81,7 @@ export class CreateWizardComponent extends NavigatableComponent
   }
 
   public isDialogInstance(): boolean {
-    return this.MatDialogRef && this.MatDialogRef.updateSize('85%', '85%') &&
-      (this.MatDialogRef.componentInstance === this) && this.data;
+    return this.MatDialogRef && (this.MatDialogRef.componentInstance === this) && this.data;
   }
 
   private buildProxyPlaceholder(): any {
@@ -118,10 +117,6 @@ export class CreateWizardComponent extends NavigatableComponent
         console.log(error);
       });
 
-  }
-
-  cancel() {
-    this.MatDialogRef.close();
   }
 
   public clearError(): void {
