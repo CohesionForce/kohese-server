@@ -74,11 +74,11 @@ export var LocationMap = {
     'params' : {},
     'route' : '/analysis'
   },
-  'Type-Editor' : {
+  'Kind-Editor' : {
     'type' : 'single',
-    'title' : 'Type Editor',
+    'title' : 'Kind Editor',
     'params' : [],
-    'route' : '/typeeditor'
+    'route' : '/kindeditor'
   },
   'Dev-Tools' : {
     'type' : 'single',
