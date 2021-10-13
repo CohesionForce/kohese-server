@@ -46,7 +46,7 @@ limitations under the License.
         <br/>
       </ng-container>
       <mat-form-field style="width: 100%;">
-        <mat-select placeholder="Reference Attribute" [ngModel]="attribute.
+        <mat-select placeholder="Reference Property" [ngModel]="attribute.
           relation" (ngModelChange)="attribute.relation = $event"
           [compareWith]="areRelationsEqual" [disabled]="!((Object.values(
           fundamentalTypes).indexOf(Array.isArray(attribute.type) ? attribute.
