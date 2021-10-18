@@ -44,6 +44,7 @@ module.exports = function (app) {
       /^\/explore.*/,
       /^\/analysis.*/,
       /^\/typeeditor.*/,
+      /^\/wordpress-editor.*/,
       /^\/devtools.*/,
       /^\/about.*/,
       /^\/outline.*/,

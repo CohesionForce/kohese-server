@@ -27,6 +27,8 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 import { ImportComponent } from '../../import/import.component';
 import { CurrentUserService } from '../../../services/user/current-user.service';
+import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
+import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ApplicationLens, LensService } from '../../../services/lens-service/lens.service';
 
 @Component({
@@ -34,7 +36,7 @@ import { ApplicationLens, LensService } from '../../../services/lens-service/len
   templateUrl: './sidebar.component.html',
   styleUrls : ['./sidebar.component.scss']
 })
-export class SideBarComponent implements OnInit, OnDestroy {
+export class SideBarComponent extends NavigatableComponent implements OnInit, OnDestroy {
   authenticated : boolean = false;
   LENSES : any;
   currentLens : any;
@@ -42,12 +44,16 @@ export class SideBarComponent implements OnInit, OnDestroy {
   currentUserSubscription : Subscription;
   lensSubscription : Subscription;
 
-  constructor(private dialogService: DialogService,
+  constructor(
+    private dialogService: DialogService,
     private itemRepository: ItemRepository,
     private currentUserService: CurrentUserService,
-    private lensService : LensService) {
-      this.LENSES = ApplicationLens
-  }
+    protected NavigationService: NavigationService,
+    private lensService : LensService
+    ) {
+      super(NavigationService);
+      this.LENSES = ApplicationLens;
+    }
 
   ngOnInit() {
     this.currentUserSubscription = this.currentUserService.

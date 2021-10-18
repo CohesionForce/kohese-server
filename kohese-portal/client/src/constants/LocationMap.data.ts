@@ -80,6 +80,12 @@ export var LocationMap = {
     'params' : [],
     'route' : '/typeeditor'
   },
+  'WordPress-Editor' : {
+    'type' : 'dual',
+    'title' : 'WordPress Editor',
+    'params' : [],
+    'route' : '/wordpress-editor'
+  },
   'Dev-Tools' : {
     'type' : 'single',
     'title' : 'Dev Tools',

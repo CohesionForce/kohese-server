@@ -28,6 +28,7 @@ import { RepositoriesComponent } from './components/admin//repositories/reposito
 import { ExploreComponent } from './components/explore/explore.component';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TypeEditorComponent } from './components/type-editor/type-editor.component';
+import { WordpressComponent } from './components/wordpress/wordpress/wordpress.component';
 import { DevToolsComponent } from './components/admin/dev-tools/dev-tools.component';
 import { AboutComponent } from './components/admin/about/about.component';
 import { DocumentOutlineComponent } from './components/document-view/document-outline/document-outline.component';
@@ -47,6 +48,7 @@ import { ReportsComponent } from './components/reports/reports.component';
     { path: 'explore', component: ExploreComponent },
     { path: 'analysis', component: AnalysisComponent },
     { path: 'typeeditor', component: TypeEditorComponent },
+    { path: 'wordpress-editor', component: WordpressComponent },
     { path: 'devtools', component: DevToolsComponent },
     { path: 'about', component: AboutComponent },
     { path: 'outline', component: DocumentOutlineComponent },
