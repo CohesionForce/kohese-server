@@ -704,23 +704,9 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   /**
    * @event Drag&Drop connected sorting group
    */
-   dropFavorites(event: CdkDragDrop<any>) {
+   drop(array: Array<any>, event: CdkDragDrop<any>) {
     if (event.previousContainer === event.container) {
-      moveItemInArray(this.favorites, event.previousIndex, event.currentIndex);
-    } else {
-      transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
-    }
-  }
-
-  /**
-   * @event Drag&Drop connected sorting group
-   */
-   dropSelected(event: CdkDragDrop<any>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(this.selection, event.previousIndex, event.currentIndex);
+      moveItemInArray(array, event.previousIndex, event.currentIndex);
     } else {
       transferArrayItem(event.previousContainer.data,
                         event.container.data,
