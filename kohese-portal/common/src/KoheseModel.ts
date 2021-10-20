@@ -87,11 +87,11 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  updateItem(kind, forItem) {
+  updateItem(kind, forItem, mounting: boolean = false) {
     console.log('::: Updating KoheseModel: ' + forItem.id);
 
     // TODO: need to skip update if there are no changes
-    super.updateItem(kind, forItem);
+    super.updateItem(kind, forItem, mounting);
 
     if (KoheseModel.modelsDefined){
       this.updateDerivedModelProperties();
@@ -109,13 +109,13 @@ export class KoheseModel extends ItemProxy implements KoheseModelInterface {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  deleteItem() {
+  deleteItem(unmounting: boolean = false) {
     let itemId = this._item.id;
     console.log('::: Deleting KoheseModel: ' + itemId);
     if (modelMap[itemId]){
       delete modelMap[itemId];
     }
-    super.deleteItem(false);
+    super.deleteItem(false, unmounting);
   }
 
   //////////////////////////////////////////////////////////////////////////

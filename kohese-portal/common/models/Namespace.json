@@ -16,6 +16,15 @@
       "type": "string",
       "required": false,
       "default": ""
+    },
+    "repositoryId": {
+      "type": "Repository",
+      "name": "repositoryId",
+      "required": false,
+      "relation": {
+        "kind": "Item",
+        "foreignKey": "id"
+      }
     }
   },
   "validations": [],

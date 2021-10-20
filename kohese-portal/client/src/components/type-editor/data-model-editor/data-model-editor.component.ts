@@ -289,7 +289,7 @@ export class DataModelEditorComponent {
       if (this._hasUnsavedChanges || viewModelProxy.dirty) {
         title += 'Display Modifications';
         text += 'All unsaved modifications to this kind are to be saved if ' +
-          'an attribute is added to this kind.';
+          'a property is added to this kind.';
         if (subtypeViewModels.length > 0) {
           title += ' And Additional Type Modification';
           text += ' The following additional types are expected to have one ' +
@@ -642,7 +642,7 @@ export class DataModelEditorComponent {
         matDialogData: {
           contextualGlobalType: this._dataModel
         },
-        label: 'Attribute'
+        label: 'Property'
       }], { data: {} }).updateSize('90%', '90%').afterClosed().toPromise();
 
       if (!results) {
@@ -817,12 +817,12 @@ export class DataModelEditorComponent {
       if (this._hasUnsavedChanges || viewModelProxy.dirty) {
         title += 'Display Modifications';
         text += 'All unsaved modifications to this kind are to be saved if ' +
-          'an attribute is added to this kind.';
+          'a property is added to this kind.';
         if (subtypeViewModels.length > 0) {
           title += ' And Additional Type Modification';
           text += ' The following additional types are expected to have an ' +
             'entry added to their default Format Definition upon a new ' +
-            'attribute being added to the selected type, as well: ' +
+            'property being added to the selected type, as well: ' +
             subtypeViewModels.map((viewModel: any) => {
             return viewModel.modelName;
           }).join(', ') + '.';
@@ -831,7 +831,7 @@ export class DataModelEditorComponent {
         title += 'Additional Type Modification';
         text += 'The following additional types are expected to have an ' +
           'entry added to their default Format Definition upon a new ' +
-          'attribute being added to the selected type: ' + subtypeViewModels.
+          'property being added to the selected type: ' + subtypeViewModels.
           map((viewModel: any) => {
           return viewModel.modelName;
         }).join(', ') + '.';
@@ -1114,12 +1114,12 @@ export class DataModelEditorComponent {
       if (this._hasUnsavedChanges || viewModelProxy.dirty) {
         title += 'Display Modifications';
         text += 'All unsaved modifications to this kind are to be saved if ' +
-          'an attribute is added to this kind.';
+          'a property is added to this kind.';
         if (subtypeViewModels.length > 0) {
           title += ' And Additional Type Modification';
           text += ' The following additional types are expected to have one ' +
             'or more Format Definitions modified upon the type of this ' +
-            'attribute being modified, as well: ' +
+            'property being modified, as well: ' +
             subtypeViewModels.map((viewModel: any) => {
             return viewModel.modelName;
           }).join(', ') + '.';
@@ -1128,7 +1128,7 @@ export class DataModelEditorComponent {
         title += 'Additional Type Modification';
         text += 'The following additional types are expected to have one ' +
             'or more Format Definitions modified upon the type of this ' +
-            'attribute being modified: ' + subtypeViewModels.
+            'property being modified: ' + subtypeViewModels.
           map((viewModel: any) => {
           return viewModel.modelName;
         }).join(', ') + '.';
@@ -1654,7 +1654,7 @@ export class DataModelEditorComponent {
     if (paths.length === 0) {
       let choiceValue: any = await this._dialogService.openYesNoDialog(
         'Remove ' + propertyId, 'All unsaved modifications to this type are ' +
-        'to be saved if this attribute is removed. Do you want to proceed?');
+        'to be saved if this property is removed. Do you want to proceed?');
       if (choiceValue) {
         await removeFromModels();
         this._changeDetectorRef.markForCheck();
@@ -1662,7 +1662,7 @@ export class DataModelEditorComponent {
     } else {
       let choiceValue: any = await this._dialogService.openYesNoDialog(
         'Remove ' + propertyId, 'All unsaved modifications to this type are ' +
-        'to be saved if this attribute is removed. Additionally, the ' +
+        'to be saved if this property is removed. Additionally, the ' +
         'following types are expected to have one or more Format Definition ' +
         'entries removed: ' + paths.map((path: Array<any>) => {
           return path[0].name;

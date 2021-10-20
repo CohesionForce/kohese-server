@@ -22,7 +22,7 @@ limitations under the License.
     </h3>
     <div style="display: flex; flex-direction: row;">
       <mat-form-field style="width: 100%; padding: 0px 3px 0px 3px;">
-        <mat-select placeholder="Attribute" [disabled]="(isDisabled || true)"
+        <mat-select placeholder="Property" [disabled]="(isDisabled || true)"
           [ngModel]="formatDefinition.header.contents[0].propertyName"
           (ngModelChange)="attributeSelected($event, formatDefinition.header.
           contents[0])">
@@ -152,7 +152,7 @@ limitations under the License.
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <div style="height: 50px; display: flex; flex-direction: row;">
-            <button mat-icon-button matTooltip="Add an attribute"
+            <button mat-icon-button matTooltip="add a property"
               [disabled]="(isDisabled || (isDefaultFormatDefinition &&
               (formatContainerIndex === 0)))" class="flex-right-align"
               (click)="addAttribute(formatContainer)">
@@ -179,7 +179,7 @@ limitations under the License.
                     <ng-container *ngIf="(formatContainer.kind ===
                       FormatContainerKind.REVERSE_REFERENCE_TABLE) else
                       notReverseReferencesTable">
-                      <mat-select placeholder="Attribute"
+                      <mat-select placeholder="Property"
                         [disabled]="isDisabled" [(ngModel)]="propertyDefinition.
                         propertyName"
                         [compareWith]="doesPropertyDefinitionMatchSelection">
@@ -198,7 +198,7 @@ limitations under the License.
                       </mat-select>
                     </ng-container>
                     <ng-template #notReverseReferencesTable>
-                      <mat-select placeholder="Attribute"
+                      <mat-select placeholder="Property"
                         [disabled]="isDisabled" [ngModel]="propertyDefinition.
                         propertyName" (ngModelChange)="attributeSelected(
                         $event, propertyDefinition)"
@@ -225,14 +225,14 @@ limitations under the License.
                     propertyDefinition, false); $event.stopPropagation()">
                     <mat-icon class="fa fa-arrow-down"></mat-icon>
                   </button>
-                  <button mat-icon-button matTooltip="Hide this attribute"
+                  <button mat-icon-button matTooltip="Hide this property"
                     [disabled]="isDisabled" [ngClass]="{ 'highlight':
                     !propertyDefinition.visible }" (click)="propertyDefinition.
                     visible = !propertyDefinition.visible; $event.
                     stopPropagation()">
                     <mat-icon class="fa fa-eye-slash"></mat-icon>
                   </button>
-                  <button mat-icon-button matTooltip="Allow this attribute to
+                  <button mat-icon-button matTooltip="Allow this property to
                     be edited" [disabled]="(isDisabled ||
                     (isDefaultFormatDefinition && (formatContainerIndex ===
                     0)))" [ngClass]="{ 'highlight': propertyDefinition.

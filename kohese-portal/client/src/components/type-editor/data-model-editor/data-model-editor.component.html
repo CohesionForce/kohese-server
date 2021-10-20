@@ -70,9 +70,9 @@ limitations under the License.
 <div style="height: 50px; width: 100%; display: flex;
   flex-direction: row;">
   <h3>
-    Attributes
+    Properties
   </h3>
-  <button mat-icon-button matTooltip="Add an attribute"
+  <button mat-icon-button matTooltip="add a property"
     class="flex-right-align" (click)="addAttribute()" [disabled]="!editable">
     <mat-icon class="fa fa-plus"></mat-icon>
   </button>
@@ -120,7 +120,7 @@ limitations under the License.
         type) ? element.type[0] : element.type] : !dataModel.classLocalTypes[
         Array.isArray(element.type) ? element.type[0] : element.type]))">
         <mat-form-field style="width: 180px; padding: 0px 5px 0px 5px;">
-          <mat-select placeholder="Reference Attribute"
+          <mat-select placeholder="Reference Property"
             [ngModel]="element.relation" (ngModelChange)="element.
             relation = $event; modifiedEventEmitter.emit()"
             [compareWith]="areRelationsEqual" [disabled]="!editable">
@@ -191,7 +191,7 @@ limitations under the License.
         <mat-icon class="fa fa-bars"></mat-icon>
       </button>
       <mat-menu #actionMenu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item matTooltip="Remove this attribute"
+        <button mat-menu-item matTooltip="remove this property"
           [disabled]="(!editable || (enclosingType && (attributes.length ===
           1)))" (click)="removeAttribute(element.name)">
           <mat-icon class="fa fa-trash"></mat-icon>

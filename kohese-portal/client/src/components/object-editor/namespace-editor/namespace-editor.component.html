@@ -94,6 +94,11 @@ limitations under the License.
               [(ngModel)]="selectedNamespace.alias"/>
           </mat-form-field>
           <mat-form-field style="width: 100%;">
+            <input matInput type="text" placeholder="Repository Id"
+            [disabled]="!editable"
+            [ngModel]="getRepositoryName()"/>
+          </mat-form-field>
+          <mat-form-field style="width: 100%;">
             <textarea matInput placeholder="Description"
               [(ngModel)]="selectedNamespace.description">
             </textarea>

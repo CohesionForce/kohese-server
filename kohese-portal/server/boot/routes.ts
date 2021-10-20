@@ -43,7 +43,7 @@ module.exports = function (app) {
       /^\/repositories.*/,
       /^\/explore.*/,
       /^\/analysis.*/,
-      /^\/typeeditor.*/,
+      /^\/kindeditor.*/,
       /^\/devtools.*/,
       /^\/about.*/,
       /^\/outline.*/,

@@ -228,6 +228,20 @@ module.exports.getDisabledRepositories = getDisabledRepositories;
 //
 //////////////////////////////////////////////////////////////////////////
 function unMountRepository(id) {
+  let repoNamespaceFileDir = mountList[id + '-mount'].repoStoragePath + '/Namespace';
+  if (kdbFS.pathExists(repoNamespaceFileDir)) {
+    unMountModelInstances('Namespace', repoNamespaceFileDir);
+  }
+
+  let repoModelFileDir = mountList[id + '-mount'].repoStoragePath + '/KoheseModel';
+  if (kdbFS.pathExists(repoModelFileDir)) {
+    unMountModelInstances('KoheseModel', repoModelFileDir);
+  }
+
+  let repoViewFileDir = mountList[id + '-mount'].repoStoragePath + '/KoheseView';
+  if (kdbFS.pathExists(repoViewFileDir)) {
+    unMountModelInstances('KoheseView', repoViewFileDir);
+  }
   kdbFS.removeFile(path.join(koheseKDBDirPath, path.join('RepoMount', id + '-mount.json')));
   delete mountList[id + '-mount'];
   updateMountFile();
@@ -409,6 +423,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
 
   var modelName = proxy.kind;
   var modelInstance = proxy.item;
+  var isnewKind: boolean = false;
 
   if(modelName !== 'Analysis'){
     // Delete any associated analysis
@@ -429,7 +444,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
     }
   }
 
-  var promise : Promise<boolean|void> = Promise.resolve(true);
+  var promise: Promise<boolean|void> = Promise.resolve(true);
   if (modelName === 'Repository'){
     var repoFilePath;
     if (isNewItem) {
@@ -499,6 +514,24 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
         // TODO: Need to call create repo structure once that has been removed from validate
       });
     }
+  } else if (modelName === 'Namespace') {
+    if (modelInstance.repositoryId && modelInstance.repositoryId.id !== 'ROOT') {
+      proxy.repoPath = mountList[modelInstance.repositoryId.id + '-mount'].repoStoragePath + path.sep + modelName + path.sep + modelInstance.id + '.json';
+      filePath = proxy.repoPath;
+      isnewKind = true;
+    } else {
+      proxy.repoPath = filePath;
+    }
+    delete proxy.repositoryId;
+  } else if (modelName === 'KoheseModel' || modelName === 'KoheseView') {
+      var namespaceProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstance.namespace.id);
+      if (namespaceProxy.item.repositoryId && namespaceProxy.item.repositoryId.id !== 'ROOT') {
+        proxy.repoPath = mountList[namespaceProxy.item.repositoryId.id + '-mount'].repoStoragePath + path.sep + modelName + path.sep + modelInstance.id + '.json';
+        filePath = proxy.repoPath;
+        isnewKind = true;
+      } else {
+        proxy.repoPath = filePath;
+      }
   } else {
     if(modelName !== 'Analysis' && filePath !== proxy.repoPath){
       console.log('}}} Old: ' + proxy.repoPath);
@@ -523,8 +556,17 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
           console.log('*** No GIT Folder Exists - Invalid Repository for ' + repoMountData.id + ' repo ' + repoStoragePath)
         }
       }
-
-      var repositoryProxy = proxy.getRepositoryProxy();
+      var repositoryProxy;
+      if (isnewKind) {
+        if (modelName == 'Namespace') {
+          repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstance.repositoryId.id)
+        }
+        else {
+          repositoryProxy = ItemProxy.getWorkingTree().getProxyFor(namespaceProxy.item.repositoryId.id);
+        }
+      } else {
+        repositoryProxy = proxy.getRepositoryProxy();
+      }
       var pathToRepo;
       var relativeFilePath;
       if (!KDBRepo.isRepo(repositoryProxy.item.id)) {
@@ -584,7 +626,7 @@ function removeModelInstance(proxy){
   var modelName = proxy.kind;
   var instanceId = proxy.item.id;
 
-  if(modelName === 'Analysis'){
+  if (modelName === 'Analysis'){
     var repo = proxy.getRepositoryProxy();
     var repoStoragePath = determineRepoStoragePath(repo);
     var filePath = repoStoragePath + '/' + modelName + '/' + instanceId + '.json';
@@ -726,7 +768,7 @@ function mountRepository(mountData, enable: boolean = false) {
         mountList[mountData.id].mounted = false;
 
         // eslint-disable-next-line no-unused-vars
-        let proxy = new ItemProxy('Repository', errorRepo);
+       let proxy = new ItemProxy('Repository', errorRepo);
     }
 }
 
@@ -744,6 +786,28 @@ function createRepoStructure(repoDirPath) {
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
+function unMountModelInstances(kind, modelDirPath) {
+  let fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
+  for (var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
+    var itemPath = modelDirPath + '/' + fileList[fileIdx];
+    var itemPayload = kdbFS.loadJSONDoc(itemPath);
+    let proxy = TreeConfiguration.getWorkingTree().getProxyFor(itemPayload.id);
+    switch (kind) {
+      case 'KoheseModel':
+        proxy.deleteItem(true)
+        break;
+      case 'KoheseView':
+      case 'Namespace':
+        proxy.deleteItem(false, true)
+        break;
+      default:
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////
 function loadModelInstances (kind, modelDirPath, inRepo, enable: boolean = false) {
   let fileList = kdbFS.getRepositoryFileList(modelDirPath, jsonExt);
   for(var fileIdx = 0; fileIdx < fileList.length; fileIdx++) {
@@ -756,10 +820,16 @@ function loadModelInstances (kind, modelDirPath, inRepo, enable: boolean = false
     switch (kind){
       case 'KoheseModel':
         proxy = new KoheseModel(itemPayload);
+        if (enable === true) {
+          proxy.updateItem(kind, itemPayload, enable)
+        }
         break;
       case 'KoheseView':
         proxy = new KoheseView(itemPayload, TreeConfiguration.
           getWorkingTree());
+        if (enable === true) {
+          proxy.mountRepository(proxy.item.id, kind)
+        }
         break;
       default:
         proxy = new ItemProxy(kind, itemPayload);
@@ -768,7 +838,7 @@ function loadModelInstances (kind, modelDirPath, inRepo, enable: boolean = false
         }
     }
 
-    if(inRepo){
+    if (inRepo){
       proxy.repoPath = itemPath;
     }
 
@@ -857,6 +927,7 @@ function validateRepositoryStructure (repoDirPath, enable: boolean = false) {
       case 'KoheseView':
       case 'KoheseUser':
       case 'RepoMount':
+      case 'Namespace':
 
         // Skip this model kind
         console.log('::: Skipping ' + modelName);
@@ -884,13 +955,13 @@ function updateMountFile() {
 //
 //////////////////////////////////////////////////////////////////////////
 async function openRepositories(indexAndExit) {
-	// Check and process mounts.json
-	// TODO Check for file existence prior to loading
-	try {
-	    mountList = kdbFS.loadJSONDoc(mountFilePath);
-	} catch(err) {
-	    // Do nothing; the mount list will get written when validating if necessary
-	}
+  // Check and process mounts.json
+  // TODO Check for file existence prior to loading
+  try {
+      mountList = kdbFS.loadJSONDoc(mountFilePath);
+  } catch(err) {
+    // Do nothing; the mount list will get written when validating if necessary
+  }
 
   let rootProxy = ItemProxy.getWorkingTree().getRootProxy();
   // TODO: Need to ensure that KDB Cache initialization has knowledge of mounted roots
@@ -912,9 +983,28 @@ async function openRepositories(indexAndExit) {
   // Validate the repositories listed inside the mount file
   console.log('>>> Mounting and Validating External Repos');
   for(let id in mountList) {
-    if(!mountList[id].mounted && mountList[id].repoStoragePath && !mountList[id].disabled) {
-        mountRepository({'id': id, name: mountList[id].name, parentId: mountList[id].parentId,
-                        repoStoragePath: mountList[id].repoStoragePath});
+    if (!mountList[id].mounted && mountList[id].repoStoragePath && !mountList[id].disabled) {
+
+      let repoNamespaceFileDir = mountList[id].repoStoragePath + '/Namespace';
+      if (kdbFS.pathExists(repoNamespaceFileDir)) {
+        loadModelInstances('Namespace', repoNamespaceFileDir, true);
+      }
+
+      let repoModelFileDir = mountList[id].repoStoragePath + '/KoheseModel';
+      if (kdbFS.pathExists(repoModelFileDir)) {
+        loadModelInstances('KoheseModel', repoModelFileDir, true);
+      }
+
+      let repoViewFileDir = mountList[id].repoStoragePath + '/KoheseView';
+      if (kdbFS.pathExists(repoViewFileDir)) {
+        loadModelInstances('KoheseView', repoViewFileDir, true);
+      }
+
+      mountRepository({
+        'id': id, name: mountList[id].name,
+        parentId: mountList[id].parentId,
+        repoStoragePath: mountList[id].repoStoragePath
+      });
     }
   }
   console.log('>>> Done loading repositories');
@@ -968,6 +1058,21 @@ async function openRepository(id, indexAndExit){
     await KDBRepo.openRepo(id, mountList[id].repoStoragePath);
   } else {
     console.log('*** No GIT Folder Exists - Invalid Repository for ' + id + ' repo ' + mountList[id].repoStoragePath)
+  }
+
+  let repoNamespaceFileDir = mountList[id].repoStoragePath + '/Namespace';
+  if (kdbFS.pathExists(repoNamespaceFileDir)) {
+    loadModelInstances('Namespace', repoNamespaceFileDir, true, enable);
+  }
+
+  let repoModelFileDir = mountList[id].repoStoragePath + '/KoheseModel';
+  if (kdbFS.pathExists(repoModelFileDir)) {
+    loadModelInstances('KoheseModel', repoModelFileDir, true, enable);
+  }
+
+  let repoViewFileDir = mountList[id].repoStoragePath + '/KoheseView';
+  if (kdbFS.pathExists(repoViewFileDir)) {
+    loadModelInstances('KoheseView', repoViewFileDir, true, enable);
   }
 
   // Mount Repository

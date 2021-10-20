@@ -119,10 +119,6 @@ export class CreateWizardComponent extends NavigatableComponent
 
   }
 
-  // cancel() {
-  //   this.MatDialogRef.close();
-  // }
-
   public clearError(): void {
     this.errorMessage = undefined;
     this._isDisabled = false;

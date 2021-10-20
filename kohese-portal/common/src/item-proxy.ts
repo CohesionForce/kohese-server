@@ -2297,7 +2297,7 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   //
   //////////////////////////////////////////////////////////////////////////
-  deleteItem(deleteDescendants: boolean = false) {
+  deleteItem(deleteDescendants: boolean = false, unmounting: boolean = false) {
     var byId = this._item.id;
 
     // console.log('::: Deleting proxy for ' + byId);
@@ -2376,7 +2376,8 @@ export class ItemProxy {
               type: 'delete',
               kind: this.kind,
               id: this._item.id,
-              proxy: this
+              proxy: this,
+              unmounting: unmounting
             });
           }
           delete this.treeConfig.proxyMap[byId];
