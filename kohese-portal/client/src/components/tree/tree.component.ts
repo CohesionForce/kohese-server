@@ -132,17 +132,25 @@ export enum TreeComponentConfiguration {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreeComponent implements OnInit, AfterViewInit, Dialog {
-  private _elementMap: Map<any, ElementMapValue> =
-    new Map<any, ElementMapValue>();
+
+  private _elementMap: Map<any, ElementMapValue> = new Map<any, ElementMapValue>();
   get elementMap() {
     return this._elementMap;
   }
 
+  private _absoluteRoot: any;
   private _root: any;
   @Input('root')
   set root(root: any) {
     this._root = root;
+    if(!this._absoluteRoot) {
+      this._absoluteRoot = root;
+    }
   }
+  get root() {
+    return this._root;
+  }
+
 
   private _getChildren: (element: any) => Array<any>;
   get getChildren() {
@@ -151,6 +159,12 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   @Input('getChildren')
   set getChildren(getChildren: (element: any) => Array<any>) {
     this._getChildren = getChildren;
+  }
+
+  private _getParent: (element: any) => any;
+  @Input('getParent')
+  set getParent(getParent: (element: any) => any ) {
+    this._getParent = getParent;
   }
 
   private _hasChildren: (element: any) => boolean;
@@ -340,6 +354,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this.root = this._data['root'];
       this.getChildren = this._data['getChildren'];
       this.hasChildren = this._data['hasChildren'];
+      this.getParent = this._data['getParent'];
       this.getText = this._data['getText'];
       this.getIcon = this._data['getIcon'];
       this.isFavorite = this._data['isFavorite'];
@@ -588,30 +603,31 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     this._changeDetectorRef.markForCheck();
   }
 
+  treePath: Array<any> = [];
   public getTreePath(element: any): Array<any> {
-    let treePath: Array<any> = [];
+    this.treePath = Array.from(this.elementMap.keys());
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
-    if (elementMapValue) {
-      treePath.unshift(element);
+    // if (elementMapValue) {
+    //   treePath.unshift(element);
 
-      if (elementMapValue.depth > 0) {
-        let elements: Array<any> = Array.from(this._elementMap.keys());
-        let beginningIndex: number = elements.indexOf(element);
-        for (let j: number = beginningIndex - 1; j >= 0; j--) {
-          let previousElementMapValue: ElementMapValue = this._elementMap.get(
-            elements[j]);
-          if (previousElementMapValue.depth === (elementMapValue.depth - 1)) {
-            treePath.unshift(elements[j]);
-            if (previousElementMapValue.depth === 0) {
-              break;
-            }
-            elementMapValue = previousElementMapValue;
-          }
-        }
-      }
-    }
+    //   if (elementMapValue.depth > 0) {
+    //     let elements: Array<any> = Array.from(this._elementMap.keys());
+    //     let beginningIndex: number = elements.indexOf(element);
+    //     for (let j: number = beginningIndex - 1; j >= 0; j--) {
+    //       let previousElementMapValue: ElementMapValue = this._elementMap.get(
+    //         elements[j]);
+    //       if (previousElementMapValue.depth === (elementMapValue.depth - 1)) {
+    //         treePath.unshift(elements[j]);
+    //         if (previousElementMapValue.depth === 0) {
+    //           break;
+    //         }
+    //         elementMapValue = previousElementMapValue;
+    //       }
+    //     }
+    //   }
+    // }
 
-    return treePath;
+    return this.treePath;
   }
 
   public update(updateStructure: boolean): void {
@@ -636,7 +652,12 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
 
   private processElement(element: any, parent: any, depth: number): void {
     this._elementMap.set(element, new ElementMapValue(
-      parent, depth, this._getText(element), this._getIcon(element), this._isFavorite(element)));
+        parent,
+        depth,
+        this._getText(element),
+        this._getIcon(element),
+        this._isFavorite(element)
+      ));
 
     let children: Array<any> = this._getChildren(element);
     for (let j: number = 0; j < children.length; j++) {
@@ -698,6 +719,25 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       } catch (error) {
         console.log('!!! Remove from Favorites Error: %s', error);
       }
+    }
+  }
+
+  public anchor(proxy: any) {
+    this.root = proxy;
+    this.update(true);
+  }
+
+  public upLevelRoot() {
+    if(this.root.parentProxy && (this.root !== this._absoluteRoot)) {
+      this.root = this.root.parentProxy;
+      this.update(true);
+    }
+  }
+
+  public returnToAbsoluteRoot() {
+    if (this.root !== this._absoluteRoot) {
+      this.root = this._absoluteRoot;
+      this.update(true);
     }
   }
 

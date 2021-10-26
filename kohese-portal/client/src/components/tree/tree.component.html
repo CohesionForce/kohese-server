@@ -103,6 +103,16 @@ limitations under the License.
         (click)="changeAllExpansionStates(false)">
         <mat-icon class="fa fa-chevron-up"></mat-icon>
       </button>
+      <ng-container *ngIf="this.root !== this._absoluteRoot">
+        <button mat-icon-button matTooltip="focus parent" style="margin-left: auto;"
+          (click)=upLevelRoot()>
+          <mat-icon class="fa fa-level-up"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="remove focus"
+          (click)=returnToAbsoluteRoot()>
+          <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
+        </button>
+      </ng-container>
       <ng-container *ngIf="allowMultiselect">
         <button mat-icon-button matTooltip="Select all elements"
           (click)="changeSelectionOfAll(true)">
@@ -122,8 +132,7 @@ limitations under the License.
     <div #elementContainer style="height: calc(100% - 70px); width: 100%; overflow-y: auto;">
       <ng-container *ngFor="let element of Array.from(elementMap.keys())">
         <ng-container *ngIf="shouldDisplay(element)">
-          <div style="height: 40px; width: 100%; display: flex; flex-direction: row;"
-            [ngStyle]="getElementStyle(element)">
+          <div style="height: 40px; width: 100%; display: flex; flex-direction: row;" [ngStyle]="getElementStyle(element)">
             <ng-container *ngIf="!elementMap.get(element).expanded">
               <mat-icon class="fa fa-caret-right" style="width: 7%; text-align: center; padding-top: 10px;"
                 [ngStyle]="getExpansionIconStyle(element)"
@@ -157,6 +166,10 @@ limitations under the License.
                   <mat-icon class="fa fa-star"></mat-icon>
                 </button>
               </ng-template>
+              <button mat-icon-button matTooltip="focus this item" style="margin-left: auto;"
+                (click)=anchor(element)>
+                <mat-icon class="fa fa-anchor"></mat-icon>
+              </button>
               <ng-container *ngFor="let action of actions; let j = index">
                 <button mat-icon-button matTooltip="{{action.tooltip}}"
                   [disabled]="!action.canExecute(element)"

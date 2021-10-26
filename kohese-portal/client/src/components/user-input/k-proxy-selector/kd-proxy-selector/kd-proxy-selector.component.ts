@@ -102,6 +102,9 @@ export class KdProxySelectorComponent implements OnInit {
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
+        getParent: (element: any) => {
+          return (element as ItemProxy).parentProxy;
+        },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
