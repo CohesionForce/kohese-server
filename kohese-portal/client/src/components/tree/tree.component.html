@@ -23,26 +23,25 @@ limitations under the License.
       <div cdkDropList class=favorites-list (cdkDropListDropped)=drop(this.favorites,$event)>
         <div cdkDrag class=favorites-box *ngFor="let favorite of favorites" style="display: flex; flex-direction: row;">
           <!-- favorites list -->
-          <button mat-button class=item-button matTooltip="{{elementMap.get(favorite)?.text}}"
-            *ngIf="elementMap.get(favorite).favorite"
-            [disabled]="!maySelect(favorite)"
-            (click)="changeElementSelection(favorite)"
-            [ngClass]="{ 'highlight': (selection.indexOf(favorite) !== -1) }">
-            <mat-icon class="{{elementMap.get(favorite)?.icon}}"></mat-icon>
-            {{elementMap.get(favorite)?.text}}
-          </button>
-          <!-- remove favorite -->
-          <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
-            *ngIf="elementMap.get(favorite).favorite"
-            (click)=removeFromFavorites(favorite)>
-            <mat-icon class="fa fa-star"></mat-icon>
-          </button>
-          <!-- scroll into view in explorer tree -->
-          <button mat-icon-button matTooltip="Display this element in the tree" style="margin-left: auto;"
-            *ngIf="elementMap.get(favorite).favorite"
-            (click)="scrollElementIntoView(favorite)">
-            <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
-          </button>
+          <ng-container *ngIf=getFavorite(favorite)>
+            <button mat-button class=item-button matTooltip="{{favorite.item.name}}"
+              [disabled]="!maySelect(favorite)"
+              (click)="changeElementSelection(favorite)"
+              [ngClass]="{ 'highlight': (selection.indexOf(favorite) !== -1) }">
+              <mat-icon class="{{this._duplicateElementMap.get(favorite)?.icon}}"></mat-icon>
+              {{favorite.item.name}}
+            </button>
+            <!-- remove favorite -->
+            <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
+              (click)=removeFromFavorites(favorite)>
+              <mat-icon class="fa fa-star"></mat-icon>
+            </button>
+            <!-- scroll into view in explorer tree -->
+            <button mat-icon-button matTooltip="Display this element in the tree" style="margin-left: auto;"
+              (click)="scrollElementIntoView(favorite)">
+              <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
+            </button>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -54,15 +53,15 @@ limitations under the License.
       <ng-container *ngFor="let quickSelectElement of quickSelectElements">
         <div style="display: flex; flex-direction: row;">
           <!-- quick select list -->
-          <button mat-button class=item-button matTooltip="{{elementMap.get(quickSelectElement)?.text}}"
+          <button mat-button class=item-button matTooltip="{{quickSelectElement.item.name}}"
             [disabled]="!maySelect(quickSelectElement)"
             (click)="changeElementSelection(quickSelectElement)"
             [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !== -1) }">
-            <mat-icon class="{{elementMap.get(quickSelectElement)?.icon}}"></mat-icon>
-            {{elementMap.get(quickSelectElement)?.text}}
+            <mat-icon class="{{this._duplicateElementMap.get(quickSelectElement)?.icon}}"></mat-icon>
+            {{quickSelectElement.item.name}}
           </button>
           <!-- add/remove favorite -->
-          <ng-container *ngIf="!elementMap.get(quickSelectElement).favorite else favorite">
+          <ng-container *ngIf="!getFavorite(quickSelectElement) else favorite">
             <button mat-icon-button matTooltip="add to favorites" style="margin-left: auto;"
               (click)=addToFavorites(quickSelectElement)>
               <mat-icon class="fa fa-star-o"></mat-icon>
@@ -154,7 +153,7 @@ limitations under the License.
                 {{elementMap.get(element).text}}
               </button>
               <!-- add/remove favorite -->
-              <ng-container *ngIf="!elementMap.get(element).favorite else favorite">
+              <ng-container *ngIf="!getFavorite(element) else favorite">
                 <button mat-icon-button matTooltip="add to favorites" style="margin-left: auto;"
                   (click)=addToFavorites(element)>
                   <mat-icon class="fa fa-star-o"></mat-icon>

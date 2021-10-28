@@ -17,8 +17,8 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
-  import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit, Directive } from '@angular/core';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 // Other External Dependencies
@@ -72,11 +72,11 @@ class ElementMapValue {
   }
 
   public constructor (
-    private _parent: any,
-    private _depth: number,
-    private _text: string,
-    private _icon: string,
-    private _favorite: boolean
+                      private _parent: any,
+                      private _depth: number,
+                      private _text: string,
+                      private _icon: string,
+                      private _favorite: boolean
   ) {}
 }
 
@@ -101,10 +101,13 @@ export class Action {
     return this._execute;
   }
 
-  public constructor(private _tooltip: string, private _classes: string,
-    private _isVisible: (element: any) => boolean, private _canExecute:
-    (element: any) => boolean, private _execute: (element: any) => void) {
-  }
+  public constructor(
+                      private _tooltip: string,
+                      private _classes: string,
+                      private _isVisible: (element: any) => boolean,
+                      private _canExecute: (element: any) => boolean,
+                      private _execute: (element: any) => void
+  ) {}
 }
 
 export class ToggleAction extends Action {
@@ -112,10 +115,14 @@ export class ToggleAction extends Action {
     return this._isSelected;
   }
 
-  public constructor(tooltip: string, classes: string, isVisible: (element:
-    any) => boolean, canExecute: (element: any) => boolean,
-    private _isSelected: (element: any) => boolean, execute: (element:
-    any) => void) {
+  public constructor(
+                      tooltip: string,
+                      classes: string,
+                      isVisible: (element: any) => boolean,
+                      canExecute: (element: any) => boolean,
+                      private _isSelected: (element: any) => boolean,
+                      execute: (element: any) => void
+  ) {
     super(tooltip, classes, isVisible, canExecute, execute);
   }
 }
@@ -138,12 +145,18 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return this._elementMap;
   }
 
+  private _duplicateElementMap: Map<any, ElementMapValue> = new Map<any, ElementMapValue>();
+  get duplicateElementMap() {
+    return this._duplicateElementMap;
+  }
+
   private _absoluteRoot: any;
   private _root: any;
+  private count: number = 0;
   @Input('root')
   set root(root: any) {
     this._root = root;
-    if(!this._absoluteRoot) {
+    if(!this._absoluteRoot && this.count === 0) {
       this._absoluteRoot = root;
     }
   }
@@ -396,10 +409,16 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     this._changeDetectorRef.markForCheck();
   }
 
+  /**
+   * @see processDuplicateElement()
+   *
+   * controls nativeElement scroll focus and sets the control flag for the duplicateElementMap
+   */
   public ngAfterViewInit(): void {
     if (this._selection.length > 0) {
       this.scrollElementIntoView(this._selection[0]);
     }
+    this.processDuplicateElementInitControl++;
   }
 
   /**
@@ -412,25 +431,39 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
 
   public scrollElementIntoView(element: any): void {
-    let selectionElementMapValue: ElementMapValue = this._elementMap.get(
-      element);
+    let selectionElementMapValue: ElementMapValue = this._elementMap.get(element);
     if (selectionElementMapValue) {
-      let parentElementMapValue: ElementMapValue = this._elementMap.get(
-        selectionElementMapValue.parent);
+      let parentElementMapValue: ElementMapValue = this._elementMap.get(selectionElementMapValue.parent);
       while (parentElementMapValue) {
         parentElementMapValue.expanded = true;
-        parentElementMapValue = this._elementMap.get(parentElementMapValue.
-          parent);
+        parentElementMapValue = this._elementMap.get(parentElementMapValue.parent);
       }
 
-      let firstSelectedElementIndex: number = this.getDisplayedElements().
-        indexOf(element);
+      let firstSelectedElementIndex: number = this.getDisplayedElements().indexOf(element);
       if (firstSelectedElementIndex !== -1) {
         // Each element row should be 40px or 36px tall.
-        this._elementContainer.nativeElement.scrollTop = (((this._actions.
-          length > 0) ? 40 : 36) * firstSelectedElementIndex);
+        this._elementContainer.nativeElement.scrollTop = (((this._actions.length > 0) ? 40 : 36) * firstSelectedElementIndex);
         this._changeDetectorRef.markForCheck();
       }
+    } else {
+      this._root = this._absoluteRoot;
+      this.update(true);
+      let selectionElementMapValue: ElementMapValue = this._elementMap.get(element);
+      if(selectionElementMapValue) {
+        let parentElementMapValue: ElementMapValue = this._elementMap.get(selectionElementMapValue.parent);
+        while (parentElementMapValue) {
+          parentElementMapValue.expanded = true;
+          parentElementMapValue = this._elementMap.get(parentElementMapValue.parent);
+        }
+
+        let firstSelectedElementIndex: number = this.getDisplayedElements().indexOf(element);
+        if (firstSelectedElementIndex !== -1) {
+          // Each element row should be 40px or 36px tall.
+          this._elementContainer.nativeElement.scrollTop = (((this._actions.length > 0) ? 40 : 36) * firstSelectedElementIndex);
+          this._changeDetectorRef.markForCheck();
+        }
+      }
+      this.update(true);
     }
   }
 
@@ -447,8 +480,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
 
   public isDialogInstance(): boolean {
-    return this._matDialogRef && (this._matDialogRef.componentInstance ===
-      this) && this._data;
+    return this._matDialogRef && (this._matDialogRef.componentInstance === this) && this._data;
   }
 
   public searchTextChanged(searchText: string): void {
@@ -490,7 +522,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
 
       this._changeDetectorRef.markForCheck();
       this._searchTimeoutIdentifier = undefined;
-    }, 700);
+    }, 1100);
   }
 
   public getElementStyle(element: any): object {
@@ -513,6 +545,13 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     }
   }
 
+  /**
+   * Checks if the element should be shown in the mat-content-drawer tree
+   *
+   * @param element mat-content-drawer tree element
+   *
+   * @returns true or false
+   */
   public shouldDisplay(element: any): boolean {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
     if (elementMapValue.visible) {
@@ -603,44 +642,26 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     this._changeDetectorRef.markForCheck();
   }
 
-  treePath: Array<any> = [];
-  public getTreePath(element: any): Array<any> {
-    this.treePath = Array.from(this.elementMap.keys());
-    let elementMapValue: ElementMapValue = this._elementMap.get(element);
-    // if (elementMapValue) {
-    //   treePath.unshift(element);
-
-    //   if (elementMapValue.depth > 0) {
-    //     let elements: Array<any> = Array.from(this._elementMap.keys());
-    //     let beginningIndex: number = elements.indexOf(element);
-    //     for (let j: number = beginningIndex - 1; j >= 0; j--) {
-    //       let previousElementMapValue: ElementMapValue = this._elementMap.get(
-    //         elements[j]);
-    //       if (previousElementMapValue.depth === (elementMapValue.depth - 1)) {
-    //         treePath.unshift(elements[j]);
-    //         if (previousElementMapValue.depth === 0) {
-    //           break;
-    //         }
-    //         elementMapValue = previousElementMapValue;
-    //       }
-    //     }
-    //   }
-    // }
-
-    return this.treePath;
-  }
-
+  /**
+   * updates the elementMap with a new root for values refresh and anchoring capability
+   *
+   * @param updateStructure set true to update the elementMap
+   *
+   */
   public update(updateStructure: boolean): void {
     if (updateStructure) {
       let expansionStates: Map<any, boolean> = this.getExpansionStates();
       this._elementMap.clear();
+      // this._duplicateElementMap.clear();
       let depth = 0;
       if (this.isDialogInstance()) {
         this.processElement(this._root, '', depth);
+        this.processDuplicateElement(this._absoluteRoot, '', depth, this.processDuplicateElementInitControl);
       } else {
         let children: Array<any> = this._getChildren(this._root);
         for (let j: number = 0; j < children.length; j++) {
           this.processElement(children[j], this._root, depth);
+          this.processDuplicateElement(children[j], this._absoluteRoot, depth, this.processDuplicateElementInitControl);
         }
       }
 
@@ -650,6 +671,13 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     this._changeDetectorRef.markForCheck();
   }
 
+  /**
+   * Processes all system items and returns the elementMap with all relevant tree data
+   *
+   * @param element the element being processed and duplicated
+   * @param parent returns the element's parent
+   * @param depth used to determine indentation (padding-left) in the tree
+   */
   private processElement(element: any, parent: any, depth: number): void {
     this._elementMap.set(element, new ElementMapValue(
         parent,
@@ -662,6 +690,32 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     let children: Array<any> = this._getChildren(element);
     for (let j: number = 0; j < children.length; j++) {
       this.processElement(children[j], element, depth + 1);
+    }
+  }
+
+  /**
+   * Creates a duplicate elementMap used to sustain system memory of favorites while anchored
+   *
+   * @param element the element being processed and duplicated
+   * @param parent returns the element's parent
+   * @param depth used to determine indentation (padding-left) in the tree
+   * @param processDuplicateElementInitControl control flag to instantiate the duplication once, and not after OnInit completion
+   */
+  processDuplicateElementInitControl: number = 0;
+  private processDuplicateElement(element: any, parent: any, depth: number, processDuplicateElementInitControl): void {
+    if(processDuplicateElementInitControl === 0) {
+      this._duplicateElementMap.set(element, new ElementMapValue(
+        parent,
+        depth,
+        this._getText(element),
+        this._getIcon(element),
+        this._isFavorite(element)
+      ));
+
+      let children: Array<any> = this._getChildren(element);
+      for (let j: number = 0; j < children.length; j++) {
+        this.processDuplicateElement(children[j], element, depth + 1, processDuplicateElementInitControl);
+      }
     }
   }
 
@@ -685,40 +739,84 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
 
   favorites: Array<any> = [];
   public addToFavorites(element: any) {
-    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    let id = element.item.id;
+    let quickSelectElementIndex = this.quickSelectElements.findIndex(t => t.item.id === id);
+    let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+    let elementMapValue: ElementMapValue = this.elementMap.get(element);
+    let duplicateElementMapValue: ElementMapValue = this._duplicateElementMap.get(element);
+
     if(elementMapValue) {
       elementMapValue.favorite = true;
+    }
+
+    if(duplicateElementMapValue) {
+      duplicateElementMapValue.favorite = true;
       try {
-        // add element if it is not in the quickSelectElements array
-        let id = element.item.id;
-        let quickSelectElementIndex = this.quickSelectElements.findIndex(t => t.item.id === id);
+        // push element to the top of quickSelectElements
         if(quickSelectElementIndex === -1) {
           this._quickSelectElements.unshift(element);
         }
-        let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
         if(favoritesElementIndex === -1) {
           this.favorites = this.treeService.addFavorite(element);
         }
       } catch (error) {
         console.log('!!! Add to Favorites Error: %s', error);
       }
-
     }
+    this.changeDetectorRef.markForCheck();
   }
 
   public removeFromFavorites(element: any) {
     let id = element.item.id;
-    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+    let elementMapValue: ElementMapValue = this.elementMap.get(element);
+    let duplicateElementMapValue: ElementMapValue = this._duplicateElementMap.get(element);
+
     if(elementMapValue) {
       elementMapValue.favorite = false;
+    }
+
+    if(duplicateElementMapValue) {
+      duplicateElementMapValue.favorite = false;
       try {
-        let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
-        if(favoritesElementIndex) {
+        if(favoritesElementIndex !== -1) {
           this.favorites = this.treeService.removeFavorite(element);
         }
       } catch (error) {
         console.log('!!! Remove from Favorites Error: %s', error);
       }
+    }
+
+    this.changeDetectorRef.markForCheck();
+  }
+
+  favored: boolean = false;
+  getFavorite(element: any): boolean {
+    let id = element.item.id;
+    let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+    let elementMapValue: ElementMapValue = this.elementMap.get(element);
+    let duplicateElementMapValue: ElementMapValue = this._duplicateElementMap.get(element);
+
+    if(favoritesElementIndex !== -1) {
+      if(elementMapValue) {
+        elementMapValue.favorite = true;
+      }
+      if(duplicateElementMapValue) {
+        duplicateElementMapValue.favorite = true;
+      }
+
+      this.changeDetectorRef.markForCheck();
+      return this.favored = true;
+    } else {
+      if(elementMapValue) {
+        elementMapValue.favorite = false;
+      }
+      if(duplicateElementMapValue) {
+        duplicateElementMapValue.favorite = false;
+      }
+
+      this.changeDetectorRef.markForCheck();
+      return this.favored = false;
     }
   }
 
