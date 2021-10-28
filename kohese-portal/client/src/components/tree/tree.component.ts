@@ -483,46 +483,50 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return this._matDialogRef && (this._matDialogRef.componentInstance === this) && this._data;
   }
 
+  _searchText: string = '';
   public searchTextChanged(searchText: string): void {
     if (this._searchTimeoutIdentifier) {
       clearTimeout(this._searchTimeoutIdentifier);
     }
 
     this._searchTimeoutIdentifier = setTimeout(() => {
-      if (searchText) {
-        searchText = searchText.toLowerCase();
-        let keys: Array<any> = Array.from(this._elementMap.keys());
-        for (let j: number = 0; j < keys.length; j++) {
-          let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
-          let matches: boolean = elementMapValue.text.toLowerCase().includes(
-            searchText);
-          elementMapValue.visible = matches;
-          elementMapValue.expanded = false;
-          if (matches) {
-            if (elementMapValue.parent) {
-              let parentElementMapValue: ElementMapValue = this._elementMap.get(
-                elementMapValue.parent);
-              while (parentElementMapValue) {
-                parentElementMapValue.visible = true;
-                parentElementMapValue.expanded = true;
-                parentElementMapValue = this._elementMap.get(
-                  parentElementMapValue.parent);
-              }
+      this._searchText = searchText;
+      this.applySearchText();
+      this._searchTimeoutIdentifier = undefined;
+    }, 1100);
+  }
+
+  private applySearchText() {
+
+    if (this._searchText) {
+      let searchText = this._searchText.toLowerCase();
+      let keys: Array<any> = Array.from(this._elementMap.keys());
+      for (let j: number = 0; j < keys.length; j++) {
+        let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+        let matches: boolean = elementMapValue.text.toLowerCase().includes(searchText);
+        elementMapValue.visible = matches;
+        elementMapValue.expanded = false;
+        if (matches) {
+          if (elementMapValue.parent) {
+            let parentElementMapValue: ElementMapValue = this._elementMap.get(elementMapValue.parent);
+            while (parentElementMapValue) {
+              parentElementMapValue.visible = true;
+              parentElementMapValue.expanded = true;
+              parentElementMapValue = this._elementMap.get(parentElementMapValue.parent);
             }
           }
         }
-      } else {
-        let keys: Array<any> = Array.from(this._elementMap.keys());
-        for (let j: number = 0; j < keys.length; j++) {
-          let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
-          elementMapValue.visible = true;
-          elementMapValue.expanded = false;
-        }
       }
+    } else {
+      let keys: Array<any> = Array.from(this._elementMap.keys());
+      for (let j: number = 0; j < keys.length; j++) {
+        let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+        elementMapValue.visible = true;
+        elementMapValue.expanded = false;
+      }
+    }
 
-      this._changeDetectorRef.markForCheck();
-      this._searchTimeoutIdentifier = undefined;
-    }, 1100);
+    this._changeDetectorRef.markForCheck();
   }
 
   public getElementStyle(element: any): object {
@@ -652,7 +656,6 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     if (updateStructure) {
       let expansionStates: Map<any, boolean> = this.getExpansionStates();
       this._elementMap.clear();
-      // this._duplicateElementMap.clear();
       let depth = 0;
       if (this.isDialogInstance()) {
         this.processElement(this._root, '', depth);
@@ -823,12 +826,15 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   public anchor(proxy: any) {
     this.root = proxy;
     this.update(true);
+    this.applySearchText();
   }
 
   public upLevelRoot() {
-    if(this.root.parentProxy && (this.root !== this._absoluteRoot)) {
-      this.root = this.root.parentProxy;
+    let parentElement = this._getParent(this.root);
+    if(parentElement && (this.root !== this._absoluteRoot)) {
+      this.root = parentElement;
       this.update(true);
+      this.applySearchText();
     }
   }
 
@@ -836,6 +842,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     if (this.root !== this._absoluteRoot) {
       this.root = this._absoluteRoot;
       this.update(true);
+      this.applySearchText();
     }
   }
 
