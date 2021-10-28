@@ -28,7 +28,7 @@ limitations under the License.
               [disabled]="!maySelect(favorite)"
               (click)="changeElementSelection(favorite)"
               [ngClass]="{ 'highlight': (selection.indexOf(favorite) !== -1) }">
-              <mat-icon class="{{this._duplicateElementMap.get(favorite)?.icon}}"></mat-icon>
+              <mat-icon class="{{this.elementMap.get(favorite)?.icon}}"></mat-icon>
               {{favorite.item.name}}
             </button>
             <!-- remove favorite -->
@@ -57,7 +57,7 @@ limitations under the License.
             [disabled]="!maySelect(quickSelectElement)"
             (click)="changeElementSelection(quickSelectElement)"
             [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !== -1) }">
-            <mat-icon class="{{this._duplicateElementMap.get(quickSelectElement)?.icon}}"></mat-icon>
+            <mat-icon class="{{this.elementMap.get(quickSelectElement)?.icon}}"></mat-icon>
             {{quickSelectElement.item.name}}
           </button>
           <!-- add/remove favorite -->
@@ -129,7 +129,7 @@ limitations under the License.
     </div>
     <!-- mat-drawer-content Tree -->
     <div #elementContainer style="height: calc(100% - 70px); width: 100%; overflow-y: auto;">
-      <ng-container *ngFor="let element of Array.from(elementMap.keys())">
+      <ng-container *ngFor="let element of elementArray">
         <ng-container *ngIf="shouldDisplay(element)">
           <div style="height: 40px; width: 100%; display: flex; flex-direction: row;" [ngStyle]="getElementStyle(element)">
             <ng-container *ngIf="!elementMap.get(element).expanded">
