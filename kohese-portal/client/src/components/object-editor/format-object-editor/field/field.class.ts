@@ -245,6 +245,7 @@ export class Field {
     selection = await this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: treeConfiguration.getRootProxy(),
+        getTitle: this._dataModel['classProperties'][attributeName],
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
@@ -255,8 +256,7 @@ export class Field {
           return (element as ItemProxy).item.name;
         },
         maySelect: (element: any) => {
-          let type: any = this._dataModel['classProperties'][
-            attributeName].definition.type;
+          let type: any = this._dataModel['classProperties'][attributeName].definition.type;
           type = (Array.isArray(type) ? type[0] : type);
           if (type === 'Item') {
             return true;

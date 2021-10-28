@@ -159,6 +159,23 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return this._root;
   }
 
+  private _getTitle: string;
+  get getTitle() {
+    return this._getTitle;
+  }
+  @Input('getTitle')
+  set getTitle(getTitle: string) {
+    if(getTitle['definition']['name'] === 'parentId') {
+      this._getTitle = 'Change Parent:'
+    }
+    if(getTitle['definition']['name'] === 'resolutionActions') {
+      this._getTitle = 'Resolution Action(s):'
+    }
+    if(getTitle['definition']['name'] === 'relatedIssues') {
+      this._getTitle = 'Related Issues:'
+    }
+  }
+
 
   private _getChildren: (element: any) => Array<any>;
   get getChildren() {
@@ -307,6 +324,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return this._elementSelectedEventEmitter;
   }
 
+  originalElement: any;
   private _quickSelectElements: Array<any> = [];
   get quickSelectElements() {
     return this._quickSelectElements;
@@ -318,6 +336,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     }
 
     this._quickSelectElements = quickSelectElements;
+    this.originalElement = quickSelectElements[0];
   }
 
   private _showSelections: boolean = false;
@@ -360,6 +379,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this.root = this._data['root'];
+      this.getTitle = this._data['getTitle'];
       this.getChildren = this._data['getChildren'];
       this.hasChildren = this._data['hasChildren'];
       this.getParent = this._data['getParent'];
