@@ -17,7 +17,7 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit, Directive } from '@angular/core';
+  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
@@ -165,15 +165,50 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
   @Input('getTitle')
   set getTitle(getTitle: string) {
-    if(getTitle['definition']['name'] === 'parentId') {
-      this._getTitle = 'Change Parent:'
+
+    if(getTitle !== undefined) {
+      if(getTitle['definition']['name'] === 'parentId') {
+        this._getTitle = 'Change Parent';
+      }
+      else if(getTitle['definition']['name'] === 'resolutionActions') {
+        this._getTitle = 'Resolution Action(s)';
+      }
+      else if(getTitle['definition']['name'] === 'relatedIssues') {
+        this._getTitle = 'Related Issues';
+      }
+      else if(getTitle['definition']['name'] === 'supportedDecisions') {
+        this._getTitle = 'Supported Decisions';
+      }
+      else if(getTitle['definition']['name'] === 'predecessors') {
+        this._getTitle = 'Predecessors';
+      }
+      else if(getTitle['definition']['name'] === 'analysisAction') {
+        this._getTitle = 'Analysis Action';
+      }
+      else if(getTitle['definition']['name'] === 'alternatives') {
+        this._getTitle = 'Alternatives';
+      }
+      else if(getTitle['definition']['name'] === 'costImpact') {
+        this._getTitle = 'Cost Impact';
+      }
+      else if(getTitle['definition']['name'] === 'scheduleImpact') {
+        this._getTitle = 'Schedule Impact';
+      }
+      else if(getTitle['definition']['name'] === 'otherImpacts') {
+        this._getTitle = 'Other Impacts';
+      }
+      else if(getTitle['definedInKind'] === 'Project') {
+        this._getTitle = 'Selected Project Items';
+      }
+      else if(getTitle['definedInKind'] === 'Observation') {
+        this._getTitle = 'Context';
+      } else {
+        this._getTitle = '';
+      }
+    } else {
+      this._getTitle = '';
     }
-    if(getTitle['definition']['name'] === 'resolutionActions') {
-      this._getTitle = 'Resolution Action(s):'
-    }
-    if(getTitle['definition']['name'] === 'relatedIssues') {
-      this._getTitle = 'Related Issues:'
-    }
+
   }
 
 
@@ -324,7 +359,6 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return this._elementSelectedEventEmitter;
   }
 
-  originalElement: any;
   private _quickSelectElements: Array<any> = [];
   get quickSelectElements() {
     return this._quickSelectElements;
@@ -336,7 +370,6 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     }
 
     this._quickSelectElements = quickSelectElements;
-    this.originalElement = quickSelectElements[0];
   }
 
   private _showSelections: boolean = false;
