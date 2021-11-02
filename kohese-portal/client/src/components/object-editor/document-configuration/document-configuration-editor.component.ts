@@ -92,6 +92,12 @@ export class DocumentConfigurationEditorComponent implements OnInit {
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getTitle: {
+          definition: {
+            name: 'docParentSelector',
+            reason: 'Choose the selected Item\'s Parent'
+          }
+        },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
@@ -128,6 +134,12 @@ export class DocumentConfigurationEditorComponent implements OnInit {
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getTitle: {
+          definition: {
+            name: 'componentSelector',
+            reason: 'Choose the Component'
+          }
+        },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },

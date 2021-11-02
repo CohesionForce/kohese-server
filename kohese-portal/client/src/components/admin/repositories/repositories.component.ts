@@ -230,6 +230,12 @@ export class RepositoriesComponent extends NavigatableComponent implements
     this.dialogueService.openComponentDialog(TreeComponent, {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getTitle: {
+          definition: {
+            name: 'changeMountPoint',
+            reason: 'Change the Repository Mount Point'
+          }
+        },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
@@ -410,10 +416,16 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
         this.repositoryService.mountRepository(this.disabledRepos[idx] as ItemProxy);
     } else {
         // this.field.openObjectSelector;
-        console.log('::: Mounting Unmounted Respository')
+        console.log('::: Mounting Unmounted Repository')
         this.dialogueService.openComponentDialog(TreeComponent, {
           data: {
             root: TreeConfiguration.getWorkingTree().getRootProxy(),
+            getTitle: {
+              definition: {
+                name: 'mountUnmountedRepository',
+                reason: 'Choose Repository Mount Point'
+              }
+            },
             getChildren: (element: any) => {
               return (element as ItemProxy).children;
             },

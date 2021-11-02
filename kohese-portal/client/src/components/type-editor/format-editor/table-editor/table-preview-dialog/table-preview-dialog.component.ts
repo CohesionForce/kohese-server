@@ -59,6 +59,12 @@ export class TablePreviewDialogComponent implements OnInit {
     this.dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getTitle: {
+          definition: {
+            name: 'openProxySelection',
+            reason: 'Choose your Item'
+          }
+        },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },

@@ -195,8 +195,44 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       else if(getTitle['definition']['name'] === 'otherImpacts') {
         this._getTitle = 'Other Impacts';
       }
+      else if(getTitle['definition']['name'] === 'BuildAllocation') {
+        this._getTitle = 'Build Allocation';
+      }
+      else if(getTitle['definition']['name'] === 'Actors') {
+        this._getTitle = 'Select Actor(s)';
+      }
+      else if(getTitle['definition']['name'] === 'OnStep') {
+        this._getTitle = 'Select Key Event to Initialize Use Case';
+      }
+      else if(getTitle['definition']['name'] === 'Flow') {
+        this._getTitle = 'Select your Flow for this Use Case';
+      }
+      else if(getTitle['definition']['name'] === 'compareItems') {
+        this._getTitle = 'Select an Item to Compare Against';
+      }
+      else if(getTitle['definition']['name'] === 'mountUnmountedRepository') {
+        this._getTitle = 'Select a Mount Point';
+      }
+      else if(getTitle['definition']['name'] === 'changeMountPoint') {
+        this._getTitle = 'Change this Repository\'s Mount Point';
+      }
+      else if(getTitle['definition']['name'] === 'docParentSelector') {
+        this._getTitle = 'Choose the selected Item\'s Parent';
+      }
+      else if(getTitle['definition']['name'] === 'componentSelector') {
+        this._getTitle = 'Choose the Component';
+      }
+      else if(getTitle['definition']['name'] === 'openProxySelection') {
+        this._getTitle = 'Choose your Item';
+      }
+      else if(getTitle['definition']['name'] === 'openProxySelectionDialog') {
+        this._getTitle = 'Select an Item';
+      }
       else if(getTitle['definedInKind'] === 'Project') {
         this._getTitle = 'Selected Project Items';
+      }
+      else if(getTitle['definedInKind'] === 'KeyEventDictionary') {
+        this._getTitle = 'Select Key Event(s)';
       }
       else if(getTitle['definedInKind'] === 'Observation') {
         this._getTitle = 'Context';
