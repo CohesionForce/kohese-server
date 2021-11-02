@@ -81,17 +81,4 @@ describe('TreeComponent', () => {
     TestBed.resetTestingModule();
   })
 
-  it('moves the selected element at a given index', () => {
-    component.moveElement(2, 0, true);
-    expect(component.selection).toEqual([TreeConfiguration.getWorkingTree().
-      getProxyFor('Item'), TreeConfiguration.getWorkingTree().getProxyFor(
-      'KoheseModel'), TreeConfiguration.getWorkingTree().getProxyFor(
-      'KoheseView')]);
-
-    component.moveElement(2, 0, false);
-    expect(component.selection).toEqual([TreeConfiguration.getWorkingTree().
-      getProxyFor('Item'), TreeConfiguration.getWorkingTree().getProxyFor(
-      'KoheseView'), TreeConfiguration.getWorkingTree().getProxyFor(
-      'KoheseModel')]);
-  });
 });
