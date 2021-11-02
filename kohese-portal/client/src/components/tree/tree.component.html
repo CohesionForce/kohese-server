@@ -19,7 +19,7 @@ limitations under the License.
   <mat-drawer #quickSelectDrawer mode="side" disableClose [opened]="(quickSelectElements.length > 0)" style="width: 30%;">
     <!-- favorites -->
     <h4 style="height: 50px;">Favorites</h4>
-    <div class=favorites style="height: calc(50% - 100px); overflow-y: auto">
+    <div class=favorites style="height: calc(50% - 100px); min-height: 100px; overflow-y: auto">
       <div cdkDropList class=favorites-list (cdkDropListDropped)=drop(this.favorites,$event)>
         <div cdkDrag class=favorites-box *ngFor="let favorite of favorites" style="display: flex; flex-direction: row;">
           <!-- favorites list -->
@@ -49,7 +49,7 @@ limitations under the License.
     <br>
     <!-- quick select -->
     <h4 style="height: 50px;">Recently Viewed</h4>
-    <div class=quick-select style="height: calc(51.5% - 50px); overflow-y: auto;">
+    <div class=quick-select style="height: calc(51.5% - 50px); min-height: 100px; overflow-y: auto;">
       <ng-container *ngFor="let quickSelectElement of quickSelectElements">
         <div style="display: flex; flex-direction: row;">
           <!-- quick select list -->
