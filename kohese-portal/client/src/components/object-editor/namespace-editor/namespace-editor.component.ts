@@ -371,11 +371,18 @@ export class NamespaceEditorComponent implements Dialog {
               'Namespace') : true);
           }).length > 0);
         },
+        getParent: (element: any) => {
+          return (element as ItemProxy).parentProxy;
+        },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
+        },
+        isFavorite: (element: any) => {
+          return (
+            (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         maySelect: (element: any) => {
           return (unselectableSubcomponents.indexOf(element) === -1);

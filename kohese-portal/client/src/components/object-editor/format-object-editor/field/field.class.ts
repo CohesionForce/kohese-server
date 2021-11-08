@@ -248,6 +248,9 @@ export class Field {
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
+        getParent: (element: any) => {
+          return (element as ItemProxy).parentProxy;
+        },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
@@ -293,6 +296,10 @@ export class Field {
         },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
+        },
+        isFavorite: (element: any) => {
+          return (
+            (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         selection: selection,
         allowMultiselect: allowMultiselect,

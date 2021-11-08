@@ -95,11 +95,18 @@ export class DocumentConfigurationEditorComponent implements OnInit {
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
+        getParent: (element: any) => {
+          return (element as ItemProxy).parentProxy;
+        },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
+        },
+        isFavorite: (element: any) => {
+          return (
+            (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         selection: (this._copy.parentId ? [TreeConfiguration.getWorkingTree().
           getProxyFor(this._copy.parentId)] : [])
@@ -124,11 +131,18 @@ export class DocumentConfigurationEditorComponent implements OnInit {
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
+        getParent: (element: any) => {
+          return (element as ItemProxy).parentProxy;
+        },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
+        },
+        isFavorite: (element: any) => {
+          return (
+            (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         allowMultiselect: true,
         selection: components

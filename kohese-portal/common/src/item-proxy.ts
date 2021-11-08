@@ -1938,23 +1938,23 @@ export class ItemProxy {
   //////////////////////////////////////////////////////////////////////////
   sortChildren() {
     let orderBeforeSort = this.getOrderedChildIds();
-    if (!this._item.itemIds || this._item.itemIds.length === 0){
+    if (!this.item.itemIds || this.item.itemIds.length === 0){
       this.children.sort(function(a, b){
-        if (a._item.name > b._item.name) { return 1; }
-        if (a._item.name < b._item.name) { return -1; }
-        if (a._item.name === b._item.name) {
-          if (a._item.id > b._item.id) { return 1; }
-          if (a._item.id < b._item.id) { return -1; }
+        if (a.item.name > b.item.name) { return 1; }
+        if (a.item.name < b.item.name) { return -1; }
+        if (a.item.name === b.item.name) {
+          if (a.item.id > b.item.id) { return 1; }
+          if (a.item.id < b.item.id) { return -1; }
         }
         return 0;
       });
     } else {
       // Sort by itemIds list if it is present
-      var itemIds = this._item.itemIds;
+      var itemIds = this.item.itemIds;
 
       this.children.sort(function(a, b) {
-        var aIndex = itemIds.indexOf(a._item.id);
-        var bIndex = itemIds.indexOf(b._item.id);
+        var aIndex = itemIds.indexOf(a.item.id);
+        var bIndex = itemIds.indexOf(b.item.id);
         if (aIndex < 0) {
           aIndex = itemIds.length;
         }
@@ -1962,14 +1962,14 @@ export class ItemProxy {
           bIndex = itemIds.length;
           // Detect when both items are not in the list
           if (aIndex === bIndex) {
-            if (a._item.name > b._item.name){
+            if (a.item.name > b.item.name){
               aIndex++;
-            } else if (a._item.name < b._item.name) {
+            } else if (a.item.name < b.item.name) {
               bIndex++;
             } else {
               // Names are the same, so sort on the id
-              if (a._item.id > b._item.id) { aIndex++; }
-              if (a._item.id < b._item.id) { bIndex++; }
+              if (a.item.id > b.item.id) { aIndex++; }
+              if (a.item.id < b.item.id) { bIndex++; }
             }
           }
         }
@@ -1980,14 +1980,14 @@ export class ItemProxy {
       });
     }
     let orderAfterSort = this.getOrderedChildIds();
-    this._item.children = this.getOrderedChildIdsAsReferences();
+    this.item.children = this.getOrderedChildIdsAsReferences();
     if (!_.isEqual(orderBeforeSort, orderAfterSort)){
       if (!this.treeConfig.loading){
         this.treeConfig.changeSubject.next({
           type: 'reference-reordered',
           relation: 'children',
           kind: this.kind,
-          id: this._item.id,
+          id: this.item.id,
           proxy: this
         });
       }
@@ -2030,7 +2030,7 @@ export class ItemProxy {
   updateChildrenManualOrder() {
     if (this.childrenAreManuallyOrdered()){
       console.log('::: Updating child order');
-      this._item.itemIds = this.getOrderedChildIds();
+      this.item.itemIds = this.getOrderedChildIds();
     }
   }
 

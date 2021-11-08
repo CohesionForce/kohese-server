@@ -233,6 +233,9 @@ export class RepositoriesComponent extends NavigatableComponent implements
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
+        getParent: (element: any) => {
+          return (element as ItemProxy).parentProxy;
+        },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },
@@ -243,6 +246,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
         },
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
+        },
+        isFavorite: (element: any) => {
+          return (
+            (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         selection: ([proxy.parentProxy])
       }
@@ -415,6 +422,10 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
             },
             getIcon: (element: any) => {
               return (element as ItemProxy).model.view.item.icon;
+            },
+            isFavorite: (element: any) => {
+              return (
+                (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
             },
             selection: ([])
           }
