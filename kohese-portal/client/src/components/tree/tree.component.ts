@@ -17,14 +17,15 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  Optional, Inject, OnInit, Output, EventEmitter, ViewChild,
-  AfterViewInit, ElementRef} from '@angular/core';
+  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
+  import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 // Other External Dependencies
 
 // Kohese
 import { Dialog } from '../dialog/Dialog.interface';
+import { TreeService } from '../../services/tree/tree.service';
 
 class ElementMapValue {
   get parent() {
@@ -43,6 +44,17 @@ class ElementMapValue {
     this._visible = visible;
   }
 
+  get favorite() {
+    return this._favorite;
+  }
+  set favorite(value: boolean) {
+    if(value === undefined) {
+      this._favorite = false;
+    } else {
+      this._favorite = value;
+    }
+  }
+
   private _expanded: boolean = false;
   get expanded() {
     return this._expanded;
@@ -59,9 +71,13 @@ class ElementMapValue {
     return this._icon;
   }
 
-  public constructor(private _parent: any, private _depth: number,
-    private _text: string, private _icon: string) {
-  }
+  public constructor (
+    private _parent: any,
+    private _depth: number,
+    private _text: string,
+    private _icon: string,
+    private _favorite: boolean
+  ) {}
 }
 
 export class Action {
@@ -147,6 +163,21 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   @Input('getText')
   set getText(getText: (element: any) => string) {
     this._getText = getText;
+  }
+
+  private _isFavorite: (element: any) => boolean;
+  get isFavorite() {
+    return this._isFavorite;
+  }
+  @Input('isFavorite')
+  set isFavorite(isFavorite: (element: any) => boolean) {
+    if(this._isFavorite === undefined) {
+      this._isFavorite = (element: any) => {
+        return false;
+      }
+    } else {
+      this._isFavorite = isFavorite;
+    }
   }
 
   private _maySelect: (element: any) => boolean = (element: any) => {
@@ -297,10 +328,12 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return Array;
   }
 
-  public constructor(private _changeDetectorRef: ChangeDetectorRef,
+  public constructor (
+    private _changeDetectorRef: ChangeDetectorRef,
+    private treeService: TreeService,
     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<TreeComponent>) {
-  }
+    @Optional() private _matDialogRef: MatDialogRef<TreeComponent>
+  ) {}
 
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
@@ -309,6 +342,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this.hasChildren = this._data['hasChildren'];
       this.getText = this._data['getText'];
       this.getIcon = this._data['getIcon'];
+      this.isFavorite = this._data['isFavorite'];
       this.maySelect = this._data['maySelect'];
       this.selection = this._data['selection'];
       this.allowMultiselect = this._data['allowMultiselect'];
@@ -331,6 +365,16 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
           parentElementMapValue = this._elementMap.get(parentElementMapValue.
             parent);
         }
+      }
+    }
+
+    if(this.isDialogInstance()) {
+      if(this.treeService.favorites.length > 0) {
+        this.favorites = this.treeService.getFavorites();
+        for(let i=0; i < this.favorites.length; i++) {
+          this.addToFavorites(this.favorites[i]);
+        }
+        this.changeDetectorRef.detectChanges();
       }
     }
 
@@ -591,8 +635,8 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
 
   private processElement(element: any, parent: any, depth: number): void {
-    this._elementMap.set(element, new ElementMapValue(parent, depth, this.
-      _getText(element), this._getIcon(element)));
+    this._elementMap.set(element, new ElementMapValue(
+      parent, depth, this._getText(element), this._getIcon(element), this._isFavorite(element)));
 
     let children: Array<any> = this._getChildren(element);
     for (let j: number = 0; j < children.length; j++) {
@@ -615,6 +659,59 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this._selection.push(element);
       this._elementSelected(element);
       this._elementSelectedEventEmitter.emit(element);
+    }
+  }
+
+  favorites: Array<any> = [];
+  public addToFavorites(element: any) {
+    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    if(elementMapValue) {
+      elementMapValue.favorite = true;
+      try {
+        // add element if it is not in the quickSelectElements array
+        let id = element.item.id;
+        let quickSelectElementIndex = this.quickSelectElements.findIndex(t => t.item.id === id);
+        if(quickSelectElementIndex === -1) {
+          this._quickSelectElements.unshift(element);
+        }
+        let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+        if(favoritesElementIndex === -1) {
+          this.favorites = this.treeService.addFavorite(element);
+        }
+      } catch (error) {
+        console.log('!!! Add to Favorites Error: %s', error);
+      }
+
+    }
+  }
+
+  public removeFromFavorites(element: any) {
+    let id = element.item.id;
+    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    if(elementMapValue) {
+      elementMapValue.favorite = false;
+      try {
+        let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+        if(favoritesElementIndex) {
+          this.favorites = this.treeService.removeFavorite(element);
+        }
+      } catch (error) {
+        console.log('!!! Remove from Favorites Error: %s', error);
+      }
+    }
+  }
+
+  /**
+   * @event Drag&Drop connected sorting group
+   */
+  drop(event: CdkDragDrop<any>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(this.favorites, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(event.previousContainer.data,
+                        event.container.data,
+                        event.previousIndex,
+                        event.currentIndex);
     }
   }
 

@@ -244,6 +244,10 @@ export class RepositoriesComponent extends NavigatableComponent implements
         getIcon: (element: any) => {
           return (element as ItemProxy).model.view.item.icon;
         },
+        isFavorite: (element: any) => {
+          return (
+            (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
+        },
         selection: ([proxy.parentProxy])
       }
     }).updateSize('90%', '90%').afterClosed().subscribe((result:
@@ -415,6 +419,10 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
             },
             getIcon: (element: any) => {
               return (element as ItemProxy).model.view.item.icon;
+            },
+            isFavorite: (element: any) => {
+              return (
+                (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
             },
             selection: ([])
           }
