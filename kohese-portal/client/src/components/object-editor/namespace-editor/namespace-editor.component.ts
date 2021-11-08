@@ -371,6 +371,9 @@ export class NamespaceEditorComponent implements Dialog {
               'Namespace') : true);
           }).length > 0);
         },
+        getParent: (element: any) => {
+          return (element as ItemProxy).parentProxy;
+        },
         getText: (element: any) => {
           return (element as ItemProxy).item.name;
         },

@@ -19,30 +19,29 @@ limitations under the License.
   <mat-drawer #quickSelectDrawer mode="side" disableClose [opened]="(quickSelectElements.length > 0)" style="width: 30%;">
     <!-- favorites -->
     <h4 style="height: 50px;">Favorites</h4>
-    <div class=favorites style="height: calc(50% - 100px); overflow-y: auto">
+    <div class=favorites style="height: calc(50% - 100px); min-height: 100px; overflow-y: auto">
       <div cdkDropList class=favorites-list (cdkDropListDropped)=drop(this.favorites,$event)>
         <div cdkDrag class=favorites-box *ngFor="let favorite of favorites" style="display: flex; flex-direction: row;">
           <!-- favorites list -->
-          <button mat-button class=item-button matTooltip="{{elementMap.get(favorite)?.text}}"
-            *ngIf="elementMap.get(favorite).favorite"
-            [disabled]="!maySelect(favorite)"
-            (click)="changeElementSelection(favorite)"
-            [ngClass]="{ 'highlight': (selection.indexOf(favorite) !== -1) }">
-            <mat-icon class="{{elementMap.get(favorite)?.icon}}"></mat-icon>
-            {{elementMap.get(favorite)?.text}}
-          </button>
-          <!-- remove favorite -->
-          <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
-            *ngIf="elementMap.get(favorite).favorite"
-            (click)=removeFromFavorites(favorite)>
-            <mat-icon class="fa fa-star"></mat-icon>
-          </button>
-          <!-- scroll into view in explorer tree -->
-          <button mat-icon-button matTooltip="Display this element in the tree" style="margin-left: auto;"
-            *ngIf="elementMap.get(favorite).favorite"
-            (click)="scrollElementIntoView(favorite)">
-            <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
-          </button>
+          <ng-container *ngIf=getFavorite(favorite)>
+            <button mat-button class=item-button matTooltip="{{favorite.item.name}}"
+              [disabled]="!maySelect(favorite)"
+              (click)="changeElementSelection(favorite)"
+              [ngClass]="{ 'highlight': (selection.indexOf(favorite) !== -1) }">
+              <mat-icon class="{{this.elementMap.get(favorite)?.icon}}"></mat-icon>
+              {{favorite.item.name}}
+            </button>
+            <!-- remove favorite -->
+            <button mat-icon-button matTooltip="remove from favorites" style="margin-left: auto;"
+              (click)=removeFromFavorites(favorite)>
+              <mat-icon class="fa fa-star"></mat-icon>
+            </button>
+            <!-- scroll into view in explorer tree -->
+            <button mat-icon-button matTooltip="Display this element in the tree" style="margin-left: auto;"
+              (click)="scrollElementIntoView(favorite)">
+              <mat-icon class="fa fa-arrow-circle-o-right"></mat-icon>
+            </button>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -50,19 +49,19 @@ limitations under the License.
     <br>
     <!-- quick select -->
     <h4 style="height: 50px;">Recently Viewed</h4>
-    <div class=quick-select style="height: calc(51.5% - 50px); overflow-y: auto;">
+    <div class=quick-select style="height: calc(51.5% - 50px); min-height: 100px; overflow-y: auto;">
       <ng-container *ngFor="let quickSelectElement of quickSelectElements">
         <div style="display: flex; flex-direction: row;">
           <!-- quick select list -->
-          <button mat-button class=item-button matTooltip="{{elementMap.get(quickSelectElement)?.text}}"
+          <button mat-button class=item-button matTooltip="{{quickSelectElement.item.name}}"
             [disabled]="!maySelect(quickSelectElement)"
             (click)="changeElementSelection(quickSelectElement)"
             [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !== -1) }">
-            <mat-icon class="{{elementMap.get(quickSelectElement)?.icon}}"></mat-icon>
-            {{elementMap.get(quickSelectElement)?.text}}
+            <mat-icon class="{{this.elementMap.get(quickSelectElement)?.icon}}"></mat-icon>
+            {{quickSelectElement.item.name}}
           </button>
           <!-- add/remove favorite -->
-          <ng-container *ngIf="!elementMap.get(quickSelectElement).favorite else favorite">
+          <ng-container *ngIf="!getFavorite(quickSelectElement) else favorite">
             <button mat-icon-button matTooltip="add to favorites" style="margin-left: auto;"
               (click)=addToFavorites(quickSelectElement)>
               <mat-icon class="fa fa-star-o"></mat-icon>
@@ -87,6 +86,7 @@ limitations under the License.
   </mat-drawer>
   <mat-drawer-content>
     <!-- Options at the top of the mat-drawer-content section -->
+    <span style="display: block"><h5>{{this._getTitle}}</h5></span>
     <div style="height: 70px; width: 100%; display: flex; flex-direction: row;">
       <ng-container *ngIf="(quickSelectElements.length > 0)">
         <button mat-icon-button matTooltip="Toggle display of the Quick Select area"
@@ -103,6 +103,16 @@ limitations under the License.
         (click)="changeAllExpansionStates(false)">
         <mat-icon class="fa fa-chevron-up"></mat-icon>
       </button>
+      <ng-container *ngIf="this.root !== this._absoluteRoot">
+        <button mat-icon-button matTooltip="focus parent" style="margin-left: auto;"
+          (click)=upLevelRoot()>
+          <mat-icon class="fa fa-level-up"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="remove focus"
+          (click)=returnToAbsoluteRoot()>
+          <mat-icon class="fa fa-arrow-circle-o-up"></mat-icon>
+        </button>
+      </ng-container>
       <ng-container *ngIf="allowMultiselect">
         <button mat-icon-button matTooltip="Select all elements"
           (click)="changeSelectionOfAll(true)">
@@ -119,11 +129,10 @@ limitations under the License.
       </mat-form-field>
     </div>
     <!-- mat-drawer-content Tree -->
-    <div #elementContainer style="height: calc(100% - 70px); width: 100%; overflow-y: auto;">
-      <ng-container *ngFor="let element of Array.from(elementMap.keys())">
+    <div #elementContainer style="height: calc(100% - 104px); width: 100%; overflow-y: auto;">
+      <ng-container *ngFor="let element of elementArray">
         <ng-container *ngIf="shouldDisplay(element)">
-          <div style="height: 40px; width: 100%; display: flex; flex-direction: row;"
-            [ngStyle]="getElementStyle(element)">
+          <div style="height: 40px; width: 100%; display: flex; flex-direction: row;" [ngStyle]="getElementStyle(element)">
             <ng-container *ngIf="!elementMap.get(element).expanded">
               <mat-icon class="fa fa-caret-right" style="width: 7%; text-align: center; padding-top: 10px;"
                 [ngStyle]="getExpansionIconStyle(element)"
@@ -145,7 +154,7 @@ limitations under the License.
                 {{elementMap.get(element).text}}
               </button>
               <!-- add/remove favorite -->
-              <ng-container *ngIf="!elementMap.get(element).favorite else favorite">
+              <ng-container *ngIf="!getFavorite(element) else favorite">
                 <button mat-icon-button matTooltip="add to favorites" style="margin-left: auto;"
                   (click)=addToFavorites(element)>
                   <mat-icon class="fa fa-star-o"></mat-icon>
@@ -157,6 +166,10 @@ limitations under the License.
                   <mat-icon class="fa fa-star"></mat-icon>
                 </button>
               </ng-template>
+              <button mat-icon-button matTooltip="focus this item" style="margin-left: auto;"
+                (click)=anchor(element)>
+                <mat-icon class="fa fa-anchor"></mat-icon>
+              </button>
               <ng-container *ngFor="let action of actions; let j = index">
                 <button mat-icon-button matTooltip="{{action.tooltip}}"
                   [disabled]="!action.canExecute(element)"
@@ -174,10 +187,7 @@ limitations under the License.
   <mat-drawer mode="side" position="end" disableClose
     [opened]="(allowMultiselect && showSelections)" style="width: 15%;">
     <div style="height: 50px; display: flex; flex-direction: row;">
-      <h3>Selected:</h3>
-      <h3 style="margin-left: auto;">
-        {{selection.length}}
-      </h3>
+      <h3>Selected:</h3> <h4 style="margin-left: auto;">{{selection.length}}</h4>
     </div>
     <div cdkDropList class=favorites-list (cdkDropListDropped)=drop(this.selection,$event) style="height: calc(100% - 50px); overflow-y: auto;">
       <div cdkDrag class=favorites-box *ngFor="let selectionEntry of selection; let j = index" style="display: flex; flex-direction: row;">

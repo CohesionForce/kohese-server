@@ -61,7 +61,7 @@ export class TreeService {
     let id = element.item.id;
     try {
       let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
-      if(favoritesElementIndex) {
+      if(favoritesElementIndex !== -1) {
         this.favorites.splice(favoritesElementIndex, 1);
       }
 

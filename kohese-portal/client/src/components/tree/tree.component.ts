@@ -17,8 +17,8 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
-  import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit, Directive } from '@angular/core';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 // Other External Dependencies
@@ -72,11 +72,11 @@ class ElementMapValue {
   }
 
   public constructor (
-    private _parent: any,
-    private _depth: number,
-    private _text: string,
-    private _icon: string,
-    private _favorite: boolean
+                      private _parent: any,
+                      private _depth: number,
+                      private _text: string,
+                      private _icon: string,
+                      private _favorite: boolean
   ) {}
 }
 
@@ -101,10 +101,13 @@ export class Action {
     return this._execute;
   }
 
-  public constructor(private _tooltip: string, private _classes: string,
-    private _isVisible: (element: any) => boolean, private _canExecute:
-    (element: any) => boolean, private _execute: (element: any) => void) {
-  }
+  public constructor(
+                      private _tooltip: string,
+                      private _classes: string,
+                      private _isVisible: (element: any) => boolean,
+                      private _canExecute: (element: any) => boolean,
+                      private _execute: (element: any) => void
+  ) {}
 }
 
 export class ToggleAction extends Action {
@@ -112,10 +115,14 @@ export class ToggleAction extends Action {
     return this._isSelected;
   }
 
-  public constructor(tooltip: string, classes: string, isVisible: (element:
-    any) => boolean, canExecute: (element: any) => boolean,
-    private _isSelected: (element: any) => boolean, execute: (element:
-    any) => void) {
+  public constructor(
+                      tooltip: string,
+                      classes: string,
+                      isVisible: (element: any) => boolean,
+                      canExecute: (element: any) => boolean,
+                      private _isSelected: (element: any) => boolean,
+                      execute: (element: any) => void
+  ) {
     super(tooltip, classes, isVisible, canExecute, execute);
   }
 }
@@ -132,17 +139,32 @@ export enum TreeComponentConfiguration {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TreeComponent implements OnInit, AfterViewInit, Dialog {
-  private _elementMap: Map<any, ElementMapValue> =
-    new Map<any, ElementMapValue>();
+
+  private _elementMap: Map<any, ElementMapValue> = new Map<any, ElementMapValue>();
   get elementMap() {
     return this._elementMap;
   }
 
+  private _absoluteRoot: any;
   private _root: any;
-  @Input('root')
-  set root(root: any) {
+  @Input('root') set root(root: any) {
     this._root = root;
+    if(!this._absoluteRoot) {
+      this._absoluteRoot = root;
+    }
   }
+  get root() {
+    return this._root;
+  }
+
+  @Input('displayFavoritesAndAnchor') _displayFavoritesAndAnchor: boolean = true;
+  set displayFavoritesAndAnchor(flag: boolean) {
+    this._displayFavoritesAndAnchor = flag;
+  }
+  get displayFavoritesAndAnchor() {
+    return this._displayFavoritesAndAnchor;
+  }
+
 
   private _getChildren: (element: any) => Array<any>;
   get getChildren() {
@@ -151,6 +173,12 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   @Input('getChildren')
   set getChildren(getChildren: (element: any) => Array<any>) {
     this._getChildren = getChildren;
+  }
+
+  private _getParent: (element: any) => any;
+  @Input('getParent')
+  set getParent(getParent: (element: any) => any ) {
+    this._getParent = getParent;
   }
 
   private _hasChildren: (element: any) => boolean;
@@ -340,6 +368,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this.root = this._data['root'];
       this.getChildren = this._data['getChildren'];
       this.hasChildren = this._data['hasChildren'];
+      this.getParent = this._data['getParent'];
       this.getText = this._data['getText'];
       this.getIcon = this._data['getIcon'];
       this.isFavorite = this._data['isFavorite'];
@@ -381,6 +410,11 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     this._changeDetectorRef.markForCheck();
   }
 
+  /**
+   * @see scrollElementIntoView
+   *
+   * controls nativeElement scroll focus
+   */
   public ngAfterViewInit(): void {
     if (this._selection.length > 0) {
       this.scrollElementIntoView(this._selection[0]);
@@ -397,25 +431,39 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
 
   public scrollElementIntoView(element: any): void {
-    let selectionElementMapValue: ElementMapValue = this._elementMap.get(
-      element);
+    let selectionElementMapValue: ElementMapValue = this._elementMap.get(element);
     if (selectionElementMapValue) {
-      let parentElementMapValue: ElementMapValue = this._elementMap.get(
-        selectionElementMapValue.parent);
+      let parentElementMapValue: ElementMapValue = this._elementMap.get(selectionElementMapValue.parent);
       while (parentElementMapValue) {
         parentElementMapValue.expanded = true;
-        parentElementMapValue = this._elementMap.get(parentElementMapValue.
-          parent);
+        parentElementMapValue = this._elementMap.get(parentElementMapValue.parent);
       }
 
-      let firstSelectedElementIndex: number = this.getDisplayedElements().
-        indexOf(element);
+      let firstSelectedElementIndex: number = this.getDisplayedElements().indexOf(element);
       if (firstSelectedElementIndex !== -1) {
         // Each element row should be 40px or 36px tall.
-        this._elementContainer.nativeElement.scrollTop = (((this._actions.
-          length > 0) ? 40 : 36) * firstSelectedElementIndex);
+        this._elementContainer.nativeElement.scrollTop = (((this._actions.length > 0) ? 40 : 36) * firstSelectedElementIndex);
         this._changeDetectorRef.markForCheck();
       }
+    } else {
+      this._root = this._absoluteRoot;
+      this.update(true);
+      let selectionElementMapValue: ElementMapValue = this._elementMap.get(element);
+      if(selectionElementMapValue) {
+        let parentElementMapValue: ElementMapValue = this._elementMap.get(selectionElementMapValue.parent);
+        while (parentElementMapValue) {
+          parentElementMapValue.expanded = true;
+          parentElementMapValue = this._elementMap.get(parentElementMapValue.parent);
+        }
+
+        let firstSelectedElementIndex: number = this.getDisplayedElements().indexOf(element);
+        if (firstSelectedElementIndex !== -1) {
+          // Each element row should be 40px or 36px tall.
+          this._elementContainer.nativeElement.scrollTop = (((this._actions.length > 0) ? 40 : 36) * firstSelectedElementIndex);
+          this._changeDetectorRef.markForCheck();
+        }
+      }
+      this.update(true);
     }
   }
 
@@ -432,50 +480,53 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
 
   public isDialogInstance(): boolean {
-    return this._matDialogRef && (this._matDialogRef.componentInstance ===
-      this) && this._data;
+    return this._matDialogRef && (this._matDialogRef.componentInstance === this) && this._data;
   }
 
+  _searchText: string = '';
   public searchTextChanged(searchText: string): void {
     if (this._searchTimeoutIdentifier) {
       clearTimeout(this._searchTimeoutIdentifier);
     }
 
     this._searchTimeoutIdentifier = setTimeout(() => {
-      if (searchText) {
-        searchText = searchText.toLowerCase();
-        let keys: Array<any> = Array.from(this._elementMap.keys());
-        for (let j: number = 0; j < keys.length; j++) {
-          let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
-          let matches: boolean = elementMapValue.text.toLowerCase().includes(
-            searchText);
-          elementMapValue.visible = matches;
-          elementMapValue.expanded = false;
-          if (matches) {
-            if (elementMapValue.parent) {
-              let parentElementMapValue: ElementMapValue = this._elementMap.get(
-                elementMapValue.parent);
-              while (parentElementMapValue) {
-                parentElementMapValue.visible = true;
-                parentElementMapValue.expanded = true;
-                parentElementMapValue = this._elementMap.get(
-                  parentElementMapValue.parent);
-              }
+      this._searchText = searchText;
+      this.applySearchText();
+      this._searchTimeoutIdentifier = undefined;
+    }, 1100);
+  }
+
+  private applySearchText() {
+
+    if (this._searchText) {
+      let searchText = this._searchText.toLowerCase();
+      let keys: Array<any> = Array.from(this._elementMap.keys());
+      for (let j: number = 0; j < keys.length; j++) {
+        let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+        let matches: boolean = elementMapValue.text.toLowerCase().includes(searchText);
+        elementMapValue.visible = matches;
+        elementMapValue.expanded = false;
+        if (matches) {
+          if (elementMapValue.parent) {
+            let parentElementMapValue: ElementMapValue = this._elementMap.get(elementMapValue.parent);
+            while (parentElementMapValue) {
+              parentElementMapValue.visible = true;
+              parentElementMapValue.expanded = true;
+              parentElementMapValue = this._elementMap.get(parentElementMapValue.parent);
             }
           }
         }
-      } else {
-        let keys: Array<any> = Array.from(this._elementMap.keys());
-        for (let j: number = 0; j < keys.length; j++) {
-          let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
-          elementMapValue.visible = true;
-          elementMapValue.expanded = false;
-        }
       }
+    } else {
+      let keys: Array<any> = Array.from(this._elementMap.keys());
+      for (let j: number = 0; j < keys.length; j++) {
+        let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+        elementMapValue.visible = true;
+        elementMapValue.expanded = false;
+      }
+    }
 
-      this._changeDetectorRef.markForCheck();
-      this._searchTimeoutIdentifier = undefined;
-    }, 700);
+    this._changeDetectorRef.markForCheck();
   }
 
   public getElementStyle(element: any): object {
@@ -498,18 +549,31 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     }
   }
 
+  /**
+   * Checks if the element should be shown in the mat-content-drawer tree
+   *
+   * @param element mat-content-drawer tree element
+   *
+   * @returns true or false
+   */
   public shouldDisplay(element: any): boolean {
     let elementMapValue: ElementMapValue = this._elementMap.get(element);
-    if (elementMapValue.visible) {
-      let parent: any = elementMapValue.parent;
-      if (parent === this._root || parent === '') {
-        return true;
+    if(elementMapValue) {
+      if (elementMapValue.visible) {
+        let parent: any = elementMapValue.parent;
+        if (parent === this._root || parent === '' || parent === this._absoluteRoot) {
+          return true;
+        } else {
+          let elementExpanded = this._elementMap.get(parent).expanded;
+          return elementExpanded;
+        }
       } else {
-        return this._elementMap.get(parent).expanded;
+        return false;
       }
     } else {
       return false;
     }
+
   }
 
   public changeSingleExpansionState(element: any, expand: boolean): void {
@@ -588,32 +652,12 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     this._changeDetectorRef.markForCheck();
   }
 
-  public getTreePath(element: any): Array<any> {
-    let treePath: Array<any> = [];
-    let elementMapValue: ElementMapValue = this._elementMap.get(element);
-    if (elementMapValue) {
-      treePath.unshift(element);
-
-      if (elementMapValue.depth > 0) {
-        let elements: Array<any> = Array.from(this._elementMap.keys());
-        let beginningIndex: number = elements.indexOf(element);
-        for (let j: number = beginningIndex - 1; j >= 0; j--) {
-          let previousElementMapValue: ElementMapValue = this._elementMap.get(
-            elements[j]);
-          if (previousElementMapValue.depth === (elementMapValue.depth - 1)) {
-            treePath.unshift(elements[j]);
-            if (previousElementMapValue.depth === 0) {
-              break;
-            }
-            elementMapValue = previousElementMapValue;
-          }
-        }
-      }
-    }
-
-    return treePath;
-  }
-
+  /**
+   * updates the elementMap with a new root for values refresh and anchoring capability
+   *
+   * @param updateStructure set true to update the elementMap
+   *
+   */
   public update(updateStructure: boolean): void {
     if (updateStructure) {
       let expansionStates: Map<any, boolean> = this.getExpansionStates();
@@ -631,12 +675,25 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this.setExpansionStates(expansionStates);
     }
 
+    this.adjustElementArray();
     this._changeDetectorRef.markForCheck();
   }
 
+  /**
+   * Processes all system items and returns the elementMap with all relevant tree data
+   *
+   * @param element the element being processed
+   * @param parent returns the element's parent
+   * @param depth used to determine indentation (padding-left) in the tree
+   */
   private processElement(element: any, parent: any, depth: number): void {
     this._elementMap.set(element, new ElementMapValue(
-      parent, depth, this._getText(element), this._getIcon(element), this._isFavorite(element)));
+        parent,
+        depth,
+        this._getText(element),
+        this._getIcon(element),
+        this._isFavorite(element)
+      ));
 
     let children: Array<any> = this._getChildren(element);
     for (let j: number = 0; j < children.length; j++) {
@@ -664,40 +721,105 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
 
   favorites: Array<any> = [];
   public addToFavorites(element: any) {
-    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    let id = element.item.id;
+    let quickSelectElementIndex = this.quickSelectElements.findIndex(t => t.item.id === id);
+    let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+    let elementMapValue: ElementMapValue = this.elementMap.get(element);
+
     if(elementMapValue) {
       elementMapValue.favorite = true;
       try {
-        // add element if it is not in the quickSelectElements array
-        let id = element.item.id;
-        let quickSelectElementIndex = this.quickSelectElements.findIndex(t => t.item.id === id);
+        // push element to the top of quickSelectElements
         if(quickSelectElementIndex === -1) {
           this._quickSelectElements.unshift(element);
         }
-        let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
         if(favoritesElementIndex === -1) {
           this.favorites = this.treeService.addFavorite(element);
         }
       } catch (error) {
         console.log('!!! Add to Favorites Error: %s', error);
       }
-
     }
+
+    this.changeDetectorRef.markForCheck();
   }
 
   public removeFromFavorites(element: any) {
     let id = element.item.id;
-    let elementMapValue: ElementMapValue = this._elementMap.get(element);
+    let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+    let elementMapValue: ElementMapValue = this.elementMap.get(element);
+
     if(elementMapValue) {
       elementMapValue.favorite = false;
       try {
-        let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
-        if(favoritesElementIndex) {
+        if(favoritesElementIndex !== -1) {
           this.favorites = this.treeService.removeFavorite(element);
         }
       } catch (error) {
         console.log('!!! Remove from Favorites Error: %s', error);
       }
+    }
+
+    this.changeDetectorRef.markForCheck();
+  }
+
+  favored: boolean = false;
+  getFavorite(element: any): boolean {
+    let id = element.item.id;
+    let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
+    let elementMapValue: ElementMapValue = this.elementMap.get(element);
+
+    if(favoritesElementIndex !== -1) {
+      if(elementMapValue) {
+        elementMapValue.favorite = true;
+      }
+
+      return this.changeDetectorRef.markForCheck(), this.favored = true;
+    } else {
+      if(elementMapValue) {
+        elementMapValue.favorite = false;
+      }
+
+      return this.changeDetectorRef.markForCheck(), this.favored = false;
+    }
+  }
+
+  elementArray: Array<ElementMapValue> = [];
+  public processAnchoredElement(element: any) {
+    this.elementArray.push(element);
+
+    let children: Array<any> = this._getChildren(element);
+    for (let j: number = 0; j < children.length; j++) {
+      this.processAnchoredElement(children[j]);
+    }
+
+  }
+
+  private adjustElementArray() {
+    this.elementArray = [];
+    this.processAnchoredElement(this.root);
+  }
+
+  public anchor(proxy: any) {
+    this.root = proxy;
+    this.adjustElementArray();
+    this.applySearchText();
+  }
+
+  public upLevelRoot() {
+    let parentElement = this._getParent(this.root);
+    if(parentElement && (this.root !== this._absoluteRoot)) {
+      this.root = parentElement;
+      this.adjustElementArray();
+      this.applySearchText();
+    }
+  }
+
+  public returnToAbsoluteRoot() {
+    if (this.root !== this._absoluteRoot) {
+      this.root = this._absoluteRoot;
+      this.adjustElementArray();
+      this.applySearchText();
     }
   }
 
@@ -715,23 +837,4 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     }
   }
 
-  /**
-   * Moves the selected element at the given ```sourceIndex``` to or
-   * immediately after the given ```targetIndex``` based on the given boolean
-   *
-   * @param sourceIndex
-   * @param targetIndex
-   * @param moveBefore
-   */
-  public moveElement(sourceIndex: number, targetIndex: number, moveBefore:
-    boolean): void {
-    let element: any = this._selection.splice(sourceIndex, 1)[0];
-    targetIndex = ((sourceIndex <= targetIndex) ? (targetIndex - 1) :
-      targetIndex);
-    if (!moveBefore) {
-      targetIndex++;
-    }
-
-    this._selection.splice(targetIndex, 0, element);
-  }
 }
