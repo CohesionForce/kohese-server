@@ -36,7 +36,6 @@ function Server(httpsServer, options){
   var decodeAuthToken = require('./boot/routes').decodeAuthToken;
 
   kio.server.on('connection', function (socket) {
-    Object.freeze(Object.prototype);
       console.log('>>> session %s connected from %s', socket.id, socket.handshake.address);
 
       socket.on('authenticate', function(request) {
