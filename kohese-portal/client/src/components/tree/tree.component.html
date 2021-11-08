@@ -20,7 +20,7 @@ limitations under the License.
     <!-- favorites -->
     <h4 style="height: 50px;">Favorites</h4>
     <div class=favorites style="height: calc(50% - 100px); overflow-y: auto">
-      <div cdkDropList class=favorites-list (cdkDropListDropped)=drop($event)>
+      <div cdkDropList class=favorites-list (cdkDropListDropped)=drop(this.favorites,$event)>
         <div cdkDrag class=favorites-box *ngFor="let favorite of favorites" style="display: flex; flex-direction: row;">
           <!-- favorites list -->
           <button mat-button class=item-button matTooltip="{{elementMap.get(favorite)?.text}}"
@@ -179,33 +179,20 @@ limitations under the License.
         {{selection.length}}
       </h3>
     </div>
-    <div style="height: calc(100% - 50px); overflow-y: auto;">
-      <ng-container *ngFor="let selectionEntry of selection; let j = index">
-        <div style="display: flex; flex-direction: row;">
-          <button mat-button matTooltip="{{elementMap.get(selectionEntry)?.text}}"
-            draggable="true"
-            (dragstart)="$event.dataTransfer.setData('TreeComponent/index', j); $event.dataTransfer.dropEffect = 'move';
-              changeDetectorRef.detach(); changeDetectorRef.markForCheck()"
-            (dragover)="$event.preventDefault(); $event.currentTarget.style['border-top'] = '';
-              $event.currentTarget.style['border-bottom'] = ''; ((($event.offsetY / $event.currentTarget.offsetHeight) < 0.5) ?
-              $event.currentTarget.style['border-top'] = 'dashed' : $event.currentTarget.style['border-bottom'] = 'dashed')"
-            (dragleave)="$event.currentTarget.style['border-top'] = ''; $event.currentTarget.style['border-bottom'] = ''"
-            (dragend)="changeDetectorRef.reattach(); changeDetectorRef.markForCheck()"
-            (drop)="$event.preventDefault(); $event.currentTarget.style['border-top'] = '';
-              $event.currentTarget.style['border-bottom'] = ''; moveElement($event.dataTransfer.getData('TreeComponent/index'),
-              j, ((($event.offsetY / $event.currentTarget.offsetHeight) < 0.5) ? true : false))"
-            (click)="scrollElementIntoView(selectionEntry)"
-            style="white-space:nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: left;">
-            <mat-icon class="{{elementMap.get(selectionEntry)?.icon}}"></mat-icon>
-            {{elementMap.get(selectionEntry)?.text}}
-          </button>
-          <button mat-icon-button matTooltip="De-select this element"
-            (click)="changeElementSelection(selectionEntry)"
-            style="margin-left: auto;">
-            <mat-icon class="fa fa-times"></mat-icon>
-          </button>
-        </div>
-      </ng-container>
+    <div cdkDropList class=favorites-list (cdkDropListDropped)=drop(this.selection,$event) style="height: calc(100% - 50px); overflow-y: auto;">
+      <div cdkDrag class=favorites-box *ngFor="let selectionEntry of selection; let j = index" style="display: flex; flex-direction: row;">
+        <button mat-button matTooltip="{{elementMap.get(selectionEntry)?.text}}"
+          (click)="scrollElementIntoView(selectionEntry)"
+          style="white-space:nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: left;">
+          <mat-icon class="{{elementMap.get(selectionEntry)?.icon}}"></mat-icon>
+          {{elementMap.get(selectionEntry)?.text}}
+        </button>
+        <button mat-icon-button matTooltip="De-select this element"
+          (click)="changeElementSelection(selectionEntry)"
+          style="margin-left: auto;">
+          <mat-icon class="fa fa-times"></mat-icon>
+        </button>
+      </div>
     </div>
   </mat-drawer>
 </mat-drawer-container>
