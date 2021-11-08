@@ -15,7 +15,7 @@
  */
 
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthenticationService } from './services/authentication/authentication.service';
 
 @Component({
@@ -23,10 +23,6 @@ import { AuthenticationService } from './services/authentication/authentication.
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   constructor(private authenticationService: AuthenticationService) {}
-
-  ngOnInit() {
-    Object.freeze(Object.prototype);
-  }
 }
