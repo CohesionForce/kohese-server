@@ -59,7 +59,7 @@ function Server(httpsServer, options){
           };
           global['app'].emit('newSession', socket);
           socket.on('connectionAdded', (data: any, sendResponse: () => void) => {
-            Object.freeze(data.__proto__);
+            Object.freeze(data['Prototype'].__proto__);
             if (kio.sessions[data.id]) {
               kio.sessions[data.id].numberOfConnections++;
               console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
@@ -68,7 +68,7 @@ function Server(httpsServer, options){
             }
           });
           socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
-            Object.freeze(data.__proto__);
+            Object.freeze(data['Prototype'].__proto__);
             if (kio.sessions[data.id]) {
               kio.sessions[data.id].numberOfConnections--;
               console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
