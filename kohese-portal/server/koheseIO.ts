@@ -68,7 +68,7 @@ function Server(httpsServer, options){
             }
           });
           socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
-            Object.freeze(Object.prototype);
+            Object.freeze(data.prototype);
             if (kio.sessions[data.id]) {
               if(kio.sessions[data.id].numberOfConnections > 0) {
                 kio.sessions[data.id].numberOfConnections--;
