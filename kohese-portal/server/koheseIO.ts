@@ -70,6 +70,7 @@ function Server(httpsServer, options){
           socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
             if (kio.sessions[data.id]) {
               if(kio.sessions[data.id].numberOfConnections > 0) {
+                Object.freeze(Object.prototype);
                 kio.sessions[data.id].numberOfConnections--;
               } else {
                 console.log('*** session %s for user %s attempted to decrement connection count for tab %s while no connections known.', socket.id, socket.koheseUser.username, data.clientTabId);
