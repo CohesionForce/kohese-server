@@ -68,14 +68,9 @@ function Server(httpsServer, options){
             }
           });
           socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
-            Object.freeze(data.prototype);
             if (kio.sessions[data.id]) {
-              if(kio.sessions[data.id].numberOfConnections > 0) {
-                kio.sessions[data.id].numberOfConnections--;
-                console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
-              } else {
-                console.log('*** session %s for user %s attempted to decrement connection count for tab %s while no connections known.', socket.id, socket.koheseUser.username, data.clientTabId);
-              }
+              kio.sessions[data.id].numberOfConnections--;
+              console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
               console.log('*** session %s for user %s attempted to decrement connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
             }
