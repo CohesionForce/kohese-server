@@ -51,10 +51,6 @@ module.exports = function (app) {
       /^\/reports.*/
     ];
 
-    app.use(ngRoutes, function (req, res) {
-      res.sendFile(path.resolve(clientBundlePath, 'index.html'));
-    });
-
     // set up rate limiter: maximum of five requests per minute
     var limiter = new RateLimit({
       windowMs: 1*60*1000, // 1 minute
@@ -64,6 +60,9 @@ module.exports = function (app) {
     // apply rate limiter to all requests
     app.use(limiter);
 
+    app.use(ngRoutes, function (req, res) {
+      res.sendFile(path.resolve(clientBundlePath, 'index.html'));
+    });
 
     //TODO Need to move this to the client-ng2 directory too
     app.use(serveFavicon(path.resolve(__dirname, '../../client/bundle/assets/icons/favicon.ico')));
