@@ -65,6 +65,7 @@ export class ChildrenTabComponent extends NavigatableComponent
 
   /* Subscriptions */
   proxyChanges : Subscription;
+  editableStreamSub : Subscription;
 
 
   constructor(protected NavigationService : NavigationService,
@@ -81,7 +82,12 @@ export class ChildrenTabComponent extends NavigatableComponent
       } else {
         this.itemProxy = undefined;
       }
-    })
+    });
+
+    this.editableStreamSub = this.editableStream.subscribe((value: any) => {
+      this.updateProxy(this.itemProxy);
+    });
+
     this.saveEmitter = new EventEmitter();
     this.filterSubject = new BehaviorSubject('');
     this.initialized = true;
