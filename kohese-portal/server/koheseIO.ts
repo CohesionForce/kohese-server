@@ -61,7 +61,7 @@ function Server(httpsServer, options){
           socket.on('connectionAdded', (data: any, sendResponse: () => void) => {
 
             let sessionId: string = data.id;
-            if (!sessionId.match(/{/) && kio.sessions[sessionId]) {
+            if (kio.sessions[sessionId]) {
               kio.sessions[sessionId].numberOfConnections++;
               console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
@@ -72,8 +72,8 @@ function Server(httpsServer, options){
           socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
 
             let sessionId: string = data.id;
-            if(!sessionId.match(/{/) && kio.sessions[sessionId]) {
-              kio.sessions[data.id].numberOfConnections--;
+            if(kio.sessions[sessionId]) {
+              kio.sessions[sessionId].numberOfConnections--;
               console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
               console.log('*** session %s for user %s attempted to decrement connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
