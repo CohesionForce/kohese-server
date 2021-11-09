@@ -59,7 +59,7 @@ function Server(httpsServer, options){
           };
           global['app'].emit('newSession', socket);
           socket.on('connectionAdded', (data: any, sendResponse: () => void) => {
-
+            // In this case, prototype-polluting assignment may be assumed as a false positive
             let sessionId: string = data.id;
             if (kio.sessions[sessionId]) {
               kio.sessions[sessionId].numberOfConnections++;
@@ -70,7 +70,7 @@ function Server(httpsServer, options){
           });
 
           socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
-
+            // In this case, prototype-polluting assignment may be assumed as a false positive
             let sessionId: string = data.id;
             if(kio.sessions[sessionId]) {
               kio.sessions[sessionId].numberOfConnections--;
