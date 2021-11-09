@@ -54,7 +54,7 @@ module.exports = function (app) {
     // set up rate limiter: safe maximum of requests per minute
     var limiter = new RateLimit({
       windowMs: 1*60*1000, // 1 minute
-      max: 60
+      max: 20
     });
 
     // apply rate limiter to all requests
