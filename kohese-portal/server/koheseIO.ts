@@ -59,15 +59,30 @@ function Server(httpsServer, options){
           };
           global['app'].emit('newSession', socket);
           socket.on('connectionAdded', (data: any, sendResponse: () => void) => {
-            if (kio.sessions[data.id] && kio.sessions[data.id] !== '__proto__' && kio.sessions[data] !== '__proto__') {
+
+            Object.keys(data).forEach((property) => {
+              if(property === '__proto__') {
+                return;
+              }
+            });
+
+            if (kio.sessions[data.id]) {
               kio.sessions[data.id].numberOfConnections++;
               console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
               console.log('*** session %s for user %s attempted to increment connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
             }
           });
+
           socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
-            if (kio.sessions[data.id] && kio.sessions[data.id] !== '__proto__' && kio.sessions[data] !== '__proto__') {
+
+            Object.keys(data).forEach((property) => {
+              if(property === '__proto__') {
+                return;
+              }
+            });
+
+            if (kio.sessions[data.id]) {
               kio.sessions[data.id].numberOfConnections--;
               console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
