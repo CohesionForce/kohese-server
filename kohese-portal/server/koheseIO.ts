@@ -60,11 +60,17 @@ function Server(httpsServer, options){
           global['app'].emit('newSession', socket);
           socket.on('connectionAdded', (data: any, sendResponse: () => void) => {
 
-            if (kio.sessions[data.id]) {
-              kio.sessions[data.id].numberOfConnections++;
-              console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
-            } else {
-              console.log('*** session %s for user %s attempted to increment connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
+            for(let attr in data) {
+              if(attr === '__proto__') {
+                continue;
+              }
+              if (attr === 'id' && kio.sessions[data.id]) {
+                kio.sessions[data.id].numberOfConnections++;
+                console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
+              } else {
+                console.log('*** session %s for user %s attempted to increment connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
+              }
+
             }
           });
 
@@ -73,7 +79,8 @@ function Server(httpsServer, options){
             for(let attr in data) {
               if(attr === '__proto__') {
                 continue;
-              } else if (attr[data.id] === kio.sessions[data.id]) {
+              }
+              if(attr === 'id' && kio.sessions[data.id]) {
                 kio.sessions[data.id].numberOfConnections--;
                 console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
               } else {
