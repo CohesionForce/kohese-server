@@ -179,10 +179,8 @@ export class CompareItemsComponent implements OnInit {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
         getTitle: {
-          definition: {
-            name: 'compareItems',
-            reason: 'choosing an item to compare against'
-          }
+          action: 'Choose an Item to Compare Against',
+          name: ''
         },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;

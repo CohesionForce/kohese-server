@@ -100,10 +100,8 @@ export class KdProxySelectorComponent implements OnInit {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
         getTitle: {
-          definition: {
-            name: 'openProxySelectionDialog',
-            reason: 'Select an Item'
-          }
+          action: 'Select an Item',
+          name: ''
         },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;

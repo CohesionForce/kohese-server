@@ -134,7 +134,7 @@ export enum TreeComponentConfiguration {
 
 export interface ActionTitle {
   action: string,
-  name?: string
+  name: string
 }
 
 @Component({
@@ -160,6 +160,16 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
   get root() {
     return this._root;
+  }
+
+  _isImport: boolean = false;
+  @Input('isImport')
+  set isImport(value: boolean) {
+    if(value) {
+      this._isImport = value;
+    } else {
+      this._isImport = false;
+    }
   }
 
   private _getTitle: ActionTitle;

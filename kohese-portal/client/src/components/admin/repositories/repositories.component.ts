@@ -231,10 +231,8 @@ export class RepositoriesComponent extends NavigatableComponent implements
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
         getTitle: {
-          definition: {
-            name: 'changeMountPoint',
-            reason: 'Change the Repository Mount Point'
-          }
+          action: 'Change the Repository Mount Point',
+          name: ''
         },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
@@ -421,10 +419,8 @@ export class RepositoryContentDialog implements OnInit, OnDestroy {
           data: {
             root: TreeConfiguration.getWorkingTree().getRootProxy(),
             getTitle: {
-              definition: {
-                name: 'mountUnmountedRepository',
-                reason: 'Choose Repository Mount Point'
-              }
+              action: 'Choose Repository Mount Point',
+              name: ''
             },
             getChildren: (element: any) => {
               return (element as ItemProxy).children;

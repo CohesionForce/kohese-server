@@ -49,7 +49,7 @@ limitations under the License.
     <br>
     <!-- quick select -->
     <h4 style="height: 50px;">Recently Viewed</h4>
-    <div class=quick-select style="height: calc(51.5% - 50px); min-height: 100px; overflow-y: auto;">
+    <div class=quick-select style="height: calc(51.5% - 49px); min-height: 100px; overflow-y: auto;">
       <ng-container *ngFor="let quickSelectElement of quickSelectElements">
         <div style="display: flex; flex-direction: row;">
           <!-- quick select list -->
@@ -86,10 +86,12 @@ limitations under the License.
   </mat-drawer>
   <mat-drawer-content>
     <!-- Options at the top of the mat-drawer-content section -->
-    <span class=truncate style="display: block">
-      <h5>{{ (this._getTitle.action.length > 60) ? (this._getTitle.action | slice:0:60)+'...' : (this._getTitle.action) }}</h5></span>
-    <span class=truncate style="display: block">
-      <h5>{{ (this._getTitle.name.length > 60) ? (this._getTitle.name | slice:0:60)+'...' : (this._getTitle.name) }}</h5></span>
+    <ng-container *ngIf="_getTitle">
+      <span class=truncate style="display: block">
+        <h5>{{ (this._getTitle.action.length > 60) ? (this._getTitle.action | slice:0:60)+'...' : (this._getTitle.action) }}</h5></span>
+      <span class=truncate style="display: block">
+        <h5>{{ (this._getTitle.name.length > 60) ? (this._getTitle.name | slice:0:60)+'...' : (this._getTitle.name) }}</h5></span>
+    </ng-container>
     <div style="height: 70px; width: 100%; display: flex; flex-direction: row;">
       <ng-container *ngIf="(quickSelectElements.length > 0)">
         <button mat-icon-button matTooltip="Toggle display of the Quick Select area"
@@ -132,7 +134,9 @@ limitations under the License.
       </mat-form-field>
     </div>
     <!-- mat-drawer-content Tree -->
-    <div #elementContainer style="height: calc(100% - 138px); width: 100%; overflow-y: auto;">
+    <div #elementContainer [ngStyle]="
+      { 'height': _isImport ? 'calc(99% - 70px)' : ( (this._getTitle.name !== '') ? 'calc(100% - 134px)' : 'calc(100% - 110px)' ) }"
+      style="width: 100%; overflow-y: auto;">
       <ng-container *ngFor="let element of elementArray">
         <ng-container *ngIf="shouldDisplay(element)">
           <div style="height: 40px; width: 100%; display: flex; flex-direction: row;" [ngStyle]="getElementStyle(element)">

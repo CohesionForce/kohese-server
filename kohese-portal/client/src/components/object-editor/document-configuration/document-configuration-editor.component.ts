@@ -93,10 +93,8 @@ export class DocumentConfigurationEditorComponent implements OnInit {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
         getTitle: {
-          definition: {
-            name: 'docParentSelector',
-            reason: 'Choose the selected Item\'s Parent'
-          }
+          action: 'Choose the selected Item\'s Parent',
+          name: ''
         },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
@@ -135,10 +133,8 @@ export class DocumentConfigurationEditorComponent implements OnInit {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
         getTitle: {
-          definition: {
-            name: 'componentSelector',
-            reason: 'Choose the Component'
-          }
+          action: 'Choose the Component',
+          name: ''
         },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
