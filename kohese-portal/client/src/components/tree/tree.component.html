@@ -86,7 +86,10 @@ limitations under the License.
   </mat-drawer>
   <mat-drawer-content>
     <!-- Options at the top of the mat-drawer-content section -->
-    <span style="display: block"><h5>{{this._getTitle}}</h5></span>
+    <span class=truncate style="display: block">
+      <h5>{{ (this._getTitle.action.length > 60) ? (this._getTitle.action | slice:0:60)+'...' : (this._getTitle.action) }}</h5></span>
+    <span class=truncate style="display: block">
+      <h5>{{ (this._getTitle.name.length > 60) ? (this._getTitle.name | slice:0:60)+'...' : (this._getTitle.name) }}</h5></span>
     <div style="height: 70px; width: 100%; display: flex; flex-direction: row;">
       <ng-container *ngIf="(quickSelectElements.length > 0)">
         <button mat-icon-button matTooltip="Toggle display of the Quick Select area"
@@ -129,7 +132,7 @@ limitations under the License.
       </mat-form-field>
     </div>
     <!-- mat-drawer-content Tree -->
-    <div #elementContainer style="height: calc(100% - 104px); width: 100%; overflow-y: auto;">
+    <div #elementContainer style="height: calc(100% - 138px); width: 100%; overflow-y: auto;">
       <ng-container *ngFor="let element of elementArray">
         <ng-container *ngIf="shouldDisplay(element)">
           <div style="height: 40px; width: 100%; display: flex; flex-direction: row;" [ngStyle]="getElementStyle(element)">

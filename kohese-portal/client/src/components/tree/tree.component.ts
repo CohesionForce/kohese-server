@@ -132,6 +132,11 @@ export enum TreeComponentConfiguration {
     ELEMENT_SELECTION_HANDLER
 }
 
+export interface ActionTitle {
+  action: string,
+  name?: string
+}
+
 @Component({
   selector: 'tree',
   templateUrl: './tree.component.html',
@@ -157,92 +162,17 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return this._root;
   }
 
-  private _getTitle: string;
+  private _getTitle: ActionTitle;
   get getTitle() {
     return this._getTitle;
   }
   @Input('getTitle')
-  set getTitle(getTitle: string) {
-
-    if(getTitle !== undefined) {
-      if(getTitle['definition']['name'] === 'parentId') {
-        this._getTitle = 'Change Parent';
-      }
-      else if(getTitle['definition']['name'] === 'resolutionActions') {
-        this._getTitle = 'Resolution Action(s)';
-      }
-      else if(getTitle['definition']['name'] === 'relatedIssues') {
-        this._getTitle = 'Related Issues';
-      }
-      else if(getTitle['definition']['name'] === 'supportedDecisions') {
-        this._getTitle = 'Supported Decisions';
-      }
-      else if(getTitle['definition']['name'] === 'predecessors') {
-        this._getTitle = 'Predecessors';
-      }
-      else if(getTitle['definition']['name'] === 'analysisAction') {
-        this._getTitle = 'Analysis Action';
-      }
-      else if(getTitle['definition']['name'] === 'alternatives') {
-        this._getTitle = 'Alternatives';
-      }
-      else if(getTitle['definition']['name'] === 'costImpact') {
-        this._getTitle = 'Cost Impact';
-      }
-      else if(getTitle['definition']['name'] === 'scheduleImpact') {
-        this._getTitle = 'Schedule Impact';
-      }
-      else if(getTitle['definition']['name'] === 'otherImpacts') {
-        this._getTitle = 'Other Impacts';
-      }
-      else if(getTitle['definition']['name'] === 'BuildAllocation') {
-        this._getTitle = 'Build Allocation';
-      }
-      else if(getTitle['definition']['name'] === 'Actors') {
-        this._getTitle = 'Select Actor(s)';
-      }
-      else if(getTitle['definition']['name'] === 'OnStep') {
-        this._getTitle = 'Select Key Event to Initialize Use Case';
-      }
-      else if(getTitle['definition']['name'] === 'Flow') {
-        this._getTitle = 'Select your Flow for this Use Case';
-      }
-      else if(getTitle['definition']['name'] === 'compareItems') {
-        this._getTitle = 'Select an Item to Compare Against';
-      }
-      else if(getTitle['definition']['name'] === 'mountUnmountedRepository') {
-        this._getTitle = 'Select a Mount Point';
-      }
-      else if(getTitle['definition']['name'] === 'changeMountPoint') {
-        this._getTitle = 'Change this Repository\'s Mount Point';
-      }
-      else if(getTitle['definition']['name'] === 'docParentSelector') {
-        this._getTitle = 'Choose the selected Item\'s Parent';
-      }
-      else if(getTitle['definition']['name'] === 'componentSelector') {
-        this._getTitle = 'Choose the Component';
-      }
-      else if(getTitle['definition']['name'] === 'openProxySelection') {
-        this._getTitle = 'Choose your Item';
-      }
-      else if(getTitle['definition']['name'] === 'openProxySelectionDialog') {
-        this._getTitle = 'Select an Item';
-      }
-      else if(getTitle['definedInKind'] === 'Project') {
-        this._getTitle = 'Selected Project Items';
-      }
-      else if(getTitle['definedInKind'] === 'KeyEventDictionary') {
-        this._getTitle = 'Select Key Event(s)';
-      }
-      else if(getTitle['definedInKind'] === 'Observation') {
-        this._getTitle = 'Context';
-      } else {
-        this._getTitle = '';
-      }
+  set getTitle(info: ActionTitle) {
+    if(info !== undefined && info.action !== undefined && info.name !== undefined) {
+      this._getTitle = info;
     } else {
-      this._getTitle = '';
+      this._getTitle = {action: '', name: ''}
     }
-
   }
 
   @Input('displayFavoritesAndAnchor') _displayFavoritesAndAnchor: boolean = true;
