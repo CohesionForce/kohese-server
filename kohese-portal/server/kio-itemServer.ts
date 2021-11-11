@@ -924,8 +924,8 @@ function KIOItemServer(socket){
                   embeddedImageCaptureGroup, request.parameters.pathBase,
                   mediaDirectoryPath);
                 if (!/^https?:\/\//.test(targetCaptureGroup) && !targetCaptureGroup.startsWith('javascript:')
-                                                            && !targetCaptureGroup.startsWith('data:')
-                                                            && !targetCaptureGroup.startsWith('vbscript:')
+                                                             && !targetCaptureGroup.startsWith('data:')
+                                                             && !targetCaptureGroup.startsWith('vbscript:')
                 ){
 
                   let replacementCaptureGroupIndex: number = replacement.indexOf(targetCaptureGroup);
@@ -936,8 +936,8 @@ function KIOItemServer(socket){
                 }
               } else {
                 if (!/^https?:\/\//.test(targetCaptureGroup) && !targetCaptureGroup.startsWith('javascript:')
-                                                            && !targetCaptureGroup.startsWith('data:')
-                                                            && !targetCaptureGroup.startsWith('vbscript:')
+                                                             && !targetCaptureGroup.startsWith('data:')
+                                                             && !targetCaptureGroup.startsWith('vbscript:')
                 ){
 
                   let matchedSubstringCaptureGroupIndex: number = matchedSubstring.indexOf(targetCaptureGroup);
