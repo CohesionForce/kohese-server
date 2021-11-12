@@ -38,20 +38,11 @@ module.exports = function (app) {
       jsonString = fs.readFileSync('./server/boot/jwt-auth.json');
       parsed = JSON.parse(jsonString);
       jwtSecret = parsed['secret'];
-
-      console.log('&&&&&&&&&&&& %s',jsonString);
-      console.log('&&&&&&&&&&&& %s',parsed);
-      console.log('&&&&&&&&&&&& %s',jwtSecret);
     } else {
       fs.writeFileSync('./server/boot/jwt-auth.json', secretJSON);
       jsonString = fs.readFileSync('./server/boot/jwt-auth.json');
       parsed = JSON.parse(jsonString);
       jwtSecret = parsed['secret'];
-
-
-      console.log('&&&&&&&&&&&& %s',jsonString);
-      console.log('&&&&&&&&&&&& %s',parsed);
-      console.log('&&&&&&&&&&&& %s',jwtSecret);
     }
 
     var serverAuthentication = require('../server-enableAuth');
