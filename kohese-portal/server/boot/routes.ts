@@ -20,7 +20,7 @@
  */
 module.exports = function (app) {
     var jwt = require('jsonwebtoken');
-    var jwtSecret = 'ij2ijo32iro2i3jrod111223';
+    var jwtSecret;
     var expressJwt = require('express-jwt');
     var express = require('express');
     var path = require('path');
@@ -28,6 +28,31 @@ module.exports = function (app) {
     var util = require('util');
     var serveFavicon = require('serve-favicon');
     var fs = require('fs');
+
+    var secretObject = { secret: 'ij2ijo32iro2i3jrod111223' }
+    var secretJSON = JSON.stringify(secretObject, null, 2);
+    var jsonString;
+    var parsed;
+
+    if(fs.existsSync('./server/boot/jwt-auth.json')) {
+      jsonString = fs.readFileSync('./server/boot/jwt-auth.json');
+      parsed = JSON.parse(jsonString);
+      jwtSecret = parsed['secret'];
+
+      console.log('&&&&&&&&&&&& %s',jsonString);
+      console.log('&&&&&&&&&&&& %s',parsed);
+      console.log('&&&&&&&&&&&& %s',jwtSecret);
+    } else {
+      fs.writeFileSync('./server/boot/jwt-auth.json', secretJSON);
+      jsonString = fs.readFileSync('./server/boot/jwt-auth.json');
+      parsed = JSON.parse(jsonString);
+      jwtSecret = parsed['secret'];
+
+
+      console.log('&&&&&&&&&&&& %s',jsonString);
+      console.log('&&&&&&&&&&&& %s',parsed);
+      console.log('&&&&&&&&&&&& %s',jwtSecret);
+    }
 
     var serverAuthentication = require('../server-enableAuth');
 
