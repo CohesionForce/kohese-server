@@ -243,8 +243,8 @@ export class Field {
     }
 
     let action: string = '';
-    if(this._propertyDefinition.propertyName) {
-      action = this._propertyDefinition.propertyName;
+    if(this._propertyDefinition.customLabel) {
+      action = this._propertyDefinition.customLabel;
     }
 
     let name: string = '';
