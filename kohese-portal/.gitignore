@@ -26,3 +26,4 @@ tmp/
 *.ccs.map
 package
 git-version.json
+server/boot/jwt-auth.json
