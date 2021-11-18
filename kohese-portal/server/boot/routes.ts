@@ -67,9 +67,6 @@ module.exports = function (app) {
     //TODO Need to move this to the client-ng2 directory too
     app.use(serveFavicon(path.resolve(__dirname, '../../client/bundle/assets/icons/favicon.ico')));
 
-    app.use('/socket.io-file-client',
-            express.static(path.resolve(__dirname, '../../node_modules/socket.io-file-client')));
-
     app.use('/producedReports', express.static(path.resolve(__dirname,
       '../../../reports')));
 
