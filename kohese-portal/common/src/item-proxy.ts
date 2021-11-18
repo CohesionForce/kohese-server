@@ -1437,7 +1437,6 @@ export class ItemProxy {
         let proxy : ItemProxy;
         let thisIteration;
 
-        // tslint:disable-next-line: no-use-before-declare
         while (thisIteration = iterator.next()){
           if (thisIteration.done){
             resolve(iterationCount);
