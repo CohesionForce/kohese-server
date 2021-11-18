@@ -21,7 +21,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
 import { MatTable } from '@angular/material/table';
 
 // Other External Dependencies
-import * as Uuid from 'uuid/v1';
+import { v1 as Uuid } from 'uuid';
 
 // Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
