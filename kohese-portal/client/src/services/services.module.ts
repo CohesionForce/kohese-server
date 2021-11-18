@@ -15,12 +15,12 @@
  */
 
 
-import { ReportService } from './reports/report.service';
 /* Core */
 import { NgModule } from '@angular/core/';
 import { RouterModule } from '@angular/router';
 
 /* Custom */
+import { ReportService } from './reports/report.service';
 import { DialogModule } from '../components/dialog/dialog.module';
 import { CacheManager } from '../../cache-worker/CacheManager';
 import { ItemRepository } from './item-repository/item-repository.service';
