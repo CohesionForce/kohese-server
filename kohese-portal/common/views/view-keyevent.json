@@ -154,7 +154,7 @@
             },
             {
               "propertyName": "loadPending",
-              "customLabel": "loadPending",
+              "customLabel": "Load Pending",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -162,7 +162,7 @@
             },
             {
               "propertyName": "hasValidationError",
-              "customLabel": "hasValidationError",
+              "customLabel": "Has Validation Error",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -170,7 +170,7 @@
             },
             {
               "propertyName": "$dirtyFields",
-              "customLabel": "$dirtyFields",
+              "customLabel": "Dirty Fields",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -178,7 +178,7 @@
             },
             {
               "propertyName": "__deletedProperty",
-              "customLabel": "__deletedProperty",
+              "customLabel": "Deleted Property",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -186,7 +186,7 @@
             },
             {
               "propertyName": "itemIds",
-              "customLabel": "itemIds",
+              "customLabel": "Item IDs",
               "labelOrientation": "Top",
               "kind": "string",
               "visible": false,
@@ -202,7 +202,7 @@
             },
             {
               "propertyName": "approvedBy",
-              "customLabel": "approvedBy",
+              "customLabel": "Approved By",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "text",
@@ -210,7 +210,7 @@
             },
             {
               "propertyName": "approvedOn",
-              "customLabel": "approvedOn",
+              "customLabel": "Approved On",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "date",
@@ -218,7 +218,7 @@
             },
             {
               "propertyName": "rationale",
-              "customLabel": "rationale",
+              "customLabel": "Rationale",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "text",
@@ -226,7 +226,7 @@
             },
             {
               "propertyName": "alternatives",
-              "customLabel": "alternatives",
+              "customLabel": "Alternatives",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -234,7 +234,7 @@
             },
             {
               "propertyName": "costImpact",
-              "customLabel": "costImpact",
+              "customLabel": "Cost Impact",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -242,7 +242,7 @@
             },
             {
               "propertyName": "scheduleImpact",
-              "customLabel": "scheduleImpact",
+              "customLabel": "Schedule Impact",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -250,7 +250,7 @@
             },
             {
               "propertyName": "otherImpacts",
-              "customLabel": "otherImpacts",
+              "customLabel": "Other Impacts",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -266,7 +266,7 @@
             },
             {
               "propertyName": "TestMethod",
-              "customLabel": "TestMethod",
+              "customLabel": "Test Method",
               "labelOrientation": "Top",
               "kind": "",
               "visible": true,
@@ -274,7 +274,7 @@
             },
             {
               "propertyName": "TestLevel",
-              "customLabel": "TestLevel",
+              "customLabel": "Test Level",
               "labelOrientation": "Top",
               "kind": "",
               "visible": true,
@@ -282,7 +282,7 @@
             },
             {
               "propertyName": "BuildAllocation",
-              "customLabel": "BuildAllocation",
+              "customLabel": "Build Allocation",
               "labelOrientation": "Top",
               "kind": "",
               "visible": true,
@@ -314,7 +314,7 @@
             },
             {
               "propertyName": "DetectionMechanism",
-              "customLabel": "DetectionMechanism",
+              "customLabel": "Detection Mechanism",
               "labelOrientation": "Top",
               "kind": "text",
               "visible": true,
@@ -322,7 +322,7 @@
             },
             {
               "propertyName": "EventInputData",
-              "customLabel": "EventInputData",
+              "customLabel": "Event Input Data",
               "labelOrientation": "Top",
               "kind": "text",
               "visible": true,
@@ -338,7 +338,7 @@
             },
             {
               "propertyName": "EventOutputData",
-              "customLabel": "EventOutputData",
+              "customLabel": "Event Output Data",
               "labelOrientation": "Top",
               "kind": "text",
               "visible": true,
@@ -351,7 +351,7 @@
           "contents": [
             {
               "propertyName": "decisionState",
-              "customLabel": "decisionState",
+              "customLabel": "Decision State",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "state-editor",
@@ -390,7 +390,7 @@
             },
             {
               "propertyName": "name",
-              "customLabel": "name",
+              "customLabel": "Name",
               "labelOrientation": "Top",
               "kind": "text",
               "tableDefinition": "",
@@ -399,7 +399,7 @@
             },
             {
               "propertyName": "DetectionMechanism",
-              "customLabel": "DetectionMechanism",
+              "customLabel": "Detection Mechanism",
               "labelOrientation": "Top",
               "kind": "text",
               "visible": true,
@@ -407,7 +407,7 @@
             },
             {
               "propertyName": "EventInputData",
-              "customLabel": "EventInputData",
+              "customLabel": "Event Input Data",
               "labelOrientation": "Top",
               "kind": "text",
               "visible": true,
@@ -423,7 +423,7 @@
             },
             {
               "propertyName": "EventOutputData",
-              "customLabel": "EventOutputData",
+              "customLabel": "Event Output Data",
               "labelOrientation": "Top",
               "kind": "text",
               "visible": true,

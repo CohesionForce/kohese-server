@@ -186,7 +186,7 @@
             },
             {
               "propertyName": "loadPending",
-              "customLabel": "loadPending",
+              "customLabel": "Load Pending",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -194,7 +194,7 @@
             },
             {
               "propertyName": "hasValidationError",
-              "customLabel": "hasValidationError",
+              "customLabel": "Has Validation Error",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -202,7 +202,7 @@
             },
             {
               "propertyName": "$dirtyFields",
-              "customLabel": "$dirtyFields",
+              "customLabel": "Dirty Fields",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -210,7 +210,7 @@
             },
             {
               "propertyName": "__deletedProperty",
-              "customLabel": "__deletedProperty",
+              "customLabel": "Deleted Property",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -218,7 +218,7 @@
             },
             {
               "propertyName": "itemIds",
-              "customLabel": "itemIds",
+              "customLabel": "Item IDs",
               "labelOrientation": "Top",
               "kind": "string",
               "visible": false,
@@ -234,7 +234,7 @@
             },
             {
               "propertyName": "observedBy",
-              "customLabel": "observedBy",
+              "customLabel": "Observed By",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "text",
@@ -242,7 +242,7 @@
             },
             {
               "propertyName": "observedOn",
-              "customLabel": "observedOn",
+              "customLabel": "Observed On",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "date",
@@ -250,7 +250,7 @@
             },
             {
               "propertyName": "context",
-              "customLabel": "context",
+              "customLabel": "Context",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -258,7 +258,7 @@
             },
             {
               "propertyName": "relatedIssues",
-              "customLabel": "relatedIssues",
+              "customLabel": "Related Issues",
               "labelOrientation": "Top",
               "kind": "",
               "visible": true,
@@ -266,7 +266,7 @@
             },
             {
               "propertyName": "analysisAction",
-              "customLabel": "analysisAction",
+              "customLabel": "Analysis Action",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -274,7 +274,7 @@
             },
             {
               "propertyName": "resolutionActions",
-              "customLabel": "resolutionActions",
+              "customLabel": "Resolution Actions",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -282,7 +282,7 @@
             },
             {
               "propertyName": "response",
-              "customLabel": "response",
+              "customLabel": "Response",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "markdown",
@@ -295,7 +295,7 @@
           "contents": [
             {
               "propertyName": "issueState",
-              "customLabel": "issueState",
+              "customLabel": "Issue State",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "state-editor",
@@ -399,7 +399,7 @@
         "contents": [
           {
             "propertyName": "name",
-            "customLabel": "name",
+            "customLabel": "Name",
             "labelOrientation": "Top",
             "kind": "text",
             "visible": true,
