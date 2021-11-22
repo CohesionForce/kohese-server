@@ -10,7 +10,7 @@
   "color": "#000000",
   "viewProperties": {
     "KeyEvents": {
-      "displayName": "KeyEvents",
+      "displayName": "Key Events",
       "inputType": {
         "type": "proxy-selector",
         "options": {}

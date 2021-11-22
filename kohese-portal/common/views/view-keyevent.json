@@ -10,7 +10,7 @@
   "color": "#000000",
   "viewProperties": {
     "DetectionMechanism": {
-      "displayName": "DetectionMechanism",
+      "displayName": "Detection Mechanism",
       "inputType": {
         "type": "text",
         "options": {}
@@ -18,7 +18,7 @@
       "name": "DetectionMechanism"
     },
     "EventInputData": {
-      "displayName": "EventInputData",
+      "displayName": "Event Input Data",
       "inputType": {
         "type": "text",
         "options": {}
@@ -34,7 +34,7 @@
       "name": "Responses"
     },
     "EventOutputData": {
-      "displayName": "EventOutputData",
+      "displayName": "Event Output Data",
       "inputType": {
         "type": "text",
         "options": {}

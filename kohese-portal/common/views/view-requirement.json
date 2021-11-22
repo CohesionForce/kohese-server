@@ -11,7 +11,7 @@
   "viewProperties": {
     "TestMethod": {
       "name": "TestMethod",
-      "displayName": "TestMethod",
+      "displayName": "Test Method",
       "inputType": {
         "type": "",
         "options": {}
@@ -19,7 +19,7 @@
     },
     "TestLevel": {
       "name": "TestLevel",
-      "displayName": "TestLevel",
+      "displayName": "Test Level",
       "inputType": {
         "type": "",
         "options": {}
@@ -27,7 +27,7 @@
     },
     "BuildAllocation": {
       "name": "BuildAllocation",
-      "displayName": "BuildAllocation",
+      "displayName": "Build Allocation",
       "inputType": {
         "type": "",
         "options": {}

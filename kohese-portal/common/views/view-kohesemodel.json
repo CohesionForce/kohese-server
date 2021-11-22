@@ -35,7 +35,7 @@
         },
         "id": {
           "name": "id",
-          "displayName": "Id",
+          "displayName": "ID",
           "inputType": {
             "type": "boolean",
             "options": {}

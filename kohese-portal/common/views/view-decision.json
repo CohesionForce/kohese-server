@@ -22,7 +22,7 @@
       },
       "required": true,
       "default": "Proposed",
-      "displayName": "DecisionState",
+      "displayName": "Decision State",
       "name": "decisionState"
     },
     "approvedBy": {
@@ -32,7 +32,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "approvedBy",
+      "displayName": "Approved By",
       "name": "approvedBy"
     },
     "approvedOn": {
@@ -42,7 +42,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "approvedOn",
+      "displayName": "Approved On",
       "name": "approvedOn"
     },
     "rationale": {
@@ -54,7 +54,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "rationale",
+      "displayName": "Rationale",
       "name": "rationale"
     },
     "alternatives": {
@@ -66,7 +66,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "alternatives",
+      "displayName": "Alternatives",
       "name": "alternatives"
     },
     "supportedDecisions": {

@@ -22,7 +22,7 @@
       },
       "required": false,
       "default": "Observed",
-      "displayName": "issueState",
+      "displayName": "Issue State",
       "name": "issueState"
     },
     "relatedIssues": {
@@ -44,7 +44,7 @@
       },
       "required": true,
       "default": null,
-      "displayName": "analysisAction",
+      "displayName": "Analysis Action",
       "name": "analysisAction"
     },
     "resolutionActions": {
@@ -58,7 +58,7 @@
       },
       "required": true,
       "default": null,
-      "displayName": "resolutionActions",
+      "displayName": "Resolution Actions",
       "name": "resolutionActions"
     },
     "response": {
@@ -70,7 +70,7 @@
       },
       "required": false,
       "default": "",
-      "displayName": "response",
+      "displayName": "Response",
       "name": "response"
     }
   },

@@ -11,7 +11,7 @@
   "viewProperties": {
     "mountPoint": {
       "name": "mountPoint",
-      "displayName": "mountPoint",
+      "displayName": "Mount Point",
       "inputType": {
         "type": "",
         "options": {}
@@ -19,7 +19,7 @@
     },
     "repoId": {
       "name": "repoId",
-      "displayName": "repoId",
+      "displayName": "Repo ID",
       "inputType": {
         "type": "",
         "options": {}

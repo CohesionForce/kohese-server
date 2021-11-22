@@ -18,7 +18,7 @@
       "name": "Actors"
     },
     "BasicPath": {
-      "displayName": "BasicPath",
+      "displayName": "Basic Path",
       "inputType": {
         "type": "",
         "options": {}
@@ -26,7 +26,7 @@
       "name": "BasicPath"
     },
     "AlternativePaths": {
-      "displayName": "AlternativePaths",
+      "displayName": "Alternative Paths",
       "inputType": {
         "type": "",
         "options": {}
@@ -44,7 +44,7 @@
       "viewProperties": {
         "PathName": {
           "name": "PathName",
-          "displayName": "PathName",
+          "displayName": "Path Name",
           "inputType": {
             "type": "text",
             "options": {}
@@ -52,7 +52,7 @@
         },
         "PathDescription": {
           "name": "PathDescription",
-          "displayName": "PathDescription",
+          "displayName": "Path Description",
           "inputType": {
             "type": "text",
             "options": {}

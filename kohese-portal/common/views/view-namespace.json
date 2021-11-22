@@ -12,7 +12,7 @@
   "viewProperties": {
     "alias": {
       "name": "alias",
-      "displayName": "alias",
+      "displayName": "Alias",
       "inputType": {
         "type": "text",
         "options": {}
@@ -20,7 +20,7 @@
     },
     "repositoryId": {
       "name": "repositoryId",
-      "displayName": "repositoryId",
+      "displayName": "Repository ID",
       "inputType": {
         "type": "",
         "options": {}

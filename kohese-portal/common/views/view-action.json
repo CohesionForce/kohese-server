@@ -28,7 +28,7 @@
       },
       "required": false,
       "default": "Proposed",
-      "displayName": "actionState",
+      "displayName": "Action State",
       "name": "actionState"
     },
     "assignedTo": {
@@ -38,7 +38,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "assignedTo",
+      "displayName": "Assigned To",
       "name": "assignedTo"
     },
     "estimatedStart": {
@@ -48,7 +48,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "estimatedStart",
+      "displayName": "Estimated Start",
       "name": "estimatedStart"
     },
     "estimatedCompletion": {
@@ -58,7 +58,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "estimatedCompletion",
+      "displayName": "Estimated Completion",
       "name": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
@@ -70,7 +70,7 @@
       },
       "required": false,
       "default": "",
-      "displayName": "estimatedHoursEffort",
+      "displayName": "Estimated Hours Effort",
       "name": "estimatedHoursEffort"
     },
     "actualStart": {
@@ -80,7 +80,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "actualStart",
+      "displayName": "Actual Start",
       "name": "actualStart"
     },
     "actualCompletion": {
@@ -90,8 +90,8 @@
       },
       "required": false,
       "default": null,
-      "displayName": "actualCompletion",
-      "name": "actualCompletion"
+      "displayName": "Actual Completion",
+      "name": "Actual Completion"
     },
     "remainingHoursEffort": {
       "inputType": {
@@ -102,7 +102,7 @@
       },
       "required": false,
       "default": "",
-      "displayName": "remainingHoursEffort",
+      "displayName": "Remaining Hours Effort",
       "name": "remainingHoursEffort"
     },
     "actualHoursEffort": {
@@ -114,7 +114,7 @@
       },
       "required": false,
       "default": "",
-      "displayName": "actualHoursEffort",
+      "displayName": "Actual Hours Effort",
       "name": "actualHoursEffort"
     },
     "predecessors": {
@@ -128,7 +128,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "predecessors",
+      "displayName": "Predecessors",
       "name": "predecessors"
     }
   },
