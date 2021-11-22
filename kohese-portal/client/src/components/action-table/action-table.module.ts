@@ -15,7 +15,7 @@
  */
 
 
-import { NgModule } from "@angular/core/";
+import { NgModule } from "@angular/core";
 
 import { ActionTableComponent } from './action-table.component';
 import { EditableCellComponent } from './editable-cell/editable-cell.component';
