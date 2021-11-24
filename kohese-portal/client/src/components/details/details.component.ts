@@ -147,6 +147,23 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  public async upsertItemAndContinueEditing(): Promise<void> {
+    let kind: string;
+    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this.
+      _formatObjectEditorQueryList.toArray();
+    if (formatObjectEditorArray.length > 0) {
+      kind = formatObjectEditorArray[0].selectedType.name;
+    } else {
+      kind = this._itemProxy.kind;
+    }
+
+    try {
+      await this._itemRepository.upsertItem(kind, this._itemProxy.item);
+      this._changeDetectorRef.markForCheck();
+    } catch (error) {
+    }
+  }
+
   public cancelEditing(): void {
     this._itemRepository.fetchItem(this._itemProxy).then(() => {
       this.editableStream.next(false);

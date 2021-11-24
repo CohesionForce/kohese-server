@@ -20,7 +20,7 @@ import { ChangeDetectorRef, EventEmitter, Output, Input, AfterViewInit,
   Component, OnInit, OnDestroy, ElementRef, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu'
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 // Other External Dependencies
 import { Parser, HtmlRenderer } from 'commonmark';
@@ -54,6 +54,7 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   docReader: Parser;
   docWriter: HtmlRenderer;
   upsertComplete: Subject<any> = new Subject();
+  saveAndContinue: BehaviorSubject<boolean> = new BehaviorSubject(false);
   observationsPresent: boolean = false;
   private treeConfig;
   private treeConfigSub;
@@ -136,6 +137,20 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
       });
     }
     row.editable = false;
+    this.checkEntries();
+    this.changeRef.markForCheck();
+  }
+
+  saveAndContinueEditing(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
+    this.itemRepository.saveAndContinueEditing(true);
+    if(proxy.dirty === true) {
+      this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
+        docInfo.proxy = newProxy;
+        this.upsertComplete.next(false);
+      });
+    }
+
+    row.editable = true;
     this.checkEntries();
     this.changeRef.markForCheck();
   }

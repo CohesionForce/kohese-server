@@ -188,6 +188,14 @@ export class AdminComponent implements OnInit, OnDestroy {
     this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
   }
 
+  public saveAndContinueEditing(user: any): void {
+    this._itemRepository.upsertItem(this._itemRepository.getTreeConfig().
+      getValue().config.getProxyFor(user.id).kind, user).then(
+      (returnedItemProxy: ItemProxy) => {
+      this._changeDetectorRef.markForCheck();
+    });
+  }
+
   public discardChanges(user: any): void {
     this._itemRepository.fetchItem(this._itemRepository.getTreeConfig().
       getValue().config.getProxyFor(user.id));

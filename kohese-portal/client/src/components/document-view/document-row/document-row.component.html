@@ -36,6 +36,11 @@ limitations under the License.
           </button>
         </ng-container>
         <ng-template #editableBlock>
+          <button mat-icon-button matTooltip="save and continue editing" style="margin-left: auto;"
+            [disabled]="!row.editable || !docInfo.proxy.dirty"
+            (click)="saveAndContinueEditing(docInfo.proxy, row, docInfo);">
+            <mat-icon class="fa fa-check-square"></mat-icon>
+          </button>
           <button mat-icon-button matTooltip="Save this Item" style="margin-left: auto;"
             [disabled]="!row.editable || !docInfo.proxy.dirty"
             (click)="save(docInfo.proxy, row, docInfo);">

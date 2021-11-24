@@ -227,6 +227,13 @@ export class JournalComponent {
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
   }
 
+  public saveAndContinueEditing(itemProxy: ItemProxy): void {
+    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
+      (returnedItemProxy: ItemProxy) => {
+      this._changeDetectorRef.markForCheck();
+    });
+  }
+
   public discardChanges(itemProxy: ItemProxy): void {
     this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
       getProxyFor(itemProxy.item.id));

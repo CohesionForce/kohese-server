@@ -52,6 +52,11 @@ limitations under the License.
                 </button>
               </ng-container>
               <ng-template #editableBlock>
+                <button mat-icon-button matTooltip="save and continue"
+                  [ngStyle]="{ 'margin-left': (assignment.dirty ? '' : 'auto') }"
+                  (click)="$event.stopPropagation(); saveAndContinueEditing(assignment)">
+                  <mat-icon class="fa fa-check-square"></mat-icon>
+                </button>
                 <button mat-icon-button matTooltip="Save this Item"
                   [ngStyle]="{ 'margin-left': (assignment.dirty ? '' : 'auto') }"
                   (click)="$event.stopPropagation(); save(assignment)">

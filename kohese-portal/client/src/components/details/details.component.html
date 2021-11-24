@@ -25,9 +25,12 @@ limitations under the License.
       </button>
     </ng-container>
     <ng-container *ngIf="editableStream.getValue() else notEditable">
+      <button mat-icon-button matTooltip="save and continue" (click)="upsertItemAndContinueEditing()"
+        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+        <mat-icon class="fa fa-check-square"></mat-icon>
+      </button>
       <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
-        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
-        '') }">
+        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
         <mat-icon class="fa fa-save"></mat-icon>
       </button>
       <button mat-icon-button matTooltip="Cancel edit"
