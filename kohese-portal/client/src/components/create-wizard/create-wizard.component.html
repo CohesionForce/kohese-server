@@ -21,10 +21,10 @@ limitations under the License.
       <mat-card>
         <mat-card-content>
           <format-object-editor #formatObjectEditor
+            [allowKindChange]="true"
             [type]="(proxyPlaceholderStream | async).model.item"
             [object]="(proxyPlaceholderStream | async).item"
-            [formatDefinitionType]="FormatDefinitionType.DEFAULT"
-            [allowKindChange]="true">
+            [formatDefinitionType]="FormatDefinitionType.DEFAULT">
           </format-object-editor>
         </mat-card-content>
         <mat-card-actions style="display: flex; flex-direction: row;">
