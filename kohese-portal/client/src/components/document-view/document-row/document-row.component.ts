@@ -54,7 +54,6 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   docReader: Parser;
   docWriter: HtmlRenderer;
   upsertComplete: Subject<any> = new Subject();
-  saveAndContinue: BehaviorSubject<boolean> = new BehaviorSubject(false);
   observationsPresent: boolean = false;
   private treeConfig;
   private treeConfigSub;
