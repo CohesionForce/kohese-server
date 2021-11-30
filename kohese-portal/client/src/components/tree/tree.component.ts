@@ -17,7 +17,7 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit, Directive } from '@angular/core';
+  Optional, Inject, OnInit, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
@@ -132,6 +132,11 @@ export enum TreeComponentConfiguration {
     ELEMENT_SELECTION_HANDLER
 }
 
+export interface ActionTitle {
+  action: string,
+  name: string
+}
+
 @Component({
   selector: 'tree',
   templateUrl: './tree.component.html',
@@ -157,6 +162,29 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return this._root;
   }
 
+  _isImport: boolean = false;
+  @Input('isImport')
+  set isImport(value: boolean) {
+    if(value) {
+      this._isImport = value;
+    } else {
+      this._isImport = false;
+    }
+  }
+
+  private _getTitle: ActionTitle;
+  get getTitle() {
+    return this._getTitle;
+  }
+  @Input('getTitle')
+  set getTitle(info: ActionTitle) {
+    if(info !== undefined && info.action !== undefined && info.name !== undefined) {
+      this._getTitle = info;
+    } else {
+      this._getTitle = {action: '', name: ''}
+    }
+  }
+
   @Input('displayFavoritesAndAnchor') _displayFavoritesAndAnchor: boolean = true;
   set displayFavoritesAndAnchor(flag: boolean) {
     this._displayFavoritesAndAnchor = flag;
@@ -164,7 +192,6 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   get displayFavoritesAndAnchor() {
     return this._displayFavoritesAndAnchor;
   }
-
 
   private _getChildren: (element: any) => Array<any>;
   get getChildren() {
@@ -366,6 +393,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   public ngOnInit(): void {
     if (this.isDialogInstance()) {
       this.root = this._data['root'];
+      this.getTitle = this._data['getTitle'];
       this.getChildren = this._data['getChildren'];
       this.hasChildren = this._data['hasChildren'];
       this.getParent = this._data['getParent'];

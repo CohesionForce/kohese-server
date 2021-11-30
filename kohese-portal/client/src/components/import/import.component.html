@@ -18,6 +18,7 @@ limitations under the License.
 <div [ngStyle]="{ 'height': isDialogInstance() ? '40%' : '45%' }" style="width: 100%;">
   <h3 style="height: 10%;">Parent</h3>
   <tree #itemProxyTree style="height: 87%;"
+    [isImport]="!!true"
     [root]="TreeConfiguration.getWorkingTree().getRootProxy()"
     [getChildren]="getChildren"
     [getText]="getText"

@@ -29,7 +29,7 @@ import { KoheseDataModel, KoheseViewModel } from '../../../../../../common/src/K
 import { PropertyDefinition } from '../../../../../../common/src/PropertyDefinition.interface';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
 import { Type, Metatype } from '../../../../../../common/src/Type.interface';
-import { TreeComponent } from '../../../../components/tree/tree.component';
+import { ActionTitle, TreeComponent } from '../../../../components/tree/tree.component';
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../../services/user/session.service';
@@ -242,9 +242,25 @@ export class Field {
       }
     }
 
+    let action: string = '';
+    if(this._propertyDefinition.customLabel) {
+      action = this._propertyDefinition.customLabel;
+    }
+
+    let name: string = '';
+    if(this._koheseObject.name) {
+      name = this._koheseObject.name;
+    }
+
+    let title: ActionTitle = {
+      action: action,
+      name: name
+    }
+
     selection = await this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: treeConfiguration.getRootProxy(),
+        getTitle: title,
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
@@ -255,8 +271,7 @@ export class Field {
           return (element as ItemProxy).item.name;
         },
         maySelect: (element: any) => {
-          let type: any = this._dataModel['classProperties'][
-            attributeName].definition.type;
+          let type: any = this._dataModel['classProperties'][attributeName].definition.type;
           type = (Array.isArray(type) ? type[0] : type);
           if (type === 'Item') {
             return true;
