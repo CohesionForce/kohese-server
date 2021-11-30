@@ -31,7 +31,7 @@
         "contents": [
           {
             "propertyName": "id",
-            "customLabel": "id",
+            "customLabel": "ID",
             "labelOrientation": "Top",
             "kind": "text",
             "visible": true,

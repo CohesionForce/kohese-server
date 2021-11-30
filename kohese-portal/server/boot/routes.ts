@@ -20,14 +20,31 @@
  */
 module.exports = function (app) {
     var jwt = require('jsonwebtoken');
-    var jwtSecret = 'ij2ijo32iro2i3jrod111223';
+    var jwtSecret;
     var expressJwt = require('express-jwt');
     var express = require('express');
+    var RateLimit = require('express-rate-limit');
     var path = require('path');
     var bodyParser = require('body-parser');
     var util = require('util');
     var serveFavicon = require('serve-favicon');
     var fs = require('fs');
+
+    var secretObject = { secret: 'ij2ijo32iro2i3jrod111223' }
+    var secretJSON = JSON.stringify(secretObject, null, 2);
+    var jsonString;
+    var parsed;
+
+    if(fs.existsSync('./server/boot/jwt-auth.json')) {
+      jsonString = fs.readFileSync('./server/boot/jwt-auth.json');
+      parsed = JSON.parse(jsonString);
+      jwtSecret = parsed['secret'];
+    } else {
+      fs.writeFileSync('./server/boot/jwt-auth.json', secretJSON);
+      jsonString = fs.readFileSync('./server/boot/jwt-auth.json');
+      parsed = JSON.parse(jsonString);
+      jwtSecret = parsed['secret'];
+    }
 
     var serverAuthentication = require('../server-enableAuth');
 
@@ -50,10 +67,18 @@ module.exports = function (app) {
       /^\/reports.*/
     ];
 
+    // set up rate limiter: safe maximum of requests per minute
+    var limiter = new RateLimit({
+      windowMs: 1*60*1000, // 1 minute
+      max: 20
+    });
+
+    // apply rate limiter to all requests
+    app.use(limiter);
+
     app.use(ngRoutes, function (req, res) {
       res.sendFile(path.resolve(clientBundlePath, 'index.html'));
     });
-
 
     //TODO Need to move this to the client-ng2 directory too
     app.use(serveFavicon(path.resolve(__dirname, '../../client/bundle/assets/icons/favicon.ico')));
