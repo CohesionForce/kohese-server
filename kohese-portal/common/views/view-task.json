@@ -22,7 +22,7 @@
       },
       "required": false,
       "default": "Proposed",
-      "displayName": "taskState",
+      "displayName": "Task State",
       "name": "taskState"
     },
     "assignedTo": {
@@ -32,7 +32,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "assignedTo",
+      "displayName": "Assigned To",
       "name": "assignedTo"
     },
     "estimatedStart": {
@@ -42,7 +42,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "estimatedStart",
+      "displayName": "Estimated Start",
       "name": "estimatedStart"
     },
     "estimatedCompletion": {
@@ -52,7 +52,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "estimatedCompletion",
+      "displayName": "Estimated Completion",
       "name": "estimatedCompletion"
     },
     "estimatedHoursEffort": {
@@ -64,7 +64,7 @@
       },
       "required": false,
       "default": "",
-      "displayName": "estimatedHoursEffort",
+      "displayName": "Estimated Hours Effort",
       "name": "estimatedHoursEffort"
     },
     "actualStart": {
@@ -74,7 +74,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "actualStart",
+      "displayName": "Actual Start",
       "name": "actualStart"
     },
     "actualCompletion": {
@@ -84,7 +84,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "actualCompletion",
+      "displayName": "Actual Completion",
       "name": "actualCompletion"
     },
     "remainingHoursEffort": {
@@ -96,7 +96,7 @@
       },
       "required": false,
       "default": "",
-      "displayName": "remainingHoursEffort",
+      "displayName": "Remaining Hours Effort",
       "name": "remainingHoursEffort"
     },
     "actualHoursEffort": {
@@ -108,7 +108,7 @@
       },
       "required": false,
       "default": "",
-      "displayName": "actualHoursEffort",
+      "displayName": "Actual Hours Effort",
       "name": "actualHoursEffort"
     },
     "predecessors": {
@@ -122,7 +122,7 @@
       },
       "required": false,
       "default": null,
-      "displayName": "predecessors",
+      "displayName": "Predecessors",
       "name": "predecessors"
     },
     "supportedDecisions": {
@@ -246,7 +246,7 @@
             },
             {
               "propertyName": "loadPending",
-              "customLabel": "loadPending",
+              "customLabel": "Load Pending",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -254,7 +254,7 @@
             },
             {
               "propertyName": "hasValidationError",
-              "customLabel": "hasValidationError",
+              "customLabel": "Has Validation Error",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -262,7 +262,7 @@
             },
             {
               "propertyName": "$dirtyFields",
-              "customLabel": "$dirtyFields",
+              "customLabel": "Dirty Fields",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -270,7 +270,7 @@
             },
             {
               "propertyName": "__deletedProperty",
-              "customLabel": "__deletedProperty",
+              "customLabel": "Deleted Property",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -278,7 +278,7 @@
             },
             {
               "propertyName": "itemIds",
-              "customLabel": "itemIds",
+              "customLabel": "Item IDs",
               "labelOrientation": "Top",
               "kind": "string",
               "visible": false,
@@ -294,7 +294,7 @@
             },
             {
               "propertyName": "predecessors",
-              "customLabel": "predecessors",
+              "customLabel": "Predecessors",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -302,7 +302,7 @@
             },
             {
               "propertyName": "assignedTo",
-              "customLabel": "assignedTo",
+              "customLabel": "Assigned To",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "text",
@@ -310,7 +310,7 @@
             },
             {
               "propertyName": "estimatedStart",
-              "customLabel": "estimatedStart",
+              "customLabel": "Estimated Start",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "date",
@@ -318,7 +318,7 @@
             },
             {
               "propertyName": "estimatedCompletion",
-              "customLabel": "estimatedCompletion",
+              "customLabel": "Estimated Completion",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "date",
@@ -326,7 +326,7 @@
             },
             {
               "propertyName": "estimatedHoursEffort",
-              "customLabel": "estimatedHoursEffort",
+              "customLabel": "Estimated Hours Effort",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "number",
@@ -334,7 +334,7 @@
             },
             {
               "propertyName": "actualStart",
-              "customLabel": "actualStart",
+              "customLabel": "Actual Start",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "date",
@@ -342,7 +342,7 @@
             },
             {
               "propertyName": "actualCompletion",
-              "customLabel": "actualCompletion",
+              "customLabel": "Actual Completion",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "date",
@@ -350,7 +350,7 @@
             },
             {
               "propertyName": "remainingHoursEffort",
-              "customLabel": "remainingHoursEffort",
+              "customLabel": "Remaining Hours Effort",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "number",
@@ -358,7 +358,7 @@
             },
             {
               "propertyName": "actualHoursEffort",
-              "customLabel": "actualHoursEffort",
+              "customLabel": "Actual Hours Effort",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "number",
@@ -379,7 +379,7 @@
           "contents": [
             {
               "propertyName": "taskState",
-              "customLabel": "taskState",
+              "customLabel": "Task State",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "state-editor",

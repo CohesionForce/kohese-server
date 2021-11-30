@@ -130,6 +130,10 @@ export class KProxySelectorComponent extends UserInput
     this.dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getTitle: {
+          action: 'Select an Item',
+          name: ''
+        },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },
