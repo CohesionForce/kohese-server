@@ -11,7 +11,7 @@
   "viewProperties": {
     "mountPoint": {
       "name": "mountPoint",
-      "displayName": "mountPoint",
+      "displayName": "Mount Point",
       "inputType": {
         "type": "",
         "options": {}
@@ -19,7 +19,7 @@
     },
     "repoId": {
       "name": "repoId",
-      "displayName": "repoId",
+      "displayName": "Repo ID",
       "inputType": {
         "type": "",
         "options": {}
@@ -36,7 +36,7 @@
         "contents": [
           {
             "propertyName": "id",
-            "customLabel": "id",
+            "customLabel": "ID",
             "labelOrientation": "Top",
             "kind": "text",
             "visible": true,
@@ -122,7 +122,7 @@
             },
             {
               "propertyName": "loadPending",
-              "customLabel": "loadPending",
+              "customLabel": "Load Pending",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -130,7 +130,7 @@
             },
             {
               "propertyName": "hasValidationError",
-              "customLabel": "hasValidationError",
+              "customLabel": "Has Validation Error",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -138,7 +138,7 @@
             },
             {
               "propertyName": "$dirtyFields",
-              "customLabel": "$dirtyFields",
+              "customLabel": "Dirty Fields",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -146,7 +146,7 @@
             },
             {
               "propertyName": "__deletedProperty",
-              "customLabel": "__deletedProperty",
+              "customLabel": "Deleted Property",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -154,7 +154,7 @@
             },
             {
               "propertyName": "itemIds",
-              "customLabel": "itemIds",
+              "customLabel": "Item IDs",
               "labelOrientation": "Top",
               "kind": "string",
               "visible": false,
@@ -170,7 +170,7 @@
             },
             {
               "propertyName": "id",
-              "customLabel": "id",
+              "customLabel": "ID",
               "labelOrientation": "Top",
               "kind": "text",
               "visible": true,
@@ -178,7 +178,7 @@
             },
             {
               "propertyName": "parentId",
-              "customLabel": "parentId",
+              "customLabel": "Parent ID",
               "labelOrientation": "Top",
               "kind": "text",
               "visible": true,
@@ -186,7 +186,7 @@
             },
             {
               "propertyName": "mountPoint",
-              "customLabel": "mountPoint",
+              "customLabel": "Mount Point",
               "labelOrientation": "Top",
               "kind": "",
               "visible": true,
@@ -194,7 +194,7 @@
             },
             {
               "propertyName": "repoId",
-              "customLabel": "repoId",
+              "customLabel": "Repo ID",
               "labelOrientation": "Top",
               "kind": "",
               "visible": true,
@@ -212,7 +212,7 @@
         "contents": [
           {
             "propertyName": "name",
-            "customLabel": "name",
+            "customLabel": "Name",
             "labelOrientation": "Top",
             "kind": "text",
             "visible": true,
@@ -226,7 +226,7 @@
           "contents": [
             {
               "propertyName": "mountPoint",
-              "customLabel": "mountPoint",
+              "customLabel": "Mount Point",
               "labelOrientation": "Top",
               "kind": "",
               "visible": true,
@@ -234,7 +234,7 @@
             },
             {
               "propertyName": "repoId",
-              "customLabel": "repoId",
+              "customLabel": "Repo ID",
               "labelOrientation": "Top",
               "kind": "",
               "visible": true,

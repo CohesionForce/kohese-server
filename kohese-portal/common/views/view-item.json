@@ -177,7 +177,7 @@
             },
             {
               "propertyName": "loadPending",
-              "customLabel": "loadPending",
+              "customLabel": "Load Pending",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -185,7 +185,7 @@
             },
             {
               "propertyName": "hasValidationError",
-              "customLabel": "hasValidationError",
+              "customLabel": "Has Validation Error",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -193,7 +193,7 @@
             },
             {
               "propertyName": "$dirtyFields",
-              "customLabel": "$dirtyFields",
+              "customLabel": "Dirty Fields",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -201,7 +201,7 @@
             },
             {
               "propertyName": "__deletedProperty",
-              "customLabel": "__deletedProperty",
+              "customLabel": "Deleted Property",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -209,7 +209,7 @@
             },
             {
               "propertyName": "itemIds",
-              "customLabel": "itemIds",
+              "customLabel": "Item IDs",
               "labelOrientation": "Top",
               "kind": "string",
               "visible": false,
