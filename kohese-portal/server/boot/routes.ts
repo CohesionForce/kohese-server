@@ -145,7 +145,10 @@ module.exports = function (app) {
       next();
     });
 
-    app.use(expressJwt({secret: jwtSecret}).unless({path: ngRoutes}));
+    app.use(expressJwt({
+      secret: jwtSecret,
+      algorithms: ['RS256', 'HS256'],
+    }).unless({path: ngRoutes}) );
 
     function decodeAuthToken(authToken){
       var decodedToken = jwt.verify(authToken, jwtSecret);
