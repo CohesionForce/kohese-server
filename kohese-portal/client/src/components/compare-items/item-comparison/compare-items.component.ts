@@ -178,6 +178,10 @@ export class CompareItemsComponent implements OnInit {
     this._dialogService.openComponentDialog(TreeComponent, {
       data: {
         root: TreeConfiguration.getWorkingTree().getRootProxy(),
+        getTitle: {
+          action: 'Choose an Item to Compare Against',
+          name: ''
+        },
         getChildren: (element: any) => {
           return (element as ItemProxy).children;
         },

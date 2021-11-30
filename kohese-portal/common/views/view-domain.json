@@ -121,7 +121,7 @@
             },
             {
               "propertyName": "loadPending",
-              "customLabel": "loadPending",
+              "customLabel": "Load Pending",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -129,7 +129,7 @@
             },
             {
               "propertyName": "hasValidationError",
-              "customLabel": "hasValidationError",
+              "customLabel": "Has Validation Error",
               "labelOrientation": "Top",
               "kind": "boolean",
               "visible": false,
@@ -137,7 +137,7 @@
             },
             {
               "propertyName": "$dirtyFields",
-              "customLabel": "$dirtyFields",
+              "customLabel": "Dirty Fields",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -145,7 +145,7 @@
             },
             {
               "propertyName": "__deletedProperty",
-              "customLabel": "__deletedProperty",
+              "customLabel": "Deleted Property",
               "labelOrientation": "Top",
               "kind": "",
               "visible": false,
@@ -153,7 +153,7 @@
             },
             {
               "propertyName": "itemIds",
-              "customLabel": "itemIds",
+              "customLabel": "Item ID",
               "labelOrientation": "Top",
               "kind": "string",
               "visible": false,
@@ -169,7 +169,7 @@
             },
             {
               "propertyName": "approvedBy",
-              "customLabel": "approvedBy",
+              "customLabel": "Approved By",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "text",
@@ -177,7 +177,7 @@
             },
             {
               "propertyName": "approvedOn",
-              "customLabel": "approvedOn",
+              "customLabel": "Approved On",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "date",
@@ -185,7 +185,7 @@
             },
             {
               "propertyName": "rationale",
-              "customLabel": "rationale",
+              "customLabel": "Rationale",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "text",
@@ -193,7 +193,7 @@
             },
             {
               "propertyName": "alternatives",
-              "customLabel": "alternatives",
+              "customLabel": "Alternatives",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -201,7 +201,7 @@
             },
             {
               "propertyName": "costImpact",
-              "customLabel": "costImpact",
+              "customLabel": "Cost Impact",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -209,7 +209,7 @@
             },
             {
               "propertyName": "scheduleImpact",
-              "customLabel": "scheduleImpact",
+              "customLabel": "Schedule Impact",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -217,7 +217,7 @@
             },
             {
               "propertyName": "otherImpacts",
-              "customLabel": "otherImpacts",
+              "customLabel": "Other Impacts",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "",
@@ -238,7 +238,7 @@
           "contents": [
             {
               "propertyName": "decisionState",
-              "customLabel": "decisionState",
+              "customLabel": "Decision State",
               "labelOrientation": "Top",
               "visible": true,
               "kind": "state-editor",
