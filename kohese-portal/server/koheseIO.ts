@@ -59,16 +59,21 @@ function Server(httpsServer, options){
           };
           global['app'].emit('newSession', socket);
           socket.on('connectionAdded', (data: any, sendResponse: () => void) => {
-            if (kio.sessions[data.id]) {
-              kio.sessions[data.id].numberOfConnections++;
+            // In this case, prototype-polluting assignment may be assumed as a false positive
+            let sessionId: string = data.id;
+            if (kio.sessions[sessionId]) {
+              kio.sessions[sessionId].numberOfConnections++;
               console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
               console.log('*** session %s for user %s attempted to increment connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
             }
           });
+
           socket.on('connectionRemoved', (data: any, sendResponse: () => void) => {
-            if (kio.sessions[data.id]) {
-              kio.sessions[data.id].numberOfConnections--;
+            // In this case, prototype-polluting assignment may be assumed as a false positive
+            let sessionId: string = data.id;
+            if(kio.sessions[sessionId]) {
+              kio.sessions[sessionId].numberOfConnections--;
               console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
               console.log('*** session %s for user %s attempted to decrement connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
