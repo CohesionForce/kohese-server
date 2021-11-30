@@ -923,7 +923,8 @@ function KIOItemServer(socket){
                 replacement = await embedImage(matchedSubstring,
                   embeddedImageCaptureGroup, request.parameters.pathBase,
                   mediaDirectoryPath);
-                if (!/^https?:\/\//.test(targetCaptureGroup) && !targetCaptureGroup.startsWith('javascript:')
+                if (!/^https?:\/\//.test(targetCaptureGroup) && targetCaptureGroup.startsWith('data:image')
+                                                             && !targetCaptureGroup.startsWith('javascript:')
                                                              && !targetCaptureGroup.startsWith('vbscript:')
                 ){
 
@@ -935,6 +936,7 @@ function KIOItemServer(socket){
                 }
               } else {
                 if (!/^https?:\/\//.test(targetCaptureGroup) && !targetCaptureGroup.startsWith('javascript:')
+                                                             && !targetCaptureGroup.startsWith('data:')
                                                              && !targetCaptureGroup.startsWith('vbscript:')
                 ){
 
