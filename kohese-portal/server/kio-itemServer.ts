@@ -909,46 +909,47 @@ function KIOItemServer(socket){
           - This regular expression is intended to handle images embedded in
             links.
       */
-      preview = await StringReplaceAsync(preview,
-        /\[(?:(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?))\]\(([\s\S]+?)\)/g,
+      preview = await StringReplaceAsync(preview, /\[(?:(?:!\[[\s\S]*?\]\(([\s\S]+?)\))|(?:[\s\S]*?))\]\(([\s\S]+?)\)/g,
         async (matchedSubstring: string, embeddedImageCaptureGroup: string,
           targetCaptureGroup: string, index: number, originalString: string) => {
-          let replacement: string = '';
-          if ((index > 0) && (originalString.charAt(index - 1) === '!')) {
-            replacement = await embedImage(matchedSubstring, targetCaptureGroup,
-              request.parameters.pathBase, mediaDirectoryPath);
-          } else {
-            replacement = matchedSubstring;
-
-            if (embeddedImageCaptureGroup) {
-              replacement = await embedImage(matchedSubstring,
-                embeddedImageCaptureGroup, request.parameters.pathBase,
-                mediaDirectoryPath);
-              if (!/^https?:\/\//.test(targetCaptureGroup) &&
-                !targetCaptureGroup.startsWith('javascript:')) {
-                let replacementCaptureGroupIndex: number = replacement.indexOf(
-                  targetCaptureGroup);
-                replacement = replacement.substring(0,
-                  replacementCaptureGroupIndex) + request.parameters.pathBase +
-                  targetCaptureGroup + replacement.substring(
-                    replacementCaptureGroupIndex + targetCaptureGroup.length);
-              }
+            let replacement: string = '';
+            if ((index > 0) && (originalString.charAt(index - 1) === '!')) {
+              replacement = await embedImage(matchedSubstring, targetCaptureGroup,
+                request.parameters.pathBase, mediaDirectoryPath);
             } else {
-              if (!/^https?:\/\//.test(targetCaptureGroup) &&
-                !targetCaptureGroup.startsWith('javascript:')) {
-                let matchedSubstringCaptureGroupIndex: number = matchedSubstring.
-                  indexOf(targetCaptureGroup);
-                replacement = matchedSubstring.substring(0,
-                  matchedSubstringCaptureGroupIndex) + request.parameters.
-                    pathBase + targetCaptureGroup + matchedSubstring.substring(
-                      matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
+              replacement = matchedSubstring;
+
+              if (embeddedImageCaptureGroup) {
+                replacement = await embedImage(matchedSubstring,
+                  embeddedImageCaptureGroup, request.parameters.pathBase,
+                  mediaDirectoryPath);
+                if (!/^https?:\/\//.test(targetCaptureGroup) && !targetCaptureGroup.startsWith('javascript:')
+                                                             && !targetCaptureGroup.startsWith('vbscript:')
+                ){
+
+                  let replacementCaptureGroupIndex: number = replacement.indexOf(targetCaptureGroup);
+                  replacement = replacement.substring(0,
+                    replacementCaptureGroupIndex) + request.parameters.pathBase +
+                    targetCaptureGroup + replacement.substring(
+                      replacementCaptureGroupIndex + targetCaptureGroup.length);
+                }
               } else {
-                replacement = matchedSubstring;
+                if (!/^https?:\/\//.test(targetCaptureGroup) && !targetCaptureGroup.startsWith('javascript:')
+                                                             && !targetCaptureGroup.startsWith('vbscript:')
+                ){
+
+                  let matchedSubstringCaptureGroupIndex: number = matchedSubstring.indexOf(targetCaptureGroup);
+                  replacement = matchedSubstring.substring(0,
+                    matchedSubstringCaptureGroupIndex) + request.parameters.
+                      pathBase + targetCaptureGroup + matchedSubstring.substring(
+                        matchedSubstringCaptureGroupIndex + targetCaptureGroup.length);
+                } else {
+                  replacement = matchedSubstring;
+                }
               }
             }
-          }
 
-          return replacement;
+            return replacement;
         });
 
       if (fs.existsSync(mediaDirectoryPath)) {
