@@ -34,6 +34,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
+import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
 
 @Component({
   selector : 'assignment-dashboard',
@@ -81,17 +82,30 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     return this._navigationService;
   }
 
+  private _focusedItemProxy: ItemProxy;
+  get focusedItemProxy(): ItemProxy {
+    return this._focusedItemProxy;
+  }
+  set focusedItemProxy(value: ItemProxy) {
+    this._focusedItemProxy = value;
+  }
+
   constructor(
     private _navigationService : NavigationService,
     private changeRef : ChangeDetectorRef,
     private _itemRepository : ItemRepository,
     private _dialogService : DialogService,
     private sessionService : SessionService,
+    private hotkeys : Hotkeys,
     private title : Title
     ) {
       this.title.setTitle('Dashboard');
-    this.assignmentTypes = DashboardSelections;
-    console.log(this.assignmentTypes)
+      this.assignmentTypes = DashboardSelections;
+      console.log(this.assignmentTypes);
+
+      hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+        this.saveAndContinueEditing(this.focusedItemProxy);
+      });
   }
 
   ngOnInit() {
