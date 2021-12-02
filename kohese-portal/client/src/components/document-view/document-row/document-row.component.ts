@@ -37,6 +37,7 @@ import { NavigationService } from "../../../services/navigation/navigation.servi
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { SessionService } from '../../../services/user/session.service';
+import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
 
 @Component({
   selector: 'document-row',
@@ -72,18 +73,30 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     return this._navigationService;
   }
 
+  _focusedRow;
+  get focusedRow() {
+    return this._focusedRow;
+  }
+  set focusedRow(value: any) {
+    this._focusedRow = value;
+  }
+
   constructor(
-    private changeRef: ChangeDetectorRef,
-    private _itemRepository: ItemRepository,
-    private _dialogService: DialogService,
-    private _navigationService: NavigationService,
-    private element: ElementRef,
-    private sessionService: SessionService,
-    private dialog: MatDialog
+              private changeRef: ChangeDetectorRef,
+              private _itemRepository: ItemRepository,
+              private _dialogService: DialogService,
+              private _navigationService: NavigationService,
+              private element: ElementRef,
+              private sessionService: SessionService,
+              private hotkeys: Hotkeys,
+              private dialog: MatDialog
     ) {
     this.docReader = new commonmark.Parser();
-    this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true},
-    );
+    this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true});
+
+    this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      this.saveAndContinueEditing(this.focusedRow);
+    });
   }
 
    ngOnInit() {
@@ -140,11 +153,11 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     this.changeRef.markForCheck();
   }
 
-  saveAndContinueEditing(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
+  saveAndContinueEditing(row: any) {
     this.itemRepository.saveAndContinueEditing(true);
-    if(proxy.dirty === true) {
-      this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
-        docInfo.proxy = newProxy;
+    if(row.docInfo.proxy.dirty === true) {
+      this._itemRepository.upsertItem(row.docInfo.proxy.kind, row.docInfo.proxy.item).then((newProxy) => {
+        row.docInfo.proxy = newProxy;
         this.upsertComplete.next(false);
       });
     }
