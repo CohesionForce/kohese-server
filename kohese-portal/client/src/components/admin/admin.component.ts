@@ -125,6 +125,9 @@ export class AdminComponent implements OnInit, OnDestroy {
       this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
         this.saveAndContinueEditing(this.focusedItemProxy);
       });
+      this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+        this.discardChanges(this.focusedItemProxy);
+      });
     }
 
   public ngOnInit(): void {

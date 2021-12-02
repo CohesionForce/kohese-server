@@ -89,13 +89,15 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
               private element: ElementRef,
               private sessionService: SessionService,
               private hotkeys: Hotkeys,
-              private dialog: MatDialog
     ) {
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true});
 
     this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
       this.saveAndContinueEditing(this.focusedRow);
+    });
+    this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+      this.discardChanges(this.focusedRow.docInfo.proxy);
     });
   }
 

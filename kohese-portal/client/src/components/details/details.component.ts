@@ -104,6 +104,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
       this.upsertItemAndContinueEditing();
     });
+    this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+      this.cancelEditing();
+    });
   }
 
   public ngOnInit(): void {
