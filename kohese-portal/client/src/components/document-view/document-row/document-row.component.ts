@@ -20,7 +20,7 @@ import { ChangeDetectorRef, EventEmitter, Output, Input, AfterViewInit,
   Component, OnInit, OnDestroy, ElementRef, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu'
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 // Other External Dependencies
 import { Parser, HtmlRenderer } from 'commonmark';
