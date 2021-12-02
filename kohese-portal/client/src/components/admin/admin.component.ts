@@ -37,6 +37,7 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DetailsComponent } from '../details/details.component';
 import { CacheManager } from '../../../../client/cache-worker/CacheManager';
+import { Hotkeys } from '../../services/hotkeys/hot-key.service';
 
 @Component({
   selector: 'app-admin',
@@ -52,6 +53,14 @@ export class AdminComponent implements OnInit, OnDestroy {
   private _lens: ApplicationLens;
   get lens() {
     return this._lens;
+  }
+
+  private _focusedItemProxy: ItemProxy;
+  get focusedItemProxy(): ItemProxy {
+    return this._focusedItemProxy;
+  }
+  set focusedItemProxy(item: ItemProxy) {
+    this._focusedItemProxy = item;
   }
 
   private _koheseUserDataModel: any;
@@ -108,9 +117,14 @@ export class AdminComponent implements OnInit, OnDestroy {
     private _lensService: LensService,
     private _dialogService: DialogService,
     private _navigationService: NavigationService,
+    private hotkeys : Hotkeys,
     private title : Title
     ) {
       this.title.setTitle('Users');
+
+      this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+        this.saveAndContinueEditing(this.focusedItemProxy);
+      });
     }
 
   public ngOnInit(): void {

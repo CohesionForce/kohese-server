@@ -103,7 +103,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       this.assignmentTypes = DashboardSelections;
       console.log(this.assignmentTypes);
 
-      hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
         this.saveAndContinueEditing(this.focusedItemProxy);
       });
   }

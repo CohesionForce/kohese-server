@@ -33,6 +33,7 @@ import { FormatDefinitionType } from '../../../../../../../../common/src/FormatD
 import { ItemProxy } from './../../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../../common/src/tree-configuration';
 import { FormatObjectEditorComponent } from '../../../../../object-editor/format-object-editor/format-object-editor.component';
+import { Hotkeys } from '../../../../../../services/hotkeys/hot-key.service';
 
 @Component({
   selector: 'state-summary-dialog',
@@ -81,6 +82,14 @@ export class StateSummaryDialogComponent implements OnInit {
     return this._editableSet;
   }
 
+  private _focusedItemProxy: ItemProxy;
+  get focusedItemProxy(): ItemProxy {
+    return this._focusedItemProxy;
+  }
+  set focusedItemProxy(item: ItemProxy) {
+    this._focusedItemProxy = item;
+  }
+
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
@@ -103,12 +112,17 @@ export class StateSummaryDialogComponent implements OnInit {
     private _dialogService: DialogService,
     private sessionService: SessionService,
     private changeRef : ChangeDetectorRef,
+    private hotkeys: Hotkeys
     ) {
     if (this.data) {
       this._proxies = data.proxies;
       this._kindName = data.kindName;
       this._stateName = data.stateName;
       this.color = TreeConfiguration.getWorkingTree().getModelProxyFor(this._kindName).view.item.color;
+
+      this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+        this.saveAndContinueEditing(this.focusedItemProxy);
+      });
     }
   }
 

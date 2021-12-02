@@ -32,6 +32,7 @@ import { FormatObjectEditorComponent } from '../../object-editor/format-object-e
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DetailsComponent } from '../details.component';
+import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
 
 // TODO: Change Component to use selectedOrdering instead of exporting enumeration with Ordering getter
 export enum JournalOrdering {
@@ -108,13 +109,27 @@ export class JournalComponent {
     return this._navigationService;
   }
 
+  private _focusedItemProxy: ItemProxy;
+  get focusedItemProxy(): ItemProxy {
+    return this._focusedItemProxy;
+  }
+  set focusedItemProxy(value: ItemProxy) {
+    this._focusedItemProxy = value;
+  }
+
   @ViewChildren(MatExpansionPanel)
   private expansionPanels: QueryList<MatExpansionPanel>;
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _itemRepository: ItemRepository, private _dialogService:
-    DialogService, private _navigationService: NavigationService,
-    private _sessionService: SessionService) {
+                     private _itemRepository: ItemRepository,
+                     private _dialogService: DialogService,
+                     private _navigationService: NavigationService,
+                     private _sessionService: SessionService,
+                     private hotkeys: Hotkeys
+  ) {
+    this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      this.saveAndContinueEditing(this.focusedItemProxy);
+    });
   }
 
   public addEntry(): void {

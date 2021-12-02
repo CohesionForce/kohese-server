@@ -31,6 +31,7 @@ import { FormatObjectEditorComponent } from '../object-editor/format-object-edit
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+import { Hotkeys } from '../../services/hotkeys/hot-key.service';
 
 /* This component serves as a manager for viewing proxy details in the explore view.
    It functions by retrieving an id from the route parameters and then retrieving
@@ -92,10 +93,17 @@ export class DetailsComponent implements OnInit, OnDestroy {
   private _formatObjectEditorQueryList: QueryList<FormatObjectEditorComponent>;
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<DetailsComponent>,
-    private _itemRepository: ItemRepository, private _navigationService:
-    NavigationService, private _dialogService: DialogService) {
+                     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
+                     @Optional() private _matDialogRef: MatDialogRef<DetailsComponent>,
+                     private _itemRepository: ItemRepository,
+                     private _navigationService:NavigationService,
+                     private hotkeys: Hotkeys,
+                     private _dialogService: DialogService,
+
+  ) {
+    this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      this.upsertItemAndContinueEditing();
+    });
   }
 
   public ngOnInit(): void {

@@ -81,16 +81,11 @@ limitations under the License.
                     <ng-container *ngIf="(editableSet.indexOf(user.id) === -1) else editableBlock">
                       <button mat-icon-button matTooltip="Edit this user"
                         [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
-                        (click)="$event.stopPropagation(); panel.open(); editableSet.push(user.id)">
+                        (click)="$event.stopPropagation(); panel.open(); editableSet.push(user.id); focusedItemProxy = user">
                         <mat-icon class="fa fa-edit"></mat-icon>
                       </button>
                     </ng-container>
                     <ng-template #editableBlock>
-                      <button mat-icon-button matTooltip="Save this user and continue editing"
-                        [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
-                        (click)="$event.stopPropagation(); saveAndContinueEditing(user)">
-                        <mat-icon class="fa fa-check-square"></mat-icon>
-                      </button>
                       <button mat-icon-button matTooltip="Save this user"
                         [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
                         (click)="$event.stopPropagation(); save(user)">
