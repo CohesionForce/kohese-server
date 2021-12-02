@@ -31,8 +31,8 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 export class HotkeysHelpComponent implements OnInit {
   hotkeys = Array.from(this.data);
 
-  displayedColumns: string[] = ['shortcut','command'];
-  rowDef: Array<string> = ['Keyboard Shortcut', 'Command'];
+  displayedColumns: Array<string> = ['shortcut','command'];
+  // rowDef: Array<string> = ['shorcut', 'command'];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data) {}
 

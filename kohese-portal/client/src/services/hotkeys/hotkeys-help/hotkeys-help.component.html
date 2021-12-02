@@ -15,15 +15,27 @@ limitations under the License.
 -->
 
 
-<mat-table [dataSource]=hotkeys class=mat-elevation-z8>
-  <ng-container matColumnDef=shortcut>
-    <mat-header-cell *matHeaderCellDef>shortcut</mat-header-cell>
-    <mat-cell *matCellDef="let key">{{key.description}}</mat-cell>
+<h2 mat-dialog-title class=dialog-title>Shortcuts</h2>
+<mat-dialog-content>
+  <ng-container class="hotkey-help-dialog">
+    <table mat-table [dataSource]=hotkeys class="mat-elevation-z8 shortcut-table">
+
+      <ng-container matColumnDef=shortcut>
+        <th mat-header-cell *matHeaderCellDef>shortcut</mat-header-cell>
+        <td mat-cell *matCellDef="let hotkeys">{{hotkeys.action}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef=command>
+        <th mat-header-cell *matHeaderCellDef>command</mat-header-cell>
+        <td mat-cell *matCellDef="let hotkeys">{{hotkeys.description}}</mat-cell>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns; let j=index;" tabindex="{{j}}"></mat-row>
+    </mat-table>
   </ng-container>
-  <ng-container matColumnDef=command>
-    <mat-header-cell *matHeaderCellDef>command</mat-header-cell>
-    <mat-cell *matCellDef="let key">{{key.action}}</mat-cell>
-  </ng-container>
-  <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-  <mat-row *matRowDef="let row; columns: displayedColumns; let j=index;" tabindex="{{j}}"></mat-row>
-</mat-table>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button color=primary mat-dialog-close>close</button>
+</mat-dialog-actions>
