@@ -38,7 +38,7 @@ limitations under the License.
         <ng-template #editableBlock>
           <button mat-icon-button matTooltip="Save this Item" style="margin-left: auto;"
             [disabled]="!row.editable || !docInfo.proxy.dirty"
-            (click)="save(docInfo.proxy, row, docInfo);">
+            (click)="save(row);">
             <mat-icon class="fa fa-save"></mat-icon>
           </button>
           <button mat-icon-button matTooltip="Discard unsaved changes to this Item"

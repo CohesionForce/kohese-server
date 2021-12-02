@@ -141,10 +141,10 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     this.viewInitialized.emit(this.element);
   }
 
-  save(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
-    if(proxy.dirty === true) {
-      this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
-        docInfo.proxy = newProxy;
+  save(row: any) {
+    if(row.docInfo.proxy.dirty === true) {
+      this._itemRepository.upsertItem(row.docInfo.proxy.kind, row.docInfo.proxy.item).then((newProxy) => {
+        row.docInfo.proxy = newProxy;
         this.upsertComplete.next();
       });
     }
