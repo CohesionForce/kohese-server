@@ -101,11 +101,17 @@ export class DetailsComponent implements OnInit, OnDestroy {
                      private _dialogService: DialogService,
 
   ) {
+    // TODO: Determine how to make shortcuts (that affect item saving) context sensitive - i.e. only available in edit mode
     this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
-      this.upsertItemAndContinueEditing();
+      if(this.editableStream.getValue() && this._itemProxy.dirty) {
+        this.upsertItemAndContinueEditing();
+      }
     });
+
     this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
-      this.cancelEditing();
+      if(this.editableStream.getValue()) {
+        this.cancelEditing();
+      }
     });
   }
 
@@ -142,8 +148,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   public async upsertItem(): Promise<void> {
     let kind: string;
-    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this.
-      _formatObjectEditorQueryList.toArray();
+    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this._formatObjectEditorQueryList.toArray();
     if (formatObjectEditorArray.length > 0) {
       kind = formatObjectEditorArray[0].selectedType.name;
     } else {
@@ -151,17 +156,18 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this._itemRepository.upsertItem(kind, this._itemProxy.item);
-      this.editableStream.next(false);
-      this._changeDetectorRef.markForCheck();
+      if(this._itemProxy.dirty) {
+        await this._itemRepository.upsertItem(kind, this._itemProxy.item);
+        this.editableStream.next(false);
+        this._changeDetectorRef.markForCheck();
+      }
     } catch (error) {
     }
   }
 
   public async upsertItemAndContinueEditing(): Promise<void> {
     let kind: string;
-    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this.
-      _formatObjectEditorQueryList.toArray();
+    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this._formatObjectEditorQueryList.toArray();
     if (formatObjectEditorArray.length > 0) {
       kind = formatObjectEditorArray[0].selectedType.name;
     } else {
@@ -169,8 +175,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this._itemRepository.upsertItem(kind, this._itemProxy.item);
-      this._changeDetectorRef.markForCheck();
+      if(this._itemProxy.dirty) {
+        await this._itemRepository.upsertItem(kind, this._itemProxy.item);
+        this._changeDetectorRef.markForCheck();
+      }
     } catch (error) {
     }
   }
