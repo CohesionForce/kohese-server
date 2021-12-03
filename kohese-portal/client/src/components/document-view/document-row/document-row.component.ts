@@ -20,7 +20,7 @@ import { ChangeDetectorRef, EventEmitter, Output, Input, AfterViewInit,
   Component, OnInit, OnDestroy, ElementRef, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu'
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 // Other External Dependencies
 import { Parser, HtmlRenderer } from 'commonmark';
@@ -60,6 +60,9 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   private treeConfigSub;
   private treeConfigProxyChangeSub;
 
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
+
   /* Getters */
   get itemRepository() {
     return this._itemRepository;
@@ -94,13 +97,13 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true});
 
     // The if statements prevent erroneous firing of shortcuts while not focused on this component
-    this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+    this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
       if(this.focusedRow) {
         this.saveAndContinueEditing(this.focusedRow);
       }
     });
 
-    this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+    this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
       if(this.focusedRow) {
         this.discardChanges(this.focusedRow.docInfo.proxy);
       }
@@ -143,6 +146,9 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     if(this.treeConfigSub) {
       this.treeConfigSub.unsubscribe();
     }
+
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   ngAfterViewInit() {

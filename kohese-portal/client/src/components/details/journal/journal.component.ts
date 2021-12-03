@@ -17,7 +17,7 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-         ViewChildren, QueryList } from '@angular/core';
+         OnDestroy, ViewChildren, QueryList } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material/expansion';
 
 // Other External Dependencies
@@ -33,6 +33,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DetailsComponent } from '../details.component';
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
+import { Subscription } from 'rxjs';
 
 // TODO: Change Component to use selectedOrdering instead of exporting enumeration with Ordering getter
 export enum JournalOrdering {
@@ -51,7 +52,11 @@ export enum JournalOrdering {
   styleUrls: ['./journal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class JournalComponent {
+export class JournalComponent implements OnDestroy {
+
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
+
   private _itemProxy: ItemProxy;
   get itemProxy() {
     return this._itemProxy;
@@ -128,17 +133,22 @@ export class JournalComponent {
                      private hotkeys: Hotkeys
   ) {
     // The if statements prevent erroneous firing of shortcuts while not focused on this component
-    this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+    this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
       if(this.focusedItemProxy) {
         this.saveAndContinueEditing(this.focusedItemProxy);
       }
     });
 
-    this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+    this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
       if(this.focusedItemProxy) {
         this.discardChanges(this.focusedItemProxy);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   public addEntry(): void {

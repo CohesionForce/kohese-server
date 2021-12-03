@@ -80,6 +80,8 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   private _treeConfigurationSubscription: Subscription;
   private _lensSubscription: Subscription;
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
 
   private _editableSet: Array<string> = [];
   get editableSet() {
@@ -123,13 +125,13 @@ export class AdminComponent implements OnInit, OnDestroy {
       this.title.setTitle('Users');
 
       // The if statements prevent erroneous firing of shortcuts while not focused on this component
-      this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
         if(this.focusedItemProxy) {
           this.saveAndContinueEditing(this.focusedItemProxy);
         }
       });
 
-      this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+      this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
         if(this.focusedItemProxy) {
           this.discardChanges(this.focusedItemProxy);
         }
@@ -161,6 +163,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this._lensSubscription.unsubscribe();
     this._treeConfigurationSubscription.unsubscribe();
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   public add(): void {

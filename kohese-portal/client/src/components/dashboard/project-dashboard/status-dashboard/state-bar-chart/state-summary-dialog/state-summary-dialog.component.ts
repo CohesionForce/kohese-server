@@ -16,7 +16,7 @@
 
 
 // Angular
-import { Component, OnInit, Input, Inject, ViewChild, ViewChildren, QueryList, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Inject, ViewChild, ViewChildren, QueryList, ChangeDetectorRef } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { Subscription } from 'rxjs';
@@ -40,12 +40,14 @@ import { Hotkeys } from '../../../../../../services/hotkeys/hot-key.service';
   templateUrl: './state-summary-dialog.component.html',
   styleUrls: ['./state-summary-dialog.component.scss']
 })
-export class StateSummaryDialogComponent implements OnInit {
+export class StateSummaryDialogComponent implements OnInit, OnDestroy {
 
   // Data
   numCommentsMap = {}; //TODO: Add type definition
   treeConfigSubscription: Subscription;
   changeSubjectSubscription: Subscription;
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
 
   private _proxies: Array<ItemProxy>;
   get proxies() {
@@ -121,13 +123,13 @@ export class StateSummaryDialogComponent implements OnInit {
       this.color = TreeConfiguration.getWorkingTree().getModelProxyFor(this._kindName).view.item.color;
 
       // The if statements prevent erroneous firing of shortcuts while not focused on this component
-      this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
         if(this.focusedItemProxy) {
           this.saveAndContinueEditing(this.focusedItemProxy);
         }
       });
 
-      this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+      this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
         if(this.focusedItemProxy) {
           this.discardChanges(this.focusedItemProxy);
         }
@@ -135,7 +137,7 @@ export class StateSummaryDialogComponent implements OnInit {
     }
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     // TODO: decide how to handle assignments (current and prior) on the dashboard with regard to the lenses
     this.treeConfigSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((notification: any) => {
       switch (notification.type) {
@@ -157,6 +159,11 @@ export class StateSummaryDialogComponent implements OnInit {
           break;
       }
   });
+  }
+
+  ngOnDestroy(): void {
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   toggleExpandRow(row) {

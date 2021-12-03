@@ -73,13 +73,13 @@ export class DetailsComponent implements OnInit, OnDestroy {
   treeConfig: TreeConfiguration;
 
   /* Observables */
-  proxyStream: BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(
-    undefined);
-  editableStream: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-    false);
+  proxyStream: BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined);
+  editableStream: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   /* Subscriptions */
   treeConfigSub: Subscription;
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
 
   get matDialogRef() {
     return this._matDialogRef;
@@ -98,17 +98,16 @@ export class DetailsComponent implements OnInit, OnDestroy {
                      private _itemRepository: ItemRepository,
                      private _navigationService:NavigationService,
                      private hotkeys: Hotkeys,
-                     private _dialogService: DialogService,
 
   ) {
     // TODO: Determine how to make shortcuts (that affect item saving) context sensitive - i.e. only available in edit mode
-    this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+    this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
       if(this.editableStream.getValue() && this._itemProxy.dirty) {
         this.upsertItemAndContinueEditing();
       }
     });
 
-    this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+    this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
       if(this.editableStream.getValue()) {
         this.cancelEditing();
       }
@@ -139,6 +138,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
     if (!this.isDialogInstance()) {
       this.treeConfigSub.unsubscribe();
     }
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   public isDialogInstance(): boolean {
