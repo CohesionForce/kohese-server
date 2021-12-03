@@ -120,11 +120,17 @@ export class StateSummaryDialogComponent implements OnInit {
       this._stateName = data.stateName;
       this.color = TreeConfiguration.getWorkingTree().getModelProxyFor(this._kindName).view.item.color;
 
+      // The if statements prevent erroneous firing of shortcuts while not focused on this component
       this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
-        this.saveAndContinueEditing(this.focusedItemProxy);
+        if(this.focusedItemProxy) {
+          this.saveAndContinueEditing(this.focusedItemProxy);
+        }
       });
+
       this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
-        this.discardChanges(this.focusedItemProxy);
+        if(this.focusedItemProxy) {
+          this.discardChanges(this.focusedItemProxy);
+        }
       });
     }
   }

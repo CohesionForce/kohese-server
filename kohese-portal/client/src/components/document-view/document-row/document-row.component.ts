@@ -93,11 +93,17 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     this.docReader = new commonmark.Parser();
     this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true});
 
+    // The if statements prevent erroneous firing of shortcuts while not focused on this component
     this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
-      this.saveAndContinueEditing(this.focusedRow);
+      if(this.focusedRow) {
+        this.saveAndContinueEditing(this.focusedRow);
+      }
     });
+
     this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
-      this.discardChanges(this.focusedRow.docInfo.proxy);
+      if(this.focusedRow) {
+        this.discardChanges(this.focusedRow.docInfo.proxy);
+      }
     });
   }
 
@@ -156,12 +162,14 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   saveAndContinueEditing(row: any) {
-    this.itemRepository.saveAndContinueEditing(true);
-    if(row.docInfo.proxy.dirty === true) {
-      this._itemRepository.upsertItem(row.docInfo.proxy.kind, row.docInfo.proxy.item).then((newProxy) => {
-        row.docInfo.proxy = newProxy;
-        this.upsertComplete.next(false);
-      });
+    if(row.docInfo) {
+      this.itemRepository.saveAndContinueEditing(true);
+      if(row.docInfo.proxy.dirty === true) {
+        this._itemRepository.upsertItem(row.docInfo.proxy.kind, row.docInfo.proxy.item).then((newProxy) => {
+          row.docInfo.proxy = newProxy;
+          this.upsertComplete.next(false);
+        });
+      }
     }
 
     row.editable = true;
