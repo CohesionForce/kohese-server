@@ -16,22 +16,46 @@
 
 
 // Angular
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 // Other External Dependencies
 
 // Kohese
 import { Hotkeys } from './hot-key.service';
+import { DialogService } from '../dialog/dialog.service';
+import { MockDialogService } from '../../../../client/mocks/services/MockDialogService';
 
 describe('HotKeyService', () => {
   let service: Hotkeys;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      declarations: [],
+      imports: [],
+      providers: [
+        { provide: DialogService, useClass: MockDialogService },
+      ]
+    });
     service = TestBed.inject(Hotkeys);
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
+
+
+  it('should detect a new shortcut', fakeAsync(() => {
+    let shortcut = { keys: 'control.s', description: 'save and continue' };
+
+    service.addShortcut(shortcut).subscribe((command) => {});
+
+    tick();
+    expect(service.hotkeys.get(shortcut.keys)).toContain('save and continue');
+  }));
+
+  // it shouldn't cause a problem if we don't have the shortcut that is called
+
+  // it might should remove a shortcut for context sensitivity
+
+  // it should replace an existing shortcut callback
 });

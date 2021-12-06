@@ -48,9 +48,9 @@ export class Hotkeys {
     ) {
       // TODO: Fix Keyboard Shortcut Help Window a.k.a. HelpModal.
       //       It is located within the hotkeys-help folder.
-      this.addShortcut({ keys: '', description: 'opens the shortcut help window' }).subscribe(() => {
-        this.openHelpModal();
-      });
+      // this.addShortcut({ keys: '', description: 'opens the shortcut help window' }).subscribe(() => {
+      //   this.openHelpModal();
+      // });
   }
 
   addShortcut(options: Partial<Options>) {
