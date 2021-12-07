@@ -55,38 +55,44 @@ describe('NamespaceEditorComponent', () => {
       ]
     }).compileComponents();
 
-    let componentFixture: ComponentFixture<NamespaceEditorComponent> = TestBed.
-      createComponent(NamespaceEditorComponent);
+    let componentFixture: ComponentFixture<NamespaceEditorComponent> = TestBed.createComponent(NamespaceEditorComponent);
     component = componentFixture.componentInstance;
-    component.selectedNamespace = TreeConfiguration.getWorkingTree().
-      getProxyFor('b32b6e10-ed3c-11ea-8737-9f31b413a913').item;
+    component.selectedNamespace = TreeConfiguration.getWorkingTree().getProxyFor('b32b6e10-ed3c-11ea-8737-9f31b413a913').item;
+
+    // let itemProxy = new ItemProxy('Action', MockAction());
 
     componentFixture.detectChanges();
   });
 
   afterEach(() => {
     TestBed.resetTestingModule();
-  })
+  });
+
+  it('should instantiate the namespace component', () => {
+    expect(component).toBeTruthy();
+  });
 
   it('determines if the selected Namespace is valid', () => {
     expect(component.isValid()).toBe(true);
     component.selectedNamespace.name = '';
     expect(component.isValid()).toBe(false);
-    component.selectedNamespace = JSON.parse(JSON.stringify(component.
-      selectedNamespace));
+    component.selectedNamespace = JSON.parse(JSON.stringify(component.selectedNamespace));
     expect(component.isValid()).toBe(false);
   });
 
   it('adds Namespaces', async () => {
     let namespacesBefore: Array<any> = [];
-    TreeConfiguration.getWorkingTree().getProxyFor('Model-Definitions').
-      visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
+    let namespacesAfter: Array<any> = [];
+    let modelDefinitionsProxy = TreeConfiguration.getWorkingTree().getProxyFor('Model-Definitions');
+
+    modelDefinitionsProxy.visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
       if (itemProxy.kind === 'Namespace') {
         namespacesBefore.push(itemProxy.item);
       }
     }, undefined);
+
     await component.add();
-    let namespacesAfter: Array<any> = [];
+
     TreeConfiguration.getWorkingTree().getProxyFor('Model-Definitions').
       visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
       if (itemProxy.kind === 'Namespace') {
@@ -99,22 +105,23 @@ describe('NamespaceEditorComponent', () => {
 
   it('retrieves Namespaces', () => {
     let almostAllNamespaces: Array<any> = component.getNamespaces(true);
-    expect(almostAllNamespaces.indexOf(component.selectedNamespace)).toBe(-1);
     let allNamespaces: Array<any> = component.getNamespaces(false);
+
+    expect(almostAllNamespaces.indexOf(component.selectedNamespace)).toBe(-1);
     expect(allNamespaces.length).toBe(almostAllNamespaces.length + 1);
     expect(allNamespaces.indexOf(component.selectedNamespace)).not.toBe(-1);
   });
 
   it('retrieves enclosing Namespace options', () => {
-    let enclosingNamespaceOptions: Array<any> = component.
-      getEnclosingNamespaceOptions();
-    expect(enclosingNamespaceOptions.indexOf(TreeConfiguration.
-      getWorkingTree().getProxyFor('com.kohese').item)).toBe(-1);
-    expect(enclosingNamespaceOptions.indexOf(TreeConfiguration.
-      getWorkingTree().getProxyFor('com.kohese.metamodel').item)).toBe(-1);
-    expect(enclosingNamespaceOptions.indexOf(TreeConfiguration.
-      getWorkingTree().getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913').
-      item)).toBe(-1);
+    let enclosingNamespaceOptions: Array<any> = component.getEnclosingNamespaceOptions();
+    let comKoheseItem = TreeConfiguration.getWorkingTree().getProxyFor('com.kohese').item;
+    let comKoheseMetaModelItem = TreeConfiguration.getWorkingTree().getProxyFor('com.kohese.metamodel').item;
+    let comKoheseGenericItem = TreeConfiguration.getWorkingTree().getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913').item;
+
+
+    expect(enclosingNamespaceOptions.indexOf(comKoheseItem)).toBe(-1);
+    expect(enclosingNamespaceOptions.indexOf(comKoheseMetaModelItem)).toBe(-1);
+    expect(enclosingNamespaceOptions.indexOf(comKoheseGenericItem)).toBe(-1);
   });
 
   it('removes Namespaces', async () => {
@@ -123,6 +130,7 @@ describe('NamespaceEditorComponent', () => {
     let namespaceNamespaceFound: boolean = false;
     let namespaceDataModelFound: boolean = false;
     let namespaceNamespaceDataModelFound: boolean = false;
+
     TreeConfiguration.getWorkingTree().getProxyFor('Model-Definitions').
       visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
       if (itemProxy.kind === 'Namespace') {
@@ -146,10 +154,8 @@ describe('NamespaceEditorComponent', () => {
   });
 
   it('adds subcomponents to a Namespace', async () => {
-    component.selectedNamespace = TreeConfiguration.getWorkingTree().
-      getProxyFor('com.kohese').item;
-    let namespaceItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-      getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913');
+    component.selectedNamespace = TreeConfiguration.getWorkingTree().getProxyFor('com.kohese').item;
+    let namespaceItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913');
     let matDialogRefPlaceholder: any = {
       updateSize: (width: string, height: string) => {
         return matDialogRefPlaceholder;
@@ -158,26 +164,26 @@ describe('NamespaceEditorComponent', () => {
         return of([[namespaceItemProxy]]);
       }
     };
-    spyOn(TestBed.inject(DialogService), 'openComponentsDialog').and.returnValue(
-      matDialogRefPlaceholder);
-    await component.addSubcomponent(true);
-    expect(namespaceItemProxy.item.parentId).toBe(component.selectedNamespace.
-      id);
 
-    let dataModelItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().
-      getProxyFor('Project');
+    spyOn(TestBed.inject(DialogService), 'openComponentsDialog').and.returnValue(matDialogRefPlaceholder);
+    await component.addSubcomponent(true);
+    expect(namespaceItemProxy.item.parentId).toBe(component.selectedNamespace.id);
+
+    let dataModelItemProxy: ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor('Project');
     matDialogRefPlaceholder.afterClosed = () => {
       return of([[dataModelItemProxy]]);
     };
     await component.addSubcomponent(false);
-    expect(dataModelItemProxy.item.namespace.id).toBe(component.
-      selectedNamespace.id);
+    expect(dataModelItemProxy.item.namespace.id).toBe(component.selectedNamespace.id);
   });
 
   it('retrieves subcomponents of a Namespace', () => {
-    expect(component.getSubcomponents()).toEqual([TreeConfiguration.
-      getWorkingTree().getProxyFor('Category').item, TreeConfiguration.
-      getWorkingTree().getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913').
-      item]);
+    let testerSubComponents = [
+      TreeConfiguration.getWorkingTree().getProxyFor('Category').item,
+      TreeConfiguration.getWorkingTree().getProxyFor('03741da0-ed41-11ea-8737-9f31b413a913').item
+    ]
+    let trueSubComponents = component.getSubcomponents();
+
+    expect(trueSubComponents).toEqual(testerSubComponents);
   });
 });

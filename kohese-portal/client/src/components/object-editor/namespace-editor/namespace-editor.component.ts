@@ -53,16 +53,15 @@ export class NamespaceEditorComponent implements Dialog {
   private _selectedRepository: any;
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _itemRepository: ItemRepository, private _dialogService:
-    DialogService) {
-  }
+                     private _itemRepository: ItemRepository,
+                     private _dialogService: DialogService
+  ) {}
 
   /**
    * @see Dialog.interface.ts
    */
   public isValid(): boolean {
-    return ((this._selectedNamespace.name !== '') && (this.getNamespaces(
-      true).map((namespace: any) => {
+    return ((this._selectedNamespace.name !== '') && (this.getNamespaces(true).map((namespace: any) => {
       return namespace.name;
     }).indexOf(this._selectedNamespace.name) === -1));
   }
@@ -90,25 +89,29 @@ export class NamespaceEditorComponent implements Dialog {
     // let name: string = 'Namespace ' + this.getNamespaces(false).length;
     this._selectedNamespace = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('com.kohese').item;
     this._selectedRepository = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('ROOT').item;
+
     let repositoryOptions: { [name: string]: any } = {};
     repositoryOptions['ROOT'] = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('ROOT').item;
-    this.itemRepository.getTreeConfig().getValue().config.getProxyFor(
-      'Repo-Mount-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
-        ItemProxy) => {
+
+    let repositoryMountDefinitions = this.itemRepository.getTreeConfig().getValue().config.getProxyFor('Repo-Mount-Definitions');
+    repositoryMountDefinitions.visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
         if (itemProxy.kind === 'RepoMount') {
           repositoryOptions[itemProxy.item.name] = itemProxy.item;
         }
       }, undefined);
+
     let namespaceOptions: { [name: string]: any } = {};
-    this._itemRepository.getTreeConfig().getValue().config.getProxyFor(
-      'Model-Definitions').visitTree({ includeOrigin: false }, (itemProxy:
-        ItemProxy) => {
-        if ((itemProxy.kind === 'Namespace') && !((itemProxy.item.id ===
-          'com.kohese') || (itemProxy.item.id === 'com.kohese.metamodel'))) {
+    let modelDefinitionsProxy = this._itemRepository.getTreeConfig().getValue().config.getProxyFor('Model-Definitions');
+    modelDefinitionsProxy.visitTree({ includeOrigin: false }, (itemProxy: ItemProxy) => {
+      // finds user-defined namespaces
+      if ((itemProxy.kind === 'Namespace') && !((itemProxy.item.id === 'com.kohese') ||
+        (itemProxy.item.id === 'com.kohese.metamodel'))) {
           namespaceOptions[itemProxy.item.name] = itemProxy.item;
-        }
-      }, undefined);
-    let inputs: Array<any> = await this._dialogService.openComponentsDialog([{
+      }
+    }, undefined);
+
+    let inputs: Array<any> = await this._dialogService.openComponentsDialog([
+      {
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: {
@@ -122,7 +125,8 @@ export class NamespaceEditorComponent implements Dialog {
           inputDialogKind: InputDialogKind.STRING
         }
       }
-    }, {
+    },
+    {
       component: InputDialogComponent,
       matDialogData: {
         inputDialogConfiguration: {
@@ -148,8 +152,7 @@ export class NamespaceEditorComponent implements Dialog {
 
     await this._itemRepository.upsertItem('Namespace', {
       name: inputs[0],
-      parentId: (this._selectedNamespace ? this._selectedNamespace.id :
-        'com.kohese'),
+      parentId: (this._selectedNamespace ? this._selectedNamespace.id : 'com.kohese'),
       repositoryId: { id: this.repoId },
       alias: inputs[0]
     });
