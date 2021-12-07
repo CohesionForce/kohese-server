@@ -28,12 +28,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // Kohese
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+import { TreeService } from '../../services/tree/tree.service';
 import { TreeComponent } from './tree.component';
 
 // Mocks
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
+import { MockItem, MockAction } from '../../../mocks/data/MockItem';
 
-describe('TreeComponent', () => {
+fdescribe('TreeComponent', () => {
   let component: TreeComponent;
 
   beforeEach(() => {
@@ -46,16 +48,22 @@ describe('TreeComponent', () => {
         MatTooltipModule,
         MatInputModule,
         MatDialogModule
+      ],
+      providers: [
+        { provide: TreeService, useClass: TreeService }
       ]
     }).compileComponents();
 
-    let componentFixture: ComponentFixture<TreeComponent> = TestBed.
-      createComponent(TreeComponent);
+    let componentFixture: ComponentFixture<TreeComponent> = TestBed.createComponent(TreeComponent);
     component = componentFixture.componentInstance;
 
     MockItemRepository.singleton.mockFullSync();
 
     component.root = TreeConfiguration.getWorkingTree().getRootProxy();
+    component.getTitle = {
+      action: 'Tree Component Test Action',
+      name: 'Tree Test'
+    },
     component.getChildren = (element: any) => {
       return (element as ItemProxy).children;
     };
@@ -67,18 +75,53 @@ describe('TreeComponent', () => {
     };
     component.getIcon = (element: any) => {
       return (element as ItemProxy).model.view.item.icon;
+    },
+    component.isFavorite = (element: any) => {
+      return (
+        (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
     };
     component.allowMultiselect = true;
     component.showSelections = true;
-    component.selection = [TreeConfiguration.getWorkingTree().getProxyFor(
-      'KoheseModel'), TreeConfiguration.getWorkingTree().getProxyFor(
-      'KoheseView'), TreeConfiguration.getWorkingTree().getProxyFor('Item')];
+    component.selection = [
+      TreeConfiguration.getWorkingTree().getProxyFor('KoheseModel'),
+      TreeConfiguration.getWorkingTree().getProxyFor('KoheseView'),
+      TreeConfiguration.getWorkingTree().getProxyFor('Item')
+    ];
 
     componentFixture.detectChanges();
   });
 
   afterEach(() => {
     TestBed.resetTestingModule();
-  })
+  });
+
+  it('should instantiate the tree component', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should add recently viewed items to the quickSelectElements array', () => {
+    let mockItem = new ItemProxy('Item', MockItem());
+    component.quickSelectElements.push(mockItem);
+    expect(component.quickSelectElements).toContain(mockItem);
+  });
+
+  it('should add favorited items to the favorites list and the top of the quickSelectElements', () => {
+    component.update(true);
+    const [firstKey] = component.elementMap.keys();
+
+    component.addToFavorites(firstKey);
+
+    expect(component.favorites).toContain(firstKey);
+    expect(component.quickSelectElements).toContain(firstKey);
+
+  });
+
+  it('should remove favorited items from the favorites list but leave them in the quickSelectElements', () => {
+
+  });
+
+  it('should set the anchored item as root and process its children to the elementArray', () => {
+
+  });
 
 });
