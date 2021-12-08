@@ -35,7 +35,7 @@ import { TreeComponent } from './tree.component';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockItem, MockAction } from '../../../mocks/data/MockItem';
 
-fdescribe('TreeComponent', () => {
+describe('TreeComponent', () => {
   let component: TreeComponent;
 
   beforeEach(() => {
