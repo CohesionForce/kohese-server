@@ -45,7 +45,6 @@ export class CreateWizardComponent extends NavigatableComponent
     this._parentId = parentId;
   }
 
-// tslint:disable-next-line: no-inferrable-types
   private _isDisabled: boolean = false;
   get isDisabled() {
     return this._isDisabled;

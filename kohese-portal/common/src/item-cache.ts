@@ -85,7 +85,6 @@ export class ItemCache {
     this.metadata.set('numBlobs', 0);
     this.metadata.set('cacheVersion', 0.1);
 
-    // tslint:disable-next-line: no-use-before-declare
     this.analysis = new CacheAnalysis(this);
   }
 

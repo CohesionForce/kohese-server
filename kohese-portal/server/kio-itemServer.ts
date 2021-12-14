@@ -865,7 +865,6 @@ function KIOItemServer(socket){
           }
 
           // Fall through to '.odt' case
-          // tslint:disable-next-line:no-switch-case-fall-through
         case 'application/vnd.oasis.opendocument.text':
           mediaDirectoryPath = Path.resolve(temporaryDirectoryPath,
             'Pictures');
