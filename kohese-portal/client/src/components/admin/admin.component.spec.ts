@@ -16,7 +16,7 @@
 
 
 // Angular
-import { TestBed, ComponentFixture} from '@angular/core/testing';
+import { TestBed, ComponentFixture, tick, fakeAsync} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -42,6 +42,8 @@ import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { MockLensService } from '../../../mocks/services/MockLensService';
 import { MockCacheManager } from '../../../mocks/services/MockCacheManager';
+import { MockUserData } from '../../../mocks/data/MockUser';
+import { ItemProxy } from '../../../../common/src/item-proxy';
 
 describe('Component: Admin', () => {
   let adminComponent: AdminComponent;
@@ -83,6 +85,34 @@ describe('Component: Admin', () => {
 
   it('should instantiate the admin component', () => {
    expect(AdminComponent).toBeTruthy();
+  });
+
+  it('should add a new user', () => {
+
+  });
+
+  it('should remove a user', () => {
+
+  });
+
+  it('should display user information', () => {
+
+  });
+
+  it('shoul get userLockoutList without displaying', () => {
+
+  });
+
+  it('should display the user lockout list', () => {
+
+  });
+
+  it('should lock out a user', () => {
+
+  });
+
+  it('should reinstate a user', () => {
+
   });
 
 });

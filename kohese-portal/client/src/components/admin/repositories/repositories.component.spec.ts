@@ -25,9 +25,10 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 // Other External Dependencies
 import { ToastrModule } from 'ngx-toastr';
 
+// Kohese
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { RepositoryService } from '../../../services/repository/repository.service';
-import { RepositoriesComponent } from './repositories.component';
+import { RepositoriesComponent, RepositoryContentDialog } from './repositories.component';
 import { VersionControlService } from '../../../services/version-control/version-control.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { SessionService } from '../../../services/user/session.service';
@@ -43,22 +44,24 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-describe('Component: Repositories', ()=>{
+describe('Component: Repositories', () => {
   let repositoriesComponent: RepositoriesComponent;
   let repositoriesFixture : ComponentFixture<RepositoriesComponent>;
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
       declarations: [RepositoriesComponent],
-      imports : [CommonModule,
-         MaterialModule,
-         PipesModule,
-         BrowserAnimationsModule,
-         FormsModule,
-         ReactiveFormsModule,
-         ToastrModule.forRoot()
-         ],
+      imports : [
+        CommonModule,
+        MaterialModule,
+        PipesModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ToastrModule.forRoot()
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: DialogService, useClass: MockDialogService },
@@ -76,14 +79,103 @@ describe('Component: Repositories', ()=>{
 
     repositoriesFixture.detectChanges();
 
-  })
+  });
 
   afterEach(() => {
     repositoriesFixture.destroy();
     TestBed.resetTestingModule();
-  })
+  });
 
   it('instantiates the Repositories component', ()=>{
     expect(repositoriesComponent).toBeTruthy();
-  })
-})
+  });
+
+  it('should add a remote repository', () => {
+
+  });
+
+  it('should get remote repositories', () => {
+
+  });
+
+  it('should commit changes made to a repository', () => {
+
+  });
+
+  it('should push changes made to a repository', () => {
+
+  });
+
+  it('should refresh all repository states', () => {
+
+  });
+
+  it('should unmount a repository', () => {
+
+  });
+
+  it('should disable a repository', () => {
+
+  });
+
+  it('should change the mount point of a repository', () => {
+
+  });
+
+});
+
+fdescribe('Component: RepositoryContentDialog', () => {
+  let repositoryContentDialogComponent: RepositoryContentDialog;
+  let repositoryContentDialogFixture: ComponentFixture<RepositoryContentDialog>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [RepositoryContentDialog],
+      imports : [
+        CommonModule,
+        MaterialModule,
+        MatDialogModule,
+        PipesModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ToastrModule.forRoot()
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [
+        { provide: DialogService, useClass: MockDialogService },
+        { provide: MatDialogRef, useClass: MockDialogService },
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: ItemRepository, useClass: MockItemRepository},
+        { provide: VersionControlService, useClass: MockVersionControlService},
+        { provide: NavigationService, useClass: MockNavigationService},
+        { provide: SessionService, useClass: MockSessionService },
+        { provide: NotificationService, useClass: MockNotificationService },
+        { provide: RepositoryService, useClass: MockItemRepository }
+      ]
+    }).compileComponents();
+
+    repositoryContentDialogFixture = TestBed.createComponent(RepositoryContentDialog);
+    repositoryContentDialogComponent = repositoryContentDialogFixture.componentInstance;
+
+    repositoryContentDialogFixture.detectChanges();
+  });
+
+  afterEach(() => {
+    repositoryContentDialogFixture.destroy();
+    TestBed.resetTestingModule();
+  });
+
+  it('instantiates the RepositoryContentDialog component', () => {
+    expect(repositoryContentDialogComponent).toBeTruthy();
+  });
+
+  it('sets the repository data', () => {
+
+  });
+
+  it('should mount a repository', () => {
+
+  });
+
+});
