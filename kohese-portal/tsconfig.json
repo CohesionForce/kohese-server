@@ -17,7 +17,6 @@
       "socket.io",
       "socket.io-client",
       "node",
-      "webpack",
       "underscore",
       "jasmine",
       "jssha",
