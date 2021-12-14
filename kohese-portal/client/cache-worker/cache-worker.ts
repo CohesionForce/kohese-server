@@ -958,7 +958,6 @@ async function fetchMissingCacheInformation(missingCacheData){
       const timestamp = response.timestamp;
       timestamp.responseReceiptTime = responseReceiptTime;
       console.log('::: Response for getMissingCacheInfo');
-      // tslint:disable-next-line:forin
       for (const tsKey in timestamp) {
         console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey] - requestTime));
       }
@@ -1047,7 +1046,6 @@ async function populateCache(): Promise<any> {
         timestamp.responseReceiptTime = responseReceiptTime;
         console.log(timestamp);
         console.log('::: Response for getItemCache');
-        // tslint:disable-next-line:forin
         for (const tsKey in timestamp) {
           console.log('$$$ ' + tsKey + ': ' + (timestamp[tsKey] - requestTime));
         }
