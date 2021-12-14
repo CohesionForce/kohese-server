@@ -22,7 +22,7 @@
 'use strict'; // Required for use of 'class'
 import * as  _ from 'underscore';
 import * as jsSHA_Import from 'jssha';
-import * as uuidV1_Import from 'uuid/v1';
+import { v1 as uuidV1_Import } from 'uuid';
 import { TreeConfiguration } from './tree-configuration';
 import { TreeHashEntry, TreeHashMap } from './tree-hash';
 import { VersionStatus } from './version-status';
@@ -1437,7 +1437,6 @@ export class ItemProxy {
         let proxy : ItemProxy;
         let thisIteration;
 
-        // tslint:disable-next-line: no-use-before-declare
         while (thisIteration = iterator.next()){
           if (thisIteration.done){
             resolve(iterationCount);
