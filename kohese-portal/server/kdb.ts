@@ -147,7 +147,7 @@ async function initialize (koheseKdbPath, indexAndExit) {
   // Make a new KDB if the create flag is provided or it's running with the default KDB
   if (create) {
     console.log('::: Creating a new KDB at ' + koheseKDBDirPath);
-    var uuid = require('node-uuid');
+    var uuid = require('uuid');
     var newRoot = {id: uuid.v1(), name: 'Root of ' + koheseKDBDirPath, description: 'Root of a repository.'};
     // eslint-disable-next-line no-unused-vars
     return createRepoStructure(koheseKDBDirPath).then(async function(repo) {

@@ -21,7 +21,7 @@ import { StateBarChartComponent } from './project-dashboard/status-dashboard/sta
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
-import { NgModule } from "@angular/core/";
+import { NgModule } from "@angular/core";
 
 import { CommonModule } from "@angular/common";
 import { KMarkdownComponent } from "../user-input/k-markdown/k-markdown.component";
