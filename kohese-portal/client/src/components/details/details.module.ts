@@ -15,7 +15,7 @@
  */
 
 
-import { NgModule } from "@angular/core/";
+import { NgModule } from "@angular/core";
 import { MarkdownModule } from 'ngx-markdown';
 
 import { DetailsComponent } from './details.component';

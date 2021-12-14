@@ -52,13 +52,13 @@ export class FormatObjectEditorComponent implements OnInit {
     }
 
     this._object = object;
-    if(this._defferedType) {
-      this.selectedType = this._defferedType;
-      delete this._defferedType;
+    if(this._deferredSelectedType) {
+      this.selectedType = this._deferredSelectedType;
+      delete this._deferredSelectedType;
     }
-    if(this._defferedSelectedNamespace) {
-      this.selectedNamespace = this._defferedSelectedNamespace;
-      delete this._defferedSelectedNamespace;
+    if(this._deferredSelectedNamespace) {
+      this.selectedNamespace = this._deferredSelectedNamespace;
+      delete this._deferredSelectedNamespace;
     }
   }
 
@@ -81,27 +81,28 @@ export class FormatObjectEditorComponent implements OnInit {
     this._changeDetectorRef.markForCheck();
   }
 
-  private _defferedSelectedNamespace: any;
+  private _deferredSelectedNamespace: any;
   private _selectedNamespace: any;
   get selectedNamespace() {
     return this._selectedNamespace;
   }
   set selectedNamespace(selectedNamespace: any) {
     if(!this._object) {
-      this._defferedSelectedNamespace = selectedNamespace;
+      this._deferredSelectedNamespace = selectedNamespace;
       return
     }
     this._selectedNamespace = selectedNamespace;
     this.selectedType = this.getNamespaceTypes(this._selectedNamespace)[0];
   }
 
+  private _deferredSelectedType: any;
   private _selectedType: any;
   get selectedType() {
     return this._selectedType;
   }
   set selectedType(selectedType: any) {
     if(!this._object) {
-      this._defferedType = selectedType;
+      this._deferredSelectedType = selectedType;
       return
     }
     this._selectedType = selectedType;
@@ -170,13 +171,16 @@ export class FormatObjectEditorComponent implements OnInit {
     this._isDisabled = isDisabled;
   }
 
-  private _allowKindChange: boolean = false;
+  private _allowKindChange: boolean;
   get allowKindChange() {
     return this._allowKindChange;
   }
   @Input('allowKindChange')
   set allowKindChange(allowKindChange: boolean) {
     this._allowKindChange = allowKindChange;
+    if(this._deferredType) {
+      this.type = this._deferredType;
+    }
   }
 
   private _allowKindNarrowingOnly: boolean = true;
@@ -188,7 +192,7 @@ export class FormatObjectEditorComponent implements OnInit {
     this._allowKindNarrowingOnly = allowKindNarrowingOnly;
   }
 
-  private _defferedType: any;
+  private _deferredType: any;
   private _type: any;
   get type() {
     return this._type;
@@ -196,6 +200,9 @@ export class FormatObjectEditorComponent implements OnInit {
   @Input('type')
   set type(type: any) {
     this._type = type;
+    if(this.allowKindChange === undefined) {
+      this._deferredType = type;
+    }
     if (this._allowKindChange && !this._enclosingType) {
       this._selectedNamespace = TreeConfiguration.getWorkingTree().getProxyFor(this._type.namespace.id).item;
     }
