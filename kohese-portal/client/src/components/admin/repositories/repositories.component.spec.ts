@@ -124,7 +124,7 @@ describe('Component: Repositories', () => {
 
 });
 
-fdescribe('Component: RepositoryContentDialog', () => {
+describe('Component: RepositoryContentDialog', () => {
   let repositoryContentDialogComponent: RepositoryContentDialog;
   let repositoryContentDialogFixture: ComponentFixture<RepositoryContentDialog>;
 
