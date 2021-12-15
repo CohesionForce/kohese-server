@@ -51,13 +51,17 @@ describe('Component: change-summary', () => {
 
   afterEach(() => {
     TestBed.resetTestingModule();
+  });
+
+  it('instantiates the change-summary component', () => {
+    expect(component).toBeTruthy();
   })
 
   it('determines if a Comparison has changes', async () => {
     let comparisonWithChanges: Comparison = new Comparison({
-      property: 'value'
+      property: 'firstValue'
       }, {
-      property: 'Value'
+      property: 'SecondValue'
     });
     await comparisonWithChanges.compare();
     expect(component.hasChanges(comparisonWithChanges)).toEqual(true);
