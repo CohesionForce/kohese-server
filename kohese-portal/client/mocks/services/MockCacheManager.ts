@@ -15,7 +15,39 @@
  */
 
 
+type SimulatedRequestType = {
+  message: string,
+  data: any
+}
 
 export class MockCacheManager {
   constructor() {}
+
+  simulatedData: Map<SimulatedRequestType, any>;
+
+  clearSimulatedData() {
+    this.simulatedData.clear();
+  }
+
+  sendMessageToWorker(message: string, data: any, expectResponse: boolean): Promise<any> {
+
+    console.log('??? message: ' + message);
+    console.log('??? data: ');
+    console.log(data);
+    return new Promise<any>((resolve: (data: any) => void, reject: () => void) => {
+      //TODO: Return a resolve promise for any messsage data pair
+      let response = this.simulatedData.get({message: message, data: data});
+      if(response) {
+        resolve(response);
+      } else {
+        console.log('*** invalid response data');
+        reject();
+      }
+    });
+  }
+
+  simulateResponseFromWorker(message: string, data: any, response: any) {
+    //TODO: store message data in a structure
+    this.simulatedData.set({message: message, data: data}, response);
+  }
 }

@@ -17,9 +17,10 @@
 
 // Angular
 import { TestBed, ComponentFixture} from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 // Other External Dependencies
@@ -34,6 +35,7 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { SessionService } from '../../../services/user/session.service';
 import { NotificationService } from '../../../services/notifications/notification.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
+import { CacheManager } from '../../../../cache-worker/CacheManager';
 import { PipesModule } from "../../../pipes/pipes.module";
 import { MaterialModule } from '../../../material.module';
 
@@ -44,11 +46,12 @@ import { MockNavigationService } from '../../../../mocks/services/MockNavigation
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
 import { MockNotificationService } from '../../../../mocks/services/MockNotificationService';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MockCacheManager } from '../../../../mocks/services/MockCacheManager';
+import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 
 describe('Component: Repositories', () => {
-  let repositoriesComponent: RepositoriesComponent;
-  let repositoriesFixture : ComponentFixture<RepositoriesComponent>;
+  let component: RepositoriesComponent;
+  let fixture : ComponentFixture<RepositoriesComponent>;
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -70,28 +73,36 @@ describe('Component: Repositories', () => {
         { provide: NavigationService, useClass: MockNavigationService},
         { provide: SessionService, useClass: MockSessionService },
         { provide: NotificationService, useClass: MockNotificationService },
-        { provide: RepositoryService, useClass: MockItemRepository }
+        { provide: RepositoryService, useClass: MockItemRepository },
+        { provide: CacheManager, useClass: MockCacheManager }
       ]
     }).compileComponents();
 
-    repositoriesFixture = TestBed.createComponent(RepositoriesComponent);
-    repositoriesComponent = repositoriesFixture.componentInstance;
+    fixture = TestBed.createComponent(RepositoriesComponent);
+    component = fixture.componentInstance;
 
-    repositoriesFixture.detectChanges();
+    component.remoteNameInput = 'Remote Name for addRemote';
+    component.remoteUrlInput = 'Remote URL for addRemote';
+    component.rootProxy = TreeConfiguration.getWorkingTree().getRootProxy();
+
+    fixture.detectChanges();
 
   });
 
   afterEach(() => {
-    repositoriesFixture.destroy();
+    fixture.destroy();
     TestBed.resetTestingModule();
   });
 
   it('instantiates the Repositories component', ()=>{
-    expect(repositoriesComponent).toBeTruthy();
+    expect(component).toBeTruthy();
   });
 
   it('should add a remote repository', () => {
 
+    component.addRemote();
+
+    // expect(toastrService.success()).toHaveBeenCalled();
   });
 
   it('should get remote repositories', () => {
