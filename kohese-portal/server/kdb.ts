@@ -436,11 +436,17 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
   console.log('>>> Repo storage: ' + repoStoragePath);
   var filePath = repoStoragePath + '/' + modelName + '/' + modelInstance.id + '.json';
 
-  let parentProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstance.parentId);
-  var parentId = modelInstance.parentId
+  var modelInstanceParentId;
+  if (modelInstance.parentId === undefined || modelInstance.parentId == '') {
+      modelInstanceParentId = 'ROOT';
+  } else {
+    modelInstanceParentId = modelInstance.parentId;
+  }
+  let parentProxy = ItemProxy.getWorkingTree().getProxyFor(modelInstanceParentId);
+  var parentId = modelInstanceParentId;
   if (parentProxy) {
     if (parentProxy.kind === 'Repository') {
-      parentId = modelInstance.parentId + '-mount'
+      parentId = modelInstanceParentId + '-mount'
     }
   }
 
@@ -471,7 +477,7 @@ function storeModelInstance(proxy, isNewItem, enable: boolean = false){
       modifiedBy: modelInstance.modifiedBy,
       modifiedOn: modelInstance.modifiedOn,
       repoId: {id: modelInstance.id},
-      mountPoint: {id: modelInstance.parentId},
+      mountPoint: {id: modelInstanceParentId},
       repoPath: repoMountFilePath
     };
 
