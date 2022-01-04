@@ -56,7 +56,7 @@ limitations under the License.
           <ng-container *ngIf="(editableSet.indexOf(observationItemProxy.item.id) === -1) else editableBlock">
             <button mat-icon-button matTooltip="Edit this Item"
               [ngStyle]="{ 'margin-left': (observationItemProxy.dirty ? '' : 'auto') }"
-              (click)="$event.stopPropagation(); panel.open(); editableSet.push(observationItemProxy.item.id)">
+              (click)="$event.stopPropagation(); panel.open(); editableSet.push(observationItemProxy.item.id); focusedItemProxy = observationItemProxy">
               <mat-icon class="fa fa-edit"></mat-icon>
             </button>
           </ng-container>

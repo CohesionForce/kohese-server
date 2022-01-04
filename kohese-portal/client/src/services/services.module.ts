@@ -37,6 +37,7 @@ import { StateService } from './state/state.service';
 import { LensService } from './lens-service/lens.service';
 import { ProjectService } from "./project-service/project.service";
 import { LogService } from "./log/log.service";
+import { Hotkeys } from './hotkeys/hot-key.service';
 
 
 // Log Events
@@ -66,6 +67,7 @@ import { InitializeLogs } from './item-repository/item-repository.registry'
     LensService,
     ProjectService,
     LogService,
+    Hotkeys,
     ReportService
   ]
 })

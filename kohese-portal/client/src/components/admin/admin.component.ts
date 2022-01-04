@@ -37,6 +37,7 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { DetailsComponent } from '../details/details.component';
 import { CacheManager } from '../../../../client/cache-worker/CacheManager';
+import { Hotkeys } from '../../services/hotkeys/hot-key.service';
 
 @Component({
   selector: 'app-admin',
@@ -52,6 +53,14 @@ export class AdminComponent implements OnInit, OnDestroy {
   private _lens: ApplicationLens;
   get lens() {
     return this._lens;
+  }
+
+  private _focusedItemProxy: ItemProxy;
+  get focusedItemProxy(): ItemProxy {
+    return this._focusedItemProxy;
+  }
+  set focusedItemProxy(item: ItemProxy) {
+    this._focusedItemProxy = item;
   }
 
   private _koheseUserDataModel: any;
@@ -71,6 +80,8 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   private _treeConfigurationSubscription: Subscription;
   private _lensSubscription: Subscription;
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
 
   private _editableSet: Array<string> = [];
   get editableSet() {
@@ -108,9 +119,23 @@ export class AdminComponent implements OnInit, OnDestroy {
     private _lensService: LensService,
     private _dialogService: DialogService,
     private _navigationService: NavigationService,
+    private hotkeys : Hotkeys,
     private title : Title
     ) {
       this.title.setTitle('Users');
+
+      // The if statements prevent erroneous firing of shortcuts while not focused on this component
+      this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+        if(this.focusedItemProxy) {
+          this.saveAndContinueEditing(this.focusedItemProxy);
+        }
+      });
+
+      this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+        if(this.focusedItemProxy) {
+          this.discardChanges(this.focusedItemProxy);
+        }
+      });
     }
 
   public ngOnInit(): void {
@@ -138,6 +163,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this._lensSubscription.unsubscribe();
     this._treeConfigurationSubscription.unsubscribe();
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   public add(): void {
@@ -180,12 +207,18 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public save(user: any): void {
-    this._itemRepository.upsertItem(this._itemRepository.getTreeConfig().
-      getValue().config.getProxyFor(user.id).kind, user).then(
-      (returnedItemProxy: ItemProxy) => {
+    let userKind = this._itemRepository.getTreeConfig().getValue().config.getProxyFor(user.id).kind
+    this._itemRepository.upsertItem(userKind, user).then((returnedItemProxy: ItemProxy) => {
       this._changeDetectorRef.markForCheck();
     });
     this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
+  }
+
+  public saveAndContinueEditing(user: any): void {
+    let userKind = this._itemRepository.getTreeConfig().getValue().config.getProxyFor(user.id).kind;
+    this._itemRepository.upsertItem(userKind, user).then((returnedItemProxy: ItemProxy) => {
+        this._changeDetectorRef.markForCheck();
+    });
   }
 
   public discardChanges(user: any): void {

@@ -34,6 +34,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
+import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
 
 @Component({
   selector : 'assignment-dashboard',
@@ -46,6 +47,8 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   numCommentsMap = {}; //TODO: Add type definition
   treeConfigSubscription: Subscription;
   changeSubjectSubscription: Subscription;
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
 
   // I/O
   @Input()
@@ -81,17 +84,38 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
     return this._navigationService;
   }
 
+  private _focusedItemProxy: ItemProxy;
+  get focusedItemProxy(): ItemProxy {
+    return this._focusedItemProxy;
+  }
+  set focusedItemProxy(value: ItemProxy) {
+    this._focusedItemProxy = value;
+  }
+
   constructor(
     private _navigationService : NavigationService,
     private changeRef : ChangeDetectorRef,
     private _itemRepository : ItemRepository,
     private _dialogService : DialogService,
     private sessionService : SessionService,
+    private hotkeys : Hotkeys,
     private title : Title
     ) {
       this.title.setTitle('Dashboard');
-    this.assignmentTypes = DashboardSelections;
-    console.log(this.assignmentTypes)
+      this.assignmentTypes = DashboardSelections;
+      console.log(this.assignmentTypes);
+
+      // The if statements prevent erroneous firing of shortcuts while not focused on this component
+      this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+        if(this.focusedItemProxy) {
+          this.saveAndContinueEditing(this.focusedItemProxy);
+        }
+      });
+      this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+        if(this.focusedItemProxy) {
+          this.discardChanges(this.focusedItemProxy);
+        }
+      });
   }
 
   ngOnInit() {
@@ -134,6 +158,8 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.assignmentTypeSub.unsubscribe();
     this.assignmentListSub.unsubscribe();
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   public getViewModel(itemProxy: ItemProxy): any {
@@ -146,6 +172,13 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
       this.changeRef.markForCheck();
     });
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+  }
+
+  public saveAndContinueEditing(itemProxy: ItemProxy): void {
+    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
+      (returnedItemProxy: ItemProxy) => {
+      this.changeRef.markForCheck();
+    });
   }
 
   public async discardChanges(itemProxy: ItemProxy): Promise<void> {

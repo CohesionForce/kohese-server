@@ -20,7 +20,7 @@ import { ChangeDetectorRef, EventEmitter, Output, Input, AfterViewInit,
   Component, OnInit, OnDestroy, ElementRef, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu'
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 // Other External Dependencies
 import { Parser, HtmlRenderer } from 'commonmark';
@@ -37,6 +37,7 @@ import { NavigationService } from "../../../services/navigation/navigation.servi
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { SessionService } from '../../../services/user/session.service';
+import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
 
 @Component({
   selector: 'document-row',
@@ -59,6 +60,9 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   private treeConfigSub;
   private treeConfigProxyChangeSub;
 
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
+
   /* Getters */
   get itemRepository() {
     return this._itemRepository;
@@ -72,18 +76,38 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     return this._navigationService;
   }
 
+  _focusedRow;
+  get focusedRow() {
+    return this._focusedRow;
+  }
+  set focusedRow(value: any) {
+    this._focusedRow = value;
+  }
+
   constructor(
-    private changeRef: ChangeDetectorRef,
-    private _itemRepository: ItemRepository,
-    private _dialogService: DialogService,
-    private _navigationService: NavigationService,
-    private element: ElementRef,
-    private sessionService: SessionService,
-    private dialog: MatDialog
+              private changeRef: ChangeDetectorRef,
+              private _itemRepository: ItemRepository,
+              private _dialogService: DialogService,
+              private _navigationService: NavigationService,
+              private element: ElementRef,
+              private sessionService: SessionService,
+              private hotkeys: Hotkeys,
     ) {
     this.docReader = new commonmark.Parser();
-    this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true},
-    );
+    this.docWriter = new commonmark.HtmlRenderer({ sourcepos: true});
+
+    // The if statements prevent erroneous firing of shortcuts while not focused on this component
+    this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      if(this.focusedRow) {
+        this.saveAndContinueEditing(this.focusedRow);
+      }
+    });
+
+    this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+      if(this.focusedRow) {
+        this.discardChanges(this.focusedRow.docInfo.proxy);
+      }
+    });
   }
 
    ngOnInit() {
@@ -122,20 +146,39 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     if(this.treeConfigSub) {
       this.treeConfigSub.unsubscribe();
     }
+
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   ngAfterViewInit() {
     this.viewInitialized.emit(this.element);
   }
 
-  save(proxy: ItemProxy, row: any, docInfo: DocumentInfo) {
-    if(proxy.dirty === true) {
-      this._itemRepository.upsertItem(proxy.kind, proxy.item).then((newProxy) => {
-        docInfo.proxy = newProxy;
+  save(row: any) {
+    if(row.docInfo.proxy.dirty === true) {
+      this._itemRepository.upsertItem(row.docInfo.proxy.kind, row.docInfo.proxy.item).then((newProxy) => {
+        row.docInfo.proxy = newProxy;
         this.upsertComplete.next();
       });
     }
     row.editable = false;
+    this.checkEntries();
+    this.changeRef.markForCheck();
+  }
+
+  saveAndContinueEditing(row: any) {
+    if(row.docInfo) {
+      this.itemRepository.saveAndContinueEditing(true);
+      if(row.docInfo.proxy.dirty === true) {
+        this._itemRepository.upsertItem(row.docInfo.proxy.kind, row.docInfo.proxy.item).then((newProxy) => {
+          row.docInfo.proxy = newProxy;
+          this.upsertComplete.next(false);
+        });
+      }
+    }
+
+    row.editable = true;
     this.checkEntries();
     this.changeRef.markForCheck();
   }

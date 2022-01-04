@@ -16,7 +16,7 @@
 
 
 // Angular
-import { Component, OnInit, Input, Inject, ViewChild, ViewChildren, QueryList, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Inject, ViewChild, ViewChildren, QueryList, ChangeDetectorRef } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { Subscription } from 'rxjs';
@@ -33,18 +33,21 @@ import { FormatDefinitionType } from '../../../../../../../../common/src/FormatD
 import { ItemProxy } from './../../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../../common/src/tree-configuration';
 import { FormatObjectEditorComponent } from '../../../../../object-editor/format-object-editor/format-object-editor.component';
+import { Hotkeys } from '../../../../../../services/hotkeys/hot-key.service';
 
 @Component({
   selector: 'state-summary-dialog',
   templateUrl: './state-summary-dialog.component.html',
   styleUrls: ['./state-summary-dialog.component.scss']
 })
-export class StateSummaryDialogComponent implements OnInit {
+export class StateSummaryDialogComponent implements OnInit, OnDestroy {
 
   // Data
   numCommentsMap = {}; //TODO: Add type definition
   treeConfigSubscription: Subscription;
   changeSubjectSubscription: Subscription;
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
 
   private _proxies: Array<ItemProxy>;
   get proxies() {
@@ -81,6 +84,14 @@ export class StateSummaryDialogComponent implements OnInit {
     return this._editableSet;
   }
 
+  private _focusedItemProxy: ItemProxy;
+  get focusedItemProxy(): ItemProxy {
+    return this._focusedItemProxy;
+  }
+  set focusedItemProxy(item: ItemProxy) {
+    this._focusedItemProxy = item;
+  }
+
   get FormatDefinitionType() {
     return FormatDefinitionType;
   }
@@ -103,16 +114,30 @@ export class StateSummaryDialogComponent implements OnInit {
     private _dialogService: DialogService,
     private sessionService: SessionService,
     private changeRef : ChangeDetectorRef,
+    private hotkeys: Hotkeys
     ) {
     if (this.data) {
       this._proxies = data.proxies;
       this._kindName = data.kindName;
       this._stateName = data.stateName;
       this.color = TreeConfiguration.getWorkingTree().getModelProxyFor(this._kindName).view.item.color;
+
+      // The if statements prevent erroneous firing of shortcuts while not focused on this component
+      this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+        if(this.focusedItemProxy) {
+          this.saveAndContinueEditing(this.focusedItemProxy);
+        }
+      });
+
+      this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+        if(this.focusedItemProxy) {
+          this.discardChanges(this.focusedItemProxy);
+        }
+      });
     }
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     // TODO: decide how to handle assignments (current and prior) on the dashboard with regard to the lenses
     this.treeConfigSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((notification: any) => {
       switch (notification.type) {
@@ -136,6 +161,11 @@ export class StateSummaryDialogComponent implements OnInit {
   });
   }
 
+  ngOnDestroy(): void {
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
+  }
+
   toggleExpandRow(row) {
     console.log('Toggled Expand Row!', row);
     this.table.rowDetail.toggleExpandRow(row);
@@ -148,6 +178,10 @@ export class StateSummaryDialogComponent implements OnInit {
   public save(itemProxy: ItemProxy): void {
     this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+  }
+
+  public saveAndContinueEditing(itemProxy: ItemProxy): void {
+    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
   }
 
   public discardChanges(itemProxy: ItemProxy): void {

@@ -17,7 +17,7 @@
 
 // Angular
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
-         ViewChildren, QueryList } from '@angular/core';
+         OnDestroy, ViewChildren, QueryList } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material/expansion';
 
 // Other External Dependencies
@@ -32,6 +32,8 @@ import { FormatObjectEditorComponent } from '../../object-editor/format-object-e
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { DetailsComponent } from '../details.component';
+import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
+import { Subscription } from 'rxjs';
 
 // TODO: Change Component to use selectedOrdering instead of exporting enumeration with Ordering getter
 export enum JournalOrdering {
@@ -50,7 +52,11 @@ export enum JournalOrdering {
   styleUrls: ['./journal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class JournalComponent {
+export class JournalComponent implements OnDestroy {
+
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
+
   private _itemProxy: ItemProxy;
   get itemProxy() {
     return this._itemProxy;
@@ -108,13 +114,41 @@ export class JournalComponent {
     return this._navigationService;
   }
 
+  private _focusedItemProxy: ItemProxy;
+  get focusedItemProxy(): ItemProxy {
+    return this._focusedItemProxy;
+  }
+  set focusedItemProxy(value: ItemProxy) {
+    this._focusedItemProxy = value;
+  }
+
   @ViewChildren(MatExpansionPanel)
   private expansionPanels: QueryList<MatExpansionPanel>;
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _itemRepository: ItemRepository, private _dialogService:
-    DialogService, private _navigationService: NavigationService,
-    private _sessionService: SessionService) {
+                     private _itemRepository: ItemRepository,
+                     private _dialogService: DialogService,
+                     private _navigationService: NavigationService,
+                     private _sessionService: SessionService,
+                     private hotkeys: Hotkeys
+  ) {
+    // The if statements prevent erroneous firing of shortcuts while not focused on this component
+    this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      if(this.focusedItemProxy) {
+        this.saveAndContinueEditing(this.focusedItemProxy);
+      }
+    });
+
+    this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+      if(this.focusedItemProxy) {
+        this.discardChanges(this.focusedItemProxy);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   public addEntry(): void {
@@ -225,6 +259,13 @@ export class JournalComponent {
       this._changeDetectorRef.markForCheck();
     });
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+  }
+
+  public saveAndContinueEditing(itemProxy: ItemProxy): void {
+    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
+      (returnedItemProxy: ItemProxy) => {
+      this._changeDetectorRef.markForCheck();
+    });
   }
 
   public discardChanges(itemProxy: ItemProxy): void {
