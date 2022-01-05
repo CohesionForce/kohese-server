@@ -16,24 +16,37 @@ limitations under the License.
 
 
 <lens></lens>
-<div style="height: 100%; display: flex; flex-direction: row;">
-  <dashboard-selector [user]="currentUser"
-    (dashboardSelected)="dashboardSelected($event)" style="width: 20%;">
-  </dashboard-selector>
-  <div *ngIf=initialized style="width: 80%;">
-    <ng-container [ngSwitch]="selectedDashboard.dashboardType">
-      <ng-container *ngSwitchCase="DashboardTypes.ASSIGNMENT">
-        <assignment-dashboard [assignmentListStream]="assignmentListStream"
-          [dashboardSelectionStream]="dashboardSelectionStream">
-        </assignment-dashboard>
-      </ng-container>
-      <ng-container *ngSwitchCase="DashboardTypes.PROJECT">
-        <project-dashboard
-          [dashboardSelectionStream]="dashboardSelectionStream"
-          (projectSelected)="onProjectSelected($event)"
-          [savedProject]="selectedProject">
-        </project-dashboard>
-      </ng-container>
-    </ng-container>
-  </div>
+<div class=dashboard-wrapper>
+
+  <as-split unit=percent direction="horizontal">
+
+    <as-split-area id="selector-container" [size]="20">
+      <dashboard-selector
+        [user]=currentUser
+        (dashboardSelected)=dashboardSelected($event)>
+      </dashboard-selector>
+    </as-split-area>
+
+    <as-split-area id="dashboard-container" [size]="80">
+      <div class=dashboard-content *ngIf=initialized>
+        <ng-container [ngSwitch]="selectedDashboard.dashboardType">
+          <ng-container *ngSwitchCase="DashboardTypes.ASSIGNMENT">
+            <assignment-dashboard
+              [assignmentListStream]="assignmentListStream"
+              [dashboardSelectionStream]="dashboardSelectionStream">
+            </assignment-dashboard>
+          </ng-container>
+          <ng-container *ngSwitchCase="DashboardTypes.PROJECT">
+            <project-dashboard
+              [dashboardSelectionStream]="dashboardSelectionStream"
+              (projectSelected)="onProjectSelected($event)"
+              [savedProject]="selectedProject">
+            </project-dashboard>
+          </ng-container>
+        </ng-container>
+      </div>
+    </as-split-area>
+
+  </as-split>
+
 </div>

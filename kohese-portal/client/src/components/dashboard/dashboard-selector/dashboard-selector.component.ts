@@ -48,7 +48,7 @@ enum MenuTypes {
 }
 
 export interface DashboardSelectionInfo {
-  dashboard: DashboardSelections,
+  dashboard?: DashboardSelections,
   dashboardType: DashboardTypes
 }
 
@@ -77,9 +77,14 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.selectDashType(DashboardTypes.ASSIGNMENT);
+    this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
     this.router.params.subscribe((params: Params) => {
       if (params['project-id']) {
         this.selectDashType(DashboardTypes.PROJECT);
+      }
+      if (params['appbarNav']) {
+        this.selectDashType(DashboardTypes.ASSIGNMENT);
+        this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
       }
     });
   }
@@ -93,7 +98,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
     switch (type) {
       case (DashboardTypes.ASSIGNMENT):
         this.selectedDashboard = {
-          dashboard: DashboardSelections.OPEN_ASSIGNMENTS,
+          // dashboard: DashboardSelections.OPEN_ASSIGNMENTS,
           dashboardType: DashboardTypes.ASSIGNMENT
         }
         this.menuType = MenuTypes.PERSONAL
@@ -101,13 +106,10 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         break;
       case (DashboardTypes.PROJECT):
         this.selectedDashboard = {
-          dashboard: DashboardSelections.PROJECT_OVERVIEW,
+          // dashboard: DashboardSelections.PROJECT_OVERVIEW,
           dashboardType: DashboardTypes.PROJECT
         };
         this.menuType = MenuTypes.PROJECT
-        this.dashboardSelected.emit(this.selectedDashboard);
-        break;
-        this.menuType = MenuTypes.PERSONAL
         this.dashboardSelected.emit(this.selectedDashboard);
         break;
     }
