@@ -81,6 +81,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
     this.router.params.subscribe((params: Params) => {
       if (params['project-id']) {
         this.selectDashType(DashboardTypes.PROJECT);
+        this.selectDashboard(DashboardSelections.PROJECT_OVERVIEW);
       }
       if (params['appbarNav']) {
         this.selectDashType(DashboardTypes.ASSIGNMENT);
