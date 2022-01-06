@@ -184,10 +184,23 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public async discardChanges(proxy: ItemProxy): Promise<void> {
-    await this._itemRepository.fetchItem(this.docInfo.proxy);
-    this.row.editable = false;
-    this.checkEntries();
-    this.changeRef.markForCheck();
+    if(proxy.dirty) {
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?', '');
+      if(response === false) {
+        this.row.editable = true;
+      }
+      if(response === true) {
+        await this._itemRepository.fetchItem(this.docInfo.proxy);
+        this.row.editable = false;
+        this.checkEntries();
+        this.changeRef.markForCheck();
+      }
+    } else {
+      await this._itemRepository.fetchItem(this.docInfo.proxy);
+      this.row.editable = false;
+      this.checkEntries();
+      this.changeRef.markForCheck();
+    }
   }
 
   numEntries: number = 0;
