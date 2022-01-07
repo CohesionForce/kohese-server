@@ -18,6 +18,7 @@
 // Angular
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 // Other External Dependencies
 
@@ -58,26 +59,24 @@ export interface DashboardSelectionInfo {
   styleUrls: ['./dashboard-selector.component.scss']
 })
 export class DashboardSelectorComponent implements OnInit, OnDestroy {
-  @Input()
-  user: ItemProxy;
+  @Input() user: ItemProxy;
   dashboards: DashboardSelections;
-
   DashboardTypes: any = DashboardTypes
   DashboardSelections: any = DashboardSelections;
   MenuTypes: any = MenuTypes;
 
-  @Output()
-  dashboardSelected: EventEmitter<DashboardSelectionInfo> = new EventEmitter<DashboardSelectionInfo>();
+  @Output() dashboardSelected: EventEmitter<DashboardSelectionInfo> = new EventEmitter<DashboardSelectionInfo>();
   selectedDashboard: DashboardSelectionInfo;
   menuType : MenuTypes;
 
-  constructor(private router: ActivatedRoute) {
+  routerParams = this.router.params;
+  routerParamSubscription: Subscription;
 
-  }
+  constructor(private router: ActivatedRoute){}
 
   ngOnInit() {
     this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
-    this.router.params.subscribe((params: Params) => {
+    this.routerParamSubscription = this.routerParams.subscribe((params: Params) => {
       if (params['appbarNav']) {
         this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
       }
@@ -85,7 +84,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-
+    this.routerParamSubscription.unsubscribe();
   }
 
   selectDashboard(dashboard: DashboardSelections) {
