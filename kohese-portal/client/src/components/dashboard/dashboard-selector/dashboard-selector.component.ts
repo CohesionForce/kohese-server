@@ -48,7 +48,7 @@ enum MenuTypes {
 }
 
 export interface DashboardSelectionInfo {
-  dashboard?: DashboardSelections,
+  dashboard: DashboardSelections,
   dashboardType: DashboardTypes
 }
 
@@ -76,15 +76,9 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.selectDashType(DashboardTypes.ASSIGNMENT);
     this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
     this.router.params.subscribe((params: Params) => {
-      if (params['project-id']) {
-        this.selectDashType(DashboardTypes.PROJECT);
-        this.selectDashboard(DashboardSelections.PROJECT_OVERVIEW);
-      }
       if (params['appbarNav']) {
-        this.selectDashType(DashboardTypes.ASSIGNMENT);
         this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
       }
     });
@@ -92,26 +86,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
 
-  }
-
-  selectDashType(type: DashboardTypes) {
-    console.log(type);
-    switch (type) {
-      case (DashboardTypes.ASSIGNMENT):
-        this.selectedDashboard = {
-          dashboardType: DashboardTypes.ASSIGNMENT
-        }
-        this.menuType = MenuTypes.PERSONAL
-        this.dashboardSelected.emit(this.selectedDashboard);
-        break;
-      case (DashboardTypes.PROJECT):
-        this.selectedDashboard = {
-          dashboardType: DashboardTypes.PROJECT
-        };
-        this.menuType = MenuTypes.PROJECT
-        this.dashboardSelected.emit(this.selectedDashboard);
-        break;
-    }
   }
 
   selectDashboard(dashboard: DashboardSelections) {
@@ -123,6 +97,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
           dashboardType: DashboardTypes.ASSIGNMENT
         };
         this.menuType = MenuTypes.PERSONAL;
+        this.dashboardSelected.emit(this.selectedDashboard);
         break;
 
         case (DashboardSelections.OPEN_ASSIGNMENTS):
@@ -131,6 +106,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
           dashboardType: DashboardTypes.ASSIGNMENT
         };
         this.menuType = MenuTypes.PERSONAL;
+        this.dashboardSelected.emit(this.selectedDashboard)
         break;
 
       case (DashboardSelections.COMPLETED_ASSIGNMENTS):
@@ -139,6 +115,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
           dashboardType: DashboardTypes.ASSIGNMENT
         };
         this.menuType = MenuTypes.PERSONAL;
+        this.dashboardSelected.emit(this.selectedDashboard)
         break;
 
       case (DashboardSelections.USER_STATISTICS):
@@ -147,6 +124,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
           dashboardType: DashboardTypes.PROJECT
         };
         this.menuType = MenuTypes.PROJECT;
+        this.dashboardSelected.emit(this.selectedDashboard)
         break;
 
       case (DashboardSelections.PROJECT_OVERVIEW):
@@ -155,6 +133,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
           dashboardType: DashboardTypes.PROJECT
         };
         this.menuType = MenuTypes.PROJECT;
+        this.dashboardSelected.emit(this.selectedDashboard)
         break;
       case (DashboardSelections.PROJECT_STATUS):
         this.selectedDashboard = {
@@ -162,6 +141,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
           dashboardType: DashboardTypes.PROJECT
         };
         this.menuType = MenuTypes.PROJECT;
+        this.dashboardSelected.emit(this.selectedDashboard)
         break;
       default:
         console.error('Invalid Dashboard selection :');

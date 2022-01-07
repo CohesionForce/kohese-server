@@ -24,17 +24,17 @@ limitations under the License.
       <mat-list>
         <mat-list-item role=listitem>
             <button mat-raised-button style="background-color: rgb(245, 164, 66); color: whitesmoke"
-              (click)="selectDashType(DashboardTypes.ASSIGNMENT); selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)">
+              (click)="selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)">
               Due</button>
           </mat-list-item>
           <mat-list-item role=listitem>
             <button mat-raised-button style="background-color: rgb(40, 110, 250); color: whitesmoke"
-              (click)="selectDashType(DashboardTypes.ASSIGNMENT); selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)">
+              (click)="selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)">
               Open</button>
           </mat-list-item>
           <mat-list-item role=listitem>
             <button mat-raised-button style="background-color: rgb(0, 128, 0); color: whitesmoke"
-              (click)="selectDashType(DashboardTypes.ASSIGNMENT); selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)">
+              (click)="selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)">
               Complete</button>
           </mat-list-item>
       </mat-list>
@@ -47,18 +47,18 @@ limitations under the License.
       <mat-list>
         <mat-list-item role=listitem>
           <button mat-raised-button
-            (click)="selectDashType(DashboardTypes.PROJECT); selectDashboard(DashboardSelections.PROJECT_OVERVIEW)">
-            overview</button>
+            (click)="selectDashboard(DashboardSelections.PROJECT_OVERVIEW)">
+            Overview</button>
         </mat-list-item>
         <mat-list-item role=listitem>
           <button mat-raised-button
-            (click)="selectDashType(DashboardTypes.PROJECT); selectDashboard(DashboardSelections.USER_STATISTICS)">
-            user statistics</button>
+            (click)="selectDashboard(DashboardSelections.USER_STATISTICS)">
+            User statistics</button>
         </mat-list-item>
         <mat-list-item role=listitem>
           <button mat-raised-button
-            (click)="selectDashType(DashboardTypes.PROJECT); selectDashboard(DashboardSelections.PROJECT_STATUS)">
-            project status</button>
+            (click)="selectDashboard(DashboardSelections.PROJECT_STATUS)">
+            Project status</button>
         </mat-list-item>
       </mat-list>
     </mat-card-actions>
