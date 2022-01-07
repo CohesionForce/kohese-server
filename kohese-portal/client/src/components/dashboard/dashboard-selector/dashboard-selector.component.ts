@@ -99,7 +99,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
     switch (type) {
       case (DashboardTypes.ASSIGNMENT):
         this.selectedDashboard = {
-          // dashboard: DashboardSelections.OPEN_ASSIGNMENTS,
           dashboardType: DashboardTypes.ASSIGNMENT
         }
         this.menuType = MenuTypes.PERSONAL
@@ -107,7 +106,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         break;
       case (DashboardTypes.PROJECT):
         this.selectedDashboard = {
-          // dashboard: DashboardSelections.PROJECT_OVERVIEW,
           dashboardType: DashboardTypes.PROJECT
         };
         this.menuType = MenuTypes.PROJECT

@@ -25,17 +25,17 @@ limitations under the License.
         <mat-list-item role=listitem>
             <button mat-raised-button style="background-color: rgb(245, 164, 66); color: whitesmoke"
               (click)="selectDashType(DashboardTypes.ASSIGNMENT); selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)">
-              due</button>
+              Due</button>
           </mat-list-item>
           <mat-list-item role=listitem>
             <button mat-raised-button style="background-color: rgb(40, 110, 250); color: whitesmoke"
               (click)="selectDashType(DashboardTypes.ASSIGNMENT); selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)">
-              open</button>
+              Open</button>
           </mat-list-item>
           <mat-list-item role=listitem>
             <button mat-raised-button style="background-color: rgb(0, 128, 0); color: whitesmoke"
               (click)="selectDashType(DashboardTypes.ASSIGNMENT); selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)">
-              complete</button>
+              Complete</button>
           </mat-list-item>
       </mat-list>
     </mat-card-actions>
@@ -64,54 +64,4 @@ limitations under the License.
     </mat-card-actions>
   </mat-card>
 
-
-
-
-
-  <!-- <h4 class="dashboard-section"
-    (click)="selectDashType(DashboardTypes.ASSIGNMENT)"
-    [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PERSONAL}">My Dashboard</h4>
-  <h4 class="dashboard-section"
-    (click)="selectDashType(DashboardTypes.PROJECT)"
-    [ngClass]="{'selectedDashListItem' : menuType === MenuTypes.PROJECT}">Project Dashboard</h4>
-  <hr>
-  <div>
-    <mat-divider style="border-color: white"></mat-divider>
-    <div *ngIf="menuType === MenuTypes.PERSONAL">
-      <h5 class="dashListHeader">Assignments</h5>
-      <div>
-        <h6 class="dashListItem"
-            (click)="selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)"
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === DashboardSelections.DUE_ASSIGNMENTS}">
-            Due</h6>
-        <h6 class="dashListItem"
-            (click)="selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)"
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === DashboardSelections.OPEN_ASSIGNMENTS}">
-            Open</h6>
-        <h6 class="dashListItem"
-            (click)="selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)"
-            [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === DashboardSelections.COMPLETED_ASSIGNMENTS}">
-            Completed</h6>
-      </div>
-      <mat-divider></mat-divider>
-    </div>
-  </div>
-  <div *ngIf="menuType === MenuTypes.PROJECT">
-    <h5 class="dashListHeader">Project</h5>
-    <div>
-      <h6 class="dashListItem"
-          (click)="selectDashboard(DashboardSelections.PROJECT_OVERVIEW)"
-          [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === DashboardSelections.PROJECT_OVERVIEW}">
-          Overview</h6>
-      <h6 class="dashListItem"
-          (click)="selectDashboard(DashboardSelections.USER_STATISTICS)"
-          [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === DashboardSelections.USER_STATISTICS}">
-          User Statistics</h6>
-      <h6 class="dashListItem"
-          (click)="selectDashboard(DashboardSelections.PROJECT_STATUS)"
-          [ngClass]="{'selectedDashListItem' : selectedDashboard.dashboard === DashboardSelections.PROJECT_STATUS}">
-          Project Status</h6>
-    </div>
-    <mat-divider></mat-divider>
-  </div> -->
 </div>
