@@ -65,6 +65,8 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   DashboardSelections: any = DashboardSelections;
   MenuTypes: any = MenuTypes;
 
+  whichLink: string;
+
   @Output() dashboardSelected: EventEmitter<DashboardSelectionInfo> = new EventEmitter<DashboardSelectionInfo>();
   selectedDashboard: DashboardSelectionInfo;
   menuType : MenuTypes;
@@ -78,6 +80,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
     this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
     this.routerParamSubscription = this.routerParams.subscribe((params: Params) => {
       if (params['appbarNav']) {
+        this.linkClicked('open');
         this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
       }
     });
@@ -148,6 +151,11 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
     }
 
     this.dashboardSelected.emit(this.selectedDashboard);
+  }
+
+  public linkClicked(link: string) {
+    this.whichLink = '';
+    this.whichLink = link;
   }
 }
 

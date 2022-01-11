@@ -23,6 +23,25 @@
     flex-direction: row;
     height: 100%;
 
+    mat-drawer-content {
+      display: flex;
+      flex-direction: row;
+
+      overflow: hidden;
+    }
+
+    .drawer-toggle > button {
+      display: block;
+      border-radius: 4px;
+      background-color: rgba(59, 150, 112, 0.5);
+
+      transform: translate(-45px, 20px);
+
+      mat-icon {
+        transform: translate(20px, 6px);
+      }
+    }
+
     .dashboard-content {
       height: 100%;
     }

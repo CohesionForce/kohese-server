@@ -17,50 +17,27 @@ limitations under the License.
 
 <div class="user-dash">
 
-  <!-- card format for smaller width -->
   <mat-card>
     <mat-card-title>My Dashboard</mat-card-title>
     <mat-card-actions>
-      <mat-list>
-        <mat-list-item role=listitem>
-            <button mat-raised-button style="background-color: rgb(245, 164, 66); color: whitesmoke"
-              (click)="selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)">
-              Due</button>
-          </mat-list-item>
-          <mat-list-item role=listitem>
-            <button mat-raised-button style="background-color: rgb(40, 110, 250); color: whitesmoke"
-              (click)="selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)">
-              Open</button>
-          </mat-list-item>
-          <mat-list-item role=listitem>
-            <button mat-raised-button style="background-color: rgb(0, 128, 0); color: whitesmoke"
-              (click)="selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)">
-              Complete</button>
-          </mat-list-item>
-      </mat-list>
+      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'due' ? 'royalblue' : '#1a1a1a' }"
+        (click)="linkClicked('due'); selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)">Due</span>
+      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'open' ? 'royalblue' : '#1a1a1a' }"
+        (click)="linkClicked('open'); selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)">Open</span>
+      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'completed' ? 'royalblue' : '#1a1a1a' }"
+        (click)="linkClicked('completed'); selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)">Completed</span>
     </mat-card-actions>
   </mat-card>
 
   <mat-card>
     <mat-card-title>Project Dashboard</mat-card-title>
     <mat-card-actions>
-      <mat-list>
-        <mat-list-item role=listitem>
-          <button mat-raised-button
-            (click)="selectDashboard(DashboardSelections.PROJECT_OVERVIEW)">
-            Overview</button>
-        </mat-list-item>
-        <mat-list-item role=listitem>
-          <button mat-raised-button
-            (click)="selectDashboard(DashboardSelections.USER_STATISTICS)">
-            User statistics</button>
-        </mat-list-item>
-        <mat-list-item role=listitem>
-          <button mat-raised-button
-            (click)="selectDashboard(DashboardSelections.PROJECT_STATUS)">
-            Project status</button>
-        </mat-list-item>
-      </mat-list>
+      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'overview' ? 'royalblue' : '#1a1a1a' }"
+        (click)="linkClicked('overview'); selectDashboard(DashboardSelections.PROJECT_OVERVIEW)">Overview</span>
+      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'user statistics' ? 'royalblue' : '#1a1a1a' }"
+        (click)="linkClicked('user statistics'); selectDashboard(DashboardSelections.USER_STATISTICS)">User&nbsp;Statistics</span>
+      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'project status' ? 'royalblue' : '#1a1a1a' }"
+        (click)="linkClicked('project status'); selectDashboard(DashboardSelections.PROJECT_STATUS)">Project&nbsp;Status</span>
     </mat-card-actions>
   </mat-card>
 

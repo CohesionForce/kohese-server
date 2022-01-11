@@ -15,25 +15,29 @@
  */
 
 
-.user-dash {
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: bold;
+:host {
+  .user-dash {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
 
-  mat-card {
-    margin: 0.25em;
+    mat-card {
+      margin: 0.25em;
 
-    mat-card-title {
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
+      mat-card-title {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
 
-    mat-card-actions {
-      button {
-       min-height:fit-content;
-       min-width: fit-content;
-       font-weight: bold;
+      mat-card-actions {
+        .dashboard-links {
+          display: flex;
+          flex-direction: column;
+          margin: 0.2em;
+          padding-left: 1em;
+          cursor: pointer;
+        }
       }
     }
   }
-
 }
+

@@ -18,17 +18,25 @@ limitations under the License.
 <lens></lens>
 <div class=dashboard-wrapper>
 
-  <as-split #mySplit unit=percent direction="horizontal">
+  <mat-drawer-container>
 
-    <as-split-area id="selector-container" [size]="20">
+    <mat-drawer mode=side [(opened)]=opened>
+
       <dashboard-selector
         [user]=currentUser
         (dashboardSelected)=dashboardSelected($event)>
       </dashboard-selector>
-    </as-split-area>
 
-    <as-split-area id="dashboard-container" [size]="80">
-      <div class=dashboard-content *ngIf=initialized>
+    </mat-drawer>
+
+    <mat-drawer-content>
+      <div class=drawer-toggle>
+        <button mat-raised-button (click)="toggleDrawer()">
+          <mat-icon *ngIf=opened class="fa fa-chevron-left"></mat-icon>
+          <mat-icon *ngIf=!opened class="fa fa-chevron-right"></mat-icon>
+        </button>
+      </div>
+      <div class="dashboard-content" *ngIf=initialized>
         <ng-container [ngSwitch]="selectedDashboard.dashboardType">
           <ng-container *ngSwitchCase="DashboardTypes.ASSIGNMENT">
             <assignment-dashboard
@@ -45,8 +53,13 @@ limitations under the License.
           </ng-container>
         </ng-container>
       </div>
-    </as-split-area>
+    </mat-drawer-content>
 
-  </as-split>
+  </mat-drawer-container>
+
+
+
+
+
 
 </div>

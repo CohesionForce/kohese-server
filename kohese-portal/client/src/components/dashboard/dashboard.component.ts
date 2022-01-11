@@ -34,7 +34,7 @@ import { ProjectInfo, ProjectService } from '../../services/project-service/proj
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls : ['./dashboard.component.scss']
+  styleUrls : ['./dashboard.component.scss'],
 })
 
 export class DashboardComponent extends NavigatableComponent implements OnInit, OnDestroy {
@@ -43,6 +43,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
   assignmentListStream : BehaviorSubject<Array<ItemProxy>> = new BehaviorSubject<Array<ItemProxy>>([]);
 
   /**Dashboard Initializations */
+  opened: boolean = true;
   selectedDashboard : DashboardSelectionInfo = {
     dashboard : undefined,
     dashboardType : undefined
@@ -96,6 +97,10 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
     if (this.changeSubjectSubscription) {
       this.changeSubjectSubscription.unsubscribe();
     }
+  }
+
+  toggleDrawer() {
+    this.opened = !this.opened;
   }
 
   dashboardSelected(dashboard : DashboardSelectionInfo) {
