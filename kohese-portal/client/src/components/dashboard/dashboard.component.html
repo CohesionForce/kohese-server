@@ -18,24 +18,26 @@ limitations under the License.
 <lens></lens>
 <div class=dashboard-wrapper>
 
-  <mat-drawer-container>
+  <mat-sidenav-container>
 
-    <mat-drawer mode=side [(opened)]=opened>
+    <mat-sidenav mode=side [opened]=opened>
 
       <dashboard-selector
         [user]=currentUser
         (dashboardSelected)=dashboardSelected($event)>
       </dashboard-selector>
 
-    </mat-drawer>
+    </mat-sidenav>
 
-    <mat-drawer-content>
-      <div class=drawer-toggle>
-        <button mat-raised-button (click)="toggleDrawer()">
+    <mat-sidenav-content>
+
+      <div class=sidenav-toggle>
+        <button mat-raised-button (click)="togglesidenav()">
           <mat-icon *ngIf=opened class="fa fa-chevron-left"></mat-icon>
           <mat-icon *ngIf=!opened class="fa fa-chevron-right"></mat-icon>
         </button>
       </div>
+
       <div class="dashboard-content" *ngIf=initialized>
         <ng-container [ngSwitch]="selectedDashboard.dashboardType">
           <ng-container *ngSwitchCase="DashboardTypes.ASSIGNMENT">
@@ -53,9 +55,10 @@ limitations under the License.
           </ng-container>
         </ng-container>
       </div>
-    </mat-drawer-content>
 
-  </mat-drawer-container>
+    </mat-sidenav-content>
+
+  </mat-sidenav-container>
 
 
 

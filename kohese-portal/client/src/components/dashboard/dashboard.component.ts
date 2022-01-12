@@ -43,7 +43,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
   assignmentListStream : BehaviorSubject<Array<ItemProxy>> = new BehaviorSubject<Array<ItemProxy>>([]);
 
   /**Dashboard Initializations */
-  opened: boolean = true;
+  opened: boolean = false;
   selectedDashboard : DashboardSelectionInfo = {
     dashboard : undefined,
     dashboardType : undefined
@@ -99,7 +99,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
     }
   }
 
-  toggleDrawer() {
+  togglesidenav() {
     this.opened = !this.opened;
   }
 

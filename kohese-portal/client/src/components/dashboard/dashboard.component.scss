@@ -23,19 +23,26 @@
     flex-direction: row;
     height: 100%;
 
-    mat-drawer-content {
-      display: flex;
-      flex-direction: row;
+    mat-sidenav-container {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    mat-sidenav-content {
 
       overflow: hidden;
     }
 
-    .drawer-toggle > button {
+    .sidenav-toggle {
+      height: 0;
+    }
+
+    .sidenav-toggle > button {
       display: block;
-      border-radius: 4px;
+      border-radius: 4px !important;
       background-color: rgba(59, 150, 112, 0.5);
 
-      transform: translate(-45px, 20px);
+      transform: translate(-45px, 10px);
 
       mat-icon {
         transform: translate(20px, 6px);
