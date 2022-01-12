@@ -18,30 +18,69 @@
 @import '../../../app.component';
 
 :host {
-  ::ng-deep .mat-expansion-indicator:after {
-  color: whitesmoke;
+
+  .assignment-dashboard-wrapper {
+    display: flex;
+    flex-direction: row;
+
+    height: 100%;
+    margin: 0.05em;
+
+    .assignments-column {
+      width: 60%;
+      color: whitesmoke;
+
+      .assignments-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        height: 2.4em;
+
+        padding-left: 1em;
+        margin-left: 0.5em;
+
+        border-bottom: 2px solid rgba(0,0,0,.65);
+        background-color: white; color: rgba(0,0,0,.8);
+      }
+
+      .sorted-assignments {
+        height: calc(100% - 4.23em);
+        overflow: auto;
+
+        ::ng-deep .mat-expansion-indicator:after {
+          color: whitesmoke;
+          }
+
+          ::ng-deep .mat-badge-content {
+            background-color: transparent;
+            color: whitesmoke;
+          }
+
+          mat-expansion-panel {
+            width: 100%;
+            box-shadow: 0 3px 1px -2px rgba(0,0,0,.8),
+                        0 2px 2px 0 rgba(0,0,0,.64),
+                        0 1px 5px 0 rgba(0,0,0,.62);
+          }
+
+          mat-panel-title {
+            display: block;
+            width: 68%;
+            align-items:center;
+            color: whitesmoke;
+            font-size: x-large;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+      }
+    }
+    activity-feed {
+      padding-left: .5em;
+
+      flex: 1 1 40%;
+    }
   }
-
-  ::ng-deep .mat-badge-content {
-    background-color: transparent;
-    color: whitesmoke;
-  }
 }
 
-mat-expansion-panel {
-  width: 100%;
-  box-shadow: 0 3px 1px -2px rgba(0,0,0,.8),
-              0 2px 2px 0 rgba(0,0,0,.64),
-              0 1px 5px 0 rgba(0,0,0,.62);
-}
-
-mat-panel-title {
-  display: block;
-  width: 68%;
-  align-items:center;
-  color: whitesmoke;
-  font-size: x-large;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}

@@ -15,10 +15,9 @@ limitations under the License.
 -->
 
 
-<div style="height: 100%; display: flex; flex-direction: row; margin: 0.05em">
-  <div style="width: 60%; color: whitesmoke">
-    <h4 style="height: 2.4em; padding-left: 1em; border-bottom: 2px solid rgba(0,0,0,.65);
-      background-color: white; color: rgba(0,0,0,.8); display: flex; flex-direction: row; align-items: center">
+<div class=assignment-dashboard-wrapper>
+  <div class=assignments-column>
+    <h4 class=assignments-header>
       Assignments:
       <button mat-icon-button matTooltip="Expand all Assignments" (click)="expandAll()" class="flex-right-align">
         <mat-icon class="fa fa-chevron-down"></mat-icon>
@@ -29,7 +28,7 @@ limitations under the License.
     </h4>
     <!-- height calc is chosen to take into account the 1.33em from the "Assignments" h4 height
          and the margin-bottom/margin-block-end  -->
-    <div style="height: calc(100% - 4.23em); overflow: auto;">
+    <div class=sorted-assignments>
       <ng-container *ngFor="let assignment of sortedAssignmentList">
         <mat-expansion-panel #panel>
           <mat-expansion-panel-header [ngStyle]="{ 'background-color': (getViewModel(assignment).color ? getViewModel(assignment).color : '#000000') }">
@@ -104,5 +103,5 @@ limitations under the License.
       </ng-container>
     </div>
   </div>
-  <activity-feed [activityList]="assignmentList" style="flex: 1 1 40%; padding-left: .5em"></activity-feed>
+  <activity-feed [activityList]="assignmentList"></activity-feed>
 </div>
