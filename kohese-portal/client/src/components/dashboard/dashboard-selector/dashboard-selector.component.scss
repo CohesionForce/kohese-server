@@ -24,18 +24,17 @@
       margin: 0.25em;
 
       mat-card-title {
+        font-weight: 550;
         white-space: nowrap;
         text-overflow: ellipsis;
       }
 
-      mat-card-actions {
-        .dashboard-links {
-          display: flex;
-          flex-direction: column;
-          margin: 0.2em;
-          padding-left: 1em;
-          cursor: pointer;
-        }
+      .dashboard-links {
+        display: flex;
+        flex-direction: column;
+        margin: 0.2em;
+        padding-left: 1em;
+        cursor: pointer;
       }
     }
   }

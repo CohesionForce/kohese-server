@@ -23,6 +23,10 @@
     flex-direction: row;
     height: 100%;
 
+    mat-sidenav {
+      background-color: #99c7b4;
+    }
+
     mat-sidenav-container {
       width: 100%;
       overflow: hidden;

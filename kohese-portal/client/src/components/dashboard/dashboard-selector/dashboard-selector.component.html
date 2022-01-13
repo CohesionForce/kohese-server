@@ -19,26 +19,43 @@ limitations under the License.
 
   <mat-card>
     <mat-card-title>My Dashboard</mat-card-title>
-    <mat-card-actions>
-      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'due' ? 'royalblue' : '#1a1a1a' }"
+    <mat-card-subtitle>
+      <span class=dashboard-links [ngStyle]="{
+                                              'color': whichLink === 'due' ? 'royalblue' : '#1a1a1a',
+                                              'font-weight': whichLink === 'due' ? 'bold' : '350'
+                                            }"
         (click)="linkClicked('due'); selectDashboard(DashboardSelections.DUE_ASSIGNMENTS)">Due</span>
-      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'open' ? 'royalblue' : '#1a1a1a' }"
+      <span class=dashboard-links [ngStyle]="{
+                                              'color': whichLink === 'open' ? 'royalblue' : '#1a1a1a',
+                                              'font-weight': whichLink === 'open' ? 'bold' : '350'
+                                            }"
         (click)="linkClicked('open'); selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS)">Open</span>
-      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'completed' ? 'royalblue' : '#1a1a1a' }"
+      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'completed' ? 'royalblue' : '#1a1a1a',
+                                              'font-weight': whichLink === 'completed' ? 'bold' : '350'
+                                            }"
         (click)="linkClicked('completed'); selectDashboard(DashboardSelections.COMPLETED_ASSIGNMENTS)">Completed</span>
-    </mat-card-actions>
+    </mat-card-subtitle>
   </mat-card>
 
   <mat-card>
     <mat-card-title>Project Dashboard</mat-card-title>
-    <mat-card-actions>
-      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'overview' ? 'royalblue' : '#1a1a1a' }"
+    <mat-card-subtitle>
+      <span class=dashboard-links [ngStyle]="{
+                                              'color': whichLink === 'overview' ? 'royalblue' : '#1a1a1a',
+                                              'font-weight': whichLink === 'overview' ? 'bold' : '350'
+                                            }"
         (click)="linkClicked('overview'); selectDashboard(DashboardSelections.PROJECT_OVERVIEW)">Overview</span>
-      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'user statistics' ? 'royalblue' : '#1a1a1a' }"
+      <span class=dashboard-links [ngStyle]="{
+                                              'color': whichLink === 'user statistics' ? 'royalblue' : '#1a1a1a',
+                                              'font-weight': whichLink === 'user statistics' ? 'bold' : '350'
+                                            }"
         (click)="linkClicked('user statistics'); selectDashboard(DashboardSelections.USER_STATISTICS)">User&nbsp;Statistics</span>
-      <span class=dashboard-links [ngStyle]="{'color': whichLink === 'project status' ? 'royalblue' : '#1a1a1a' }"
+      <span class=dashboard-links [ngStyle]="{
+                                              'color': whichLink === 'project status' ? 'royalblue' : '#1a1a1a',
+                                              'font-weight': whichLink === 'project status' ? 'bold' : '350'
+                                            }"
         (click)="linkClicked('project status'); selectDashboard(DashboardSelections.PROJECT_STATUS)">Project&nbsp;Status</span>
-    </mat-card-actions>
+    </mat-card-subtitle>
   </mat-card>
 
 </div>
