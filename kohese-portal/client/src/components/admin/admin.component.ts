@@ -199,7 +199,6 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
   }
 
-  // user is now a proxy
   public displayInformation(user: any): void {
 
     this._dialogService.openComponentDialog(DetailsComponent, {
