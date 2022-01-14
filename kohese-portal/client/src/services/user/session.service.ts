@@ -65,10 +65,6 @@ export class SessionService {
                      private itemRepository: ItemRepository,
                      private router: Router
   ) {
-    this.initService();
-  }
-
-  initService() {
     this.CurrentUserService.getCurrentUserSubject().subscribe( async (decodedToken: any) => {
       if (decodedToken) {
 
@@ -90,7 +86,7 @@ export class SessionService {
           }
         });
 
-        this.treeConfigChangeSubjectSub = TreeConfiguration.getWorkingTree().changeSubject.subscribe((change) => {
+        this.treeConfigChangeSubjectSub = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
           if(change.proxy.kind === 'KoheseUser') {
             switch (change.type) {
               case 'create':
