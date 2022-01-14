@@ -26,8 +26,7 @@ import { Subscription } from 'rxjs';
 
 // Kohese
 import { SessionService } from '../../services/user/session.service';
-import { ItemRepository } from '../../services/item-repository/item-repository.service';
-import { LensService, ApplicationLens } from '../../services/lens-service/lens.service';
+import { ItemRepository, RepoStates } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { FormatObjectEditorComponent } from '../object-editor/format-object-editor/format-object-editor.component';
@@ -50,10 +49,6 @@ export class AdminComponent implements OnInit, OnDestroy {
   private lockoutList: Array<string> = [];
 
   // Getters
-  private _lens: ApplicationLens;
-  get lens() {
-    return this._lens;
-  }
 
   private _focusedItemProxy: ItemProxy;
   get focusedItemProxy(): ItemProxy {
@@ -73,15 +68,27 @@ export class AdminComponent implements OnInit, OnDestroy {
     return this._koheseUserViewModel;
   }
 
+  private _users: any;
+  get users() {
+    return this._users;
+  }
+  set users(sortedUserProxiesArray: any) {
+    this._users = sortedUserProxiesArray;
+  }
+
   private _sessionMap: any;
   get sessionMap() {
     return this._sessionMap;
   }
+  set sessionMap(value: any) {
+    this._sessionMap = value;
+  }
 
-  private _treeConfigurationSubscription: Subscription;
-  private _lensSubscription: Subscription;
-  _saveShortcutSubscription: Subscription;
-  _exitShortcutSubscription: Subscription;
+  repositoryStatusSubscription: Subscription;
+  sessionMapChangeSub: Subscription;
+  usersChangeSub: Subscription;
+  private _saveShortcutSubscription: Subscription;
+  private _exitShortcutSubscription: Subscription;
 
   private _editableSet: Array<string> = [];
   get editableSet() {
@@ -94,10 +101,6 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   get FormatDefinitionType() {
     return FormatDefinitionType;
-  }
-
-  get ApplicationLens() {
-    return ApplicationLens;
   }
 
   get Object() {
@@ -116,7 +119,6 @@ export class AdminComponent implements OnInit, OnDestroy {
     private _changeDetectorRef: ChangeDetectorRef,
     private _sessionService: SessionService,
     private _itemRepository:ItemRepository,
-    private _lensService: LensService,
     private _dialogService: DialogService,
     private _navigationService: NavigationService,
     private hotkeys : Hotkeys,
@@ -139,21 +141,25 @@ export class AdminComponent implements OnInit, OnDestroy {
     }
 
   public ngOnInit(): void {
-    this._treeConfigurationSubscription = this._itemRepository.getTreeConfig().
-      subscribe(async (treeConfigurationObject: any) => {
-      if (treeConfigurationObject) {
+
+    this.repositoryStatusSubscription = this._itemRepository.getRepoStatusSubject().subscribe(async (status: any) => {
+      if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
+
         let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseUser');
         this._koheseUserDataModel = modelProxy.item;
         this._koheseUserViewModel = modelProxy.view.item;
-        this._sessionMap = await this._itemRepository.getSessionMap();
+        this.sessionMap = this.sessionService.sessionMap;
+        this.users = this.sessionService.userProxies;
+        this.sessionMapChangeSub = this.sessionService.sessionChangeSubject.subscribe((sessionData) => {
+          this.sessionMap = sessionData;
+        });
+        console.log(this.sessionMap);
+        this.usersChangeSub = this.sessionService.usersChangeSubject.subscribe((userProxies) => {
+          this.users = userProxies;
+        });
+        console.log(this.users);
         this._changeDetectorRef.markForCheck();
       }
-    });
-
-    this._lensSubscription = this._lensService.getLensSubject().subscribe(
-      (lens: ApplicationLens) => {
-      this._lens = lens;
-      this._changeDetectorRef.markForCheck();
     });
 
     // Loads user lockout list for lock/reinstate panel buttons
@@ -161,8 +167,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._lensSubscription.unsubscribe();
-    this._treeConfigurationSubscription.unsubscribe();
+    this.sessionMapChangeSub.unsubscribe();
+    this.usersChangeSub.unsubscribe();
     this._saveShortcutSubscription.unsubscribe();
     this._exitShortcutSubscription.unsubscribe();
   }
@@ -187,58 +193,46 @@ export class AdminComponent implements OnInit, OnDestroy {
     }).updateSize('90%', '90%').afterClosed().subscribe(async (result:
       any) => {
       if (result) {
-        let itemProxy: ItemProxy = await this._itemRepository.upsertItem(
-          result.type.name, result.object);
-        this._sessionService.users.push(itemProxy.item);
+        this._itemRepository.upsertItem(result.type.name, result.object);
         this._changeDetectorRef.markForCheck();
       }
     });
   }
 
+  // user is now a proxy
   public displayInformation(user: any): void {
-    let userIdProxy: ItemProxy = this._itemRepository.getTreeConfig().
-    getValue().config.getProxyFor(user.id);
 
     this._dialogService.openComponentDialog(DetailsComponent, {
       data: {
-        itemProxy: userIdProxy
+        itemProxy: user
       }
     }).updateSize('90%', '90%');
   }
 
   public save(user: any): void {
-    let userKind = this._itemRepository.getTreeConfig().getValue().config.getProxyFor(user.id).kind
-    this._itemRepository.upsertItem(userKind, user).then((returnedItemProxy: ItemProxy) => {
+    this._itemRepository.upsertItem(user.kind, user.item).then((returnedItemProxy: ItemProxy) => {
       this._changeDetectorRef.markForCheck();
     });
-    this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
+    this._editableSet.splice(this._editableSet.indexOf(user.item.id), 1);
   }
 
   public saveAndContinueEditing(user: any): void {
-    let userKind = this._itemRepository.getTreeConfig().getValue().config.getProxyFor(user.id).kind;
-    this._itemRepository.upsertItem(userKind, user).then((returnedItemProxy: ItemProxy) => {
+    this._itemRepository.upsertItem(user.kind, user.item).then((returnedItemProxy: ItemProxy) => {
         this._changeDetectorRef.markForCheck();
     });
   }
 
-  public discardChanges(user: any): void {
-    this._itemRepository.fetchItem(this._itemRepository.getTreeConfig().
-      getValue().config.getProxyFor(user.id));
-    this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
+  public async discardChanges(user: any): Promise<void> {
+    await this._itemRepository.fetchItem(user);
+    this._editableSet.splice(this._editableSet.indexOf(user.item.id), 1);
     this._changeDetectorRef.markForCheck();
   }
 
   public async remove(user: any): Promise<void> {
-    let response: any = await this._dialogService.openYesNoDialog('Remove ' +
-      user.name, 'Are you sure that you want to remove ' + user.name +
-      ' from the system?');
+    let response: any = await this._dialogService.openYesNoDialog('Remove ' + user.item.name + ' from Kohese?', '');
     if (response) {
-      this._itemRepository.deleteItem(this._itemRepository.getTreeConfig().
-        getValue().config.getProxyFor(user.id), false).then(() => {
-        this._sessionService.users.splice(this._sessionService.users.indexOf(
-          user), 1);
-        this._changeDetectorRef.markForCheck();
-      });
+      this._itemRepository.deleteItem(user, false);
+      this._changeDetectorRef.markForCheck();
     }
   }
 
@@ -249,7 +243,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     let lock: any = await this._dialogService.openYesNoDialog('Lock ' +
       user.name, 'Lock ' + user.name + ' out of Kohese?');
     if (lock) {
-      let response = await this.cacheManager.sendMessageToWorker('Admin/lockoutUser', {username: user.username}, true);
+      let response = await this.cacheManager.sendMessageToWorker('Admin/lockoutUser', {username: user.item.username}, true);
       console.log('::: ' + response.username + 'has been locked out.');
       this.getUserLockoutList();
       this._changeDetectorRef.markForCheck();
@@ -259,8 +253,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   // Provides the option to reinstate a locked user
   //////////////////////////////////////////////////////////
   private async reinstateUser(user: any) {
-    let reinstate: any = await this._dialogService.openYesNoDialog('Reinstate ' + user.name + '?\n',
-      'Reinstate ' + user.name + '?');
+    let reinstate: any = await this._dialogService.openYesNoDialog('Reinstate ' + user.item.name + '?\n',
+      'Reinstate ' + user.item.name + '?');
     if (reinstate) {
       let response = await this.cacheManager.sendMessageToWorker('Admin/reinstateUser', {username: user.username}, true);
       console.log('::: ' + response.username + 'has been reinstated.');
@@ -291,7 +285,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   isModified(user: any): boolean {
-    return this._itemRepository.getTreeConfig().getValue().config.getProxyFor(user.id).dirty;
+    return user.dirty;
   }
 
   public expandAll(): void {

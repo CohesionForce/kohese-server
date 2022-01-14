@@ -15,60 +15,149 @@
  */
 
 
+// Angular
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
 
-import { Subscription } from 'rxjs';
+// Other External Imports
+
+// Kohese
 import { CurrentUserService } from './current-user.service';
 import { ItemProxy } from '../../../../common/src/item-proxy';
-import { ItemRepository } from '../item-repository/item-repository.service';
+import { ItemRepository, RepoStates } from '../item-repository/item-repository.service';
+import { CacheManager } from '../../../cache-worker/CacheManager';
+import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+
+
+
+
+                  // TODO: add users by splicing here in the session service when treeconfig change subscription
+                  //       is called and remove:
+                  //                              this._sessionService.users.push(itemProxy.item);
+                  //       from admin.component.ts.
+                  //
+                  // TODO: Add ItemProxy.treeConfig.changeSubject subscription (this is line 2119 in item-proxy.ts)
+                  //       for create, update, delete
+                  //
+                  // TODO: Use Proxies everywhere in admin component
+                  // TODO: Change _users Array<any> to a _users Map<id,ItemProxy>
 
 @Injectable()
 export class SessionService {
+  // TODO: Remove this after transition to userProxies is complete
   private _user: any;
   get user() {
     return this._user;
   }
 
-  private _users: Array<any> = [];
-  get users() {
-    return this._users;
+
+  // <itemProxy.item.id, itemProxy>
+  private _userProxies: Map<string,ItemProxy> = new Map<string,ItemProxy>();
+  get userProxies() {
+    let sortedUsers: Array<ItemProxy> = Array.from(this._userProxies.values());
+
+    // gives alphabetically sorted list of proxies
+    sortedUsers.sort((leftUserProxy: any, rightUserProxy: any) => {
+      return leftUserProxy.item.name.localeCompare(rightUserProxy.item.name);
+    });
+
+    return sortedUsers;
   }
 
-  private _treeConfigurationSubscription: Subscription;
+  private _sessionMap: {};
+  get sessionMap() {
+    return this._sessionMap;
+  }
+
+  sessionChangeSubject: Subject<any> = new Subject<any>();
+  usersChangeSubject: Subject<ItemProxy[]> = new Subject<ItemProxy[]>();
+  private treeConfigChangeSubjectSub: Subscription;
+  private repositoryStatusSubscription: Subscription;
 
   public constructor(private CurrentUserService: CurrentUserService,
-    private itemRepository: ItemRepository, private router: Router) {
-    this.CurrentUserService.getCurrentUserSubject().subscribe((decodedToken:
-      any) => {
-      if (decodedToken) {
-        this._treeConfigurationSubscription = this.itemRepository.
-          getTreeConfig().subscribe((treeConfigurationObject: any) => {
-          this._users = [];
-          if (treeConfigurationObject) {
-            this._user = treeConfigurationObject.config.getRootProxy().
-              getChildByName('Users').getChildByName(decodedToken.username).
-              item;
+                     private cacheManager : CacheManager,
+                     private itemRepository: ItemRepository,
+                     private router: Router
+  ) {
+    this.initService();
+  }
 
-            treeConfigurationObject.config.getRootProxy().visitChildren(
-              { includeOrigin: false }, (itemProxy: ItemProxy) => {
+  initService() {
+    this.CurrentUserService.getCurrentUserSubject().subscribe( async (decodedToken: any) => {
+      if (decodedToken) {
+
+        this.repositoryStatusSubscription = this.itemRepository.getRepoStatusSubject().subscribe(async (status: any) => {
+          if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
+            this._userProxies.clear();
+
+            let rootProxy = TreeConfiguration.getWorkingTree().getRootProxy();
+            this._user = rootProxy.getChildByName('Users').getChildByName(decodedToken.username).item;
+
+            rootProxy.visitChildren({ includeOrigin: false }, (itemProxy: ItemProxy) => {
               if (itemProxy.kind === 'KoheseUser') {
-                this._users.push(itemProxy.item);
+                this._userProxies.set(itemProxy.item.id, itemProxy);
               }
             });
-
-            this._users.sort((oneUser: any, anotherUser: any) => {
-              return oneUser.name.localeCompare(anotherUser.name);
-            });
+            this.usersChangeSubject.next(this.userProxies);
+            this._sessionMap = await this.itemRepository.getSessionMap();
           }
         });
+
+        this.treeConfigChangeSubjectSub = TreeConfiguration.getWorkingTree().changeSubject.subscribe((change) => {
+          if(change.proxy.kind === 'KoheseUser') {
+            switch (change.type) {
+              case 'create':
+              case 'update':
+                this._userProxies.set(change.proxy.item.id, change.proxy);
+                this.usersChangeSubject.next(this.userProxies);
+                break;
+              case 'delete':
+                this._userProxies.delete(change.proxy.item.id);
+                this.usersChangeSubject.next(this.userProxies);
+                break;
+              default:
+                break;
+            }
+          }
+        });
+
+        this.cacheManager.subscribe('sessionAdd', (sessionData) => {
+          this._sessionMap[sessionData.sessionId] = sessionData;
+          this.sessionChangeSubject.next({
+            type: 'add',
+            sessionData: this._sessionMap[sessionData.sessionId]
+          });
+        });
+
+        this.cacheManager.subscribe('sessionUpdate', (sessionData) => {
+          this._sessionMap[sessionData.sessionId].numberOfConnections = sessionData.numberOfConnections;
+          this.sessionChangeSubject.next({
+            type: 'update',
+            sessionData: this._sessionMap[sessionData.sessionId]
+          });
+        });
+
+        this.cacheManager.subscribe('sessionDelete', (sessionData) => {
+          let oldSessionData = this._sessionMap[sessionData.sessionId];
+          delete this._sessionMap[sessionData.sessionId];
+          this.sessionChangeSubject.next({
+            type: 'delete',
+            sessionData: oldSessionData
+          });
+        });
+
       } else {
-        if (this._treeConfigurationSubscription) {
-          this._treeConfigurationSubscription.unsubscribe();
+        if (this.repositoryStatusSubscription) {
+          this.repositoryStatusSubscription.unsubscribe();
         }
+        this._user = undefined;
+        this._userProxies = undefined;
+        this._sessionMap = undefined;
 
         this.router.navigate(['login']);
       }
     });
   }
+
 }

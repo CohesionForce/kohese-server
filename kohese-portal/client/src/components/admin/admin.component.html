@@ -15,10 +15,8 @@ limitations under the License.
 -->
 
 
-<div class="users-page-wrapper"
-[ngStyle]="{ 'height': ((lens === ApplicationLens.DEFAULT) ? 'calc(100% - 34px)' : 'calc(100% - 84px)') }">
+<div class=users-page-wrapper>
   <ng-container *ngIf="sessionMap else initializing">
-    <lens></lens>
     <div class="panel-heading">Admin</div>
     <as-split unit=percent direction="horizontal">
 
@@ -64,13 +62,14 @@ limitations under the License.
             </button>
           </h2>
           <div class="user-panel">
-            <ng-container *ngFor="let user of sessionService.users">
+            <!-- let userProxy of getUserProxies() and session service contains sessionService.userProxies -->
+            <ng-container *ngFor="let user of users">
               <mat-expansion-panel #panel>
                 <mat-expansion-panel-header [ngStyle]="{ 'background-color': koheseUserViewModel.color }">
                   <mat-panel-title>
                     <mat-icon class="{{koheseUserViewModel.icon}}" style="margin-right: 3px;"></mat-icon>
-                    {{user.name}}
-                    <ng-container *ngIf="(lockoutList.indexOf(user.username) > -1)"><mat-icon class="fa fa-lock"></mat-icon></ng-container>
+                    {{user.item.name}}
+                    <ng-container *ngIf="(lockoutList.indexOf(user.item.username) > -1)"><mat-icon class="fa fa-lock"></mat-icon></ng-container>
                   </mat-panel-title>
                   <mat-panel-description>
                     <ng-container *ngIf="isModified(user)">
@@ -78,10 +77,10 @@ limitations under the License.
                         <img src="assets/icons/versioncontrol/dirty.ico" />
                       </button>
                     </ng-container>
-                    <ng-container *ngIf="(editableSet.indexOf(user.id) === -1) else editableBlock">
+                    <ng-container *ngIf="(editableSet.indexOf(user.item.id) === -1) else editableBlock">
                       <button mat-icon-button matTooltip="Edit this user"
                         [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
-                        (click)="$event.stopPropagation(); panel.open(); editableSet.push(user.id); focusedItemProxy = user">
+                        (click)="$event.stopPropagation(); panel.open(); editableSet.push(user.item.id); focusedItemProxy = user">
                         <mat-icon class="fa fa-edit"></mat-icon>
                       </button>
                     </ng-container>
@@ -107,17 +106,17 @@ limitations under the License.
                         Display Item information
                       </button>
                       <button mat-menu-item
-                        (click)="$event.stopPropagation(); navigationService.navigate('Explore', { id: user.id })">
+                        (click)="$event.stopPropagation(); navigationService.navigate('Explore', { id: user.item.id })">
                         <mat-icon class="fa fa-arrow-right"></mat-icon>
                         Navigate in Explorer
                       </button>
                       <button mat-menu-item
-                        (click)="$event.stopPropagation(); navigationService.addTab('Explore', { id: user.id })">
+                        (click)="$event.stopPropagation(); navigationService.addTab('Explore', { id: user.item.id })">
                         <mat-icon class="fa fa-external-link"></mat-icon>
                         Navigate in New Tab
                       </button>
                       <mat-divider></mat-divider>
-                      <ng-container *ngIf="!(lockoutList.indexOf(user.username) > -1) else reinstate">
+                      <ng-container *ngIf="!(lockoutList.indexOf(user.item.username) > -1) else reinstate">
                         <button mat-menu-item (click)="lockUser(user)">
                           <mat-icon class="fa fa-lock"></mat-icon>
                           Lock User
@@ -130,9 +129,9 @@ limitations under the License.
                         </button>
                       </ng-template>
                       <!-- div to display tooltip on disabled button -->
-                      <div matTooltip="Unlock User First" [matTooltipDisabled]="(lockoutList.indexOf(user.username) === -1)">
+                      <div matTooltip="Unlock User First" [matTooltipDisabled]="(lockoutList.indexOf(user.item.username) === -1)">
                         <button mat-menu-item (click)="remove(user)"
-                          [disabled]="lockoutList.indexOf(user.username) > -1">
+                          [disabled]="lockoutList.indexOf(user.item.username) > -1">
                           <mat-icon class="fa fa-trash"></mat-icon>
                           Remove This User
                         </button>
@@ -141,11 +140,12 @@ limitations under the License.
                   </mat-panel-description>
                 </mat-expansion-panel-header>
                 <ng-template matExpansionPanelContent>
+                  <!-- change to [object]=userProxy.item -->
                   <format-object-editor
                     [type]="koheseUserDataModel"
-                    [object]="user"
+                    [object]="user.item"
                     [formatDefinitionType]="FormatDefinitionType.DEFAULT"
-                    [disabled]="(editableSet.indexOf(user.id) === -1)">
+                    [disabled]="(editableSet.indexOf(user.item.id) === -1)">
                   </format-object-editor>
                 </ng-template>
               </mat-expansion-panel>

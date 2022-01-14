@@ -58,11 +58,17 @@ function Server(httpsServer, options){
             numberOfConnections: 0
           };
           global['app'].emit('newSession', socket);
+          kio.server.emit('Session/add', kio.sessions[socket.id]);
           socket.on('connectionAdded', (data: any, sendResponse: () => void) => {
             // In this case, prototype-polluting assignment may be assumed as a false positive
             let sessionId: string = data.id;
             if (kio.sessions[sessionId]) {
               kio.sessions[sessionId].numberOfConnections++;
+              kio.server.emit('Session/update', {
+                sessionId: sessionId,
+                numberOfConnections: kio.sessions[sessionId].numberOfConnections,
+                username: kio.sessions[sessionId].username
+               });
               console.log('::: session %s for user %s added tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
               console.log('*** session %s for user %s attempted to increment connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
@@ -74,6 +80,11 @@ function Server(httpsServer, options){
             let sessionId: string = data.id;
             if(kio.sessions[sessionId]) {
               kio.sessions[sessionId].numberOfConnections--;
+              kio.server.emit('Session/update', {
+                sessionId: sessionId,
+                numberOfConnections: kio.sessions[sessionId].numberOfConnections,
+                username: kio.sessions[sessionId].username
+               });
               console.log('::: session %s for user %s removed tab %s for a total of %s', socket.id, socket.koheseUser.username, data.clientTabId, kio.sessions[data.id].numberOfConnections);
             } else {
               console.log('*** session %s for user %s attempted to decrement connection count for tab %s before establishing session.', socket.id, socket.koheseUser.username, data.clientTabId);
@@ -123,7 +134,9 @@ function Server(httpsServer, options){
         }
         console.log('>>> session %s: user %s disconnected from %s', socket.id, username, socket.handshake.address);
         if(kio.sessions[socket.id]){
+          let username = kio.sessions[socket.id].username;
           delete kio.sessions[socket.id];
+          kio.server.emit('Session/delete', {sessionId: socket.id, username: username});
         }
       });
   });
