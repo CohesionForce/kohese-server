@@ -228,7 +228,9 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public async remove(user: any): Promise<void> {
-    let response: any = await this._dialogService.openYesNoDialog('Remove ' + user.item.name + ' from Kohese?', '');
+    let response: any = await this._dialogService.openYesNoDialog('Remove ' +
+      user.item.name, 'Are you sure that you want to remove ' + user.item.name +
+      ' from the system?');
     if (response) {
       this._itemRepository.deleteItem(user, false);
       this._changeDetectorRef.markForCheck();
