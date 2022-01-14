@@ -199,7 +199,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
   }
 
-  public displayInformation(user: any): void {
+  public displayInformation(user: ItemProxy): void {
 
     this._dialogService.openComponentDialog(DetailsComponent, {
       data: {
@@ -208,26 +208,26 @@ export class AdminComponent implements OnInit, OnDestroy {
     }).updateSize('90%', '90%');
   }
 
-  public save(user: any): void {
+  public save(user: ItemProxy): void {
     this._itemRepository.upsertItem(user.kind, user.item).then((returnedItemProxy: ItemProxy) => {
       this._changeDetectorRef.markForCheck();
     });
     this._editableSet.splice(this._editableSet.indexOf(user.item.id), 1);
   }
 
-  public saveAndContinueEditing(user: any): void {
+  public saveAndContinueEditing(user: ItemProxy): void {
     this._itemRepository.upsertItem(user.kind, user.item).then((returnedItemProxy: ItemProxy) => {
         this._changeDetectorRef.markForCheck();
     });
   }
 
-  public async discardChanges(user: any): Promise<void> {
+  public async discardChanges(user: ItemProxy): Promise<void> {
     await this._itemRepository.fetchItem(user);
     this._editableSet.splice(this._editableSet.indexOf(user.item.id), 1);
     this._changeDetectorRef.markForCheck();
   }
 
-  public async remove(user: any): Promise<void> {
+  public async remove(user: ItemProxy): Promise<void> {
     let response: any = await this._dialogService.openYesNoDialog('Remove ' +
       user.item.name, 'Are you sure that you want to remove ' + user.item.name +
       ' from the system?');
@@ -240,9 +240,9 @@ export class AdminComponent implements OnInit, OnDestroy {
   //////////////////////////////////////////////////////////
   // Provides the option to lock a current user
   //////////////////////////////////////////////////////////
-  private async lockUser(user: any) {
+  private async lockUser(user: ItemProxy) {
     let lock: any = await this._dialogService.openYesNoDialog('Lock ' +
-      user.name, 'Lock ' + user.name + ' out of Kohese?');
+      user.item.name, 'Lock ' + user.item.name + ' out of Kohese?');
     if (lock) {
       let response = await this.cacheManager.sendMessageToWorker('Admin/lockoutUser', {username: user.item.username}, true);
       console.log('::: ' + response.username + 'has been locked out.');
@@ -253,11 +253,11 @@ export class AdminComponent implements OnInit, OnDestroy {
   //////////////////////////////////////////////////////////
   // Provides the option to reinstate a locked user
   //////////////////////////////////////////////////////////
-  private async reinstateUser(user: any) {
+  private async reinstateUser(user: ItemProxy) {
     let reinstate: any = await this._dialogService.openYesNoDialog('Reinstate ' + user.item.name + '?\n',
       'Reinstate ' + user.item.name + '?');
     if (reinstate) {
-      let response = await this.cacheManager.sendMessageToWorker('Admin/reinstateUser', {username: user.username}, true);
+      let response = await this.cacheManager.sendMessageToWorker('Admin/reinstateUser', {username: user.item.username}, true);
       console.log('::: ' + response.username + 'has been reinstated.');
       this.getUserLockoutList();
       this._changeDetectorRef.markForCheck();
@@ -285,7 +285,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
 
-  isModified(user: any): boolean {
+  isModified(user: ItemProxy): boolean {
     return user.dirty;
   }
 
