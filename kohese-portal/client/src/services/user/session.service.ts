@@ -29,23 +29,8 @@ import { ItemRepository, RepoStates } from '../item-repository/item-repository.s
 import { CacheManager } from '../../../cache-worker/CacheManager';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 
-
-
-
-                  // TODO: add users by splicing here in the session service when treeconfig change subscription
-                  //       is called and remove:
-                  //                              this._sessionService.users.push(itemProxy.item);
-                  //       from admin.component.ts.
-                  //
-                  // TODO: Add ItemProxy.treeConfig.changeSubject subscription (this is line 2119 in item-proxy.ts)
-                  //       for create, update, delete
-                  //
-                  // TODO: Use Proxies everywhere in admin component
-                  // TODO: Change _users Array<any> to a _users Map<id,ItemProxy>
-
 @Injectable()
 export class SessionService {
-  // TODO: Remove this after transition to userProxies is complete
   private _user: any;
   get user() {
     return this._user;

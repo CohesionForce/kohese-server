@@ -62,7 +62,6 @@ limitations under the License.
             </button>
           </h2>
           <div class="user-panel">
-            <!-- let userProxy of getUserProxies() and session service contains sessionService.userProxies -->
             <ng-container *ngFor="let user of users">
               <mat-expansion-panel #panel>
                 <mat-expansion-panel-header [ngStyle]="{ 'background-color': koheseUserViewModel.color }">
@@ -140,7 +139,6 @@ limitations under the License.
                   </mat-panel-description>
                 </mat-expansion-panel-header>
                 <ng-template matExpansionPanelContent>
-                  <!-- change to [object]=userProxy.item -->
                   <format-object-editor
                     [type]="koheseUserDataModel"
                     [object]="user.item"
