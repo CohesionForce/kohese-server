@@ -84,8 +84,9 @@ export class SessionService {
                 this._userProxies.set(itemProxy.item.id, itemProxy);
               }
             });
+            // sends sorted users list
             this.usersChangeSubject.next(this.userProxies);
-            this._sessionMap = await this.itemRepository.getSessionMap();
+            this._sessionMap = await this.cacheManager.sendMessageToWorker('getSessionMap', undefined, true);
           }
         });
 
