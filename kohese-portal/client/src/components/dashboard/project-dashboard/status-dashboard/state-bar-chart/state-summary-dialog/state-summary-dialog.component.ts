@@ -191,7 +191,7 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
         return;
       }
       if(response === true) {
-        await this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().getProxyFor(itemProxy.item.id));
+        await this._itemRepository.fetchItem(itemProxy);
         this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
         this.checkEntries(itemProxy);
         this.changeRef.markForCheck();

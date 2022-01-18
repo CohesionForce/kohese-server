@@ -35,7 +35,6 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
-import { proxy } from 'jquery';
 
 @Component({
   selector : 'assignment-dashboard',
@@ -189,7 +188,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
         return;
       }
       if(response === true) {
-        await this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().getProxyFor(itemProxy.item.id));
+        await this._itemRepository.fetchItem(itemProxy);
         this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
         this.checkEntries(itemProxy);
         this.changeRef.markForCheck();

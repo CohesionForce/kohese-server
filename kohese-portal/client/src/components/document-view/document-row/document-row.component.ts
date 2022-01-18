@@ -196,7 +196,6 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
         this.changeRef.markForCheck();
       }
     } else {
-      await this._itemRepository.fetchItem(this.docInfo.proxy);
       this.row.editable = false;
       this.checkEntries();
       this.changeRef.markForCheck();
