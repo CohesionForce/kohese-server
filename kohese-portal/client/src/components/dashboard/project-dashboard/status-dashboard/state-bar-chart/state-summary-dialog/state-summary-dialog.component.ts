@@ -197,7 +197,7 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
       data: {
         itemProxy: itemProxy
       }
-    }).updateSize('70%', '70%');
+    }).updateSize('80%', '80%');
   }
 
   public getHeader(itemProxy: ItemProxy): string {

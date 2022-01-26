@@ -51,7 +51,7 @@ export class StatefulProxyCardComponent implements OnInit {
       data : {
         itemProxy : this.proxy
       }
-    }).updateSize('70%', '70%')
+    }).updateSize('80%', '80%')
       .afterClosed().subscribe((results)=>{
 
       });
