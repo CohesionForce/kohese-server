@@ -289,7 +289,7 @@ export class JournalComponent implements OnDestroy {
       data: {
         itemProxy: itemProxy
       }
-    }).updateSize('70%', '70%');
+    }).updateSize('80%', '80%');
   }
 
   public expandAll(): void {
