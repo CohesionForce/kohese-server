@@ -44,7 +44,6 @@ import { UserStatisticsComponent } from "./project-dashboard/user-statistics/use
 import { ProjectSelectorComponent } from "./project-dashboard/project-selector/project-selector.component";
 import { TreeModule } from "@circlon/angular-tree-component";
 import { StateFilterService } from './state-filter.service';
-import { StatefulProxyCardComponent } from './stateful-proxy-card/stateful-proxy-card.component';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 import { ItemBoardModule } from '../item-board/item-board.module';
 import { DirectivesModule } from '../../directives/directives.module'
@@ -65,7 +64,6 @@ import { DirectivesModule } from '../../directives/directives.module'
     OpenAssignmentComponent,
     StateBarChartComponent,
     StateSummaryDialogComponent,
-    StatefulProxyCardComponent,
     ActivityFeedComponent
   ],
   providers : [
