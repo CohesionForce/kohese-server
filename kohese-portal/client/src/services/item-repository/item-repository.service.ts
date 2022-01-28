@@ -93,6 +93,9 @@ export class ItemRepository {
 
   currentTreeConfigSubject: BehaviorSubject<TreeConfigInfo> = new BehaviorSubject<TreeConfigInfo>(undefined);
 
+  saveAndContinueSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  currentSaveAndContinueValue = this.saveAndContinueSubject.asObservable();
+
   private _cache: ItemCache = new ItemCache();
   private _initialized: boolean = false;
   private _initialWorkingTreeNotificationSent = false;
@@ -211,6 +214,11 @@ export class ItemRepository {
         console.log('*** Need to disconnect cache-worker');
       }
     });
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  saveAndContinueEditing(continueEditing: boolean) {
+    this.saveAndContinueSubject.next(continueEditing);
   }
 
   //////////////////////////////////////////////////////////////////////////
