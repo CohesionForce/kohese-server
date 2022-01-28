@@ -376,11 +376,18 @@ export class ItemBoardComponent {
   }
 
   public async discardChanges(item: any): Promise<void> {
-    let itemProxy : ItemProxy = TreeConfiguration.getWorkingTree().getProxyFor(item.id);
-    if(itemProxy.dirty) {
-      await this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().getProxyFor(item.id));
-      this.changeRef.markForCheck();
+    if(item.$proxy.dirty) {
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?', '');
+      if(response === false) {
+        return;
+      }
+      if(response === true) {
+          await this._itemRepository.fetchItem(item.$proxy);
+          this._editableSet.splice(this._editableSet.indexOf(item.id), 1);
+          this.changeDetectorRef.markForCheck();
+      }
+    } else {
+      this._editableSet.splice(this._editableSet.indexOf(item.id), 1);
     }
-    this._editableSet.splice(this._editableSet.indexOf(item.id), 1);
   }
 }

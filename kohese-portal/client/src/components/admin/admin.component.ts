@@ -221,11 +221,20 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
   }
 
-  public discardChanges(user: any): void {
-    this._itemRepository.fetchItem(this._itemRepository.getTreeConfig().
-      getValue().config.getProxyFor(user.id));
-    this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
-    this._changeDetectorRef.markForCheck();
+  public async discardChanges(user: any): Promise<void> {
+    if(this.isModified(user)) {
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?', '');
+      if(response === false) {
+        return;
+      }
+      if(response === true) {
+        this._itemRepository.fetchItem(this._itemRepository.getTreeConfig().getValue().config.getProxyFor(user.id));
+        this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
+        this._changeDetectorRef.markForCheck();
+      }
+    } else {
+      this._editableSet.splice(this._editableSet.indexOf(user.id), 1);
+    }
   }
 
   public async remove(user: any): Promise<void> {
@@ -290,7 +299,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
 
-  isModified(user: any): boolean {
+  public isModified(user: any): boolean {
     return this._itemRepository.getTreeConfig().getValue().config.getProxyFor(user.id).dirty;
   }
 

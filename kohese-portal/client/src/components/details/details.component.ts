@@ -96,7 +96,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
                      @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
                      @Optional() private _matDialogRef: MatDialogRef<DetailsComponent>,
                      private _itemRepository: ItemRepository,
-                     private _navigationService:NavigationService,
+                     private _navigationService: NavigationService,
+                     private _dialogService: DialogService,
                      private hotkeys: Hotkeys,
 
   ) {
@@ -184,11 +185,21 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public cancelEditing(): void {
-    this._itemRepository.fetchItem(this._itemProxy).then(() => {
+  public async cancelEditing(): Promise<void> {
+    if(this._itemProxy.dirty){
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?','');
+      if(response === true){
+        this._itemRepository.fetchItem(this._itemProxy).then(() => {
+          this.editableStream.next(false);
+          this._changeDetectorRef.markForCheck();
+        });
+      }
+      if(response === false){
+          this.editableStream.next(true);
+      }
+    } else
       this.editableStream.next(false);
       this._changeDetectorRef.markForCheck();
-    });
   }
 
   public navigate(id: string, openNewTab: boolean): void {
