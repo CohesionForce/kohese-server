@@ -31,7 +31,7 @@
   }
 
   .state-summary-panels {
-    height: calc(100% - 100px);
+    height: calc(100% - 105px);
     overflow-y: auto;
 
     ::ng-deep .mat-expansion-panel-content {
@@ -60,7 +60,7 @@
       color:whitesmoke;
       font-size: medium;
       align-items: center;
-      width: 28%
+      width: 32%
     }
 
     ::ng-deep .mat-expansion-indicator:after {
