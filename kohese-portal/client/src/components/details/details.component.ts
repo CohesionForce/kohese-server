@@ -31,6 +31,7 @@ import { FormatObjectEditorComponent } from '../object-editor/format-object-edit
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
+import { Hotkeys } from '../../services/hotkeys/hot-key.service';
 
 /* This component serves as a manager for viewing proxy details in the explore view.
    It functions by retrieving an id from the route parameters and then retrieving
@@ -72,13 +73,13 @@ export class DetailsComponent implements OnInit, OnDestroy {
   treeConfig: TreeConfiguration;
 
   /* Observables */
-  proxyStream: BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(
-    undefined);
-  editableStream: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-    false);
+  proxyStream: BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined);
+  editableStream: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   /* Subscriptions */
   treeConfigSub: Subscription;
+  _saveShortcutSubscription: Subscription;
+  _exitShortcutSubscription: Subscription;
 
   get matDialogRef() {
     return this._matDialogRef;
@@ -92,10 +93,26 @@ export class DetailsComponent implements OnInit, OnDestroy {
   private _formatObjectEditorQueryList: QueryList<FormatObjectEditorComponent>;
 
   public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<DetailsComponent>,
-    private _itemRepository: ItemRepository, private _navigationService:
-    NavigationService, private _dialogService: DialogService) {
+                     @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
+                     @Optional() private _matDialogRef: MatDialogRef<DetailsComponent>,
+                     private _itemRepository: ItemRepository,
+                     private _navigationService: NavigationService,
+                     private _dialogService: DialogService,
+                     private hotkeys: Hotkeys,
+
+  ) {
+    // TODO: Determine how to make shortcuts (that affect item saving) context sensitive - i.e. only available in edit mode
+    this._saveShortcutSubscription = this.hotkeys.addShortcut({ keys: 'control.s', description: 'save and continue' }).subscribe(command => {
+      if(this.editableStream.getValue() && this._itemProxy.dirty) {
+        this.upsertItemAndContinueEditing();
+      }
+    });
+
+    this._exitShortcutSubscription = this.hotkeys.addShortcut({ keys: 'escape', description: 'discard changes and exit edit mode' }).subscribe(command => {
+      if(this.editableStream.getValue()) {
+        this.cancelEditing();
+      }
+    });
   }
 
   public ngOnInit(): void {
@@ -122,6 +139,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
     if (!this.isDialogInstance()) {
       this.treeConfigSub.unsubscribe();
     }
+    this._saveShortcutSubscription.unsubscribe();
+    this._exitShortcutSubscription.unsubscribe();
   }
 
   public isDialogInstance(): boolean {
@@ -131,8 +150,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   public async upsertItem(): Promise<void> {
     let kind: string;
-    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this.
-      _formatObjectEditorQueryList.toArray();
+    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this._formatObjectEditorQueryList.toArray();
     if (formatObjectEditorArray.length > 0) {
       kind = formatObjectEditorArray[0].selectedType.name;
     } else {
@@ -140,18 +158,48 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this._itemRepository.upsertItem(kind, this._itemProxy.item);
-      this.editableStream.next(false);
-      this._changeDetectorRef.markForCheck();
+      if(this._itemProxy.dirty) {
+        await this._itemRepository.upsertItem(kind, this._itemProxy.item);
+        this.editableStream.next(false);
+        this._changeDetectorRef.markForCheck();
+      }
     } catch (error) {
     }
   }
 
-  public cancelEditing(): void {
-    this._itemRepository.fetchItem(this._itemProxy).then(() => {
+  public async upsertItemAndContinueEditing(): Promise<void> {
+    let kind: string;
+    let formatObjectEditorArray: Array<FormatObjectEditorComponent> = this._formatObjectEditorQueryList.toArray();
+    if (formatObjectEditorArray.length > 0) {
+      kind = formatObjectEditorArray[0].selectedType.name;
+    } else {
+      kind = this._itemProxy.kind;
+    }
+
+    try {
+      if(this._itemProxy.dirty) {
+        await this._itemRepository.upsertItem(kind, this._itemProxy.item);
+        this._changeDetectorRef.markForCheck();
+      }
+    } catch (error) {
+    }
+  }
+
+  public async cancelEditing(): Promise<void> {
+    if(this._itemProxy.dirty){
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?','');
+      if(response === true){
+        this._itemRepository.fetchItem(this._itemProxy).then(() => {
+          this.editableStream.next(false);
+          this._changeDetectorRef.markForCheck();
+        });
+      }
+      if(response === false){
+          this.editableStream.next(true);
+      }
+    } else
       this.editableStream.next(false);
       this._changeDetectorRef.markForCheck();
-    });
   }
 
   public navigate(id: string, openNewTab: boolean): void {

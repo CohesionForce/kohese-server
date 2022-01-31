@@ -81,6 +81,8 @@ implements OnInit, OnDestroy {
   /* UI Toggles */
   @ViewChild('docView') docView: ElementRef;
 
+  saveAndContinue: boolean;
+
   /* Data */
   proxyTitle: string = '';
   itemProxy: ItemProxy;
@@ -223,6 +225,10 @@ implements OnInit, OnDestroy {
         }
       }
     });
+
+    this.itemRepository.currentSaveAndContinueValue.subscribe(continueEditing => {
+      this.saveAndContinue = continueEditing;
+    });
   }
 
   ngOnDestroy() {
@@ -279,43 +285,45 @@ implements OnInit, OnDestroy {
   }
 
   generateDoc(): void {
-    const subtreeAsList = this.itemProxy.getSubtreeAsList();
-    this.itemLength = subtreeAsList.length;
+    if(!this.saveAndContinue) {
+      const subtreeAsList = this.itemProxy.getSubtreeAsList();
+      this.itemLength = subtreeAsList.length;
 
-    if (this.itemsLoaded >= subtreeAsList.length) {
-      this.itemsLoaded = subtreeAsList.length;
-    }
-
-    this.loadedProxies = [];
-    this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
-
-    if (this.itemsLoaded > subtreeAsList.length) {
-      this.itemsLoaded = subtreeAsList.length;
-    }
-
-    for (let i = 0;
-      (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
-      const listItem = subtreeAsList[i];
-      let format = this.formatDefs[listItem.proxy.kind];
-      if (!format) {
-        format = {
-          header : {
-            kind: 'header',
-            contents : [
-              {propertyName : 'name', hideLabel: true}
-            ]
-          },
-          containers: []
-        };
+      if (this.itemsLoaded >= subtreeAsList.length) {
+        this.itemsLoaded = subtreeAsList.length;
       }
 
-      this.loadedProxies.push({
-        proxy: listItem.proxy,
-        format : format,
-        active: false,
-        hovered: false,
-        depth: listItem.depth
-      });
+      this.loadedProxies = [];
+      this.itemsLoaded = this.determineLoad(subtreeAsList, this.itemsLoaded);
+
+      if (this.itemsLoaded > subtreeAsList.length) {
+        this.itemsLoaded = subtreeAsList.length;
+      }
+
+      for (let i = 0;
+        (i < this.itemsLoaded) && (i < subtreeAsList.length); i++) {
+        const listItem = subtreeAsList[i];
+        let format = this.formatDefs[listItem.proxy.kind];
+        if (!format) {
+          format = {
+            header : {
+              kind: 'header',
+              contents : [
+                {propertyName : 'name', hideLabel: true}
+              ]
+            },
+            containers: []
+          };
+        }
+
+        this.loadedProxies.push({
+          proxy: listItem.proxy,
+          format : format,
+          active: false,
+          hovered: false,
+          depth: listItem.depth
+        });
+      }
     }
   }
 
