@@ -83,24 +83,28 @@ export class SessionService {
             // sends sorted users list
             this.usersChangeSubject.next(this.userProxies);
             this._sessionMap = await this.cacheManager.sendMessageToWorker('getSessionMap', undefined, true);
-          }
-        });
 
-        this.treeConfigChangeSubjectSub = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
-          if(change.proxy.kind === 'KoheseUser') {
-            switch (change.type) {
-              case 'create':
-              case 'update':
-                this._userProxies.set(change.proxy.item.id, change.proxy);
-                this.usersChangeSubject.next(this.userProxies);
-                break;
-              case 'delete':
-                this._userProxies.delete(change.proxy.item.id);
-                this.usersChangeSubject.next(this.userProxies);
-                break;
-              default:
-                break;
+            if(this.treeConfigChangeSubjectSub) {
+              this.treeConfigChangeSubjectSub.unsubscribe();
             }
+
+            this.treeConfigChangeSubjectSub = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((change) => {
+              if(change.proxy.kind === 'KoheseUser') {
+                switch (change.type) {
+                  case 'create':
+                  case 'update':
+                    this._userProxies.set(change.proxy.item.id, change.proxy);
+                    this.usersChangeSubject.next(this.userProxies);
+                    break;
+                  case 'delete':
+                    this._userProxies.delete(change.proxy.item.id);
+                    this.usersChangeSubject.next(this.userProxies);
+                    break;
+                  default:
+                    break;
+                }
+              }
+            });
           }
         });
 
