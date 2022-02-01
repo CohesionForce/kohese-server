@@ -228,7 +228,7 @@ export class AdminComponent implements OnInit, OnDestroy {
         return;
       }
       if(response === true) {
-        this._itemRepository.fetchItem(user);
+        await this._itemRepository.fetchItem(user);
         this._editableSet.splice(this._editableSet.indexOf(user.item.id), 1);
         this._changeDetectorRef.markForCheck();
       }
