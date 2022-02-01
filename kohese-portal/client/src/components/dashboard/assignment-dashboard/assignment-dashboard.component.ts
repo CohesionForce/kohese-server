@@ -182,11 +182,20 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   }
 
   public async discardChanges(itemProxy: ItemProxy): Promise<void> {
-    await this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
-      getProxyFor(itemProxy.item.id));
-    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
-    this.checkEntries(itemProxy);
-    this.changeRef.markForCheck();
+    if(itemProxy.dirty) {
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?', '');
+      if(response === false) {
+        return;
+      }
+      if(response === true) {
+        await this._itemRepository.fetchItem(itemProxy);
+        this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+        this.checkEntries(itemProxy);
+        this.changeRef.markForCheck();
+      }
+    } else {
+      this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+    }
   }
 
   public displayInformation(itemProxy: ItemProxy): void {

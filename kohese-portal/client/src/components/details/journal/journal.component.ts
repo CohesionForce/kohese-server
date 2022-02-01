@@ -268,11 +268,20 @@ export class JournalComponent implements OnDestroy {
     });
   }
 
-  public discardChanges(itemProxy: ItemProxy): void {
-    this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
-      getProxyFor(itemProxy.item.id));
-    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
-    this._changeDetectorRef.markForCheck();
+  public async discardChanges(itemProxy: ItemProxy): Promise<void> {
+    if(itemProxy.dirty) {
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?', '');
+      if(response === false) {
+        return;
+      }
+      if (response === true) {
+        this._itemRepository.fetchItem(itemProxy);
+        this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+        this._changeDetectorRef.markForCheck();
+      }
+    } else {
+      this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+    }
   }
 
   public displayInformation(itemProxy: ItemProxy): void {
@@ -280,7 +289,7 @@ export class JournalComponent implements OnDestroy {
       data: {
         itemProxy: itemProxy
       }
-    }).updateSize('70%', '70%');
+    }).updateSize('80%', '80%');
   }
 
   public expandAll(): void {

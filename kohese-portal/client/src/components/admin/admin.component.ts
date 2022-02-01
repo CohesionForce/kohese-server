@@ -222,9 +222,19 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public async discardChanges(user: ItemProxy): Promise<void> {
-    await this._itemRepository.fetchItem(user);
-    this._editableSet.splice(this._editableSet.indexOf(user.item.id), 1);
-    this._changeDetectorRef.markForCheck();
+    if(user.dirty) {
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?', '');
+      if(response === false) {
+        return;
+      }
+      if(response === true) {
+        this._itemRepository.fetchItem(user);
+        this._editableSet.splice(this._editableSet.indexOf(user.item.id), 1);
+        this._changeDetectorRef.markForCheck();
+      }
+    } else {
+      this._editableSet.splice(this._editableSet.indexOf(user.item.id), 1);
+    }
   }
 
   public async remove(user: ItemProxy): Promise<void> {
