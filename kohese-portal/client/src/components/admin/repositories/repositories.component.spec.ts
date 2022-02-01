@@ -94,6 +94,8 @@ describe('Component: Repositories', () => {
     TestBed.resetTestingModule();
   });
 
+  // TODO: Add Expectations
+
   it('instantiates the Repositories component', ()=>{
     expect(component).toBeTruthy();
   });
@@ -176,6 +178,8 @@ describe('Component: RepositoryContentDialog', () => {
     repositoryContentDialogFixture.destroy();
     TestBed.resetTestingModule();
   });
+
+  // TODO: Add Expectations
 
   it('instantiates the RepositoryContentDialog component', () => {
     expect(repositoryContentDialogComponent).toBeTruthy();
