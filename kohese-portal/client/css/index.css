@@ -82,9 +82,6 @@ themes/
   height: 350px;
   overflow-y: scroll; }
 
-.login-panel {
-  margin-top: 25%; }
-
 .flot-chart {
   display: block;
   height: 400px; }
@@ -541,27 +538,6 @@ body #layout-bottom {
         margin-top: 20px; }
         .admin-screen .users-screen .user-container #admin-user-form * {
           margin: 5px; }
-
-#login-form {
-  height: 100%;
-  width: 100%;
-  text-align: center; }
-  #login-form h1 {
-    font-size: 60px;
-    margin-top: auto;
-    font-family: lobster, arial, sans-serif; }
-  #login-form input {
-    width: calc(33%);
-    margin: 5px;
-    display: inline; }
-  #login-form button {
-    color: white;
-    padding: 10px;
-    margin: 5px;
-    background-color: #005A31; }
-    #login-form button:hover {
-      color: white;
-      background-color: #64be95; }
 
 .results-list {
   width: calc(90% - 350px);
