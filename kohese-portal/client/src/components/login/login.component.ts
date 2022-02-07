@@ -99,6 +99,10 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  googleLogin(): void {
+    this.authenticationService.googleLogin();
+  }
+
   showHidePassword() {
     let passwordContent = document.getElementById('password');
     if (passwordContent['type'] === "password") {
@@ -107,6 +111,4 @@ export class LoginComponent implements OnInit {
       passwordContent['type'] = "password";
     }
   }
-
-  loginGoogle(): void {}
 }
