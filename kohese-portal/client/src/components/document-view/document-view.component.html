@@ -16,7 +16,7 @@ limitations under the License.
 
 
 <div class="panel right-zone" [ngClass]="{'details-doc' : incrementalLoad}">
-  <div class="panel-heading">
+  <!-- <div class="panel-heading">
 
     <ng-container *ngIf="!analysisView else analysisMode">
 
@@ -55,7 +55,7 @@ limitations under the License.
       </div>
     </ng-template>
 
-  </div>
+  </div> -->
   <div class="body-container">
     <div data-infinite-scroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
       [scrollWindow]="false" [immediateCheck]="true" class="panel-body doc-view" #docView>

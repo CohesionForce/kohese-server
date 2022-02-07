@@ -50,6 +50,7 @@ limitations under the License.
     <mat-tab-group id="details-tabs" [selectedIndex]="startingTabIndex">
       <mat-tab id="defaultTab">
         <ng-template mat-tab-label>
+
           Document
           <ng-container *ngIf="shouldDocumentTabIndicateModification()">
             <img src="assets/icons/versioncontrol/dirty.ico"/>
@@ -58,11 +59,40 @@ limitations under the License.
         <ng-template matTabContent>
           <div class="panel-heading">
             <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+            <ng-container *ngIf="!analysisView else analysisMode">
+
+              <ng-container *ngIf="!outlineView else documentOutline">
+
+                <div class="panel-heading-right">
+                  <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
+                  <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })" matTooltip="go to outline">
+                    <mat-icon class="fa fa-list"></mat-icon>
+                  </button>
+                </div>
+              </ng-container>
+
+              <ng-template #documentOutline>
+
+                <div class="panel-heading-right">
+                  <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
+                  <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })" matTooltip="go to explorer">
+                    <mat-icon class="fa fa-arrow-left"></mat-icon>
+                  </button>
+                </div>
+              </ng-template>
+            </ng-container>
             <ng-container *ngIf="itemProxy.item.parentId">
               <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
-                itemProxy.item.parentId, false)" style="margin-left: auto;">
+                itemProxy.item.parentId, false)" style="margin: auto;">
                 <mat-icon class="fa fa-level-up"></mat-icon>
               </button>
+
+
+              <ng-template #analysisMode>
+                <div class="panel-heading-right">
+                  <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
+                </div>
+              </ng-template>
             </ng-container>
           </div>
           <document-view [proxyStream]="proxyStream" [incrementalLoad]="true">
@@ -71,6 +101,7 @@ limitations under the License.
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
+
           Details
           &nbsp;
           <img *ngIf="itemProxy.dirty"src="assets/icons/versioncontrol/dirty.ico"/>
@@ -178,6 +209,32 @@ limitations under the License.
         <ng-template matTabContent>
           <div class="panel-heading">
             <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+            <ng-container *ngIf="itemProxy.item.parentId">
+              <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
+                itemProxy.item.parentId, false)" style="margin-left: auto;">
+                <mat-icon class="fa fa-level-up"></mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngIf="editableStream.getValue() else notEditable">
+              <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
+                [disabled]="!itemProxy.dirty"
+                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Cancel edit"
+                (click)="cancelEditing()">
+                <mat-icon class="fa fa-times"></mat-icon>
+              </button>
+            </ng-container>
+            <ng-template #notEditable>
+              <button mat-icon-button matTooltip="Edit" [disabled]="((itemProxy.item.
+                preventModification === true) || (itemProxy.model.item.
+                restrictInstanceEditing === true))" (click)="editableStream.next(true)"
+                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
+                '') }">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+            </ng-template>
           </div>
           <h4>
             Raw Data Tab
