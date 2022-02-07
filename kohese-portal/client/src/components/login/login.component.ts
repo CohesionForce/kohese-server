@@ -100,7 +100,6 @@ export class LoginComponent implements OnInit {
   }
 
   googleLogin(): void {
-    this.authenticationService.googleLogin();
   }
 
   showHidePassword() {
