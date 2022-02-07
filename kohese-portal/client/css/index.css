@@ -246,8 +246,8 @@ table.tree-grid {
   color: whitesmoke; }
 
 .panel-heading {
-  color: whitesmoke;
-  background-color: #ca6464;
+  color: grey;
+  background-color:whitesmoke;
   border: 0;
   padding: 5px 15px 5px 5px; }
   .panel-heading > span {

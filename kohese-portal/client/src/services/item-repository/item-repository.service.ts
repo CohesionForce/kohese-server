@@ -782,7 +782,7 @@ export class ItemRepository {
 
     if (headingLevel > -1) {
       if ((headingLevel === 0) && (formatDefinitionType === FormatDefinitionType.DOCUMENT)) {
-        representation += '<div style="font-size: xxx-large;">';
+        representation += '<div style="font-size: x-large;">';
       } else {
         for (let j: number = 0; j < headingLevel; j++) {
 	        representation += '#';

@@ -13,15 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+<div class="panel-heading">
 
 
-<h2 class="section-header">Children</h2>
-  <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
-<h2 class="section-header">References</h2>
+<label class="section-header">References</label>
   <reference-table [referencesInfo]="referenceInfo" [routingStrategy]="routingStrategy"></reference-table>
-<h2 class="section-header">Referenced By</h2>
+<label class="section-header">Referenced By</label>
   <reference-table [referencesInfo]="referencedByInfo" [routingStrategy]="routingStrategy"></reference-table>
-
+<label class="section-header">Children</label>
+  <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
 
   <!-- <mat-tab>
               <ng-template mat-tab-label>

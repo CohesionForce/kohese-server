@@ -16,7 +16,7 @@ limitations under the License.
 
 
 <div [ngStyle]="{ 'height': isDialogInstance() ? '93%' :'100%' }">
-  <div class="panel-heading">
+  <!-- <div class="panel-heading">
     <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
     <ng-container *ngIf="itemProxy.item.parentId">
       <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
@@ -44,7 +44,7 @@ limitations under the License.
         <mat-icon class="fa fa-edit"></mat-icon>
       </button>
     </ng-template>
-  </div>
+  </div> -->
   <div style="height: calc(100% - 50px);">
     <!-- Nav tabs -->
     <mat-tab-group id="details-tabs" [selectedIndex]="startingTabIndex">
@@ -56,6 +56,15 @@ limitations under the License.
           </ng-container>
         </ng-template>
         <ng-template matTabContent>
+          <div class="panel-heading">
+            <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+            <ng-container *ngIf="itemProxy.item.parentId">
+              <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
+                itemProxy.item.parentId, false)" style="margin-left: auto;">
+                <mat-icon class="fa fa-level-up"></mat-icon>
+              </button>
+            </ng-container>
+          </div>
           <document-view [proxyStream]="proxyStream" [incrementalLoad]="true">
           </document-view>
         </ng-template>
@@ -67,6 +76,35 @@ limitations under the License.
           <img *ngIf="itemProxy.dirty"src="assets/icons/versioncontrol/dirty.ico"/>
         </ng-template>
         <ng-template matTabContent>
+          <div class="panel-heading">
+            <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+            <ng-container *ngIf="itemProxy.item.parentId">
+              <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
+                itemProxy.item.parentId, false)" style="margin-left: auto;">
+                <mat-icon class="fa fa-level-up"></mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngIf="editableStream.getValue() else notEditable">
+              <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
+                [disabled]="!itemProxy.dirty"
+                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Cancel edit"
+                (click)="cancelEditing()">
+                <mat-icon class="fa fa-times"></mat-icon>
+              </button>
+            </ng-container>
+            <ng-template #notEditable>
+              <button mat-icon-button matTooltip="Edit" [disabled]="((itemProxy.item.
+                preventModification === true) || (itemProxy.model.item.
+                restrictInstanceEditing === true))" (click)="editableStream.next(true)"
+                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
+                '') }">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+            </ng-template>
+          </div>
           <format-object-editor [object]="itemProxy.item" [type]="itemProxy.
             model.item" [formatDefinitionType]="FormatDefinitionType.DEFAULT"
             [allowKindChange]="true" [allowKindNarrowingOnly]="false"
@@ -76,6 +114,35 @@ limitations under the License.
       </mat-tab>
       <mat-tab label="References">
         <ng-template matTabContent>
+          <div class="panel-heading">
+            <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+            <ng-container *ngIf="itemProxy.item.parentId">
+              <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
+                itemProxy.item.parentId, false)" style="margin-left: auto;">
+                <mat-icon class="fa fa-level-up"></mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngIf="editableStream.getValue() else notEditable">
+              <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
+                [disabled]="!itemProxy.dirty"
+                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+                <mat-icon class="fa fa-save"></mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Cancel edit"
+                (click)="cancelEditing()">
+                <mat-icon class="fa fa-times"></mat-icon>
+              </button>
+            </ng-container>
+            <ng-template #notEditable>
+              <button mat-icon-button matTooltip="Edit" [disabled]="((itemProxy.item.
+                preventModification === true) || (itemProxy.model.item.
+                restrictInstanceEditing === true))" (click)="editableStream.next(true)"
+                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
+                '') }">
+                <mat-icon class="fa fa-edit"></mat-icon>
+              </button>
+            </ng-template>
+          </div>
           <references-tab [proxyStream]="proxyStream"
             [editableStream]="editableStream">
           </references-tab>
@@ -83,6 +150,9 @@ limitations under the License.
       </mat-tab>
       <mat-tab label="Journal">
         <ng-template matTabContent>
+          <div class="panel-heading">
+            <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+          </div>
           <journal [itemProxy]="itemProxy" style="display: flex;
             flex-direction: column;">
           </journal>
@@ -90,16 +160,25 @@ limitations under the License.
       </mat-tab>
       <mat-tab label="Action Table" *ngIf="itemProxy.children">
         <ng-template matTabContent>
+          <div class="panel-heading">
+            <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+          </div>
           <action-table [proxyStream]="proxyStream"></action-table>
         </ng-template>
       </mat-tab>
       <mat-tab label="History">
         <ng-template matTabContent>
+          <div class="panel-heading">
+            <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+          </div>
           <history-tab [proxyStream]="proxyStream"></history-tab>
         </ng-template>
       </mat-tab>
       <mat-tab label="Raw Data">
         <ng-template matTabContent>
+          <div class="panel-heading">
+            <label><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></label>
+          </div>
           <h4>
             Raw Data Tab
           </h4>
