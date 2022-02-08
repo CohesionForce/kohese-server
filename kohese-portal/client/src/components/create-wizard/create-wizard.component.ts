@@ -75,6 +75,9 @@ export class CreateWizardComponent extends NavigatableComponent
     if (this.isDialogInstance()) {
       this._parentId = this.data['parentId'];
     }
+    if (this._parentId === '' || this._parentId === undefined) {
+      this._parentId = 'ROOT';
+    }
 
     this._proxyPlaceholderStream.next(this.buildProxyPlaceholder());
   }

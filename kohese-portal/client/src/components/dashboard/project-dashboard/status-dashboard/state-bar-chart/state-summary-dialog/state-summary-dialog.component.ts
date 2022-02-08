@@ -184,12 +184,21 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
     this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
   }
 
-  public discardChanges(itemProxy: ItemProxy): void {
-    this._itemRepository.fetchItem(TreeConfiguration.getWorkingTree().
-      getProxyFor(itemProxy.item.id));
-    this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
-    this.checkEntries(itemProxy);
-    this.changeRef.markForCheck();
+  public async discardChanges(itemProxy: ItemProxy): Promise<void> {
+    if(itemProxy.dirty) {
+      let response = await this._dialogService.openYesNoDialog('Discard Changes?', '');
+      if(response === false) {
+        return;
+      }
+      if(response === true) {
+        await this._itemRepository.fetchItem(itemProxy);
+        this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+        this.checkEntries(itemProxy);
+        this.changeRef.markForCheck();
+      }
+    } else {
+      this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+    }
   }
 
   public displayInformation(itemProxy: ItemProxy): void {
@@ -197,7 +206,7 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
       data: {
         itemProxy: itemProxy
       }
-    }).updateSize('70%', '70%');
+    }).updateSize('80%', '80%');
   }
 
   public getHeader(itemProxy: ItemProxy): string {
