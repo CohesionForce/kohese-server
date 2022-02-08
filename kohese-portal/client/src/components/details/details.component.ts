@@ -97,6 +97,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
                      @Optional() private _matDialogRef: MatDialogRef<DetailsComponent>,
                      private _itemRepository: ItemRepository,
                      private _navigationService:NavigationService,
+                     private _dialogService: DialogService,
                      private hotkeys: Hotkeys,
 
   ) {
@@ -146,6 +147,12 @@ export class DetailsComponent implements OnInit, OnDestroy {
     return (this._matDialogRef && (this._matDialogRef.componentInstance ===
       this) && this._data);
   }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this._dialogService.openComponentDialog(DetailsComponent, {
+    data: { itemProxy: itemProxy }
+    }).updateSize('90%', '90%');
+    }
 
   public async upsertItem(): Promise<void> {
     let kind: string;
