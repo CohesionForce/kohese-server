@@ -40,7 +40,7 @@
   margin: 5px;
   padding-left : 10px;
   padding-right: 10px;
-  width: 98.5%;
+  width: calc(100% - 10px); // because of the margin left&right
   display: inline-block;
   background-color : #fff;
 }
@@ -64,4 +64,3 @@
     }
   }
 }
-
