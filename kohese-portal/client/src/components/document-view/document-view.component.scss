@@ -18,21 +18,21 @@
 @import '../../app.component';
 
 .doc-view {
-  height : 100%;
+  // height : 100%;
   overflow : auto;
 }
 
 .body-container {
-  height : calc(100% - 50px);
+  // height : calc(100% - 50px);
   background-color: #aaaa;
 }
 
 .details-doc {
-  height: calc(100% - 53px);
+  // height: calc(100% - 53px);
 }
 
 .right-zone {
-  height: 100%;
+  // height: 100%;
   overflow: hidden;
 }
 
@@ -46,7 +46,7 @@
 }
 
 :host {
-  height: 100%;
+  // height: 100%;
 
   .panel-heading {
     width: 100%;

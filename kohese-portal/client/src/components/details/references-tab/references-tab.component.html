@@ -13,23 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
+
 <div class="panel-heading">
-
-
-<h6 class="section-header">References</h6>
-  <reference-table [referencesInfo]="referenceInfo" [routingStrategy]="routingStrategy"></reference-table>
-<h6 class="section-header">Referenced By</h6>
-  <reference-table [referencesInfo]="referencedByInfo" [routingStrategy]="routingStrategy"></reference-table>
-<h6 class="section-header">Children</h6>
-  <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
-
-  <!-- <mat-tab>
-              <ng-template mat-tab-label>
-                  Children ({{itemProxy.children.length}})
-                  <ng-container *ngIf="itemProxy.dirty">
-                    <img src="../../../assets/icons/versioncontrol/dirty.ico"
-                      title="Dirty item"/>
-                  </ng-container>
-              </ng-template>
-              <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
-            </mat-tab> -->
+  <h6 class="section-header">References</h6>
+    <reference-table [referencesInfo]="referenceInfo" [routingStrategy]="routingStrategy"></reference-table>
+  <h6 class="section-header">Referenced By</h6>
+    <reference-table [referencesInfo]="referencedByInfo" [routingStrategy]="routingStrategy"></reference-table>
+  <h6 class="section-header">Children</h6>
+    <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
+</div>

@@ -16,41 +16,13 @@ limitations under the License.
 
 
 <div [ngStyle]="{ 'height': isDialogInstance() ? '92%' :'100%' }">
-  <div class="panel-heading">
-    <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
-    <ng-container *ngIf="itemProxy.item.parentId">
-      <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
-        itemProxy.item.parentId, false)" style="margin-left: auto;">
-        <mat-icon class="fa fa-level-up"></mat-icon>
-      </button>
-    </ng-container>
-    <ng-container *ngIf="editableStream.getValue() else notEditable">
-      <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
-        [disabled]="!itemProxy.dirty"
-        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
-        <mat-icon class="fa fa-save"></mat-icon>
-      </button>
-      <button mat-icon-button matTooltip="Cancel edit"
-        (click)="cancelEditing()">
-        <mat-icon class="fa fa-times"></mat-icon>
-      </button>
-    </ng-container>
-    <ng-template #notEditable>
-      <button mat-icon-button matTooltip="Edit" [disabled]="((itemProxy.item.
-        preventModification === true) || (itemProxy.model.item.
-        restrictInstanceEditing === true))" (click)="editableStream.next(true)"
-        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
-        '') }">
-        <mat-icon class="fa fa-edit"></mat-icon>
-      </button>
-    </ng-template>
-  </div> -->
-  <div style="height: calc(100% - 50px);">
+  <div class=tab-group-container>
     <!-- Nav tabs -->
     <mat-tab-group id="details-tabs" [selectedIndex]="startingTabIndex">
+
+
       <mat-tab id="defaultTab">
         <ng-template mat-tab-label>
-
           Document
           <ng-container *ngIf="shouldDocumentTabIndicateModification()">
             <img src="assets/icons/versioncontrol/dirty.ico"/>
@@ -58,171 +30,211 @@ limitations under the License.
         </ng-template>
 
         <ng-template matTabContent>
+
           <div class="panel-heading">
-            <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
-            <ng-container *ngIf="!analysisView else analysisMode">
-            <ng-container *ngIf="!outlineView else documentOutline">
-              <div class="panel-heading">
-                <button mat-icon-button matTooltip="Produce Report" (click)="navigate(
-                  itemProxy.item.parentId, false)" style="margin-left: auto;">
-                  <mat-icon class="fa fa-file-text"></mat-icon>
-                </button>
-                <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
-                <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })" matTooltip="go to outline">
-                  <mat-icon class="fa fa-list"></mat-icon>
-                </button>
-              </div>
-            </ng-container>
-              <ng-template #documentOutline>
-                <div class="panel-heading-right">
-                  <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
-                  <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })" matTooltip="go to explorer">
-                    <mat-icon class="fa fa-arrow-left"></mat-icon>
-                  </button>
-                </div>
-              </ng-template>
-            </ng-container>
-            <ng-container *ngIf="itemProxy.item.parentId">
-              <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
-                itemProxy.item.parentId, false)" style="margin: auto;">
-                <mat-icon class="fa fa-level-up"></mat-icon>
-              </button>
+            <div class=panel-heading-left>
+              <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
+            </div>
+
+            <div class=panel-heading-right>
+              <ng-container *ngIf="!analysisView else analysisMode">
+                <ng-container *ngIf="!outlineView else documentOutline">
+                  <div class="panel-heading-right">
+                    <span style="padding-top: 7px"><b>({{itemsLoaded}}/{{itemLength}})</b></span>
+                    <button mat-icon-button matTooltip="produce report" style="margin-left: auto;"
+                      (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+                      <mat-icon class="fa fa-file-text"></mat-icon>
+                    </button>
+                    <button mat-icon-button matTooltip="go to outline"
+                      (click)="this.navigationService.navigate('Outline', { id: itemProxy.item.id })">
+                      <mat-icon class="fa fa-list"></mat-icon>
+                    </button>
+                  </div>
+                </ng-container>
+
+
+                <ng-template #documentOutline>
+                  <div class="panel-heading-left">
+                    <span><b>Outline View</b></span>
+                  </div>
+                  <div class="panel-heading-right">
+                    <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
+                    <button mat-icon-button matTooltip="go to explorer"
+                      (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.id })">
+                      <mat-icon class="fa fa-arrow-left"></mat-icon>
+                    </button>
+                  </div>
+                </ng-template>
+              </ng-container>
+
               <ng-template #analysisMode>
+                <div class="panel-heading-left">
+                  <span><b>Document View</b></span>
+                </div>
                 <div class="panel-heading-right">
                   <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
                 </div>
               </ng-template>
-            </ng-container>
+            </div>
           </div>
-          <document-view [proxyStream]="proxyStream" [incrementalLoad]="true">
-          </document-view>
+
+          <document-view [proxyStream]="proxyStream" [incrementalLoad]="true"></document-view>
+
         </ng-template>
       </mat-tab>
+
       <mat-tab>
         <ng-template mat-tab-label>
-
-          Details
-          &nbsp;
+          Details&nbsp;
           <img *ngIf="itemProxy.dirty"src="assets/icons/versioncontrol/dirty.ico"/>
         </ng-template>
         <ng-template matTabContent>
+
           <div class="panel-heading">
-            <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
-            <ng-container *ngIf="editableStream.getValue() else notEditable">
-              <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
-                [disabled]="!itemProxy.dirty"
-                [ngStyle]="{ 'margin-right': (!itemProxy.item.parentId ? 'auto' : '') }">
-                <mat-icon class="fa fa-save"></mat-icon>
-              </button>
-              <button mat-icon-button matTooltip="Cancel edit"
-                (click)="cancelEditing()">
-                <mat-icon class="fa fa-times"></mat-icon>
-              </button>
-            </ng-container>
-            <ng-template #notEditable>
-              <button mat-icon-button matTooltip="Edit" [disabled]="((itemProxy.item.
-                preventModification === true) || (itemProxy.model.item.
-                restrictInstanceEditing === true))" (click)="editableStream.next(true)"
-                [ngStyle]="{ 'margin-right': (!itemProxy.item.parentId ? 'auto' :
-                '') }">
-                <mat-icon class="fa fa-edit"></mat-icon>
-              </button>
-            </ng-template>
-            <ng-container *ngIf="itemProxy.item.parentId">
-              <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
-                itemProxy.item.parentId, false)" style="margin-right: auto;">
-                <mat-icon class="fa fa-level-up"></mat-icon>
-              </button>
-            </ng-container>
+            <div class=panel-heading-left>
+              <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
+            </div>
+
+            <div class=panel-heading-right>
+              <ng-container *ngIf="editableStream.getValue() else notEditable">
+                <button mat-icon-button matTooltip="save"
+                  (click)="upsertItem()"
+                  [disabled]="!itemProxy.dirty"
+                  [ngStyle]="{ 'margin-right': (!itemProxy.item.parentId ? 'auto' : '') }">
+                  <mat-icon class="fa fa-save"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="cancel edit"
+                  (click)="cancelEditing()">
+                  <mat-icon class="fa fa-times"></mat-icon>
+                </button>
+              </ng-container>
+
+              <ng-template #notEditable>
+                <button mat-icon-button matTooltip="edit"
+                  [disabled]="((itemProxy.item.preventModification === true) ||
+                              (itemProxy.model.item.restrictInstanceEditing === true))"
+                  (click)="editableStream.next(true)"
+                  [ngStyle]="{ 'margin-right': (!itemProxy.item.parentId ? 'auto' : '') }">
+                  <mat-icon class="fa fa-edit"></mat-icon>
+                </button>
+              </ng-template>
+
+              <ng-container *ngIf="itemProxy.item.parentId">
+                <button mat-icon-button matTooltip="go to parent" style="margin-right: auto;"
+                  (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+                  <mat-icon class="fa fa-level-up"></mat-icon>
+                </button>
+              </ng-container>
+            </div>
           </div>
-          <format-object-editor [object]="itemProxy.item" [type]="itemProxy.
-            model.item" [formatDefinitionType]="FormatDefinitionType.DEFAULT"
-            [allowKindChange]="true" [allowKindNarrowingOnly]="false"
+
+          <format-object-editor
+            [object]="itemProxy.item"
+            [type]="itemProxy.model.item"
+            [formatDefinitionType]="FormatDefinitionType.DEFAULT"
+            [allowKindChange]="true"
+            [allowKindNarrowingOnly]="false"
             [disabled]="!(editableStream | async)">
           </format-object-editor>
+
         </ng-template>
       </mat-tab>
 
       <mat-tab label="References">
         <ng-template matTabContent>
+
           <div class="panel-heading">
-            <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
+            <div class=panel-heading-left>
+              <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
+            </div>
 
-            <ng-container *ngIf="editableStream.getValue() else notEditable">
-              <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
-                [disabled]="!itemProxy.dirty"
-                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
-                <mat-icon class="fa fa-save"></mat-icon>
-              </button>
-              <button mat-icon-button matTooltip="Cancel edit"
-                (click)="cancelEditing()">
-                <mat-icon class="fa fa-times"></mat-icon>
-              </button>
-            </ng-container>
+            <div class=panel-heading-right>
+              <ng-container *ngIf="editableStream.getValue() else notEditable">
+                <button mat-icon-button matTooltip="save" (click)="upsertItem()"
+                  [disabled]="!itemProxy.dirty"
+                  style="margin-left: auto">
+                  <mat-icon class="fa fa-save"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="cancel edit"
+                  (click)="cancelEditing()">
+                  <mat-icon class="fa fa-times"></mat-icon>
+                </button>
+              </ng-container>
 
-            <ng-template #notEditable>
-              <button mat-icon-button matTooltip="Edit" [disabled]="((itemProxy.item.
-                preventModification === true) || (itemProxy.model.item.
-                restrictInstanceEditing === true))" (click)="editableStream.next(true)"
-                style="margin-left: auto">
-                <mat-icon class="fa fa-edit"></mat-icon>
+              <ng-template #notEditable>
+                <button mat-icon-button matTooltip="edit" style="margin-left: auto"
+                  [disabled]="((itemProxy.item.preventModification === true) ||
+                              (itemProxy.model.item.restrictInstanceEditing === true))"
+                  (click)="editableStream.next(true)">
+                  <mat-icon class="fa fa-edit"></mat-icon>
+                </button>
+              </ng-template>
+              <button mat-icon-button style="margin-left: auto;"
+                (click)="displayInformation(itemProxy)">
+                <mat-icon class="fa fa-clone"></mat-icon>
               </button>
-            </ng-template>
-            <button mat-menu-item (click)="displayInformation(itemProxy)" style="margin-left: auto;">
-              <mat-icon class="fa fa-clone"></mat-icon>
-            </button>
-            <ng-container *ngIf="itemProxy.item.parentId">
-              <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
-                itemProxy.item.parentId, false)" style="margin-left: auto;">
-                <mat-icon class="fa fa-level-up"></mat-icon>
-              </button>
-
-            </ng-container>
-
+              <ng-container *ngIf="itemProxy.item.parentId">
+                <button mat-icon-button matTooltip="go to parent" style="margin-left: auto;"
+                  (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+                  <mat-icon class="fa fa-level-up"></mat-icon>
+                </button>
+              </ng-container>
+            </div>
           </div>
-          <references-tab [proxyStream]="proxyStream"
-            [editableStream]="editableStream">
-          </references-tab>
+
+          <references-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></references-tab>
+
         </ng-template>
       </mat-tab>
 
       <mat-tab label="Journal">
         <ng-template matTabContent>
-          <div class="panel-heading">
+
+          <div class="panel-heading panel-heading-left">
             <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
           </div>
-          <journal [itemProxy]="itemProxy" style="display: flex;
-            flex-direction: column;">
-          </journal>
+
+          <journal [itemProxy]="itemProxy" style="display: flex; flex-direction: column;"></journal>
+
         </ng-template>
       </mat-tab>
       <mat-tab label="Action Table" *ngIf="itemProxy.children">
         <ng-template matTabContent>
-          <div class="panel-heading">
+
+          <div class="panel-heading panel-heading-left">
             <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
           </div>
+
           <action-table [proxyStream]="proxyStream"></action-table>
+
         </ng-template>
       </mat-tab>
+
       <mat-tab label="History">
         <ng-template matTabContent>
-          <div class="panel-heading">
+
+          <div class="panel-heading panel-heading-left">
             <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
           </div>
+
           <history-tab [proxyStream]="proxyStream"></history-tab>
+
         </ng-template>
       </mat-tab>
+
       <mat-tab label="Raw Data">
         <ng-template matTabContent>
-          <div class="panel-heading">
+
+          <div class="panel-heading panel-heading-left">
             <h5><b>{{itemProxy.kind}}: {{itemProxy.item.name}}</b></h5>
             <ng-container *ngIf="itemProxy.item.parentId">
-              <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
+              <button mat-icon-button matTooltip="go to parent" (click)="navigate(
                 itemProxy.item.parentId, false)" style="margin-left: auto;">
                 <mat-icon class="fa fa-level-up"></mat-icon>
               </button>
             </ng-container>
           </div>
+
           <h4>
             Raw Data Tab
           </h4>
@@ -283,9 +295,8 @@ limitations under the License.
   </div>
 </div>
 <ng-container *ngIf="isDialogInstance()">
-  <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
-    row;">
-    <button mat-raised-button matTooltip="Close this dialog box" style="margin-left: auto;"
+  <mat-dialog-actions style="height: 40px; display: flex; flex-direction:row;">
+    <button mat-raised-button matTooltip="close this dialog box" style="margin-left: auto;"
       (click)="matDialogRef.close(undefined)">
       Close
     </button>

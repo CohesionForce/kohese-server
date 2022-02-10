@@ -96,7 +96,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
                      @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
                      @Optional() private _matDialogRef: MatDialogRef<DetailsComponent>,
                      private _itemRepository: ItemRepository,
-                     private _navigationService: NavigationService,
+                     private navigationService: NavigationService,
                      private _dialogService: DialogService,
                      private hotkeys: Hotkeys,
 
@@ -206,14 +206,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
     } else
       this.editableStream.next(false);
       this._changeDetectorRef.markForCheck();
-  }
-
-  public navigate(id: string, openNewTab: boolean): void {
-    if (openNewTab) {
-      this._navigationService.addTab('Explore', { id: id });
-    } else {
-      this._navigationService.navigate('Explore', { id: id });
-    }
   }
 
   public shouldDocumentTabIndicateModification(): boolean {
