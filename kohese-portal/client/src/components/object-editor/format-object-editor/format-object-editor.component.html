@@ -15,7 +15,7 @@ limitations under the License.
 -->
 
 
-<div class=FOE-template [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 44px)' : '100%' }">
+<div class=FOE-template [ngStyle]="{ 'height': isDialogInstance() ? 'calc(100% - 44px)' : 'calc(100% - 50px)' }">
   <ng-container *ngIf="isDisabled else enabled">
     <markdown [data]="itemRepository.getMarkdownRepresentation(object,
       (enclosingType ? enclosingType : selectedType), selectedType, viewModel,
