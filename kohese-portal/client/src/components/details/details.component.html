@@ -58,8 +58,7 @@ limitations under the License.
           </ng-container>
         </ng-template>
         <ng-template matTabContent>
-          <document-view [proxyStream]="proxyStream" [incrementalLoad]="true">
-          </document-view>
+          <document-view [proxyStream]="proxyStream" [incrementalLoad]="true"></document-view>
         </ng-template>
       </mat-tab>
 
@@ -71,7 +70,7 @@ limitations under the License.
         </ng-template>
         <ng-template matTabContent>
 
-          <div class="panel-heading sticky-heading">
+          <div class="panel-heading">
             <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
             <ng-container *ngIf="itemProxy.item.parentId">
               <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"

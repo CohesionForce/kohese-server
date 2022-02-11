@@ -15,21 +15,9 @@ limitations under the License.
 -->
 
 
+<h2 class="section-header">References</h2>
+<reference-table [referencesInfo]="referenceInfo" [routingStrategy]="routingStrategy"></reference-table>
+<h2 class="section-header">Referenced By</h2>
+<reference-table [referencesInfo]="referencedByInfo" [routingStrategy]="routingStrategy"></reference-table>
 <h2 class="section-header">Children</h2>
   <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
-<h2 class="section-header">References</h2>
-  <reference-table [referencesInfo]="referenceInfo" [routingStrategy]="routingStrategy"></reference-table>
-<h2 class="section-header">Referenced By</h2>
-  <reference-table [referencesInfo]="referencedByInfo" [routingStrategy]="routingStrategy"></reference-table>
-
-
-  <!-- <mat-tab>
-              <ng-template mat-tab-label>
-                  Children ({{itemProxy.children.length}})
-                  <ng-container *ngIf="itemProxy.dirty">
-                    <img src="../../../assets/icons/versioncontrol/dirty.ico"
-                      title="Dirty item"/>
-                  </ng-container>
-              </ng-template>
-              <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
-            </mat-tab> -->
