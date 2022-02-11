@@ -71,7 +71,7 @@ limitations under the License.
         </ng-template>
         <ng-template matTabContent>
 
-          <div class="panel-heading">
+          <div class="panel-heading sticky-heading">
             <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
             <ng-container *ngIf="itemProxy.item.parentId">
               <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
@@ -101,7 +101,7 @@ limitations under the License.
             </ng-template>
           </div>
 
-          <format-object-editor
+          <format-object-editor class=details-body
             [object]="itemProxy.item"
             [type]="itemProxy.model.item"
             [formatDefinitionType]="FormatDefinitionType.DEFAULT"
