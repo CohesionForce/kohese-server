@@ -20,12 +20,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 import { AuthenticationModule } from '../../services/authentication/authentication.module';
+import { MaterialModule } from '../../material.module';
 import { LoginComponent } from './login.component';
 @NgModule({
   declarations: [ LoginComponent ],
   exports: [ LoginComponent ],
-  imports: [ AuthenticationModule,
-             CommonModule,
-             FormsModule,
-             ReactiveFormsModule ]
+  imports: [
+    AuthenticationModule,
+    MaterialModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule
+  ]
 }) export class LoginModule {}

@@ -129,6 +129,12 @@ export class ImportComponent implements OnInit {
   get getIcon() {
     return this._getIcon;
   }
+  private _isFavorite: (element: any) => boolean = (element: any) => {
+    return ( (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
+  }
+  get isFavorite() {
+    return this._isFavorite;
+  }
 
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<ImportComponent>,
