@@ -161,6 +161,9 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   get root() {
     return this._root;
   }
+  get absoluteRoot() {
+    return this._absoluteRoot;
+  }
 
   _isImport: boolean = false;
   @Input('isImport')

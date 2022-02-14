@@ -100,6 +100,10 @@ export class LoginComponent implements OnInit {
   }
 
   googleLogin(): void {
+    window.open('https://localhost:3010/auth/google',"mywindow","location=1,status=1,scrollbars=1, width=600,height=600");
+    let listener = window.addEventListener('message', (message) => {
+      //message will contain google user and details
+    });
   }
 
   showHidePassword() {

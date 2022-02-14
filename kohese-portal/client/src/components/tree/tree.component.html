@@ -86,7 +86,7 @@ limitations under the License.
   </mat-drawer>
   <mat-drawer-content>
     <!-- Options at the top of the mat-drawer-content section -->
-    <ng-container *ngIf="_getTitle">
+    <ng-container *ngIf="getTitle">
       <span class=truncate style="display: block">
         <h5>{{ (this._getTitle.action.length > 60) ? (this._getTitle.action | slice:0:60)+'...' : (this._getTitle.action) }}</h5></span>
       <span class=truncate style="display: block">
@@ -108,7 +108,7 @@ limitations under the License.
         (click)="changeAllExpansionStates(false)">
         <mat-icon class="fa fa-chevron-up"></mat-icon>
       </button>
-      <ng-container *ngIf="this.root !== this._absoluteRoot">
+      <ng-container *ngIf="this.root !== this.absoluteRoot">
         <button mat-icon-button matTooltip="focus parent" style="margin-left: auto;"
           (click)=upLevelRoot()>
           <mat-icon class="fa fa-level-up"></mat-icon>
@@ -135,7 +135,7 @@ limitations under the License.
     </div>
     <!-- mat-drawer-content Tree -->
     <div #elementContainer [ngStyle]="
-      { 'height': _isImport ? 'calc(99% - 70px)' : ( (this._getTitle.name !== '') ? 'calc(100% - 134px)' : 'calc(100% - 110px)' ) }"
+      { 'height': _isImport ? 'calc(99% - 70px)' : ( (this.getTitle.name !== '') ? 'calc(100% - 134px)' : 'calc(100% - 110px)' ) }"
       style="width: 100%; overflow-y: auto;">
       <ng-container *ngFor="let element of elementArray">
         <ng-container *ngIf="shouldDisplay(element)">
