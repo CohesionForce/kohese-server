@@ -15,6 +15,15 @@ limitations under the License.
 -->
 
 
+<div class="panel-heading">
+  <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
+  <ng-container *ngIf="itemProxy.item.parentId">
+    <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
+      (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+      <mat-icon class="fa fa-level-up"></mat-icon>
+    </button>
+  </ng-container>
+</div>
 <div style="height: 70px; display: flex; flex-direction: row;">
   <mat-form-field style="width: 40%; padding: 0px 3px 0px 3px;">
     <mat-select placeholder="Ordering" [(ngModel)]="selectedOrdering">
@@ -36,7 +45,7 @@ limitations under the License.
     <mat-icon class="fa fa-plus"></mat-icon>
   </button>
 </div>
-<div style="height: calc(100% - 70px); overflow-y: auto;">
+<div style="height: calc(100% - 120px); overflow-y: auto;">
   <ng-container *ngFor="let observationItemProxy of getObservations(filterInput.value)">
     <mat-expansion-panel #panel>
       <mat-expansion-panel-header [ngStyle]="{ 'background-color':
