@@ -16,10 +16,13 @@
 
 
 :host {
-  .edit-buttons {
+  .order-panel {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-left: auto;
+
+    .edit-buttons {
+      padding-bottom: 7px; // easy alignment of the buttons
+    }
   }
 }

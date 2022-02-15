@@ -32,6 +32,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 @Component({
   selector : 'children-tab',
   templateUrl : './children-tab.component.html',
+  styleUrls: ['./children-tab.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChildrenTabComponent extends NavigatableComponent
