@@ -15,9 +15,21 @@ limitations under the License.
 -->
 
 
-<h2 class="section-header">References</h2>
-<reference-table [referencesInfo]="referenceInfo" [routingStrategy]="routingStrategy"></reference-table>
-<h2 class="section-header">Referenced By</h2>
-<reference-table [referencesInfo]="referencedByInfo" [routingStrategy]="routingStrategy"></reference-table>
-<h2 class="section-header">Children</h2>
-  <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
+<div class="panel-heading">
+  <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
+  <ng-container *ngIf="itemProxy.item.parentId">
+    <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
+      (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+      <mat-icon class="fa fa-level-up"></mat-icon>
+    </button>
+  </ng-container>
+</div>
+
+<div class=references-content>
+  <h2 class="section-header">References</h2>
+  <reference-table [referencesInfo]="referenceInfo" [routingStrategy]="routingStrategy"></reference-table>
+  <h2 class="section-header">Referenced By</h2>
+  <reference-table [referencesInfo]="referencedByInfo" [routingStrategy]="routingStrategy"></reference-table>
+  <h2 class="section-header">Children</h2>
+  <children-tab [proxyStream]="proxyStream"></children-tab>
+</div>

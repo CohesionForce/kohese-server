@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ * Copyright (c) 2022 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,10 @@
 
 
 :host {
-
-  .panel-heading {
-    width: 100%;
+  .edit-buttons {
     display: flex;
     flex-direction: row;
     align-items: center;
-
-    overflow: hidden;
-
-    label {
-      width: 80%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    margin-left: auto;
   }
-
-  .references-content {
-    height: calc(100% - 50px);
-    overflow-x: hidden;
-    overflow-y: auto;
-
-    .section-header {
-      background-color : darkgreen;
-      color : white;
-      padding : 5px;
-    }
-  }
-
 }

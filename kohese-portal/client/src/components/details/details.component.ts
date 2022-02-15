@@ -121,13 +121,11 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this.itemProxy = this._data['itemProxy'];
       this.startWithJournal = this._data['startWithJournal'];
     } else {
-      this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe(
-        (treeConfigurationObject: any) => {
+      this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe((treeConfigurationObject: any) => {
         this.treeConfig = treeConfigurationObject.config;
         this.editableStream.next(false);
         if (this._itemProxy) {
-          this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.
-            id);
+          this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.id);
         }
 
         this._changeDetectorRef.markForCheck();

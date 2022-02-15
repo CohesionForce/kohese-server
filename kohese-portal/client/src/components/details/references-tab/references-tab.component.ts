@@ -23,6 +23,7 @@ import { Subscription, Observable } from 'rxjs';
 // Other External Dependencies
 
 // Kohese
+import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 @Component({
@@ -43,11 +44,13 @@ export class ReferencesTabComponent implements OnInit, OnDestroy {
   itemProxy: ItemProxy
   referenceInfo: Array<ReferenceTableInfo> = [];
   referencedByInfo: Array<ReferenceTableInfo> = [];
+
   /* Subscriptions */
   proxySubscription: Subscription;
 
-  constructor(private changeRef: ChangeDetectorRef) {
-  }
+  constructor(private changeRef: ChangeDetectorRef,
+              private navigationService: NavigationService
+  ) {}
 
   ngOnInit() {
     console.log(this);
