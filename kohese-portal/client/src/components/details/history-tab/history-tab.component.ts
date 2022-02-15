@@ -56,24 +56,25 @@ export class HistoryTabComponent extends NavigatableComponent
     return this._differenceMap;
   }
 
+  itemProxy: ItemProxy
   streamSub: Subscription;
   itemCache: ItemCache;
 
   constructor(
-    protected NavigationService: NavigationService,
-    private changeRef: ChangeDetectorRef,
-    private _dynamicTypesService:
-    DynamicTypesService,
-    ) {
-    super(NavigationService);
+              protected navigationService: NavigationService,
+              private changeRef: ChangeDetectorRef,
+              private _dynamicTypesService:
+              DynamicTypesService
+  ) {
+    super(navigationService);
     this.itemCache = ItemCache.getItemCache();
   }
 
   ngOnInit() {
     this.streamSub = this.proxyStream.subscribe(async (newProxy) => {
       if (newProxy) {
-        this._versions = await ItemCache.getItemCache().getHistory(newProxy.
-          item.id);
+        this._versions = await ItemCache.getItemCache().getHistory(newProxy.item.id);
+        this.itemProxy = newProxy;
         this._differenceMap.clear();
         this.changeRef.markForCheck();
       }

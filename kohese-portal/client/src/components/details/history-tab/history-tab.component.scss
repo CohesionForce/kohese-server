@@ -16,3 +16,51 @@
 
 
 @import '../../../app.component';
+
+:host {
+  .panel-heading {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow: hidden;
+
+    label {
+      width: 80%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .history-body {
+    height: calc(100% - 50px);
+    overflow: hidden;
+
+    .creation-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .collapse-expand {
+      display: flex;
+      flex-direction: row;
+      height: 50px;
+      overflow: hidden;
+    }
+
+    .expansion-panels {
+      height: calc(100% - 114px);
+      overflow: auto;
+
+      mat-expansion-panel {
+        margin-top: 1px;
+
+        mat-expansion-panel-header {
+          background-color: rgb(220,220,220);
+        }
+      }
+    }
+  }
+}
