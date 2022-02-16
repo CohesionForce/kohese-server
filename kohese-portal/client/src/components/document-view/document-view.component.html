@@ -25,15 +25,16 @@ limitations under the License.
           <span><b>{{itemProxy.kind}} Info: {{itemProxy.item.name}}</b></span>
         </div>
         <div class="panel-heading-right">
+          <button mat-icon-button matTooltip="go to outline"
+            (click)="navigate('Outline', { id: itemProxy.item.id })">
+            <mat-icon class="fa fa-list"></mat-icon>
+          </button>
           <ng-container *ngIf="itemProxy.item.parentId">
             <button mat-icon-button matTooltip="Go to parent"
               (click)="navigate('Explore', { id: itemProxy.item.parentId })">
               <mat-icon class="fa fa-level-up"></mat-icon>
             </button>
           </ng-container>
-          <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })" matTooltip="go to outline">
-            <mat-icon class="fa fa-list"></mat-icon>
-          </button>
           <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
         </div>
       </ng-container>

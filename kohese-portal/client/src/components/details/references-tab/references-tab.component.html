@@ -17,16 +17,18 @@ limitations under the License.
 
 <div class="panel-heading">
   <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
-  <ng-container *ngIf="itemProxy.item.parentId">
-    <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
-      (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
-      <mat-icon class="fa fa-level-up"></mat-icon>
+  <div class=panel-buttons>
+    <button mat-icon-button matTooltip="Display Item information"
+      (click)=displayInformation(itemProxy)>
+      <mat-icon class="fa fa-clone"></mat-icon>
     </button>
-  <button mat-icon-button matTooltip="Display Item information"
-    (click)=displayInformation(itemProxy)>
-    <mat-icon class="fa fa-clone"></mat-icon>
-  </button>
-  </ng-container>
+    <ng-container *ngIf="itemProxy.item.parentId">
+      <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
+        (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+        <mat-icon class="fa fa-level-up"></mat-icon>
+      </button>
+    </ng-container>
+  </div>
 </div>
 
 <div class=references-content>
