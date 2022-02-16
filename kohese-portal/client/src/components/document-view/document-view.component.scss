@@ -55,8 +55,13 @@
     align-items: center;
 
     .panel-heading-left {
+      width: 72%;
       margin-right: auto;
       margin-left: 1em;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .panel-heading-right {
