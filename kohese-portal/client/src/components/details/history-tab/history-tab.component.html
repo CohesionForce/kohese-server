@@ -16,12 +16,19 @@ limitations under the License.
 
 <div class="panel-heading">
   <label><b>{{ (proxyStream | async).kind }} Information: {{ (proxyStream | async).item.name }}</b></label>
-  <ng-container *ngIf="proxyStream.getValue().item.parentId">
-    <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
-      (click)="this.navigationService.navigate('Explore', { id: proxyStream.getValue().item.parentId })">
-      <mat-icon class="fa fa-level-up"></mat-icon>
+  <div class=panel-buttons>
+    <button mat-icon-button matTooltip="Display Item information"
+      (click)=displayInformation(proxyStream.getValue())>
+      <mat-icon class="fa fa-clone"></mat-icon>
     </button>
-  </ng-container>
+    <ng-container *ngIf="proxyStream.getValue().item.parentId">
+      <button mat-icon-button matTooltip="Go to parent"
+        (click)="this.navigationService.navigate('Explore', { id: proxyStream.getValue().item.parentId })">
+        <mat-icon class="fa fa-level-up"></mat-icon>
+      </button>
+    </ng-container>
+  </div>
+
 </div>
 <div class=history-body>
   <!-- production info -->

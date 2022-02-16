@@ -27,6 +27,8 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { DetailsComponent } from '../details.component';
 import { Compare } from '../../compare-items/compare.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { ItemCache } from '../../../../../common/src/item-cache';
@@ -61,9 +63,9 @@ export class HistoryTabComponent extends NavigatableComponent
 
   constructor(
               protected navigationService: NavigationService,
+              private dialogService: DialogService,
               private changeRef: ChangeDetectorRef,
-              private _dynamicTypesService:
-              DynamicTypesService
+              private _dynamicTypesService: DynamicTypesService
   ) {
     super(navigationService);
     this.itemCache = ItemCache.getItemCache();
@@ -121,5 +123,13 @@ export class HistoryTabComponent extends NavigatableComponent
       changeBlob,
       this._dynamicTypesService));
     this.changeRef.markForCheck();
+  }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this.dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: itemProxy
+      }
+    }).updateSize('80%', '80%');
   }
 }

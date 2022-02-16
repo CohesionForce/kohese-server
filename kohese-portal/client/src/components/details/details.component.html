@@ -66,38 +66,40 @@ limitations under the License.
         <ng-template mat-tab-label>
           Details
           &nbsp;
-          <img *ngIf="itemProxy.dirty"src="assets/icons/versioncontrol/dirty.ico"/>
+          <img *ngIf="itemProxy.dirty" src="assets/icons/versioncontrol/dirty.ico"/>
         </ng-template>
         <ng-template matTabContent>
 
-          <div class="panel-heading">
+          <div class=panel-heading>
             <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
-            <ng-container *ngIf="itemProxy.item.parentId">
-              <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
-                (click)="navigate(itemProxy.item.parentId, false)">
-                <mat-icon class="fa fa-level-up"></mat-icon>
-              </button>
-            </ng-container>
-            <ng-container *ngIf="editableStream.getValue() else notEditable">
-              <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
-                [disabled]="!itemProxy.dirty"
-                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
-                <mat-icon class="fa fa-save"></mat-icon>
-              </button>
-              <button mat-icon-button matTooltip="Cancel edit"
-                (click)="cancelEditing()">
-                <mat-icon class="fa fa-times"></mat-icon>
-              </button>
-            </ng-container>
-            <ng-template #notEditable>
-              <button mat-icon-button matTooltip="Edit"
-                [disabled]="((itemProxy.item.preventModification === true) ||
-                            (itemProxy.model.item.restrictInstanceEditing === true))"
-                (click)="editableStream.next(true)"
-                [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
-                <mat-icon class="fa fa-edit"></mat-icon>
-              </button>
-            </ng-template>
+            <div class=panel-buttons>
+              <ng-container *ngIf="editableStream.getValue() else notEditable">
+                <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
+                  [disabled]="!itemProxy.dirty"
+                  [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+                  <mat-icon class="fa fa-save"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Cancel edit"
+                  (click)="cancelEditing()">
+                  <mat-icon class="fa fa-times"></mat-icon>
+                </button>
+              </ng-container>
+              <ng-template #notEditable>
+                <button mat-icon-button matTooltip="Edit"
+                  [disabled]="((itemProxy.item.preventModification === true) ||
+                              (itemProxy.model.item.restrictInstanceEditing === true))"
+                  (click)="editableStream.next(true)"
+                  [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+                  <mat-icon class="fa fa-edit"></mat-icon>
+                </button>
+              </ng-template>
+              <ng-container *ngIf="itemProxy.item.parentId">
+                <button mat-icon-button matTooltip="Go to parent"
+                  (click)="navigate(itemProxy.item.parentId, false)">
+                  <mat-icon class="fa fa-level-up"></mat-icon>
+                </button>
+              </ng-container>
+            </div>
           </div>
 
           <format-object-editor class=details-body
