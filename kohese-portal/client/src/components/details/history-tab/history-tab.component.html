@@ -15,10 +15,10 @@ limitations under the License.
 -->
 
 <div class="panel-heading">
-  <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
-  <ng-container *ngIf="itemProxy.item.parentId">
+  <label><b>{{ (proxyStream | async).kind }} Information: {{ (proxyStream | async).item.name }}</b></label>
+  <ng-container *ngIf="proxyStream.getValue().item.parentId">
     <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
-      (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+      (click)="this.navigationService.navigate('Explore', { id: proxyStream.getValue().item.parentId })">
       <mat-icon class="fa fa-level-up"></mat-icon>
     </button>
   </ng-container>

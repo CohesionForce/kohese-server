@@ -56,7 +56,6 @@ export class HistoryTabComponent extends NavigatableComponent
     return this._differenceMap;
   }
 
-  itemProxy: ItemProxy
   streamSub: Subscription;
   itemCache: ItemCache;
 
@@ -74,7 +73,6 @@ export class HistoryTabComponent extends NavigatableComponent
     this.streamSub = this.proxyStream.subscribe(async (newProxy) => {
       if (newProxy) {
         this._versions = await ItemCache.getItemCache().getHistory(newProxy.item.id);
-        this.itemProxy = newProxy;
         this._differenceMap.clear();
         this.changeRef.markForCheck();
       }
