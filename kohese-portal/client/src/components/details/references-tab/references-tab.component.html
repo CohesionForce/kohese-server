@@ -22,6 +22,10 @@ limitations under the License.
       (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
       <mat-icon class="fa fa-level-up"></mat-icon>
     </button>
+  <button mat-icon-button matTooltip="Display Item information"
+    (click)=displayInformation(itemProxy)>
+    <mat-icon class="fa fa-clone"></mat-icon>
+  </button>
   </ng-container>
 </div>
 

@@ -24,7 +24,9 @@ import { Subscription, Observable } from 'rxjs';
 
 // Kohese
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { DetailsComponent } from '../details.component';
 
 @Component({
   selector: 'references-tab',
@@ -49,7 +51,8 @@ export class ReferencesTabComponent implements OnInit, OnDestroy {
   proxySubscription: Subscription;
 
   constructor(private changeRef: ChangeDetectorRef,
-              private navigationService: NavigationService
+              private navigationService: NavigationService,
+              private dialogService: DialogService
   ) {}
 
   ngOnInit() {
@@ -98,6 +101,14 @@ export class ReferencesTabComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.proxySubscription.unsubscribe();
+  }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this.dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: itemProxy
+      }
+    }).updateSize('90%', '90%');
   }
 
 }
