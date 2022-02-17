@@ -71,6 +71,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   treeConfig: TreeConfiguration;
+  isDialog: boolean;
 
   /* Observables */
   proxyStream: BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined);
@@ -142,8 +143,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   public isDialogInstance(): boolean {
-    return (this._matDialogRef && (this._matDialogRef.componentInstance ===
-      this) && this._data);
+    this.isDialog = (this._matDialogRef && (this._matDialogRef.componentInstance === this) && this._data);
+    return this.isDialog;
   }
 
   public async upsertItem(): Promise<void> {

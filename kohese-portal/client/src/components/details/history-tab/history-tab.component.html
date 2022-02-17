@@ -21,7 +21,7 @@ limitations under the License.
       (click)=displayInformation(proxyStream.getValue())>
       <mat-icon class="fa fa-clone"></mat-icon>
     </button>
-    <ng-container *ngIf="proxyStream.getValue().item.parentId">
+    <ng-container *ngIf="proxyStream.getValue().item.parentId && !isDialog">
       <button mat-icon-button matTooltip="Go to parent"
         (click)="this.navigationService.navigate('Explore', { id: proxyStream.getValue().item.parentId })">
         <mat-icon class="fa fa-level-up"></mat-icon>

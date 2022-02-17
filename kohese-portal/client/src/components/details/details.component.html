@@ -58,7 +58,7 @@ limitations under the License.
           </ng-container>
         </ng-template>
         <ng-template matTabContent>
-          <document-view [proxyStream]="proxyStream" [incrementalLoad]="true"></document-view>
+          <document-view [isDialog]=isDialog [proxyStream]="proxyStream" [incrementalLoad]="true"></document-view>
         </ng-template>
       </mat-tab>
 
@@ -93,7 +93,7 @@ limitations under the License.
                   <mat-icon class="fa fa-edit"></mat-icon>
                 </button>
               </ng-template>
-              <ng-container *ngIf="itemProxy.item.parentId">
+              <ng-container *ngIf="itemProxy.item.parentId && !isDialog">
                 <button mat-icon-button matTooltip="Go to parent"
                   (click)="navigate(itemProxy.item.parentId, false)">
                   <mat-icon class="fa fa-level-up"></mat-icon>
@@ -114,25 +114,25 @@ limitations under the License.
 
       <mat-tab label="References">
         <ng-template matTabContent>
-          <references-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></references-tab>
+          <references-tab [isDialog]=isDialog [proxyStream]="proxyStream" [editableStream]="editableStream"></references-tab>
         </ng-template>
       </mat-tab>
 
       <mat-tab label="Journal">
         <ng-template matTabContent>
-          <journal [itemProxy]="itemProxy" style="display: flex; flex-direction: column;"></journal>
+          <journal [isDialog]=isDialog [itemProxy]="itemProxy" style="display: flex; flex-direction: column;"></journal>
         </ng-template>
       </mat-tab>
 
       <mat-tab label="Action Table" *ngIf="itemProxy.children">
         <ng-template matTabContent>
-          <action-table [proxyStream]="proxyStream"></action-table>
+          <action-table [isDialog]=isDialog [proxyStream]="proxyStream"></action-table>
         </ng-template>
       </mat-tab>
 
       <mat-tab label="History">
         <ng-template matTabContent>
-          <history-tab [proxyStream]="proxyStream"></history-tab>
+          <history-tab [isDialog]=isDialog [proxyStream]="proxyStream"></history-tab>
         </ng-template>
       </mat-tab>
 

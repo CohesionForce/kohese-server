@@ -42,6 +42,8 @@ import { KoheseCommit } from '../../../../../common/src/kohese-commit';
 })
 export class HistoryTabComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
+
+  @Input('isDialog') isDialog: boolean;
   @Input()
   proxyStream: BehaviorSubject<ItemProxy>;
 

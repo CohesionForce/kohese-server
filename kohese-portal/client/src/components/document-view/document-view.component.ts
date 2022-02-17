@@ -111,6 +111,7 @@ implements OnInit, OnDestroy {
 
 
   /* Observables */
+  @Input('isDialog') isDialog: boolean;
   @Input()
   filterSubject: BehaviorSubject < AnalysisFilter > ;
   @Input()

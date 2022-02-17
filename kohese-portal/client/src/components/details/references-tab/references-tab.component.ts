@@ -37,6 +37,7 @@ import { DetailsComponent } from '../details.component';
 export class ReferencesTabComponent implements OnInit, OnDestroy {
 
   /* Data */
+  @Input('isDialog') isDialog: boolean;
   @Input()
   proxyStream: Observable<ItemProxy>;
   @Input()
