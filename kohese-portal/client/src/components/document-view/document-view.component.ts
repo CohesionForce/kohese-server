@@ -37,6 +37,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { ReportSpecificationComponent, ReportSpecifications } from '../reports/report-specification/report-specification.component';
 
 export interface DocumentInfo {
   proxy: ItemProxy;
@@ -133,20 +134,20 @@ implements OnInit, OnDestroy {
   changeSubjectSubscription: Subscription;
 
   constructor(
-    navigationService: NavigationService,
-    private changeRef: ChangeDetectorRef,
-    private router: Router,
-    private itemRepository: ItemRepository,
-    private dialogService: DialogService,
-    private typeService: DynamicTypesService,
-    private title : Title
+              navigationService: NavigationService,
+              private changeRef: ChangeDetectorRef,
+              private router: Router,
+              private itemRepository: ItemRepository,
+              private dialogService: DialogService,
+              private typeService: DynamicTypesService,
+              private title : Title
     ) {
-    super(navigationService);
-    this.docReader = new commonmark.Parser();
-    this.docWriter = new commonmark.HtmlRenderer({
-      sourcepos: true
-    });
-    this.initialized = false;
+      super(navigationService);
+      this.docReader = new commonmark.Parser();
+      this.docWriter = new commonmark.HtmlRenderer({
+        sourcepos: true
+      });
+      this.initialized = false;
   }
 
   ngOnInit() {
@@ -363,5 +364,41 @@ implements OnInit, OnDestroy {
 
   selectRow(proxy: ItemProxy) {
     this.proxySelected.emit(proxy);
+  }
+
+  produceReport(proxy: ItemProxy) {
+    this.dialogService.openComponentDialog(ReportSpecificationComponent,
+    {
+      data: {
+        defaultName: proxy.item.name + '_' + new Date().toISOString(),
+        allowDescendantInclusionSpecification: true,
+        allowLinkSpecification: true,
+        getReportContent: (initialContent: string, reportSpecifications: ReportSpecifications) => {
+          let processItemProxy: (itemProxy: ItemProxy) => void = (itemProxy: ItemProxy) => {
+            initialContent += this.itemRepository.getMarkdownRepresentation(
+                                itemProxy.item,
+                                undefined,
+                                itemProxy.model.item,
+                                itemProxy.model.view.item,
+                                FormatDefinitionType.DOCUMENT,
+                                itemProxy.getDepthFromAncestor(proxy),
+                                reportSpecifications.addLinks);
+          };
+
+          if (reportSpecifications.includeDescendants) {
+            let itemProxyStack: Array<ItemProxy> = [proxy];
+            while (itemProxyStack.length > 0) {
+              let itemProxy: ItemProxy = itemProxyStack.shift();
+              processItemProxy(itemProxy);
+              itemProxyStack.unshift(...itemProxy.children);
+            }
+          } else {
+            processItemProxy(proxy);
+          }
+
+          return initialContent;
+        }
+      }
+    }).updateSize('40%', '40%');
   }
 }

@@ -25,6 +25,10 @@ limitations under the License.
           <span><b>{{itemProxy.kind}} Info: {{itemProxy.item.name}}</b></span>
         </div>
         <div class="panel-heading-right">
+          <button mat-icon-button matTooltip="produce report"
+            (click)=produceReport(itemProxy)>
+            <mat-icon class="fa fa-file-text-o"></mat-icon>
+          </button>
           <button mat-icon-button matTooltip="go to outline"
             (click)="navigate('Outline', { id: itemProxy.item.id })">
             <mat-icon class="fa fa-list"></mat-icon>
