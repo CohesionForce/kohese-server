@@ -46,7 +46,8 @@ import { TreeModule } from "@circlon/angular-tree-component";
 import { StateFilterService } from './state-filter.service';
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 import { ItemBoardModule } from '../item-board/item-board.module';
-import { DirectivesModule } from '../../directives/directives.module'
+import { DirectivesModule } from '../../directives/directives.module';
+import { AngularSplitModule } from 'angular-split';
 
 @NgModule({
   declarations: [
@@ -88,7 +89,8 @@ import { DirectivesModule } from '../../directives/directives.module'
     ReactiveFormsModule,
     ObjectEditorModule,
     ItemBoardModule,
-    DirectivesModule
+    DirectivesModule,
+    AngularSplitModule
   ],
   exports : [
     DashboardComponent

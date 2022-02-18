@@ -15,31 +15,28 @@
  */
 
 
-.dashListHeader {
-  color : whitesmoke !important;
-}
+:host {
+  .user-dash {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
 
-.dashListItem {
-  color : silver;
-  padding-left : 20px;
-  &:hover {
-    cursor: pointer;
+    mat-card {
+      margin: 0.25em;
+
+      mat-card-title {
+        font-weight: 550;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .dashboard-links {
+        display: flex;
+        flex-direction: column;
+        margin: 0.2em;
+        padding-left: 1em;
+        cursor: pointer;
+      }
+    }
   }
 }
 
-.selectedDashListItem {
-  color : black;
-  background-color : silver;
-
-}
-
-.user-dash {
-  background-color : #111e1e;
-  color : whitesmoke !important;
-}
-
-.dashboard-section {
-  &:hover {
-    cursor: pointer;
-  }
-}
