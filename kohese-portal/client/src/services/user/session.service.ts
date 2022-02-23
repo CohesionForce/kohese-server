@@ -146,4 +146,8 @@ export class SessionService {
     });
   }
 
+  public getUsers(): Array<ItemProxy> {
+    return this.userProxies;
+  }
+
 }
