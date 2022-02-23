@@ -34,16 +34,16 @@ import { ProjectInfo, ProjectService } from '../../services/project-service/proj
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls : ['./dashboard.component.scss']
+  styleUrls : ['./dashboard.component.scss'],
 })
 
 export class DashboardComponent extends NavigatableComponent implements OnInit, OnDestroy {
   currentUser : ItemProxy;
   username : string;
   assignmentListStream : BehaviorSubject<Array<ItemProxy>> = new BehaviorSubject<Array<ItemProxy>>([]);
-  private itemList: Array<Object>;
-  private repoStatusSubject : BehaviorSubject<any>;
 
+  /**Dashboard Initializations */
+  opened: boolean = false;
   selectedDashboard : DashboardSelectionInfo = {
     dashboard : undefined,
     dashboardType : undefined
@@ -57,6 +57,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
 
   dashboardSelectionStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(undefined);
 
+  /**Subscriptions */
   treeConfigSubscription : Subscription;
   changeSubjectSubscription : Subscription;
 
@@ -91,12 +92,16 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
 
   ngOnDestroy () {
     if (this.treeConfigSubscription) {
-      this.treeConfigSubscription.unsubscribe()
+      this.treeConfigSubscription.unsubscribe();
       }
     if (this.changeSubjectSubscription) {
       this.changeSubjectSubscription.unsubscribe();
     }
-    }
+  }
+
+  togglesidenav() {
+    this.opened = !this.opened;
+  }
 
   dashboardSelected(dashboard : DashboardSelectionInfo) {
     this.selectedDashboard = dashboard;

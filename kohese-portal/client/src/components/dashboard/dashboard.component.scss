@@ -16,3 +16,45 @@
 
 
 @import '../../app.component';
+
+:host {
+  .dashboard-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+
+    mat-sidenav {
+      background-color: #99c7b4;
+    }
+
+    mat-sidenav-container {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    mat-sidenav-content {
+
+      overflow: hidden;
+    }
+
+    .sidenav-toggle {
+      height: 0;
+    }
+
+    .sidenav-toggle > button {
+      display: block;
+      border-radius: 4px !important;
+      background-color: rgba(59, 150, 112, 0.5);
+
+      transform: translate(-45px, 10px);
+
+      mat-icon {
+        transform: translate(20px, 6px);
+      }
+    }
+
+    .dashboard-content {
+      height: 100%;
+    }
+  }
+}
