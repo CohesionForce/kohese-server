@@ -173,7 +173,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this._exitShortcutSubscription.unsubscribe();
   }
 
-  public add(): void {
+  public async add(): Promise<void> {
     let username: string = this._sessionService.user.name;
     let timestamp: number = Date.now();
     this._dialogService.openComponentDialog(FormatObjectEditorComponent, {
@@ -193,7 +193,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     }).updateSize('90%', '90%').afterClosed().subscribe(async (result:
       any) => {
       if (result) {
-        this._itemRepository.upsertItem(result.type.name, result.object);
+        await this._itemRepository.upsertItem(result.type.name, result.object);
         this._changeDetectorRef.markForCheck();
       }
     });
@@ -242,7 +242,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       user.item.name, 'Are you sure that you want to remove ' + user.item.name +
       ' from the system?');
     if (response) {
-      this._itemRepository.deleteItem(user, false);
+      await this._itemRepository.deleteItem(user, false);
       this._changeDetectorRef.markForCheck();
     }
   }
