@@ -15,21 +15,22 @@ limitations under the License.
 -->
 
 
-<div *ngIf="!project" style="padding: 20px;">
+<div class=project-selection-header *ngIf="!project">
   <h1> Select a Project :
     <button class="btn btn-primary" style="margin-left: 2em;" (click)="openProjectSelection()"> Select </button>
   </h1>
 </div>
-<div *ngIf="project" style="padding: 20px;">
+<div class=project-selection-header *ngIf="project">
   <h1>{{ project.proxy.item.name }}
-    <button class="btn btn-primary" style="margin-left: 2em; margin-right: 2em;" (click)="openProjectSelection()">
+    <button class="btn btn-primary" style="margin-left: 2em; margin-right: 2em;"
+      (click)="openProjectSelection()">
       Change Project
     </button>
     <button class="btn btn-primary" (click)="editProject()">Edit Project</button>
   </h1>
-
 </div>
-<div style="height: calc(100% - 100px);">
+
+<div class=project-dashboard-wrapper>
   <ng-container *ngIf="(projectStream | async)">
     <ng-container [ngSwitch]="dashboardSelection">
       <ng-container *ngSwitchCase="DashboardSelections.PROJECT_OVERVIEW">

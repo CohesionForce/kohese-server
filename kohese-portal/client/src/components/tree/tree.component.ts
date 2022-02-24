@@ -151,6 +151,9 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
 
   private _absoluteRoot: any;
+  get absoluteRoot() {
+    return this._absoluteRoot;
+  }
   private _root: any;
   @Input('root') set root(root: any) {
     this._root = root;
