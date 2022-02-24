@@ -15,29 +15,27 @@
  */
 
 
+// Angular
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-.flex-container {
-  display : flex;
-}
+// Other External Dependencies
 
-.left-content {
-  width : 2.5%;
-  color : whitesmoke;
-}
-.top-content {
-  width : 100%;
-  color : whitesmoke;
-  height : 40px;
-  transform: translate(-29px, -24px);
-}
+// Kohese
 
-.right-content {
-  flex : 2;
-}
+@Component({
+  selector: 'app-hotkeys-help',
+  templateUrl: './hotkeys-help.component.html',
+  styleUrls: ['./hotkeys-help.component.scss']
+})
+export class HotkeysHelpComponent implements OnInit {
+  hotkeys = Array.from(this.data);
 
-.uneditable {
-  background-color : lightgray
-}
-.editable {
-  background-color : whitesmoke;
+  displayedColumns: Array<string> = ['shortcut','command'];
+  // rowDef: Array<string> = ['shorcut', 'command'];
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data) {}
+
+  ngOnInit(): void {}
+
 }

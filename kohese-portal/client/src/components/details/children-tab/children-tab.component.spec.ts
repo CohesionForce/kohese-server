@@ -16,7 +16,7 @@
 
 
 // Angular
-import { TestBed, ComponentFixture} from '@angular/core/testing';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs';
@@ -27,21 +27,18 @@ import { MaterialModule } from '../../../material.module';
 
 // Kohese
 import { ChildrenTabComponent } from './children-tab.component';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
-import { DialogService } from '../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 
 // Mocks
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
-import { MockDialogService } from '../../../../mocks/services/MockDialogService';
-import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockItem } from '../../../../mocks/data/MockItem';
 
 describe('Component: Children Tab', ()=>{
   let childrenTabComponent: ChildrenTabComponent;
   let childrenTabFixture : ComponentFixture<ChildrenTabComponent>;
   let proxyStream : BehaviorSubject<ItemProxy>;
+  let editableStream : BehaviorSubject<boolean>;
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -54,20 +51,22 @@ describe('Component: Children Tab', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide: ItemRepository, useClass: MockItemRepository},
-        {provide: DialogService, useClass: MockDialogService},
         {provide: NavigationService, useClass: MockNavigationService}
       ]
     }).compileComponents();
 
     childrenTabFixture = TestBed.createComponent(ChildrenTabComponent);
     childrenTabComponent = childrenTabFixture.componentInstance;
+
     proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem()));
     childrenTabComponent.proxyStream = new BehaviorSubject(new ItemProxy('Item', MockItem()));
 
+    editableStream = new BehaviorSubject(false);
+    childrenTabComponent.editableStream = editableStream;
+
     childrenTabFixture.detectChanges();
 
-  })
+  });
 
   afterEach(() => {
     childrenTabFixture.destroy();
@@ -76,7 +75,7 @@ describe('Component: Children Tab', ()=>{
 
   it('instantiates the childrenTab component', ()=>{
     expect(childrenTabComponent).toBeTruthy();
-  })
+  });
 
   it('updates the proxy when a new proxy is pushed downstream', ()=>{
     expect(childrenTabComponent.itemProxy.item.name).toBe('Test item');
@@ -86,4 +85,4 @@ describe('Component: Children Tab', ()=>{
     expect(childrenTabComponent.itemProxy.item.name).toBe('A different name');
 
   });
-})
+});
