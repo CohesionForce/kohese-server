@@ -26,8 +26,6 @@ import { Subscription ,  BehaviorSubject ,  Observable } from 'rxjs';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
-import { DialogService } from '../../../services/dialog/dialog.service';
-import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
 @Component({
   selector : 'children-tab',
@@ -64,19 +62,17 @@ export class ChildrenTabComponent extends NavigatableComponent
 
 
   /* Subscriptions */
-  proxyChanges : Subscription;
+  proxyChangesSub : Subscription;
   editableStreamSub : Subscription;
 
 
   constructor(protected NavigationService : NavigationService,
-              private DialogService : DialogService,
-              private ItemRepository : ItemRepository,
               private changeRef : ChangeDetectorRef) {
     super(NavigationService);
   }
 
   ngOnInit() {
-    this.proxyChanges = this.proxyStream.subscribe((newProxy : ItemProxy) => {
+    this.proxyChangesSub = this.proxyStream.subscribe((newProxy : ItemProxy) => {
       if (newProxy) {
         this.updateProxy(newProxy);
       } else {
@@ -94,7 +90,8 @@ export class ChildrenTabComponent extends NavigatableComponent
   }
 
   ngOnDestroy () {
-    this.proxyChanges.unsubscribe();
+    this.proxyChangesSub.unsubscribe();
+    this.editableStreamSub.unsubscribe();
   }
 
   updateProxy (newProxy : ItemProxy) {
