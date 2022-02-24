@@ -17,16 +17,37 @@
 
 @import '../../../../app.component';
 
-virtual-scroll {
-  height: 90%;
-  width : 100%;
-}
+:host {
 
-.activity-row {
-  height : 50px;
-  width : 100%;
-  border-bottom : 1px solid gray;
-  &:hover {
-    cursor: pointer;
+  .project-overview-wrapper {
+    display: flex;
+    flex-direction: row;
+
+    height: 100%;
+
+    .project-tree-container {
+      display: flex;
+      flex-direction: column;
+
+      height: 100%;
+
+      tree-root {
+        height: calc(100% - 36px);
+      }
+    }
   }
+
+  activity-feed {
+    margin-left: 1em;
+    height: 100%;
+    width: 30%;
+  }
+
+  .lost-project-items-container {
+    height: 100%;
+    width: 35%;
+
+    padding: 15px;
+  }
+
 }

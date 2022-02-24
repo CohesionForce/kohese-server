@@ -15,24 +15,32 @@
  */
 
 
-virtual-scroll {
-  height: 90%;
-  width : 100%;
-}
+:host {
 
-.activity-row {
-  height : 80px;
-  width : 100%;
-  border-bottom : 1px solid gray;
-  &:hover {
-    cursor: pointer;
+  .activity-feed-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    height: 2.4em;
+    padding-left: 0.3em;
+
+    border-bottom: 2px solid rgba(0,0,0,.65);
+    background-color: white;
+    color: rgba(0,0,0,.8);
   }
-}
 
-.activity-list {
-  padding : 15px;
-  width: 50%;
-  display: inline-block;
-  height : 600px;
-  overflow : auto !important;
+  .activity-feed-body {
+    overflow: auto;
+    height: calc(100% - 4.23em);
+  }
+
+  .activity-row {
+    height : 80px;
+    width : 100%;
+    border-bottom : 1px solid gray;
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }

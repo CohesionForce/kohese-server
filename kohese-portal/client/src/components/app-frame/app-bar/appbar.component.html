@@ -19,13 +19,13 @@ limitations under the License.
   <ng-container *ngIf="(authenticated)">
     <div class="navbar-header">
       <img src="../../../../assets/icons/favicon.ico" width="50" height="50"
-        (click)="navigate('Dashboard', {})">
+        (click)="navigate('Dashboard', {appbarNav: 'appbarNav'})">
       <span class="navbar-brand"
         [ngClass]="{'navbar-syncing': (State.SYNCHRONIZING === itemRepositoryState),
                     'navbar-disconnected': ((State.DISCONNECTED === itemRepositoryState)  ||
                                             (State.USER_LOCKED_OUT === itemRepositoryState) ||
                                             (State.SYNCHRONIZATION_FAILED === itemRepositoryState))}"
-        (click)="navigate('Dashboard', {})">
+        (click)="navigate('Dashboard', {appbarNav: 'appbarNav'})">
         Dashboard
         <i class="fa fa-exclamation-triangle" *ngIf="(State.SYNCHRONIZATION_SUCCEEDED !== itemRepositoryState)">
           - {{syncStatusString}}
