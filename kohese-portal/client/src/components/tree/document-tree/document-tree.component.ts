@@ -91,10 +91,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
 
   @Output() rootSelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
   @Output() onSelect : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
-  // @Input() selectedProxyStream : Observable<ItemProxy>;
   @Input() viewingProxyStream : Observable<ItemProxy>;
 
-  // selectedProxyStreamSubscription : Subscription;
   viewingProxyStreamSubscription: Subscription;
 
   constructor(
@@ -308,13 +306,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     });
 
-    // this.selectedProxyStreamSubscription = this.selectedProxyStream.subscribe((newSelection) => {
-    //   if(newSelection) {
-    //     this.focusedObjectSubject.next(newSelection);
-    //     this.showFocus();
-    //   }
-    // });
-
     this.viewingProxyStreamSubscription = this.viewingProxyStream.subscribe((newViewedProxy) => {
       if(newViewedProxy) {
         this.beingViewedObjectSubject.next(newViewedProxy);
@@ -329,7 +320,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       this.treeConfigSubscription.unsubscribe();
     }
     this.changeSubjectSubscription.unsubscribe();
-    // this.selectedProxyStreamSubscription.unsubscribe();
     this.viewingProxyStreamSubscription.unsubscribe();
   }
 
