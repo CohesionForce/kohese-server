@@ -54,6 +54,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   paramSubscription: Subscription;
   changeSubjectSubscription : Subscription;
   outlineSync : boolean = true;
+  synchronizeWithSelection: boolean = true;
 
   documentRoot : ItemProxy;
   documentRootId : string;

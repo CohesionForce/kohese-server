@@ -18,7 +18,7 @@ limitations under the License.
 <div class="kt-item"
   (click)="treeRow.rowFocused()"
   [ngClass]="{ 'selected-border': ( !outlineSync && treeRow.isRowFocused() ),
-               'viewing-border' : treeRow.isRowBeingViewed()
+               'viewing-border' : ( synchronizeWithSelection && treeRow.isRowBeingViewed() )
              }"
 
   [ngStyle]="{ 'padding-left': (treeRow.depth * 31) + 'px',

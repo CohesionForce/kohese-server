@@ -37,16 +37,18 @@ limitations under the License.
     Root
   </div>
   <ng-container *ngIf="rootSubject.getValue()">
-    <tree-row [treeRow]="getRootRow()" [images]="images" [outlineSync]=outlineSync
-      [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
+    <tree-row [treeRow]="getRootRow()" [images]="images"
+      [rowActions]="rootRowActions" [menuActions]="rootMenuActions"
+      [outlineSync]=outlineSync [synchronizeWithSelection]=synchronizeWithSelection>
     </tree-row>
   </ng-container>
 </div>
 <div class="outline-tree">
   <virtual-scroll #tree [items]="visibleRows">
     <tree-row *ngFor="let row of tree.viewPortItems"
-      [treeRow]="row" [rowActions]="rowActions" [outlineSync]=outlineSync
-      [images]="images" [menuActions]="menuActions">
+      [treeRow]="row" [rowActions]="rowActions"
+      [images]="images" [menuActions]="menuActions"
+      [outlineSync]=outlineSync [synchronizeWithSelection]=synchronizeWithSelection>
     </tree-row>
   </virtual-scroll>
 </div>

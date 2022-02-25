@@ -67,6 +67,7 @@ export class TreeRowComponent implements OnInit {
   }
 
   @Input('outlineSync') outlineSync: boolean;
+  @Input('synchronizeWithSelection') synchronizeWithSelection: boolean;
 
   public constructor(protected changeDetector: ChangeDetectorRef) {
   }
