@@ -312,7 +312,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
         this.beingViewedObjectSubject.next(newViewedProxy);
         this.showBeingViewed();
       }
-    })
+    });
   }
 
   ngOnDestroy () {

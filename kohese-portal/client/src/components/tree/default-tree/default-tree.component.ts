@@ -41,6 +41,7 @@ import { Filter, FilterCriterion } from '../../filter/filter.class';
 import { ItemProxyFilter } from '../../filter/item-proxy-filter.class';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 import { ImportComponent } from '../../import/import.component';
+import { TreeService } from '../../../services/tree/tree.service';
 
 @Component({
   selector: 'default-tree',
@@ -88,18 +89,20 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
 
   private _itemRepositorySubscription: Subscription;
   private _treeConfigurationSubscription: Subscription;
+  private viewingProxyStreamSubscription: Subscription;
 
   public constructor(
-    private _changeDetectorRef: ChangeDetectorRef,
-    route: ActivatedRoute,
-    private _itemRepository: ItemRepository,
-    dialogService: DialogService,
-    private _navigationService: NavigationService,
-    private _dynamicTypesService: DynamicTypesService,
-    private title : Title
+                      route: ActivatedRoute,
+                      dialogService: DialogService,
+                      private _changeDetectorRef: ChangeDetectorRef,
+                      private _itemRepository: ItemRepository,
+                      private _navigationService: NavigationService,
+                      private _dynamicTypesService: DynamicTypesService,
+                      private treeService: TreeService,
+                      private title : Title
     ) {
-    super(route, dialogService);
-    this.canMoveRows = true;
+      super(route, dialogService);
+      this.canMoveRows = true;
   }
 
   public ngOnInit(): void {
@@ -344,6 +347,15 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
         }, 0);
       }
     });
+
+    this.viewingProxyStreamSubscription = this.treeService.viewingProxyStream.subscribe((newViewedProxy) => {
+      if(newViewedProxy) {
+        this.beingViewedObjectSubject.next(newViewedProxy);
+        if(this.synchronizeWithSelection) {
+          this.showBeingViewed();
+        }
+      }
+    });
   }
 
   public ngOnDestroy(): void {
@@ -358,6 +370,7 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
     this._synchronizeWithSelection = !this._synchronizeWithSelection;
     if (this._synchronizeWithSelection) {
       this.showFocus();
+      this.showBeingViewed();
     }
   }
 

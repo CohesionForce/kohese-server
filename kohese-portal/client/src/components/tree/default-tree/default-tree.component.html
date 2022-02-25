@@ -57,7 +57,7 @@ limitations under the License.
   <div class="kt-body">
     <virtual-scroll #tree [items]="visibleRows">
       <tree-row *ngFor="let row of tree.viewPortItems"
-        [treeRow]="row" [rowActions]="rowActions"
+        [treeRow]="row" [rowActions]="rowActions" [synchronizeWithSelection]=synchronizeWithSelection
         [images]="images" [menuActions]="menuActions">
       </tree-row>
     </virtual-scroll>
