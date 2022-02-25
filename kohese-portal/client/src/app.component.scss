@@ -122,6 +122,10 @@ table {
   border: 3px solid #007541 !important;
 }
 
+.viewing-border {
+  border: 3px dashed #007541 !important;
+}
+
 #pageWrapper {
   height: calc(100% - $topNavHeight);
 }

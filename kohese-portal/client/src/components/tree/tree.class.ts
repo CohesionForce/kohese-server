@@ -230,6 +230,8 @@ export abstract class Tree {
 
   protected focusedObjectSubject: BehaviorSubject<any> =
     new BehaviorSubject<any>(undefined);
+  protected beingViewedObjectSubject: BehaviorSubject<any> =
+    new BehaviorSubject<any>(undefined);
   private _selectedObjectsSubject: BehaviorSubject<Array<any>> =
     new BehaviorSubject<Array<any>>([]);
   get selectedObjectsSubject() {
@@ -292,6 +294,14 @@ export abstract class Tree {
     };
     row.getIcon = () => {
       return this.getIcon(object);
+    };
+    row.isRowBeingViewed = () => {
+      return (object === this.beingViewedObjectSubject.getValue());
+    }
+    row.rowBeingViewed = () => {
+      this.rowBeingViewed(row);
+      this.beingViewedObjectSubject.next(object);
+      this.showBeingViewed();
     };
     row.isRowFocused = () => {
       return (object === this.focusedObjectSubject.getValue());
@@ -610,6 +620,10 @@ export abstract class Tree {
     this._rootSubject.next(object);
   }
 
+  protected rowBeingViewed(row: TreeRow): void {
+    // Subclasses may override this function
+  }
+
   protected rowFocused(row: TreeRow): void {
     // Subclasses may override this function
   }
@@ -678,6 +692,40 @@ export abstract class Tree {
       let selectedRow: TreeRow = this._rowMap.get(id);
       if (selectedRow) {
         let parent: any = this.getParent(focusedObject);
+        if (parent) {
+          let parentId: string = this.getId(parent);
+          let rootId: string = this.getId(this._rootSubject.getValue());
+          while (parentId !== rootId) {
+            let row: TreeRow = this._rowMap.get(parentId);
+            if (!row) {
+              break;
+            }
+
+            row.expanded = true;
+            parent = this.getParent(row.object);
+            if (parent) {
+              parentId = this.getId(parent);
+            } else {
+              break;
+            }
+          }
+        }
+
+        this.showRows();
+        if (this._virtualScrollComponent) {
+          this._virtualScrollComponent.scrollInto(selectedRow);
+        }
+      }
+    }
+  }
+
+  protected showBeingViewed(): void {
+    let viewedObject: any = this.beingViewedObjectSubject.getValue();
+    if (viewedObject) {
+      let id: string = this.getId(viewedObject);
+      let selectedRow: TreeRow = this._rowMap.get(id);
+      if (selectedRow) {
+        let parent: any = this.getParent(viewedObject);
         if (parent) {
           let parentId: string = this.getId(parent);
           let rootId: string = this.getId(this._rootSubject.getValue());

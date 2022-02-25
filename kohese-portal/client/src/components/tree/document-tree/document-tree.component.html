@@ -31,18 +31,13 @@ limitations under the License.
     (click)="removeFilter()" matTooltip="Remove filter">
     <mat-icon class="fa fa-eraser"></mat-icon>
   </button>
-  <button mat-icon-button (click)="toggleDocumentSync()" style="margin-left: auto"
-    matTooltip="Toggle selection synchronization for the tree"
-    [ngClass]="{ 'highlight': sync }">
-    <mat-icon class="fa fa-exchange"></mat-icon>
-  </button>
 </div>
-<div style="height: 12%; width: 100%;">
+<div class=root-panel style="height: 12%; width: 100%;">
   <div class="kt-head kth-cell">
     Root
   </div>
   <ng-container *ngIf="rootSubject.getValue()">
-    <tree-row [treeRow]="getRootRow()" [images]="images"
+    <tree-row [treeRow]="getRootRow()" [images]="images" [outlineSync]=outlineSync
       [rowActions]="rootRowActions" [menuActions]="rootMenuActions">
     </tree-row>
   </ng-container>
@@ -50,7 +45,7 @@ limitations under the License.
 <div class="outline-tree">
   <virtual-scroll #tree [items]="visibleRows">
     <tree-row *ngFor="let row of tree.viewPortItems"
-      [treeRow]="row" [rowActions]="rowActions"
+      [treeRow]="row" [rowActions]="rowActions" [outlineSync]=outlineSync
       [images]="images" [menuActions]="menuActions">
     </tree-row>
   </virtual-scroll>
