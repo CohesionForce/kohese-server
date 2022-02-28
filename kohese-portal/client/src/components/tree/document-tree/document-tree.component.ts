@@ -53,7 +53,6 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   treeConfig : any;
   paramSubscription: Subscription;
   changeSubjectSubscription : Subscription;
-  outlineSync : boolean = true;
   synchronizeWithSelection: boolean = true;
 
   documentRoot : ItemProxy;
@@ -524,7 +523,3 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     }).updateSize('90%', '90%');
   }
 }
-
-/*
-
-*/

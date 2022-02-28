@@ -17,7 +17,7 @@ limitations under the License.
 
 <div class="kt-item"
   (click)="treeRow.rowFocused()"
-  [ngClass]="{ 'selected-border': ( !outlineSync && treeRow.isRowFocused() ),
+  [ngClass]="{ 'selected-border': treeRow.isRowFocused(),
                'viewing-border' : ( synchronizeWithSelection && treeRow.isRowBeingViewed() )
              }"
 
