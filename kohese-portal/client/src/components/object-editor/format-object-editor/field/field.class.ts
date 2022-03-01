@@ -34,6 +34,7 @@ import { DialogService } from '../../../../services/dialog/dialog.service';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../../services/user/session.service';
 import { FormatContainer, FormatContainerKind } from '../../../../../../common/src/FormatContainer.interface';
+import { TreeService } from '../../../../services/tree/tree.service';
 
 /**
  * Displays an attribute based on the given PropertyDefinition
@@ -124,10 +125,13 @@ export class Field {
     return this._sessionService;
   }
 
-  protected constructor(protected _changeDetectorRef: ChangeDetectorRef,
-    protected _itemRepository: ItemRepository, protected _dialogService:
-    DialogService, protected _sessionService: SessionService) {
-  }
+  protected constructor(
+                        protected _changeDetectorRef: ChangeDetectorRef,
+                        protected _itemRepository: ItemRepository,
+                        protected _dialogService: DialogService,
+                        protected _sessionService: SessionService,
+                        protected treeService: TreeService
+  ) {}
 
   /**
    * Returns the representation of an attribute based on the associated
@@ -319,7 +323,7 @@ export class Field {
         selection: selection,
         allowMultiselect: allowMultiselect,
         showSelections: allowMultiselect,
-        quickSelectElements: this._itemRepository.getRecentProxies()
+        quickSelectElements: this.treeService.getRecentProxies()
       }
     }).updateSize('90%', '90%').afterClosed().toPromise();
 

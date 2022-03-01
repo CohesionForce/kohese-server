@@ -15,15 +15,26 @@
  */
 
 
-
+// Angular
 import { Injectable } from '@angular/core';
+
+// Other External Dependencies
+
+// Kohese
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { LogService } from '../log/log.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TreeService {
 
-  constructor() { }
+  constructor(
+              private logService: LogService,
+  ) {}
+
+  recentProxies: Array<ItemProxy> = [];
+  logEvents: any;
 
   _favorites: Array<any> = [];
   get favorites() {
@@ -35,16 +46,58 @@ export class TreeService {
 
   ngOnInit() {
     // TODO: Add check for favorites in local storage
+
+    ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
+      this.logService.log(this.logEvents.receivedNofificationOfChange, { change: change });
+
+      switch (change.type) {
+        case 'loaded':
+          this.logService.log(this.logEvents.itemProxyLoaded);
+          break;
+        case 'loading':
+          this.logService.log(this.logEvents.itemProxyLoading);
+          break;
+        //////////////////////////////////////////////////////////////////////////
+        // This case prevents a previously focused item from showing a
+        // blank entry in the list of recent proxies once it has been deleted.
+        //////////////////////////////////////////////////////////////////////////
+        case 'delete':
+          let deletedItemIndex = this.recentProxies.findIndex(y => y.item.id === change.proxy.item.id);
+          if(deletedItemIndex !== -1) {
+            this.recentProxies.splice(deletedItemIndex, 1);
+          }
+          break;
+      }
+    });
+
+    this.recentProxies = [];
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  registerRecentProxy(itemProxy: ItemProxy) {
+    let recentProxyIndex: number = this.recentProxies.indexOf(itemProxy);
+    if (recentProxyIndex !== -1) {
+      this.recentProxies.splice(recentProxyIndex, 1);
+    }
+
+    // Add the recent proxy to the front of list
+    this.recentProxies.unshift(itemProxy);
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  getRecentProxies(): Array<ItemProxy> {
+    return this.recentProxies;
+  }
+
+  //////////////////////////////////////////////////////////////////////////
   getFavorites(): Array<any> {
     // TODO: Implementation of favorites retrieval from localStorage
     return this.favorites;
   }
 
+  //////////////////////////////////////////////////////////////////////////
   addFavorite(element: any): Array<any> {
     try {
-      // add element if it is not in the favorites array
       let id = element.item.id;
       let favoritesElementIndex = this.favorites.findIndex(t => t.item.id === id);
       if(favoritesElementIndex === -1) {
@@ -57,6 +110,7 @@ export class TreeService {
     return this.favorites;
   }
 
+  //////////////////////////////////////////////////////////////////////////
   removeFavorite(element: any): Array<any> {
     let id = element.item.id;
     try {

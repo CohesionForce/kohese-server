@@ -27,6 +27,7 @@ import { SessionService } from '../../../../../services/user/session.service';
 import { NavigationService } from '../../../../../services/navigation/navigation.service';
 import { DetailsComponent } from '../../../../details/details.component';
 import { Field } from '../field.class';
+import { TreeService } from '../../../../../services/tree/tree.service';
 
 /**
  * Displays a singlevalued attribute
@@ -38,10 +39,15 @@ import { Field } from '../field.class';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SinglevaluedFieldComponent extends Field {
-  public constructor(changeDetectorRef: ChangeDetectorRef, itemRepository:
-    ItemRepository, dialogService: DialogService, sessionService:
-    SessionService, private navigationService: NavigationService) {
-    super(changeDetectorRef, itemRepository, dialogService, sessionService);
+  public constructor(
+                      changeDetectorRef: ChangeDetectorRef,
+                      itemRepository: ItemRepository,
+                      dialogService: DialogService,
+                      sessionService: SessionService,
+                      treeService: TreeService,
+                      private navigationService: NavigationService,
+  ) {
+    super(changeDetectorRef, itemRepository, dialogService, sessionService, treeService);
   }
 
   /**

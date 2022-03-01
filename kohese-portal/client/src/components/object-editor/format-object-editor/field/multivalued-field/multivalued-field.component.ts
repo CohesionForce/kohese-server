@@ -34,6 +34,7 @@ import { DetailsComponent } from '../../../../details/details.component';
 import { ItemRepository } from '../../../../../services/item-repository/item-repository.service';
 import { SessionService } from '../../../../../services/user/session.service';
 import { Field } from '../field.class';
+import { TreeService } from '../../../../../services/tree/tree.service';
 
 /**
  * Displays a multivalued attribute based on the given PropertyDefinition
@@ -53,10 +54,14 @@ export class MultivaluedFieldComponent extends Field {
     return this._changeDetectorRef;
   }
 
-  public constructor(changeDetectorRef: ChangeDetectorRef, itemRepository:
-    ItemRepository, dialogService: DialogService, sessionService:
-    SessionService, private navigationService: NavigationService) {
-    super(changeDetectorRef, itemRepository, dialogService, sessionService);
+  public constructor( changeDetectorRef: ChangeDetectorRef,
+                      itemRepository: ItemRepository,
+                      treeService: TreeService,
+                      dialogService: DialogService,
+                      sessionService: SessionService,
+                      private navigationService: NavigationService
+  ) {
+    super(changeDetectorRef, itemRepository, dialogService, sessionService, treeService,);
   }
 
   /**
@@ -212,7 +217,7 @@ export class MultivaluedFieldComponent extends Field {
             return TreeConfiguration.getWorkingTree().getProxyFor(reference.
               id);
           }),
-          quickSelectElements: this._itemRepository.getRecentProxies(),
+          quickSelectElements: this.treeService.getRecentProxies(),
           allowMultiselect: true,
           showSelections: true
         }

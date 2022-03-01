@@ -103,14 +103,15 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   constructor(
-    private CacheManager : CacheManager,
-    private CurrentUserService: CurrentUserService,
-    private AuthenticationService: AuthenticationService,
-    private toastrService: ToastrService,
-    private dialogService: DialogService,
-    private _versionControlService: VersionControlService,
-    private logService: LogService, private _markdownService:
-    MarkdownService) {
+              private CacheManager : CacheManager,
+              private CurrentUserService: CurrentUserService,
+              private AuthenticationService: AuthenticationService,
+              private toastrService: ToastrService,
+              private dialogService: DialogService,
+              private _versionControlService: VersionControlService,
+              private logService: LogService,
+              private _markdownService: MarkdownService
+  ) {
     this.logEvents = InitializeLogs(logService)
     this.logService.log(this.logEvents.itemRepoInit);
 

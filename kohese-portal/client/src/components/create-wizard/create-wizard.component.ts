@@ -30,6 +30,7 @@ import { FormatObjectEditorComponent } from '../object-editor/format-object-edit
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
+import { TreeService } from '../../services/tree/tree.service';
 
 @Component({
   selector: 'create-wizard',
@@ -64,10 +65,12 @@ export class CreateWizardComponent extends NavigatableComponent
   }
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) private data: any,
-    protected NavigationService: NavigationService,
-    private itemRepository: ItemRepository,
-    public MatDialogRef: MatDialogRef<CreateWizardComponent>,
-    private _sessionService: SessionService) {
+              protected NavigationService: NavigationService,
+              private itemRepository: ItemRepository,
+              private treeService: TreeService,
+              public MatDialogRef: MatDialogRef<CreateWizardComponent>,
+              private _sessionService: SessionService
+  ) {
     super(NavigationService);
   }
 
@@ -110,7 +113,8 @@ export class CreateWizardComponent extends NavigatableComponent
     this._isDisabled = true;
     let itemProxyPlaceholder: any = this.proxyPlaceholderStream.getValue();
     this.itemRepository.upsertItem(this._formatObjectEditor.selectedType.name,
-      itemProxyPlaceholder.item).then(() => {
+      itemProxyPlaceholder.item).then((itemProxy) => {
+        this.treeService.registerRecentProxy(itemProxy);
         console.log('Build Item promise resolve');
         this.MatDialogRef.close();
       }, (error) => {
