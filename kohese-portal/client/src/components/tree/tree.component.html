@@ -55,7 +55,7 @@ limitations under the License.
           <!-- quick select list -->
           <button mat-button class=item-button matTooltip="{{quickSelectElement.item.name}}"
             [disabled]="!maySelect(quickSelectElement)"
-            (click)="changeElementSelection(quickSelectElement)"
+            (click)="changeElementSelection(quickSelectElement); expandSelected(quickSelectElement)"
             [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !== -1) }">
             <mat-icon class="{{this.elementMap.get(quickSelectElement)?.icon}}"></mat-icon>
             {{quickSelectElement.item.name}}
@@ -191,13 +191,14 @@ limitations under the License.
       </ng-container>
     </div>
   </mat-drawer-content>
+  <!-- MultiSelect Drawer -->
   <mat-drawer mode="side" position="end" disableClose
     [opened]="(allowMultiselect && showSelections)" style="width: 15%;">
     <div style="height: 50px; display: flex; flex-direction: row;">
       <h3>Selected:</h3> <h4 style="margin-left: auto;">{{selection.length}}</h4>
     </div>
-    <div cdkDropList class=favorites-list (cdkDropListDropped)=drop(this.selection,$event) style="height: calc(100% - 50px); overflow-y: auto;">
-      <div cdkDrag class=favorites-box *ngFor="let selectionEntry of selection; let j = index" style="display: flex; flex-direction: row;">
+    <div cdkDropList class=favorites-list (cdkDropListDropped)=drop(this.selection,$event)>
+      <div cdkDrag class=favorites-box *ngFor="let selectionEntry of selection; let j = index">
         <button mat-button matTooltip="{{elementMap.get(selectionEntry)?.text}}"
           (click)="scrollElementIntoView(selectionEntry)"
           style="white-space:nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: left;">
