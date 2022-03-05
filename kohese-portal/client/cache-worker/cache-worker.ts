@@ -815,6 +815,22 @@ function registerKoheseIOListeners() {
       updateItemStatus(itemId, statusMap[itemId]);
     }
   });
+
+  socket.on('Session/add', (sessionData) => {
+    console.log('^^^ Session Addition received: %s for %s', sessionData.sessionId, sessionData.username);
+    postToAllPorts('sessionAdd', sessionData);
+  });
+
+  socket.on('Session/update', (sessionData) => {
+    console.log('^^^ Session update received with id: %s - %s for %s',
+      sessionData.sessionId, sessionData.numberOfConnections, sessionData.username);
+    postToAllPorts('sessionUpdate', sessionData);
+  });
+
+  socket.on('Session/delete', (sessionData) => {
+    console.log('^^^ Session Deletion received with id: %s for %s', sessionData.sessionId, sessionData.username);
+    postToAllPorts('sessionDelete', sessionData);
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////
