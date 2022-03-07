@@ -100,9 +100,9 @@ export class DefaultTreeComponent extends Tree implements OnInit, OnDestroy {
                       private _dynamicTypesService: DynamicTypesService,
                       private treeService: TreeService,
                       private title : Title
-    ) {
-      super(route, dialogService);
-      this.canMoveRows = true;
+  ) {
+    super(route, dialogService);
+    this.canMoveRows = true;
   }
 
   public ngOnInit(): void {
