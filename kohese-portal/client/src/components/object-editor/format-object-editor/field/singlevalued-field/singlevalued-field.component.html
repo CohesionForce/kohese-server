@@ -121,9 +121,9 @@ limitations under the License.
           propertyName].definition.required !== true)">
           <mat-option [value]="null"></mat-option>
         </ng-container>
-        <ng-container *ngFor="let user of sessionService.users">
-          <mat-option [value]="user.name">
-            {{user.name}}
+        <ng-container *ngFor="let user of users">
+          <mat-option [value]="user.item.name">
+            {{user.item.name}}
           </mat-option>
         </ng-container>
       </mat-select>
