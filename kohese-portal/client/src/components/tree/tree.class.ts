@@ -692,6 +692,11 @@ export abstract class Tree {
       let selectedRow: TreeRow = this._rowMap.get(id);
       if (selectedRow) {
         let parent: any = this.getParent(focusedObject);
+
+        if(this.beingViewedObjectSubject.getValue().parentProxy !== parent) {
+          this.beingViewedObjectSubject.next(null);
+        }
+
         if (parent) {
           let parentId: string = this.getId(parent);
           let rootId: string = this.getId(this._rootSubject.getValue());
