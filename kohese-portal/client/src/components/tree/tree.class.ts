@@ -692,6 +692,16 @@ export abstract class Tree {
       let selectedRow: TreeRow = this._rowMap.get(id);
       if (selectedRow) {
         let parent: any = this.getParent(focusedObject);
+
+        // object used to display dashed viewing border when synchronizeWithSelection is true
+        if(this.beingViewedObjectSubject.getValue()) {
+          let viewedObject: any = this.beingViewedObjectSubject.getValue();
+          let viewedObjectParent = this.getParent(viewedObject);
+          if(viewedObjectParent.item.id !== parent.item.id) {
+            this.beingViewedObjectSubject.next(null);
+          }
+        }
+
         if (parent) {
           let parentId: string = this.getId(parent);
           let rootId: string = this.getId(this._rootSubject.getValue());
