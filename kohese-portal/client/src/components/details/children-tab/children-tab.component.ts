@@ -54,7 +54,7 @@ export class ChildrenTabComponent extends NavigatableComponent
   childrenStream : BehaviorSubject<Array<ItemProxy>> = new BehaviorSubject([]);
 
   /* Subscriptions */
-  proxyChanges : Subscription;
+  proxyChangesSub : Subscription;
   editableStreamSub : Subscription;
   treeConfigSubscription: Subscription;
 
@@ -67,7 +67,7 @@ export class ChildrenTabComponent extends NavigatableComponent
   }
 
   ngOnInit() {
-    this.proxyChanges = this.proxyStream.subscribe((newProxy : ItemProxy) => {
+    this.proxyChangesSub = this.proxyStream.subscribe((newProxy : ItemProxy) => {
       if (newProxy) {
         this.updateProxy(newProxy);
       } else {
@@ -90,8 +90,8 @@ export class ChildrenTabComponent extends NavigatableComponent
   }
 
   ngOnDestroy () {
-    this.proxyChanges.unsubscribe();
-    this.treeConfigSubscription.unsubscribe();
+    this.proxyChangesSub.unsubscribe();
+    this.editableStreamSub.unsubscribe();
   }
 
   updateProxy (newProxy : ItemProxy) {

@@ -66,7 +66,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   set startWithJournal(value: boolean) {
     this._startWithJournal = value;
     if (this._startWithJournal) {
-      this.startingTabIndex = 4;
+      this.startingTabIndex = 3;
     }
   }
 

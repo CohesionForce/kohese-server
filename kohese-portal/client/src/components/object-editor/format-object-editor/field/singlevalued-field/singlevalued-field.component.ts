@@ -16,7 +16,7 @@
 
 
 // Angular
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 // Other External Dependencies
 
@@ -27,6 +27,7 @@ import { SessionService } from '../../../../../services/user/session.service';
 import { NavigationService } from '../../../../../services/navigation/navigation.service';
 import { DetailsComponent } from '../../../../details/details.component';
 import { Field } from '../field.class';
+import { ItemProxy } from '../../../../../../../common/src/item-proxy';
 
 /**
  * Displays a singlevalued attribute
@@ -37,11 +38,22 @@ import { Field } from '../field.class';
   styleUrls: ['./singlevalued-field.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SinglevaluedFieldComponent extends Field {
-  public constructor(changeDetectorRef: ChangeDetectorRef, itemRepository:
-    ItemRepository, dialogService: DialogService, sessionService:
-    SessionService, private navigationService: NavigationService) {
+export class SinglevaluedFieldComponent extends Field implements OnInit {
+
+  users: Array<ItemProxy>;
+
+  public constructor(
+                    changeDetectorRef: ChangeDetectorRef,
+                    itemRepository: ItemRepository,
+                    dialogService: DialogService,
+                    sessionService: SessionService,
+                    private navigationService: NavigationService
+  ) {
     super(changeDetectorRef, itemRepository, dialogService, sessionService);
+  }
+
+  ngOnInit() {
+    this.users = this.sessionService.getUsers();
   }
 
   /**

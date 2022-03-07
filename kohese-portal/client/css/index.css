@@ -587,26 +587,3 @@ body #layout-bottom {
     color: whitesmoke; }
   .filter-wizard .panel-body {
     padding: 5px; }
-
-.assignment-accordion {
-  position: absolute;
-  right: 0;
-  width: 50%;
-  overflow: auto;
-  height: 100%; }
-  .assignment-accordion .assignment {
-    background-color: #005A31;
-    color: white;
-    margin: 5px;
-    padding: 2px;
-    width: 100%;
-    border: 1px solid #7dd7ae; }
-    .assignment-accordion .assignment:hover {
-      cursor: pointer; }
-
-.dashboard-navigation {
-  position: absolute;
-  left: 0;
-  width: 50%; }
-  .dashboard-navigation button {
-    margin: 5px; }
