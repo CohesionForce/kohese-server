@@ -16,7 +16,7 @@
 
 
 // Angular
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 // Other External Dependencies
 
@@ -28,6 +28,7 @@ import { NavigationService } from '../../../../../services/navigation/navigation
 import { DetailsComponent } from '../../../../details/details.component';
 import { Field } from '../field.class';
 import { TreeService } from '../../../../../services/tree/tree.service';
+import { ItemProxy } from '../../../../../../../common/src/item-proxy';
 
 /**
  * Displays a singlevalued attribute
@@ -48,6 +49,11 @@ export class SinglevaluedFieldComponent extends Field {
                       private navigationService: NavigationService,
   ) {
     super(changeDetectorRef, itemRepository, dialogService, sessionService, treeService);
+  }
+
+  users: Array<ItemProxy> = [];
+  ngOnInit() {
+    this.users = this.sessionService.getUsers();
   }
 
   /**
