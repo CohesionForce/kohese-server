@@ -26,7 +26,7 @@ limitations under the License.
           <ng-container *ngIf=getFavorite(favorite)>
             <button mat-button class=item-button matTooltip="{{favorite.item.name}}"
               [disabled]="!maySelect(favorite)"
-              (click)="changeElementSelection(favorite)"
+              (click)="changeElementSelection(favorite); expandSelected(favorite);"
               [ngClass]="{ 'highlight': (selection.indexOf(favorite) !== -1) }">
               <mat-icon class="{{this.elementMap.get(favorite)?.icon}}"></mat-icon>
               {{favorite.item.name}}

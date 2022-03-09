@@ -689,7 +689,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
           elementMapValue.expanded = true;
         }
       }
-
+      this.changeDetectorRef.detectChanges();
     }
 
     let firstSelectedElementIndex: number = this.getDisplayedElements().indexOf(element);
@@ -697,7 +697,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       // Each element row should be 40px or 36px tall.
       this._elementContainer.nativeElement.scrollTop = (((this._actions.length > 0) ? 40 : 36) * firstSelectedElementIndex);
     }
-    this._changeDetectorRef.markForCheck();
+    this._changeDetectorRef.detectChanges();
   }
 
   public setExpansionStates(expansionStateMap: Map<any, boolean>): void {
