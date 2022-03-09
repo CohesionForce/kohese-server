@@ -15,7 +15,7 @@
  */
 
 
-import { MockUserData } from '../data/MockUser';
+import { MockUserData, MockUsersData } from '../data/MockUser';
 
 export class MockSessionService {
   get user() {
@@ -31,5 +31,9 @@ export class MockSessionService {
 
   getSessions() {
     return {123: {}}
+  }
+
+  public getUsers() {
+    return [MockUsersData()];
   }
 }
