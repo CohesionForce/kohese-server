@@ -690,9 +690,14 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
         }
       }
 
-      this._changeDetectorRef.markForCheck();
     }
 
+    let firstSelectedElementIndex: number = this.getDisplayedElements().indexOf(element);
+    if (firstSelectedElementIndex !== -1) {
+      // Each element row should be 40px or 36px tall.
+      this._elementContainer.nativeElement.scrollTop = (((this._actions.length > 0) ? 40 : 36) * firstSelectedElementIndex);
+    }
+    this._changeDetectorRef.markForCheck();
   }
 
   public setExpansionStates(expansionStateMap: Map<any, boolean>): void {

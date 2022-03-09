@@ -55,7 +55,7 @@ limitations under the License.
           <!-- quick select list -->
           <button mat-button class=item-button matTooltip="{{quickSelectElement.item.name}}"
             [disabled]="!maySelect(quickSelectElement)"
-            (click)="changeElementSelection(quickSelectElement); expandSelected(quickSelectElement)"
+            (click)="changeElementSelection(quickSelectElement); expandSelected(quickSelectElement);"
             [ngClass]="{ 'highlight': (selection.indexOf(quickSelectElement) !== -1) }">
             <mat-icon class="{{this.elementMap.get(quickSelectElement)?.icon}}"></mat-icon>
             {{quickSelectElement.item.name}}
