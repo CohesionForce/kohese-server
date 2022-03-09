@@ -29,13 +29,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeService } from '../../services/tree/tree.service';
+import { LogService } from '../../services/log/log.service';
 import { TreeComponent } from './tree.component';
 
 // Mocks
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockItem, MockAction } from '../../../mocks/data/MockItem';
 
-describe('TreeComponent', () => {
+fdescribe('TreeComponent', () => {
   let component: TreeComponent;
 
   beforeEach(() => {
@@ -50,7 +51,8 @@ describe('TreeComponent', () => {
         MatDialogModule
       ],
       providers: [
-        { provide: TreeService, useClass: TreeService }
+        { provide: TreeService, useClass: TreeService },
+        { provide: LogService, useClass: LogService }
       ]
     }).compileComponents();
 
