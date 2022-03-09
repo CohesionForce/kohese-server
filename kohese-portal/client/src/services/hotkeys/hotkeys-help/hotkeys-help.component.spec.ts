@@ -16,6 +16,7 @@
 
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { HotkeysHelpComponent } from './hotkeys-help.component';
 
@@ -25,7 +26,11 @@ describe('HotkeysHelpComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ HotkeysHelpComponent ]
+      declarations: [ HotkeysHelpComponent ],
+      providers: [
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: MatDialogRef, useValue: {} }
+      ]
     })
     .compileComponents();
   });
