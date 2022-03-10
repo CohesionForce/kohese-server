@@ -167,10 +167,18 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.sessionMapChangeSub.unsubscribe();
-    this.usersChangeSub.unsubscribe();
-    this._saveShortcutSubscription.unsubscribe();
-    this._exitShortcutSubscription.unsubscribe();
+    if(this.sessionMapChangeSub){
+      this.sessionMapChangeSub.unsubscribe();
+    }
+    if(this.usersChangeSub) {
+      this.usersChangeSub.unsubscribe();
+    }
+    if(this._saveShortcutSubscription) {
+      this._saveShortcutSubscription.unsubscribe();
+    }
+    if(this._exitShortcutSubscription) {
+      this._exitShortcutSubscription.unsubscribe();
+    }
   }
 
   public async add(): Promise<void> {
