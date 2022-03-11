@@ -48,6 +48,9 @@ export class MockItemRepository {
   mockRootProxy = ItemProxy.getWorkingTree().getRootProxy();
   state: any;
 
+  saveAndContinueSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  currentSaveAndContinueValue = this.saveAndContinueSubject.asObservable();
+
   constructor() {
     console.log('### MIR Constructor called');
     if (MockItemRepository.singleton) {
