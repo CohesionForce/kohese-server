@@ -36,8 +36,17 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 export class KUserSelectorComponent extends UserInput implements OnInit, OnDestroy {
   userProxies : Array<ItemProxy>;
   filteredProxiesSub : Subscription;
+  usersChangeSub : Subscription;
   filteredProxies : Array<ItemProxy>;
   repoStagingSub : Subscription;
+
+  private _users: any;
+  get users() {
+    return this.users;
+  }
+  set users(value: any) {
+    this._users = value;
+  }
 
   constructor(private ItemRepository : ItemRepository,
               private SessionService : SessionService) {
@@ -49,8 +58,11 @@ export class KUserSelectorComponent extends UserInput implements OnInit, OnDestr
       if (RepoStates.SYNCHRONIZATION_SUCCEEDED === update.state) {
         this.filteredProxiesSub = this.formGroup.get(this.fieldId).
           valueChanges.pipe(startWith(''), map((text: string) => {
-          return this.SessionService.users.filter((user: any) => {
-            return (-1 !== user.name.indexOf(text));
+            this.usersChangeSub = this.SessionService.usersChangeSubject.subscribe((userProxies) => {
+              this.users = userProxies
+            });
+          return this.users.filter((user: any) => {
+            return (-1 !== user.item.name.indexOf(text));
           });
         }),).subscribe((filteredProxies)=> {
           this.filteredProxies = filteredProxies;

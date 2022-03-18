@@ -16,11 +16,11 @@ limitations under the License.
 
 
 <div [ngStyle]="{ 'height': isDialogInstance() ? '92%' :'100%' }">
-  <div class="panel-heading">
+  <!-- <div class="panel-heading">
     <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
     <ng-container *ngIf="itemProxy.item.parentId">
-      <button mat-icon-button matTooltip="Go to parent" (click)="navigate(
-        itemProxy.item.parentId, false)" style="margin-left: auto;">
+      <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
+        (click)="navigate(itemProxy.item.parentId, false)">
         <mat-icon class="fa fa-level-up"></mat-icon>
       </button>
     </ng-container>
@@ -36,18 +36,20 @@ limitations under the License.
       </button>
     </ng-container>
     <ng-template #notEditable>
-      <button mat-icon-button matTooltip="Edit" [disabled]="((itemProxy.item.
-        preventModification === true) || (itemProxy.model.item.
-        restrictInstanceEditing === true))" (click)="editableStream.next(true)"
-        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' :
-        '') }">
+      <button mat-icon-button matTooltip="Edit"
+        [disabled]="((itemProxy.item.preventModification === true) ||
+                    (itemProxy.model.item.restrictInstanceEditing === true))"
+        (click)="editableStream.next(true)"
+        [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
         <mat-icon class="fa fa-edit"></mat-icon>
       </button>
     </ng-template>
-  </div>
-  <div style="height: calc(100% - 50px);">
+  </div> -->
+
+  <div style="height: 100%">
     <!-- Nav tabs -->
     <mat-tab-group id="details-tabs" [selectedIndex]="startingTabIndex">
+
       <mat-tab id="defaultTab">
         <ng-template mat-tab-label>
           Document
@@ -56,115 +58,121 @@ limitations under the License.
           </ng-container>
         </ng-template>
         <ng-template matTabContent>
-          <document-view [proxyStream]="proxyStream" [incrementalLoad]="true">
-          </document-view>
+          <document-view [isDialog]=isDialog [proxyStream]="proxyStream" [incrementalLoad]="true"></document-view>
         </ng-template>
       </mat-tab>
+
       <mat-tab>
         <ng-template mat-tab-label>
           Details
           &nbsp;
-          <img *ngIf="itemProxy.dirty"src="assets/icons/versioncontrol/dirty.ico"/>
+          <img *ngIf="itemProxy.dirty" src="assets/icons/versioncontrol/dirty.ico"/>
         </ng-template>
         <ng-template matTabContent>
-          <format-object-editor [object]="itemProxy.item" [type]="itemProxy.
-            model.item" [formatDefinitionType]="FormatDefinitionType.DEFAULT"
+
+          <div class=panel-heading>
+            <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
+            <div class=panel-buttons>
+              <ng-container *ngIf="editableStream.getValue() else notEditable">
+                <button mat-icon-button matTooltip="Save" (click)="upsertItem()"
+                  [disabled]="!itemProxy.dirty"
+                  [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+                  <mat-icon class="fa fa-save"></mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Cancel edit"
+                  (click)="cancelEditing()">
+                  <mat-icon class="fa fa-times"></mat-icon>
+                </button>
+              </ng-container>
+              <ng-template #notEditable>
+                <button mat-icon-button matTooltip="Edit"
+                  [disabled]="((itemProxy.item.preventModification === true) ||
+                              (itemProxy.model.item.restrictInstanceEditing === true))"
+                  (click)="editableStream.next(true)"
+                  [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+                  <mat-icon class="fa fa-edit"></mat-icon>
+                </button>
+              </ng-template>
+              <ng-container *ngIf="itemProxy.item.parentId && !isDialog">
+                <button mat-icon-button matTooltip="Go to parent"
+                  (click)="navigate(itemProxy.item.parentId, false)">
+                  <mat-icon class="fa fa-level-up"></mat-icon>
+                </button>
+              </ng-container>
+            </div>
+          </div>
+
+          <format-object-editor class=details-body
+            [object]="itemProxy.item"
+            [type]="itemProxy.model.item"
+            [formatDefinitionType]="FormatDefinitionType.DEFAULT"
             [allowKindChange]="true" [allowKindNarrowingOnly]="false"
             [disabled]="!(editableStream | async)">
           </format-object-editor>
         </ng-template>
       </mat-tab>
+
       <mat-tab label="References">
         <ng-template matTabContent>
-          <references-tab [proxyStream]="proxyStream"
-            [editableStream]="editableStream">
-          </references-tab>
+          <references-tab [isDialog]=isDialog [proxyStream]="proxyStream" [editableStream]="editableStream"></references-tab>
         </ng-template>
       </mat-tab>
+
       <mat-tab label="Journal">
         <ng-template matTabContent>
-          <journal [itemProxy]="itemProxy" style="display: flex;
-            flex-direction: column;">
-          </journal>
+          <journal [isDialog]=isDialog [itemProxy]="itemProxy" style="display: flex; flex-direction: column;"></journal>
         </ng-template>
       </mat-tab>
+
       <mat-tab label="Action Table" *ngIf="itemProxy.children">
         <ng-template matTabContent>
-          <action-table [proxyStream]="proxyStream"></action-table>
+          <action-table [isDialog]=isDialog [proxyStream]="proxyStream"></action-table>
         </ng-template>
       </mat-tab>
+
       <mat-tab label="History">
         <ng-template matTabContent>
-          <history-tab [proxyStream]="proxyStream"></history-tab>
+          <history-tab [isDialog]=isDialog [proxyStream]="proxyStream"></history-tab>
         </ng-template>
       </mat-tab>
+
       <mat-tab label="Raw Data">
         <ng-template matTabContent>
-          <h4>
-            Raw Data Tab
-          </h4>
-          <h5>
-            {{itemProxy.kind}}: {{itemProxy.item.name}} ({{itemProxy.item.id}})
-          </h5>
-          <h5>
-            Id: {{itemProxy.item.id}}
-          </h5>
-          <h5>
-            OID: {{itemProxy.oid}}
-          </h5>
-          <h5>
-            Tree Hash: {{itemProxy.treeHash}}
-          </h5>
-          <h5>
-            Descendant Count: {{itemProxy.descendantCount}}
-          </h5>
+          <h4>Raw Data Tab</h4>
+          <h5>{{itemProxy.kind}}: {{itemProxy.item.name}} ({{itemProxy.item.id}})</h5>
+          <h5>Id: {{itemProxy.item.id}}</h5>
+          <h5>OID: {{itemProxy.oid}}</h5>
+          <h5>Tree Hash: {{itemProxy.treeHash}}</h5>
+          <h5>Descendant Count: {{itemProxy.descendantCount}}</h5>
           <ng-container *ngIf="itemProxy.dirty">
-            <h5>
-              Dirty: {{itemProxy.dirty}}
-            </h5>
+            <h5>Dirty: {{itemProxy.dirty}}</h5>
             <pre>{{itemProxy.dirtyFields | json}}</pre>
           </ng-container>
-          <h5>
-            Item Data:
-          </h5>
+          <h5>Item Data:</h5>
           <pre>{{itemProxy.document()}}</pre>
           <ng-container *ngIf="itemProxy.validationError">
-            <h5>
-              Validation Error:
-            </h5>
+            <h5>Validation Error:</h5>
             <pre>{{itemProxy.validationError | json}}</pre>
           </ng-container>
-          <h5>
-            Tree Hash Entry:
-          </h5>
+          <h5>Tree Hash Entry:</h5>
           <pre>{{itemProxy.treeHashEntry | json}}</pre>
-          <h5>
-            Relations:
-          </h5>
+          <h5>Relations:</h5>
           <pre>{{itemProxy.getRelationIdMap() | json}}</pre>
-          <h5>
-            Version Status:
-          </h5>
+          <h5>Version Status:</h5>
           <pre>{{(itemProxy.vcStatus | json)}}</pre>
-          <h5>
-            New History (Old Style):
-          </h5>
+          <h5>New History (Old Style):</h5>
           <pre>{{itemProxy.history | json}}</pre>
-          <h5>
-            New History (With Details):
-          </h5>
+          <h5>New History (With Details):</h5>
           <pre>{{itemProxy.newHistoryNewStyle | json}}</pre>
         </ng-template>
       </mat-tab>
+
     </mat-tab-group>
   </div>
 </div>
+
 <ng-container *ngIf="isDialogInstance()">
-  <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
-    row;">
-    <button mat-raised-button matTooltip="Close this dialog box" style="margin-left: auto;"
-      (click)="matDialogRef.close(undefined)">
-      Close
-    </button>
+  <mat-dialog-actions align="end">
+    <button mat-raised-button mat-dialog-close cdkFocusInitial>Close</button>
   </mat-dialog-actions>
 </ng-container>
