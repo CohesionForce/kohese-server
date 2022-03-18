@@ -23,10 +23,10 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 // Kohese
 import { DialogService } from './../../../../../services/dialog/dialog.service';
-import { ItemRepository } from '../../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
 import { TreeComponent } from '../../../../tree/tree.component';
+import { TreeService } from '../../../../../services/tree/tree.service';
 
 @Component({
   selector: 'table-preview-dialog',
@@ -39,13 +39,15 @@ export class TablePreviewDialogComponent implements OnInit {
   property;
 
 
-  constructor(private dialogRef: MatDialogRef<TablePreviewDialogComponent>,
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    private dialogService: DialogService, private _itemRepository:
-    ItemRepository) {
-                this.tableDefinition = data.tableDef;
-                this.property = data.property;
-               }
+  constructor(
+              @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+              private dialogRef: MatDialogRef<TablePreviewDialogComponent>,
+              private dialogService: DialogService,
+              private treeService: TreeService
+  ) {
+    this.tableDefinition = data.tableDef;
+    this.property = data.property;
+  }
 
   ngOnInit() {
     console.log(this);
@@ -80,7 +82,7 @@ export class TablePreviewDialogComponent implements OnInit {
             (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         selection: [this.previewProxy],
-        quickSelectElements: this._itemRepository.getRecentProxies()
+        quickSelectElements: this.treeService.getRecentProxies()
       }
     }).updateSize('90%', '90%').afterClosed().subscribe((selection:
       Array<any>) => {

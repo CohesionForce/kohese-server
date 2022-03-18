@@ -27,6 +27,7 @@ import { SessionService } from '../../../../../services/user/session.service';
 import { NavigationService } from '../../../../../services/navigation/navigation.service';
 import { DetailsComponent } from '../../../../details/details.component';
 import { Field } from '../field.class';
+import { TreeService } from '../../../../../services/tree/tree.service';
 import { ItemProxy } from '../../../../../../../common/src/item-proxy';
 
 /**
@@ -47,9 +48,10 @@ export class SinglevaluedFieldComponent extends Field implements OnInit {
                     itemRepository: ItemRepository,
                     dialogService: DialogService,
                     sessionService: SessionService,
+                    treeService: TreeService,
                     private navigationService: NavigationService
   ) {
-    super(changeDetectorRef, itemRepository, dialogService, sessionService);
+    super(changeDetectorRef, itemRepository, dialogService, sessionService, treeService);
   }
 
   ngOnInit() {

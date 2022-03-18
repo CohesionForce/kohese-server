@@ -85,7 +85,6 @@ export class ItemRepository {
   logEvents: any;
 
 
-  recentProxies: Array<ItemProxy>;
   state: any;
 
   repositoryStatus: BehaviorSubject<any>;
@@ -103,14 +102,15 @@ export class ItemRepository {
 
   //////////////////////////////////////////////////////////////////////////
   constructor(
-    private CacheManager : CacheManager,
-    private CurrentUserService: CurrentUserService,
-    private AuthenticationService: AuthenticationService,
-    private toastrService: ToastrService,
-    private dialogService: DialogService,
-    private _versionControlService: VersionControlService,
-    private logService: LogService, private _markdownService:
-    MarkdownService) {
+              private CacheManager : CacheManager,
+              private CurrentUserService: CurrentUserService,
+              private AuthenticationService: AuthenticationService,
+              private toastrService: ToastrService,
+              private dialogService: DialogService,
+              private _versionControlService: VersionControlService,
+              private logService: LogService,
+              private _markdownService: MarkdownService
+  ) {
     this.logEvents = InitializeLogs(logService)
     this.logService.log(this.logEvents.itemRepoInit);
 
@@ -120,31 +120,6 @@ export class ItemRepository {
       state: this._repoState,
       message: 'Initializing Item Repository'
     });
-
-    ItemProxy.getWorkingTree().getChangeSubject().subscribe(change => {
-      this.logService.log(this.logEvents.receivedNofificationOfChange, { change: change });
-
-      switch (change.type) {
-        case 'loaded':
-          this.logService.log(this.logEvents.itemProxyLoaded);
-          break;
-        case 'loading':
-          this.logService.log(this.logEvents.itemProxyLoading);
-          break;
-        //////////////////////////////////////////////////////////////////////////
-        // This case prevents a previously focused item from showing a
-        // blank entry in the list of recent proxies once it has been deleted.
-        //////////////////////////////////////////////////////////////////////////
-        case 'delete':
-          let deletedItemIndex = this.recentProxies.findIndex(y => y.item.id === change.proxy.item.id);
-          if(deletedItemIndex !== -1) {
-            this.recentProxies.splice(deletedItemIndex, 1);
-          }
-          break;
-      }
-    });
-
-    this.recentProxies = [];
 
     // Establish the Item Cache
     ItemCache.setItemCache(this._cache);
@@ -485,22 +460,6 @@ export class ItemRepository {
   //////////////////////////////////////////////////////////////////////////
   getRepoStatusSubject(): BehaviorSubject<any> {
     return this.repositoryStatus;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  registerRecentProxy(itemProxy: ItemProxy) {
-    let recentProxyIndex: number = this.recentProxies.indexOf(itemProxy);
-    if (recentProxyIndex !== -1) {
-      this.recentProxies.splice(recentProxyIndex, 1);
-    }
-
-    // Add the recent proxy to the front of list
-    this.recentProxies.unshift(itemProxy);
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  getRecentProxies(): Array<ItemProxy> {
-    return this.recentProxies;
   }
 
   //////////////////////////////////////////////////////////////////////////

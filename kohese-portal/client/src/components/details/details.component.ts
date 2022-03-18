@@ -32,6 +32,7 @@ import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.in
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { Hotkeys } from '../../services/hotkeys/hot-key.service';
+import { TreeService } from '../../services/tree/tree.service';
 
 /* This component serves as a manager for viewing proxy details in the explore view.
    It functions by retrieving an id from the route parameters and then retrieving
@@ -54,7 +55,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this._itemRepository.getHistoryFor(this.itemProxy);
 
     if (this._itemProxy) {
-      this._itemRepository.registerRecentProxy(this._itemProxy);
+      this.treeService.registerRecentProxy(this._itemProxy);
     }
 
     this.proxyStream.next(this._itemProxy);
@@ -100,6 +101,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
                      private _navigationService: NavigationService,
                      private _dialogService: DialogService,
                      private hotkeys: Hotkeys,
+                     private treeService: TreeService
 
   ) {
     // TODO: Determine how to make shortcuts (that affect item saving) context sensitive - i.e. only available in edit mode

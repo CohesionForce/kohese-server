@@ -29,6 +29,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { TreeComponent } from '../../tree/tree.component';
+import { TreeService } from '../../../services/tree/tree.service';
 
 @Component({
   selector: 'k-proxy-selector',
@@ -54,7 +55,9 @@ export class KProxySelectorComponent extends UserInput
   treeConfig: any;
 
   constructor(private itemRepository: ItemRepository,
-    private dialogService: DialogService) {
+              private dialogService: DialogService,
+              private treeService: TreeService
+  ) {
     super();
   }
 
@@ -152,7 +155,7 @@ export class KProxySelectorComponent extends UserInput
         },
         selection: (Array.isArray(this.selected) ? this.selected : [this.
           selected]),
-        quickSelectElements: this.itemRepository.getRecentProxies(),
+        quickSelectElements: this.treeService.getRecentProxies(),
         allowMultiselect: this.allowMultiSelect,
         showSelections: this.allowMultiSelect
       }

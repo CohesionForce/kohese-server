@@ -28,6 +28,7 @@ import { map, startWith} from 'rxjs/operators';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
+import { TreeService } from '../../../../services/tree/tree.service';
 
 interface RelationInfo {
   proxy: ItemProxy;
@@ -75,7 +76,9 @@ export class ProxySelectorComponent implements OnInit {
   treeConfig: any;
   treeConfigSub: Subscription;
 
-  constructor(private itemRepository: ItemRepository) {
+  constructor(private itemRepository: ItemRepository,
+              private treeService: TreeService
+  ) {
     this.proxySearchControl = new FormControl('');
   }
 
@@ -85,7 +88,7 @@ export class ProxySelectorComponent implements OnInit {
         if (newConfig) {
           this.treeConfig = newConfig.config;
           this.rootProxy = this.treeConfig.getRootProxy();
-          this.recentProxies = this.itemRepository.getRecentProxies();
+          this.recentProxies = this.treeService.getRecentProxies();
           this.recentProxies = this.recentProxies.slice().reverse();
           if (this.proxyContext) {
             this.generateRelatedProxies();

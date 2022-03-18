@@ -26,6 +26,7 @@ import { ItemRepository } from '../../../services/item-repository/item-repositor
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { NavigationService } from '../../../services/navigation/navigation.service';
+import { TreeService } from '../../../services/tree/tree.service';
 import { TreeComponent } from '../../tree/tree.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
@@ -98,12 +99,14 @@ export class CompareItemsComponent implements OnInit {
   }
 
   public constructor(
-    @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
-    private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
-    ItemRepository, private _dynamicTypesService: DynamicTypesService,
-    private _dialogService: DialogService, private _navigationService:
-    NavigationService) {
-  }
+                      @Optional() @Inject(MAT_DIALOG_DATA) private _dialogParameters: any,
+                      private _changeDetectorRef: ChangeDetectorRef,
+                      private _itemRepository: ItemRepository,
+                      private _dynamicTypesService: DynamicTypesService,
+                      private _dialogService: DialogService,
+                      private _navigationService: NavigationService,
+                      private treeService: TreeService
+  ) {}
 
   public ngOnInit(): void {
     if (this._dialogParameters) {
@@ -199,7 +202,7 @@ export class CompareItemsComponent implements OnInit {
             (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         selection: [proxySubject.getValue()],
-        quickSelectElements: this._itemRepository.getRecentProxies()
+        quickSelectElements: this.treeService.getRecentProxies()
       }
     }).updateSize('90%', '90%').afterClosed().subscribe((selection:
       Array<any>) => {

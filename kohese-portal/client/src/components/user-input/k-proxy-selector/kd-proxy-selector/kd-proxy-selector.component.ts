@@ -28,6 +28,7 @@ import { ItemProxy } from './../../../../../../common/src/item-proxy';
 import { PropertyDefinition } from '../../../../../../common/src/PropertyDefinition.interface';
 import { TreeComponent } from '../../../tree/tree.component';
 import { TreeConfiguration } from '../../../../../../common/src/tree-configuration';
+import { TreeService } from '../../../../services/tree/tree.service';
 
 @Component({
   selector: 'kd-proxy-selector',
@@ -46,10 +47,9 @@ export class KdProxySelectorComponent implements OnInit {
   @Input()
   multiselect : boolean;
 
-  public constructor(private dialogService: DialogService,
-    private _itemRepository: ItemRepository) {
-
-  }
+  public constructor( private dialogService: DialogService,
+                      private treeService: TreeService
+  ) {}
 
   ngOnInit() {
     let selected = this.proxy.item[this.property.propertyName];
@@ -120,7 +120,7 @@ export class KdProxySelectorComponent implements OnInit {
             (element as ItemProxy).item.favorite ? (element as ItemProxy).item.favorite : false);
         },
         selection: (Array.isArray(selected) ? selected : [selected]),
-        quickSelectElements: this._itemRepository.getRecentProxies(),
+        quickSelectElements: this.treeService.getRecentProxies(),
         allowMultiselect: this.multiselect,
         showSelections: this.multiselect
       }
