@@ -32,6 +32,7 @@ import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.in
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { Hotkeys } from '../../services/hotkeys/hot-key.service';
+import { TreeService } from '../../services/tree/tree.service';
 
 /* This component serves as a manager for viewing proxy details in the explore view.
    It functions by retrieving an id from the route parameters and then retrieving
@@ -54,7 +55,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this._itemRepository.getHistoryFor(this.itemProxy);
 
     if (this._itemProxy) {
-      this._itemRepository.registerRecentProxy(this._itemProxy);
+      this.treeService.registerRecentProxy(this._itemProxy);
     }
 
     this.proxyStream.next(this._itemProxy);
@@ -71,6 +72,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   treeConfig: TreeConfiguration;
+  isDialog: boolean;
 
   /* Observables */
   proxyStream: BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined);
@@ -99,6 +101,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
                      private _navigationService: NavigationService,
                      private _dialogService: DialogService,
                      private hotkeys: Hotkeys,
+                     private treeService: TreeService
 
   ) {
     // TODO: Determine how to make shortcuts (that affect item saving) context sensitive - i.e. only available in edit mode
@@ -121,13 +124,11 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this.itemProxy = this._data['itemProxy'];
       this.startWithJournal = this._data['startWithJournal'];
     } else {
-      this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe(
-        (treeConfigurationObject: any) => {
+      this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe((treeConfigurationObject: any) => {
         this.treeConfig = treeConfigurationObject.config;
         this.editableStream.next(false);
         if (this._itemProxy) {
-          this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.
-            id);
+          this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.id);
         }
 
         this._changeDetectorRef.markForCheck();
@@ -144,8 +145,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   public isDialogInstance(): boolean {
-    return (this._matDialogRef && (this._matDialogRef.componentInstance ===
-      this) && this._data);
+    this.isDialog = (this._matDialogRef && (this._matDialogRef.componentInstance === this) && this._data);
+    return this.isDialog;
   }
 
   public async upsertItem(): Promise<void> {

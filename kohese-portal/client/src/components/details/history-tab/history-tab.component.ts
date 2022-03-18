@@ -27,6 +27,8 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { NavigatableComponent } from '../../../classes/NavigationComponent.class'
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
+import { DetailsComponent } from '../details.component';
 import { Compare } from '../../compare-items/compare.class';
 import { ItemProxy } from '../../../../../common/src/item-proxy.js';
 import { ItemCache } from '../../../../../common/src/item-cache';
@@ -40,6 +42,8 @@ import { KoheseCommit } from '../../../../../common/src/kohese-commit';
 })
 export class HistoryTabComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
+
+  @Input('isDialog') isDialog: boolean;
   @Input()
   proxyStream: BehaviorSubject<ItemProxy>;
 
@@ -60,20 +64,19 @@ export class HistoryTabComponent extends NavigatableComponent
   itemCache: ItemCache;
 
   constructor(
-    protected NavigationService: NavigationService,
-    private changeRef: ChangeDetectorRef,
-    private _dynamicTypesService:
-    DynamicTypesService,
-    ) {
-    super(NavigationService);
+              protected navigationService: NavigationService,
+              private dialogService: DialogService,
+              private changeRef: ChangeDetectorRef,
+              private _dynamicTypesService: DynamicTypesService
+  ) {
+    super(navigationService);
     this.itemCache = ItemCache.getItemCache();
   }
 
   ngOnInit() {
     this.streamSub = this.proxyStream.subscribe(async (newProxy) => {
       if (newProxy) {
-        this._versions = await ItemCache.getItemCache().getHistory(newProxy.
-          item.id);
+        this._versions = await ItemCache.getItemCache().getHistory(newProxy.item.id);
         this._differenceMap.clear();
         this.changeRef.markForCheck();
       }
@@ -122,5 +125,13 @@ export class HistoryTabComponent extends NavigatableComponent
       changeBlob,
       this._dynamicTypesService));
     this.changeRef.markForCheck();
+  }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this.dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: itemProxy
+      }
+    }).updateSize('80%', '80%');
   }
 }

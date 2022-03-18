@@ -20,7 +20,7 @@ limitations under the License.
 
     <as-split-area id="tree-container" [size]="30">
       <document-tree class="left-content"
-        [selectedProxyStream]="documentProxyStream"
+        [viewingProxyStream]="documentProxyStream"
         (onSelect)="selectedProxyStream.next($event)"
         (rootSelected)="setRoot($event);">
       </document-tree>
