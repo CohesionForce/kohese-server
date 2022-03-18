@@ -37,6 +37,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { AnalysisFilter } from '../analysis/AnalysisViewComponent.class';
 import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.service';
+import { TreeService } from '../../services/tree/tree.service';
 import { ReportSpecificationComponent, ReportSpecifications } from '../reports/report-specification/report-specification.component';
 
 export interface DocumentInfo {
@@ -135,13 +136,14 @@ implements OnInit, OnDestroy {
   changeSubjectSubscription: Subscription;
 
   constructor(
-              navigationService: NavigationService,
-              private changeRef: ChangeDetectorRef,
-              private router: Router,
-              private itemRepository: ItemRepository,
-              private dialogService: DialogService,
-              private typeService: DynamicTypesService,
-              private title : Title
+    navigationService: NavigationService,
+    private treeService: TreeService,
+    private changeRef: ChangeDetectorRef,
+    private router: Router,
+    private itemRepository: ItemRepository,
+    private dialogService: DialogService,
+    private typeService: DynamicTypesService,
+    private title : Title
     ) {
       super(navigationService);
       this.docReader = new commonmark.Parser();
@@ -365,6 +367,7 @@ implements OnInit, OnDestroy {
 
   selectRow(proxy: ItemProxy) {
     this.proxySelected.emit(proxy);
+    this.treeService.viewingProxyStream.next(proxy);
   }
 
   produceReport(proxy: ItemProxy) {

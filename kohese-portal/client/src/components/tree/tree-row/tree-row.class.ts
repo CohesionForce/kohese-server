@@ -91,7 +91,16 @@ export class TreeRow {
     return false;
   }
 
+  public isRowBeingViewed(): boolean {
+    // May be implemented externally
+    return false;
+  }
+
   public rowFocused(): void {
+    // May be implemented externally
+  }
+
+  public rowBeingViewed(): void {
     // May be implemented externally
   }
 
