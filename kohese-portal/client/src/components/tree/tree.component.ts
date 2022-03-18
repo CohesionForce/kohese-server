@@ -674,11 +674,40 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return expansionStates;
   }
 
+  public expandSelected(element: any) {
+    let expansionStates: Map<any, boolean> = new Map<any, boolean>();
+    let parentElement = element.parentProxy;
+
+    if(parentElement) {
+
+      while(parentElement) {
+        let expansionState = this.elementMap.get(parentElement).expanded;
+        expansionStates.set(parentElement, expansionState);
+        parentElement = parentElement.parentProxy;
+      }
+
+      let keys: Array<any> = Array.from(expansionStates.keys());
+      for (let j: number = 0; j < keys.length; j++) {
+        let elementMapValue: ElementMapValue = this._elementMap.get(keys[j]);
+        if (elementMapValue.visible) {
+          elementMapValue.expanded = true;
+        }
+      }
+      this.changeDetectorRef.detectChanges();
+    }
+
+    let firstSelectedElementIndex: number = this.getDisplayedElements().indexOf(element);
+    if (firstSelectedElementIndex !== -1) {
+      // Each element row should be 40px or 36px tall.
+      this._elementContainer.nativeElement.scrollTop = (((this._actions.length > 0) ? 40 : 36) * firstSelectedElementIndex);
+    }
+    this._changeDetectorRef.detectChanges();
+  }
+
   public setExpansionStates(expansionStateMap: Map<any, boolean>): void {
     let givenElements: Array<any> = Array.from(expansionStateMap.keys());
     for (let j: number = 0; j < givenElements.length; j++) {
-      let elementMapValue: ElementMapValue = this._elementMap.get(
-        givenElements[j]);
+      let elementMapValue: ElementMapValue = this._elementMap.get(givenElements[j]);
       if (elementMapValue) {
         elementMapValue.expanded = expansionStateMap.get(givenElements[j]);
       }
