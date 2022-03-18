@@ -173,6 +173,10 @@ limitations under the License.
                   <mat-icon class="fa fa-star"></mat-icon>
                 </button>
               </ng-template>
+              <button mat-icon-button matTooltip="Display Item information"
+                (click)="displayInformation(element)">
+                <mat-icon class="fa fa-clone"></mat-icon>
+              </button>
               <button mat-icon-button matTooltip="focus this item" style="margin-left: auto;"
                 (click)=anchor(element)>
                 <mat-icon class="fa fa-anchor"></mat-icon>
