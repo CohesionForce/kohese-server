@@ -17,7 +17,7 @@ limitations under the License.
 
 <div *ngFor="let referenceInfo of referencesInfo">
   <div *ngIf="referenceInfo.relationName != 'children'">
-    <h3 class="panel-heading">{{referenceInfo.relationName}} </h3>
+    <h6 class="panel-heading">{{referenceInfo.relationName}} </h6>
     <mat-table *ngIf="referenceInfo" [dataSource]="referenceInfo.tableStream">
 
       <ng-container matColumnDef="kind">

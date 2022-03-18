@@ -15,9 +15,33 @@ limitations under the License.
 -->
 
 
-<span class="control-group">
-  <mat-checkbox [(ngModel)]="orderedChildren" (change)="toggleOrderedChildren()" [disabled]="!(editableStream | async)">
-    Ordered
-  </mat-checkbox>
+<span class=control-group>
+  <div class=order-panel>
+    <div class=order-button>
+      <mat-checkbox [(ngModel)]=orderedChildren (change)=toggleOrderedChildren() [disabled]="!(editableStream | async)">Ordered</mat-checkbox>
+    </div>
+    <div class=edit-buttons>
+      <ng-container *ngIf="editableStream.getValue() else notEditable">
+        <button mat-icon-button matTooltip=Save (click)=upsertItem()
+          [disabled]=!itemProxy.dirty
+          [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+          <mat-icon class="fa fa-save"></mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="discard changes"
+          (click)=discardChanges()>
+          <mat-icon class="fa fa-times"></mat-icon>
+        </button>
+      </ng-container>
+      <ng-template #notEditable>
+        <button mat-icon-button matTooltip=edit
+          [disabled]="((itemProxy.item.preventModification === true) ||
+                      (itemProxy.model.item.restrictInstanceEditing === true))"
+          (click)="this.editableStream.next(true)"
+          [ngStyle]="{ 'margin-left': (!itemProxy.item.parentId ? 'auto' : '') }">
+          <mat-icon class="fa fa-edit"></mat-icon>
+        </button>
+      </ng-template>
+    </div>
+  </div>
 </span>
-<children-table [childrenStream]="childrenStream" [filterSubject]="filterSubject" [editableStream]="editableStream"></children-table>
+<children-table [childrenStream]=childrenStream [filterSubject]=filterSubject [editableStream]=editableStream></children-table>

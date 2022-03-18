@@ -37,6 +37,8 @@ import { ItemProxy } from '../../../../common/src/item-proxy.js';
 })
 export class ActionTableComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
+
+  @Input('isDialog') isDialog: boolean;
   @Input()
   proxyStream: Observable<ItemProxy>;
   actionProxies: Array<ItemProxy>;

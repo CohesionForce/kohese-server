@@ -28,7 +28,7 @@
 }
 
 .details-doc {
-  height: calc(100% - 53px);
+  height: 100%;
 }
 
 .right-zone {
@@ -40,7 +40,7 @@
   margin: 5px;
   padding-left : 10px;
   padding-right: 10px;
-  width: 98.5%;
+  width: calc(100% - 10px); // because of the margin left&right
   display: inline-block;
   background-color : #fff;
 }
@@ -55,8 +55,13 @@
     align-items: center;
 
     .panel-heading-left {
+      width: 72%;
       margin-right: auto;
       margin-left: 1em;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .panel-heading-right {
@@ -64,4 +69,3 @@
     }
   }
 }
-

@@ -45,7 +45,7 @@ limitations under the License.
   <ng-container matColumnDef="nav">
     <mat-header-cell *matHeaderCellDef>Navigation</mat-header-cell>
     <mat-cell *matCellDef="let child" style="display: flex; justify-content: flex-end;">
-      <div class="hidden-buttons"> <!-- div and class for scss styling -->
+      <div class="hidden-buttons">
         <button mat-icon-button matTooltip="Display Item Information" (click)="displayInformation(child)">
           <mat-icon class="fa fa-clone"></mat-icon>
         </button>

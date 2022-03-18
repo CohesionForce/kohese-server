@@ -71,6 +71,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   treeConfig: TreeConfiguration;
+  isDialog: boolean;
 
   /* Observables */
   proxyStream: BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(undefined);
@@ -121,13 +122,11 @@ export class DetailsComponent implements OnInit, OnDestroy {
       this.itemProxy = this._data['itemProxy'];
       this.startWithJournal = this._data['startWithJournal'];
     } else {
-      this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe(
-        (treeConfigurationObject: any) => {
+      this.treeConfigSub = this._itemRepository.getTreeConfig().subscribe((treeConfigurationObject: any) => {
         this.treeConfig = treeConfigurationObject.config;
         this.editableStream.next(false);
         if (this._itemProxy) {
-          this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.
-            id);
+          this.itemProxy = this.treeConfig.getProxyFor(this._itemProxy.item.id);
         }
 
         this._changeDetectorRef.markForCheck();
@@ -144,8 +143,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   public isDialogInstance(): boolean {
-    return (this._matDialogRef && (this._matDialogRef.componentInstance ===
-      this) && this._data);
+    this.isDialog = (this._matDialogRef && (this._matDialogRef.componentInstance === this) && this._data);
+    return this.isDialog;
   }
 
   public async upsertItem(): Promise<void> {
