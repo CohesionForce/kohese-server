@@ -66,6 +66,8 @@ export class TreeRowComponent implements OnInit {
     this._menuActions = menuActions;
   }
 
+  @Input('synchronizeWithSelection') synchronizeWithSelection: boolean;
+
   public constructor(protected changeDetector: ChangeDetectorRef) {
   }
 
