@@ -14,19 +14,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
+<div class="panel-heading">
+  <label><b>{{ (proxyStream | async).kind }} Information: {{ (proxyStream | async).item.name }}</b></label>
+  <div class=panel-buttons>
+    <button mat-icon-button matTooltip="Display Item information"
+      (click)=displayInformation(proxyStream.getValue())>
+      <mat-icon class="fa fa-clone"></mat-icon>
+    </button>
+    <ng-container *ngIf="proxyStream.getValue().item.parentId && !isDialog">
+      <button mat-icon-button matTooltip="Go to parent"
+        (click)="this.navigationService.navigate('Explore', { id: proxyStream.getValue().item.parentId })">
+        <mat-icon class="fa fa-level-up"></mat-icon>
+      </button>
+    </ng-container>
+  </div>
 
-<div style="height: 5%; display: flex; flex-direction: column;">
-  <label>
-    Created by {{proxyStream.getValue().item.createdBy}} on {{(proxyStream.
-      getValue().item.createdOn | date:'medium')}}
-  </label>
-  <label>
-    Last modified by {{proxyStream.getValue().item.modifiedBy}} on
-      {{(proxyStream.getValue().item.modifiedOn | date:'medium')}}
-  </label>
 </div>
-<div style="height: 95%;">
-  <div style="height: 50px; display: flex; flex-direction: row;">
+<div class=history-body>
+  <!-- production info -->
+  <div class=creation-info>
+    <label>
+      Created by {{proxyStream.getValue().item.createdBy}} on {{(proxyStream.getValue().item.createdOn | date:'medium')}}
+    </label>
+    <label>
+      Last modified by {{proxyStream.getValue().item.modifiedBy}} on {{(proxyStream.getValue().item.modifiedOn | date:'medium')}}
+    </label>
+  </div>
+  <!-- collapse/expand all -->
+  <div class=collapse-expand>
     <button mat-icon-button matTooltip="Expand all versions"
       class="flex-right-align" (click)="changeAllExpansionStates(true)">
       <mat-icon class="fa fa-chevron-down"></mat-icon>
@@ -36,25 +51,18 @@ limitations under the License.
       <mat-icon class="fa fa-chevron-up"></mat-icon>
     </button>
   </div>
-  <div style="height: calc(100% - 50px); overflow: auto;">
+  <!-- panels -->
+  <div class=expansion-panels>
     <ng-container *ngFor="let version of versions">
-      <mat-expansion-panel (opened)="compare(version)"
-        style="box-shadow: 0 3px 1px -2px rgba(0,0,0,.8), 0 2px 2px 0 rgba(0,0,0,.64), 0 1px 5px 0 rgba(0,0,0,.62);">
+      <mat-expansion-panel (opened)="compare(version)">
         <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{version.message}}
-          </mat-panel-title>
+          <mat-panel-title>{{version.message}}</mat-panel-title>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <div style="display: flex; flex-direction: column;">
-            <label>
-              Produced By: {{version.author}}
-            </label>
-            <label>
-              Produced On: {{(version.date | date:'medium')}}
-            </label>
-            <comparison [comparison]="differenceMap.get(version.commit)">
-            </comparison>
+            <label>Produced By: {{version.author}}</label>
+            <label>Produced On: {{(version.date | date:'medium')}}</label>
+            <comparison [comparison]="differenceMap.get(version.commit)"></comparison>
           </div>
         </ng-template>
       </mat-expansion-panel>

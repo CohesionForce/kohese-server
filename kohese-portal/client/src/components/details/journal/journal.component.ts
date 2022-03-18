@@ -57,6 +57,8 @@ export class JournalComponent implements OnDestroy {
   _saveShortcutSubscription: Subscription;
   _exitShortcutSubscription: Subscription;
 
+  @Input('isDialog') isDialog: boolean;
+
   private _itemProxy: ItemProxy;
   get itemProxy() {
     return this._itemProxy;
