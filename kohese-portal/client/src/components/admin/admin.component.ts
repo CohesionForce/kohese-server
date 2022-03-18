@@ -47,6 +47,7 @@ import { Hotkeys } from '../../services/hotkeys/hot-key.service';
 export class AdminComponent implements OnInit, OnDestroy {
   // Data
   private lockoutList: Array<string> = [];
+  private initialized: boolean = false;
 
   // Getters
 
@@ -144,7 +145,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
     this.repositoryStatusSubscription = this._itemRepository.getRepoStatusSubject().subscribe(async (status: any) => {
       if (RepoStates.SYNCHRONIZATION_SUCCEEDED === status.state) {
-
+        this.initialized = true;
         let modelProxy : KoheseModel = TreeConfiguration.getWorkingTree().getModelProxyFor('KoheseUser');
         this._koheseUserDataModel = modelProxy.item;
         this._koheseUserViewModel = modelProxy.view.item;
