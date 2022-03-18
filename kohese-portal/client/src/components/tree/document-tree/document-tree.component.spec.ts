@@ -70,7 +70,7 @@ describe('DocumentTreeComponent', () => {
 
     fixture = TestBed.createComponent(DocumentTreeComponent);
     component = fixture.componentInstance;
-    component.selectedProxyStream = ObservableOf(TreeConfiguration.
+    component.viewingProxyStream = ObservableOf(TreeConfiguration.
       getWorkingTree().getProxyFor('test-uuid5'));
 
     fixture.detectChanges();
@@ -90,8 +90,7 @@ describe('DocumentTreeComponent', () => {
     component.searchStringChanged('Search String');
     setTimeout(() => {
       let filter: Filter = component.filterSubject.getValue();
-      expect(filter.rootElement.criteria[0]).toEqual(component.
-        searchCriterion);
+      expect(filter.rootElement.criteria[0]).toEqual(component.searchCriterion);
       done();
     }, 1000);
   });

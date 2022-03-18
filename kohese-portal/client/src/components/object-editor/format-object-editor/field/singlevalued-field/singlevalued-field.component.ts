@@ -39,19 +39,21 @@ import { ItemProxy } from '../../../../../../../common/src/item-proxy';
   styleUrls: ['./singlevalued-field.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SinglevaluedFieldComponent extends Field {
+export class SinglevaluedFieldComponent extends Field implements OnInit {
+
+  users: Array<ItemProxy>;
+
   public constructor(
-                      changeDetectorRef: ChangeDetectorRef,
-                      itemRepository: ItemRepository,
-                      dialogService: DialogService,
-                      sessionService: SessionService,
-                      treeService: TreeService,
-                      private navigationService: NavigationService,
+                    changeDetectorRef: ChangeDetectorRef,
+                    itemRepository: ItemRepository,
+                    dialogService: DialogService,
+                    sessionService: SessionService,
+                    treeService: TreeService,
+                    private navigationService: NavigationService
   ) {
     super(changeDetectorRef, itemRepository, dialogService, sessionService, treeService);
   }
 
-  users: Array<ItemProxy> = [];
   ngOnInit() {
     this.users = this.sessionService.getUsers();
   }

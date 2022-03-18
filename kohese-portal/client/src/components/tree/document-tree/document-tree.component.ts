@@ -53,7 +53,7 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
   treeConfig : any;
   paramSubscription: Subscription;
   changeSubjectSubscription : Subscription;
-  sync : boolean = true;
+  synchronizeWithSelection: boolean = true;
 
   documentRoot : ItemProxy;
   documentRootId : string;
@@ -89,13 +89,11 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     return this._images;
   }
 
-  @Output()
-  rootSelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
-  @Output()
-  onSelect : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
-  @Input()
-  selectedProxyStream : Observable<ItemProxy>;
-  selectedProxyStreamSubscription : Subscription;
+  @Output() rootSelected : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
+  @Output() onSelect : EventEmitter<ItemProxy> = new EventEmitter<ItemProxy>();
+  @Input() viewingProxyStream : Observable<ItemProxy>;
+
+  viewingProxyStreamSubscription: Subscription;
 
   constructor(
     router: ActivatedRoute, dialogService : DialogService,
@@ -257,66 +255,64 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       }
     });
 
-  this.treeConfigSubscription = this.itemRepository.getTreeConfig()
-    .subscribe((treeConfigurationObject: any) => {
-    this.treeConfig = treeConfigurationObject;
-    if (this.treeConfig) {
-      this.documentRoot = this.treeConfig.config.getProxyFor(this.documentRootId);
-      this.absoluteRoot = this.documentRoot;
-      this.documentRoot.visitTree({ includeOrigin: true }, (proxy:ItemProxy) => {
-        this.buildRow(proxy);
-      });
+    this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((treeConfigurationObject: any) => {
+      this.treeConfig = treeConfigurationObject;
+      if (this.treeConfig) {
+        this.documentRoot = this.treeConfig.config.getProxyFor(this.documentRootId);
+        this.absoluteRoot = this.documentRoot;
+        this.documentRoot.visitTree({ includeOrigin: true }, (proxy:ItemProxy) => {
+          this.buildRow(proxy);
+        });
 
-      if (this.changeSubjectSubscription) {
-        this.changeSubjectSubscription.unsubscribe();
-      }
-      this.changeSubjectSubscription = treeConfigurationObject.config.
-        getChangeSubject().subscribe((notification: any) => {
-        switch (notification.type) {
-          case 'create': {
-              this.buildRow(notification.proxy);
-              this.refresh();
-            }
-            break;
-          case 'update':
-          case 'dirty':
-              this.refresh();
-              break;
-          case 'delete': {
-              this.deleteRow(notification.id);
-              this.refresh();
-            }
-            break;
-          case 'loaded': {
-              this.documentRoot.visitTree({ includeOrigin: true }, (proxy:
-                ItemProxy) => {
-                this.buildRow(proxy);
-              });
-              this.refresh();
-              this.showFocus();
-            }
-            break;
+        if (this.changeSubjectSubscription) {
+          this.changeSubjectSubscription.unsubscribe();
         }
-      });
+        this.changeSubjectSubscription = treeConfigurationObject.config.getChangeSubject().subscribe((notification: any) => {
+          switch (notification.type) {
+            case 'create': {
+                this.buildRow(notification.proxy);
+                this.refresh();
+              }
+              break;
+            case 'update':
+            case 'dirty':
+                this.refresh();
+                break;
+            case 'delete': {
+                this.deleteRow(notification.id);
+                this.refresh();
+              }
+              break;
+            case 'loaded': {
+                this.documentRoot.visitTree({ includeOrigin: true }, (proxy: ItemProxy) => {
+                  this.buildRow(proxy);
+                });
+                this.refresh();
+                this.showFocus();
+                this.showBeingViewed();
+              }
+              break;
+          }
+        });
 
-      this.rootSubject.next(this.documentRoot);
-      this.rootSelected.emit(this.documentRoot);
+        this.rootSubject.next(this.documentRoot);
+        this.rootSelected.emit(this.documentRoot);
 
-      this.initialize();
+        this.initialize();
 
-      this.showFocus();
-      setTimeout(()=>{
-      }, 500)
-    }
-  });
+        this.showFocus();
+        setTimeout(()=>{
+        }, 500)
+      }
+    });
 
-  this.selectedProxyStreamSubscription = this.selectedProxyStream.subscribe((newSelection) => {
-    if(this.sync && newSelection) {
-      this.focusedObjectSubject.next(newSelection);
-      this.showFocus();
-    }
-  })
-}
+    this.viewingProxyStreamSubscription = this.viewingProxyStream.subscribe((newViewedProxy) => {
+      if(newViewedProxy) {
+        this.beingViewedObjectSubject.next(newViewedProxy);
+        this.showBeingViewed();
+      }
+    });
+  }
 
   ngOnDestroy () {
     this.prepareForDismantling();
@@ -324,16 +320,8 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
       this.treeConfigSubscription.unsubscribe();
     }
     this.changeSubjectSubscription.unsubscribe();
+    this.viewingProxyStreamSubscription.unsubscribe();
   }
-
-
-  toggleDocumentSync(): void {
-    this.sync = !this.sync;
-    if (this.sync) {
-      this.showFocus();
-    }
-  }
-
 
   protected getId(object: any): any {
     return (object as ItemProxy).item.id;
@@ -535,7 +523,3 @@ export class DocumentTreeComponent extends Tree implements OnInit, OnDestroy {
     }).updateSize('90%', '90%');
   }
 }
-
-/*
-
-*/

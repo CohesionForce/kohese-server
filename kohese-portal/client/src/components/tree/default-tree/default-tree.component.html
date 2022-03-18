@@ -33,6 +33,7 @@ limitations under the License.
   </button>
   <button mat-icon-button (click)="toggleSelectionSynchronization()"
     matTooltip="Toggle selection synchronization for the tree"
+    style="margin-top: 5px; margin-right: 5px"
     [ngClass]="{ 'highlight': synchronizeWithSelection }"
     class="flex-right-align">
     <mat-icon class="fa fa-exchange"></mat-icon>
@@ -57,7 +58,7 @@ limitations under the License.
   <div class="kt-body">
     <virtual-scroll #tree [items]="visibleRows">
       <tree-row *ngFor="let row of tree.viewPortItems"
-        [treeRow]="row" [rowActions]="rowActions"
+        [treeRow]="row" [rowActions]="rowActions" [synchronizeWithSelection]=synchronizeWithSelection
         [images]="images" [menuActions]="menuActions">
       </tree-row>
     </virtual-scroll>

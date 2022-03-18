@@ -17,52 +17,55 @@
 
 @import '../../app.component';
 
-#buildProcessStepper {
-  height: 100%;
-  width: 100%;
-}
+:host {
+  #buildProcessStepper {
+    height: 100%;
+    width: 100%;
+  }
 
-::ng-deep .mat-horizontal-content-container {
-  height: 90%;
-  width: 100%;
-}
+  ::ng-deep .mat-horizontal-content-container {
+    height: 90%;
+    width: 100%;
+  }
 
-::ng-deep .mat-horizontal-stepper-content {
-  height: 100%;
-  width: 100%;
-}
+  ::ng-deep .mat-horizontal-stepper-content {
+    height: 100%;
+    width: 100%;
+  }
 
-mat-card {
-  height: 100%;
-  width: 100%;
-}
+  mat-card {
+    height: 100%;
+    width: 100%;
+  }
 
-mat-card-content {
-  height: 90%;
-  width: 100%;
-  overflow: auto;
-}
+  mat-card-content {
+    height: 90%;
+    width: 100%;
+    overflow: auto;
+  }
 
-mat-card-actions {
-  height: 10%;
-  width: 100%;
-}
+  mat-card-actions {
+    height: 10%;
+    width: 100%;
+  }
 
-.step-container {
-  height: 100%;
-  width: 100%;
-}
+  .step-container {
+    height: 100%;
+    width: 100%;
+  }
 
-.left-content {
-  width: 50%;
-  height: 600px;
-}
-.right-content {
-  width: 40%;
-  height: 600px;
-}
+  .left-content {
+    width: 50%;
+    height: 600px;
+  }
+  .right-content {
+    width: 40%;
+    height: 600px;
+  }
 
-mat-tab-group {
-  height: 100%;
-  width: 100%;
+  mat-tab-group {
+    height: 100%;
+    width: 100%;
+  }
+
 }

@@ -26,6 +26,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 // Kohese
 import { Dialog } from '../dialog/Dialog.interface';
 import { TreeService } from '../../services/tree/tree.service';
+import { ItemProxy } from '../../../../common/src/item-proxy';
+import { DetailsComponent } from '../details/details.component';
+import { DialogService } from '../../services/dialog/dialog.service';
 
 class ElementMapValue {
   get parent() {
@@ -387,10 +390,11 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
   }
 
   public constructor (
-    private _changeDetectorRef: ChangeDetectorRef,
-    private treeService: TreeService,
-    @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
-    @Optional() private _matDialogRef: MatDialogRef<TreeComponent>
+                      private _changeDetectorRef: ChangeDetectorRef,
+                      private treeService: TreeService,
+                      private dialogService: DialogService,
+                      @Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
+                      @Optional() private _matDialogRef: MatDialogRef<TreeComponent>
   ) {}
 
   public ngOnInit(): void {
@@ -881,6 +885,14 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
       this.adjustElementArray();
       this.applySearchText();
     }
+  }
+
+  public displayInformation(itemProxy: ItemProxy): void {
+    this.dialogService.openComponentDialog(DetailsComponent, {
+      data: {
+        itemProxy: itemProxy
+      }
+    }).updateSize('90%', '90%');
   }
 
   /**
