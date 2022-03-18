@@ -17,15 +17,21 @@ limitations under the License.
 
 <div class="kt-item"
   (click)="treeRow.rowFocused()"
-  [ngClass]="{ 'selected-border': treeRow.isRowFocused() }"
-  [ngStyle]="{ 'padding-left': (treeRow.depth * 31) + 'px', 'background-color':
-  ((!treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) ?
-  '#FFFFCC' : (treeRow.hasError() ? 'lightcoral' : '')) }">
+  [ngClass]="{ 'selected-border': treeRow.isRowFocused(),
+               'viewing-border' : ( synchronizeWithSelection && treeRow.isRowBeingViewed() )
+             }"
+
+  [ngStyle]="{ 'padding-left': (treeRow.depth * 31) + 'px',
+               'background-color':  ( (!treeRow.isRowRoot() && treeRow.visible && treeRow.matchesFilter) ?
+                                      '#FFFFCC' : (treeRow.hasError() ? 'lightcoral' : '')
+                                    )
+            }">
   <i class="kt-icon fa"
     (click)="treeRow.expanded = !treeRow.expanded; treeRow.updateVisibleRows.next(true); $event.stopPropagation()"
     [ngClass]="{ 'fa-caret-down': (treeRow.hasChildren() && treeRow.expanded),
-    'fa-caret-right': (treeRow.hasChildren() && !treeRow.expanded),
-    'no-children': !treeRow.hasChildren() }">
+                 'fa-caret-right': (treeRow.hasChildren() && !treeRow.expanded),
+                 'no-children': !treeRow.hasChildren()
+                }">
   </i>
   <ng-container *ngIf="treeRow.isMultiselectEnabled()">
     <mat-checkbox [checked]="treeRow.isRowSelected()"
@@ -34,8 +40,7 @@ limitations under the License.
     </mat-checkbox>
   </ng-container>
   <ng-container *ngIf="treeRow.hasError()">
-    <mat-icon class="fa fa-exclamation" style="color: darkred; padding-top:
-      5px;">
+    <mat-icon class="fa fa-exclamation" style="color: darkred; padding-top: 5px;">
     </mat-icon>
   </ng-container>
   <ng-container *ngIf="treeRow.getIcon()">
@@ -48,17 +53,20 @@ limitations under the License.
     {{treeRow.getText()}}
   </span>
   <ng-container *ngFor="let tag of treeRow.getTags()">
-    <span style="max-height: 40px; background: lightblue; border: 1px groove
-      lightblue; margin: 0px 3px 0px 3px; white-space: nowrap; overflow:
-      hidden; text-overflow: ellipsis;">
+    <span style=" max-height: 40px;
+                  background: lightblue;
+                  border: 1px groove lightblue;
+                  margin: 0px 3px 0px 3px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;">
       {{tag}}
     </span>
   </ng-container>
   <ng-container *ngFor="let image of images">
     <ng-container *ngIf="image.display(treeRow.object)">
       <ng-container *ngIf="image.displayAsIcon">
-        <mat-icon class="{{image.path}}" matTooltip="{{image.getText(treeRow.
-          object)}}" style="padding: 0px 3px;">
+        <mat-icon class="{{image.path}}" matTooltip="{{image.getText(treeRow.object)}}" style="padding: 0px 3px;">
         </mat-icon>
       </ng-container>
       <ng-container *ngIf="!image.displayAsIcon">
@@ -90,9 +98,8 @@ limitations under the License.
         <ng-container *ngIf="!isActionGroup(displayableEntity)">
           <button mat-icon-button
             matTooltip="{{displayableEntity.description}}"
-            (click)="displayableEntity.perform(treeRow.object); $event.
-              stopPropagation()">
-            <mat-icon class="kt-icon {{displayableEntity.icon}}"></mat-icon>
+            (click)="displayableEntity.perform(treeRow.object); $event.stopPropagation()">
+            <mat-icon class="kt-actions {{displayableEntity.icon}}"></mat-icon>
           </button>
         </ng-container>
       </ng-container>

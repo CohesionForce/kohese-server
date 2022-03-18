@@ -17,6 +17,7 @@
 
 // Angular
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 // Other External Dependencies
 
@@ -42,6 +43,14 @@ export class TreeService {
   }
   set favorites(value: any) {
     this._favorites = value;
+  }
+
+  _viewingProxyStream : BehaviorSubject<ItemProxy> = new BehaviorSubject<ItemProxy>(null);
+  get viewingProxyStream() {
+    return this._viewingProxyStream;
+  }
+  set viewingProxyStream(proxy: any) {
+    this._viewingProxyStream.next(proxy);
   }
 
   ngOnInit() {

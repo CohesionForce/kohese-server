@@ -22,13 +22,26 @@ limitations under the License.
 
       <ng-container *ngIf="!outlineView else documentOutline">
         <div class="panel-heading-left">
-          <span><b>Document View</b></span>
+          <span><b>{{itemProxy.kind}} Info: {{itemProxy.item.name}}</b></span>
         </div>
         <div class="panel-heading-right">
-          <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
-          <button mat-icon-button (click)="navigate('Outline', { id: itemProxy.item.id })" matTooltip="go to outline">
-            <mat-icon class="fa fa-list"></mat-icon>
+          <button mat-icon-button matTooltip="produce report"
+            (click)=produceReport(itemProxy)>
+            <mat-icon class="fa fa-file-text-o"></mat-icon>
           </button>
+          <ng-container *ngIf=!isDialog>
+            <button mat-icon-button matTooltip="go to outline"
+              (click)="navigate('Outline', { id: itemProxy.item.id })">
+              <mat-icon class="fa fa-list"></mat-icon>
+            </button>
+            <ng-container *ngIf="itemProxy.item.parentId">
+              <button mat-icon-button matTooltip="Go to parent"
+                (click)="navigate('Explore', { id: itemProxy.item.parentId })">
+                <mat-icon class="fa fa-level-up"></mat-icon>
+              </button>
+            </ng-container>
+          </ng-container>
+          <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
         </div>
       </ng-container>
 
@@ -38,10 +51,10 @@ limitations under the License.
           <span><b>Outline View</b></span>
         </div>
         <div class="panel-heading-right">
-          <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
           <button mat-icon-button (click)="navigate('Explore', { id: itemProxy.item.id })" matTooltip="go to explorer">
             <mat-icon class="fa fa-arrow-left"></mat-icon>
           </button>
+          <span><b>({{itemsLoaded}}/{{itemLength}})</b></span>
         </div>
       </ng-template>
     </ng-container>
@@ -57,10 +70,17 @@ limitations under the License.
 
   </div>
   <div class="body-container">
-    <div data-infinite-scroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
-      [scrollWindow]="false" [immediateCheck]="true" class="panel-body doc-view" #docView>
+    <div data-infinite-scroll class=doc-view #docView
+      [infiniteScrollDistance]="2"
+      [infiniteScrollThrottle]="50"
+      [scrollWindow]="false"
+      [immediateCheck]="true"
+      (scrolled)="onScroll()">
+
       <document-row #row id="docInfo.proxy.item.id" *ngFor="let docInfo of loadedProxies"
-        [docInfo]="docInfo" [row]="row" (mouseenter)="selectRow(docInfo.proxy)"
+        [docInfo]="docInfo"
+        [row]="row"
+        (mouseenter)="selectRow(docInfo.proxy)"
         (viewInitialized)="rowMap[docInfo.proxy.item.id] = $event">
       </document-row>
     </div>

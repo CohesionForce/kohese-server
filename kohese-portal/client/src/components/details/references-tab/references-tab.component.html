@@ -15,21 +15,27 @@ limitations under the License.
 -->
 
 
-<h2 class="section-header">Children</h2>
-  <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
-<h2 class="section-header">References</h2>
+<div class="panel-heading">
+  <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
+  <div class=panel-buttons>
+    <button mat-icon-button matTooltip="Display Item information"
+      (click)=displayInformation(itemProxy)>
+      <mat-icon class="fa fa-clone"></mat-icon>
+    </button>
+    <ng-container *ngIf="itemProxy.item.parentId && !isDialog">
+      <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
+        (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+        <mat-icon class="fa fa-level-up"></mat-icon>
+      </button>
+    </ng-container>
+  </div>
+</div>
+
+<div class=references-content>
+  <h6 class="section-header">References</h6>
   <reference-table [referencesInfo]="referenceInfo" [routingStrategy]="routingStrategy"></reference-table>
-<h2 class="section-header">Referenced By</h2>
+  <h6 class="section-header">Referenced By</h6>
   <reference-table [referencesInfo]="referencedByInfo" [routingStrategy]="routingStrategy"></reference-table>
-
-
-  <!-- <mat-tab>
-              <ng-template mat-tab-label>
-                  Children ({{itemProxy.children.length}})
-                  <ng-container *ngIf="itemProxy.dirty">
-                    <img src="../../../assets/icons/versioncontrol/dirty.ico"
-                      title="Dirty item"/>
-                  </ng-container>
-              </ng-template>
-              <children-tab [proxyStream]="proxyStream" [editableStream]="editableStream"></children-tab>
-            </mat-tab> -->
+  <h6 class="section-header">Children</h6>
+  <children-tab [proxyStream]="proxyStream"></children-tab>
+</div>
