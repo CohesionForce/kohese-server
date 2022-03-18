@@ -28,7 +28,7 @@ import { NavigationService } from '../../../../../services/navigation/navigation
 import { DetailsComponent } from '../../../../details/details.component';
 import { Field } from '../field.class';
 import { TreeService } from '../../../../../services/tree/tree.service';
-import { ItemProxy } from 'common/src/item-proxy';
+import { ItemProxy } from '../../../../../../../common/src/item-proxy';
 
 /**
  * Displays a singlevalued attribute
