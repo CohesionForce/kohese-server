@@ -35,9 +35,9 @@ export function MockUsersData() {
   return {
     "item": {
       "password": "$2a$10$vPeOPQX7dQRF8L4Cz5glmO4p0WuqSLrKcM2VtDnivGTXKgtueKs2i",
-      "username": "admin",
+      "username": "testUser123",
       "id": "c30f3230-66cd-11e5-b47a-1dc450d60d40",
-      "name": "admin",
+      "name": "Mr. Test",
       "description": "Administrator",
       "parentId": "808f50f0-66e8-11e5-be0b-d369503e923d",
       "createdBy": "admin",
