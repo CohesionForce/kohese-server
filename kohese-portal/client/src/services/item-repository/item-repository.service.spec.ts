@@ -59,7 +59,7 @@ describe('ItemRepository', () => {
       toBe(true);
     expect(itemRepository.getMarkdownRepresentation(dataModel, undefined,
       dataModel, viewModel, FormatDefinitionType.DOCUMENT, 0, true).startsWith(
-      '<div style="font-size: xxx-large;">[KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n</div>\n\n')).
+      '<div style="font-size: x-large;">[KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n</div>\n\n')).
       toBe(true);
     expect(itemRepository.getMarkdownRepresentation(dataModel, undefined,
       dataModel, viewModel, FormatDefinitionType.DEFAULT, 1, false).startsWith(
