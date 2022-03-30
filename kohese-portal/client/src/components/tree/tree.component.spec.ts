@@ -29,8 +29,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeService } from '../../services/tree/tree.service';
-import { TreeComponent } from './tree.component';
 import { LogService } from '../../services/log/log.service';
+import { TreeComponent } from './tree.component';
 import { DialogService } from '../../services/dialog/dialog.service';
 
 // Mocks
