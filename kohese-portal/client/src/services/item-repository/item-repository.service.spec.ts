@@ -25,7 +25,7 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { ItemCache } from '../../../../common/src/item-cache';
 
-fdescribe('ItemRepository', () => {
+describe('ItemRepository', () => {
   // Save ItemCache used for testing since the ItemRepository creates an empty ItemCache
   let mockItemCache = ItemCache.getItemCache();
 
