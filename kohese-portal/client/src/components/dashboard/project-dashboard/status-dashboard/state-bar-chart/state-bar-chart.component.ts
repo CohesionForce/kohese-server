@@ -156,7 +156,6 @@ export class StateBarChartComponent implements OnInit, AfterViewInit {
   }
 
   openStateSummaryDialog(proxies: Array<ItemProxy>, kindName: string, stateName: string): void {
-    // console.log(this.stateMap[kindName][this.selection.attributeName][this.selection.stateName]);
     this.dialogService.openComponentDialog(StateSummaryDialogComponent, {
       data: {
         proxies : proxies,
