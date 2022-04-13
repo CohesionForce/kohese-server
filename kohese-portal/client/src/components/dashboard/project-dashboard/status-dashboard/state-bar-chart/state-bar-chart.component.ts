@@ -186,8 +186,8 @@ export class StateBarChartComponent implements OnInit, AfterViewInit {
     .attr('class','x-axis')
     .attr('transform', 'translate(0,' + (chartXTransformHeight) + ')')
     .call(this.xAxis)
-    .selectAll("text").style("text-anchor", "end").attr("dx", "-.8em")
-    .attr("dy", ".15em").attr("transform", function(d) {
+    .selectAll("text").style("text-anchor", "end")
+    .attr("dx", "-.8em").attr("dy", ".15em").attr("transform", function(d) {
       return "rotate(-65)"
     }).on('mouseover', (d: any) => {
       let attributeAndStateNames: Array<string> = d.split(': ');
@@ -268,7 +268,8 @@ export class StateBarChartComponent implements OnInit, AfterViewInit {
 
     this.yScale = d3.scaleLinear().domain([0, maxItems]).range([
       this._svgElement.nativeElement.clientHeight,
-      StateBarChartComponent._X_AXIS_PADDING]);
+      StateBarChartComponent._X_AXIS_PADDING
+    ]);
   }
 
   // Move to service
