@@ -107,10 +107,10 @@ export class StateBarChartComponent implements OnInit, AfterViewInit {
   public ngOnInit(): void {
     this.treeConfigChangeSubjectSubscription = this.TreeConfiguration.getWorkingTree().getChangeSubject()
     .subscribe((updatedItem) => {
-      let updatedProxyID = updatedItem.proxy.item.id;
       let updatedProject = this.projectService.getProjectById(this.project.proxy.item.id);
       if(updatedProject) {
         // TODO: handle case for newly created items
+          // let updatedProxyID = updatedItem.proxy.item.id;
         this.project = updatedProject;
       }
 
