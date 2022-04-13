@@ -109,8 +109,9 @@ export class StateBarChartComponent implements OnInit, AfterViewInit {
     .subscribe((updatedItem) => {
       let updatedProject = this.projectService.getProjectById(this.project.proxy.item.id);
       if(updatedProject) {
-        // TODO: handle case for newly created items
+        // TODO: handle case for newly created and/or irrelevant items
           // let updatedProxyID = updatedItem.proxy.item.id;
+          // if(this.project contains the updatedItem)...
         this.project = updatedProject;
       }
 
