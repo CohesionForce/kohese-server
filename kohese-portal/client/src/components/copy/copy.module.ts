@@ -23,13 +23,12 @@ import { MaterialModule } from '../../material.module';
 import { CopyComponent } from './copy.component';
 
 @NgModule({
-  declarations: [CopyComponent],
-  entryComponents: [CopyComponent],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MaterialModule
-  ]
+    declarations: [CopyComponent],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MaterialModule
+    ]
 })
 export class CopyModule {
   public constructor() {

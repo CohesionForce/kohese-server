@@ -37,32 +37,29 @@ import { LensModule } from "../lens/lens.module";
 import { ObjectEditorModule } from '../object-editor/object-editor.module';
 
 @NgModule({
-  declarations: [
-    AdminComponent,
-    RepositoryContentDialog,
-    RepositoriesComponent,
-    DevToolsComponent,
-    AboutComponent
-  ],
-  entryComponents: [
-    RepositoryContentDialog
-  ],
-  imports : [
-    CommonModule,
-    MaterialModule,
-    ServicesModule,
-    UserModule,
-    FormsModule,
-    ReactiveFormsModule,
-    PipesModule,
-    LensModule,
-    ObjectEditorModule,
-    AngularSplitModule
-  ],
-  exports : [
-    AdminComponent,
-    RepositoriesComponent,
-    DevToolsComponent
-  ]
+    declarations: [
+        AdminComponent,
+        RepositoryContentDialog,
+        RepositoriesComponent,
+        DevToolsComponent,
+        AboutComponent
+    ],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        ServicesModule,
+        UserModule,
+        FormsModule,
+        ReactiveFormsModule,
+        PipesModule,
+        LensModule,
+        ObjectEditorModule,
+        AngularSplitModule
+    ],
+    exports: [
+        AdminComponent,
+        RepositoriesComponent,
+        DevToolsComponent
+    ]
 })
 export class AdminModule {}

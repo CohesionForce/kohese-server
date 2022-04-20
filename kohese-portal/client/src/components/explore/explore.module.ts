@@ -33,26 +33,24 @@ import { PipesModule } from "../../pipes/pipes.module";
 
 
 @NgModule({
-  declarations: [
-    ExploreComponent
-  ],
-  entryComponents: [
-  ],
-  imports : [
-    CommonModule,
-    MaterialModule,
-    ServicesModule,
-    BrowserModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AngularSplitModule,
-    NavigatorModule,
-    DetailsModule,
-    PipesModule,
-    LensModule
-  ],
-  exports : [
-    ExploreComponent,
-  ]
+    declarations: [
+        ExploreComponent
+    ],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        ServicesModule,
+        BrowserModule,
+        FormsModule,
+        ReactiveFormsModule,
+        AngularSplitModule,
+        NavigatorModule,
+        DetailsModule,
+        PipesModule,
+        LensModule
+    ],
+    exports: [
+        ExploreComponent,
+    ]
 })
 export class ExploreModule {}

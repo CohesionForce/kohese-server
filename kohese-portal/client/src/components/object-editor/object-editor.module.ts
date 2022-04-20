@@ -34,34 +34,29 @@ import { SinglevaluedFieldComponent } from './format-object-editor/field/singlev
 import { NamespaceEditorComponent } from './namespace-editor/namespace-editor.component';
 
 @NgModule({
-  declarations: [
-    DocumentConfigurationEditorComponent,
-    FormatObjectEditorComponent,
-    MultivaluedFieldComponent,
-    SinglevaluedFieldComponent,
-    FormatDefinitionEditorComponent,
-    NamespaceEditorComponent
-  ],
-  entryComponents: [
-    FormatObjectEditorComponent,
-    DocumentConfigurationEditorComponent,
-    NamespaceEditorComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    AngularSplitModule,
-    MarkdownModule.forChild(),
-    MaterialModule,
-    PipesModule,
-    MarkdownEditorModule,
-    TreeViewModule,
-    TableModule
-  ],
-  exports: [
-    FormatObjectEditorComponent,
-    FormatDefinitionEditorComponent
-  ]
+    declarations: [
+        DocumentConfigurationEditorComponent,
+        FormatObjectEditorComponent,
+        MultivaluedFieldComponent,
+        SinglevaluedFieldComponent,
+        FormatDefinitionEditorComponent,
+        NamespaceEditorComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        AngularSplitModule,
+        MarkdownModule.forChild(),
+        MaterialModule,
+        PipesModule,
+        MarkdownEditorModule,
+        TreeViewModule,
+        TableModule
+    ],
+    exports: [
+        FormatObjectEditorComponent,
+        FormatDefinitionEditorComponent
+    ]
 })
 export class ObjectEditorModule {
   public constructor() {

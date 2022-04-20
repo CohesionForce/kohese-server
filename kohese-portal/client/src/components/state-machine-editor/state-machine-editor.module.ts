@@ -23,17 +23,14 @@ import { MaterialModule } from '../../material.module';
 import { StateMachineEditorComponent } from './state-machine-editor.component';
 
 @NgModule({
-  declarations: [
-    StateMachineEditorComponent
-  ],
-  entryComponents: [
-    StateMachineEditorComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MaterialModule
-  ]
+    declarations: [
+        StateMachineEditorComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MaterialModule
+    ]
 })
 export class StateMachineEditorModule {
 }

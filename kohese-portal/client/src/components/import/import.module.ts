@@ -27,22 +27,18 @@ import { ImportComponent } from './import.component';
 import { ParameterSpecifierComponent } from './parameter-specifier/parameter-specifier.component';
 
 @NgModule({
-  declarations: [
-    ImportComponent,
-    ParameterSpecifierComponent
-  ],
-  entryComponents: [
-    ImportComponent,
-    ParameterSpecifierComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MarkdownModule,
-    MaterialModule,
-    UserInputModule,
-    TreeViewModule
-  ]
+    declarations: [
+        ImportComponent,
+        ParameterSpecifierComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MarkdownModule,
+        MaterialModule,
+        UserInputModule,
+        TreeViewModule
+    ]
 })
 export class ImportModule {
   public constructor() {

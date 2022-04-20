@@ -50,51 +50,45 @@ import { DirectivesModule } from '../../directives/directives.module';
 import { AngularSplitModule } from 'angular-split';
 
 @NgModule({
-  declarations: [
-    DashboardComponent,
-    DashboardSelectorComponent,
-    AssignmentDashboardComponent,
-    DueAssignmentComponent,
-    CompletedAssignmentComponent,
-    DependencyInfoComponent,
-    ProjectDashboardComponent,
-    ProjectOverviewComponent,
-    UserStatisticsComponent,
-    ProjectSelectorComponent,
-    StatusDashboardComponent,
-    OpenAssignmentComponent,
-    StateBarChartComponent,
-    StateSummaryDialogComponent,
-    ActivityFeedComponent
-  ],
-  providers : [
-    StateFilterService
-  ],
-  entryComponents: [
-    KMarkdownComponent,
-    ProjectSelectorComponent,
-    StateSummaryDialogComponent,
-  ],
-  imports : [
-    CommonModule,
-    ServicesModule,
-    MaterialModule,
-    UserInputModule,
-    PipesModule,
-    UserInputModule,
-    LensModule,
-    TreeModule,
-    VirtualScrollModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ObjectEditorModule,
-    ItemBoardModule,
-    DirectivesModule,
-    AngularSplitModule
-  ],
-  exports : [
-    DashboardComponent
-  ]
-
+    declarations: [
+        DashboardComponent,
+        DashboardSelectorComponent,
+        AssignmentDashboardComponent,
+        DueAssignmentComponent,
+        CompletedAssignmentComponent,
+        DependencyInfoComponent,
+        ProjectDashboardComponent,
+        ProjectOverviewComponent,
+        UserStatisticsComponent,
+        ProjectSelectorComponent,
+        StatusDashboardComponent,
+        OpenAssignmentComponent,
+        StateBarChartComponent,
+        StateSummaryDialogComponent,
+        ActivityFeedComponent
+    ],
+    providers: [
+        StateFilterService
+    ],
+    imports: [
+        CommonModule,
+        ServicesModule,
+        MaterialModule,
+        UserInputModule,
+        PipesModule,
+        UserInputModule,
+        LensModule,
+        TreeModule,
+        VirtualScrollModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ObjectEditorModule,
+        ItemBoardModule,
+        DirectivesModule,
+        AngularSplitModule
+    ],
+    exports: [
+        DashboardComponent
+    ]
 })
 export class DashboardModule {}

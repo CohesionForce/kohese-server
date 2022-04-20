@@ -29,26 +29,22 @@ import { UserInputModule } from "../user-input/user-input.module";
 
 
 @NgModule({
-  declarations: [
-    CreateWizardComponent
-  ],
-  entryComponents: [
-    CreateWizardComponent
-  ],
-  imports : [
-    CommonModule,
-    MaterialModule,
-    FormsModule,
-    ReactiveFormsModule,
-    PipesModule,
-    ObjectEditorModule,
-    BrowserAnimationsModule,
-    UserInputModule
-
-  ],
-  exports : [
-    CreateWizardComponent,
-    UserInputModule
-  ]
+    declarations: [
+        CreateWizardComponent
+    ],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        FormsModule,
+        ReactiveFormsModule,
+        PipesModule,
+        ObjectEditorModule,
+        BrowserAnimationsModule,
+        UserInputModule
+    ],
+    exports: [
+        CreateWizardComponent,
+        UserInputModule
+    ]
 })
 export class CreateWizardModule {}

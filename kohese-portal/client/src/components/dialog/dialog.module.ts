@@ -36,30 +36,25 @@ import { InputDialogComponent } from './input-dialog/input-dialog.component';
 import { DynamicComponentDirective, ComponentDialogComponent } from './component-dialog/component-dialog.component';
 
 @NgModule({
-  declarations: [
-    SimpleDialogComponent,
-    InputDialogComponent,
-    DynamicComponentDirective,
-    ComponentDialogComponent
-  ],
-  entryComponents: [
-    SimpleDialogComponent,
-    InputDialogComponent,
-    ComponentDialogComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatSelectModule,
-    MatStepperModule,
-    MatIconModule,
-    MarkdownEditorModule
-  ]
+    declarations: [
+        SimpleDialogComponent,
+        InputDialogComponent,
+        DynamicComponentDirective,
+        ComponentDialogComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatCheckboxModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatSelectModule,
+        MatStepperModule,
+        MatIconModule,
+        MarkdownEditorModule
+    ]
 })
 export class DialogModule {
   public constructor() {
