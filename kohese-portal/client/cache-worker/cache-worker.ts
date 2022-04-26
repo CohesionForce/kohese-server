@@ -17,7 +17,7 @@
 
 console.log('$$$ Loading Cache Worker');
 
-import * as SocketIoClient from 'socket.io-client';
+import {io, Socket } from 'socket.io-client';
 import * as LevelJs from 'level-js';
 import * as _ from 'underscore';
 
@@ -29,7 +29,7 @@ import { KoheseView } from '../../common/src/KoheseView';
 import { LevelCache } from '../../common/src/level-cache';
 import { Workspace } from '../../common/src/kohese-commit';
 
-let socket: SocketIOClient.Socket;
+let socket: Socket;
 let clientMap = {};
 let _authRequest = {};
 let kioListenersInitialized: boolean = false;
@@ -101,7 +101,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     switch (request.type) {
       case 'connect':
         if (!socket) {
-          socket = SocketIoClient({
+          socket = io({
             rejectUnauthorized: false
           });
           socket.on('connect_error', (err) => {

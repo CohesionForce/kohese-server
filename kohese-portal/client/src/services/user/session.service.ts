@@ -50,7 +50,7 @@ export class SessionService {
     return sortedUsers;
   }
 
-  private _sessionMap: {};
+  private _sessionMap: {} = {};
   get sessionMap() {
     return this._sessionMap;
   }
