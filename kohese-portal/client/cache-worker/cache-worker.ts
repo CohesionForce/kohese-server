@@ -101,9 +101,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
     switch (request.type) {
       case 'connect':
         if (!socket) {
-          socket = io({
-            rejectUnauthorized: false
-          });
+          socket = io();
           socket.on('connect_error', (err) => {
             console.log('*** Worker socket connection error');
             console.log(JSON.stringify(err, null, '  '));
