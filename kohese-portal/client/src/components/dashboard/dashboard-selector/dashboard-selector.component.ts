@@ -38,7 +38,6 @@ export enum DashboardSelections {
 // Used to determine greater sub-type of dashboards
 export enum DashboardTypes {
   PROJECT,
-  USER,
   ASSIGNMENT
 }
 
@@ -82,6 +81,10 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
       if (params['appbarNav']) {
         this.linkClicked('open');
         this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
+      }
+      if (params['project-id']) {
+        this.linkClicked('project status');
+        this.selectDashboard(DashboardSelections.PROJECT_STATUS);
       }
     });
   }
@@ -154,7 +157,6 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
   }
 
   public linkClicked(link: string) {
-    this.whichLink = '';
     this.whichLink = link;
   }
 }
