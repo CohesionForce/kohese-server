@@ -103,6 +103,7 @@
     "karma-coverage-istanbul-reporter": "^3.0.3",
     "karma-jasmine": "^4.0.1",
     "karma-jasmine-html-reporter": "^1.7.0",
+    "node-polyfill-webpack-plugin": "^1.1.4",
     "protractor": "^7.0.0",
     "ts-loader": "^9.2.9",
     "tslib": "^2.0.0",
