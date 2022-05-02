@@ -18,7 +18,6 @@
       "node",
       "underscore",
       "jasmine",
-      "jssha",
     ],
     "typeRoots": [
       "../node_modules/@types"
