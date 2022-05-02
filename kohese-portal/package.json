@@ -59,7 +59,7 @@
     "license-checker": "^25.0.1",
     "mark.js": "^8.11.1",
     "morgan": "^1.10.0",
-    "ngx-infinite-scroll": "^10.0.1",
+    "ngx-infinite-scroll": "^13.0.1",
     "ngx-markdown": "^13.1.0",
     "ngx-toastr": "^14.3.0",
     "node-fetch": "^2.6.7",
