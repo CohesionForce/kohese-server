@@ -73,7 +73,7 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     ServiceWorkerModule.register('/ngsw-worker.js', {enabled : true}),
     ToastrModule.forRoot(),
     MarkdownModule.forRoot({
-      sanitize: SecurityContext.NONE,
+      sanitize: SecurityContext.HTML,
       markedOptions: {
         provide: MarkedOptions,
         useFactory: () => {
