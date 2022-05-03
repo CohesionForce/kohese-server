@@ -72,29 +72,7 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     BrowserAnimationsModule,
     ServiceWorkerModule.register('/ngsw-worker.js', {enabled : true}),
     ToastrModule.forRoot(),
-    MarkdownModule.forRoot({
-      sanitize: SecurityContext.HTML,
-      markedOptions: {
-        provide: MarkedOptions,
-        useFactory: () => {
-          let markedRenderer: MarkedRenderer = new MarkedRenderer();
-          markedRenderer.image = (href: string, title: string, text:
-            string) => {
-            let imageHtml: string = new MarkedRenderer().image(href, title,
-              text);
-            imageHtml = imageHtml.substring(0, 5) +
-              'style="max-height: 100%; max-width: 100%;" ' + imageHtml.
-              substring(5);
-
-            return imageHtml;
-          };
-
-          let markedOptions: MarkedOptions = new MarkedOptions();
-          markedOptions.renderer = markedRenderer;
-          return markedOptions;
-        }
-      }
-    }),
+    MarkdownModule.forRoot(),
     InfiniteScrollModule,
     PipesModule,
     MaterialModule,

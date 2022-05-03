@@ -31,7 +31,8 @@
               "./node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": [
-              "./build/client/cache-worker/cache-bundle.js"
+              "./build/client/cache-worker/cache-bundle.js",
+              "node_modules/marked/marked.min.js"
             ],
             "vendorChunk": true,
             "extractLicenses": false,
