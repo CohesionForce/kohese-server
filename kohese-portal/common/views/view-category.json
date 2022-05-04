@@ -6,7 +6,7 @@
     "id": "com.kohese"
   },
   "modelName": "Category",
-  "icon": "",
+  "icon": "fa fa-hashtag",
   "color": "#000000",
   "localTypes": {},
   "viewProperties": {},
