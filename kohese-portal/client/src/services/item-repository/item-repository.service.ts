@@ -739,17 +739,17 @@ export class ItemRepository {
       }
     }, undefined);
 
-    // if (headingLevel > -1) {
-    //   if ((headingLevel === 0) && (formatDefinitionType === FormatDefinitionType.DOCUMENT)) {
-    //     representation += '<div style="font-size: x-large;">';
-    //   } else {
-    //     for (let j: number = 0; j < headingLevel; j++) {
-	  //       representation += '#';
-	  //     }
+    if (headingLevel > -1) {
+      if ((headingLevel === 0) && (formatDefinitionType === FormatDefinitionType.DOCUMENT)) {
+        representation += '<div style="font-size: x-large;">';
+      } else {
+        for (let j: number = 0; j < headingLevel; j++) {
+	        representation += '#';
+	      }
 
-	  //     representation += ' ';
-	  //   }
-	  // }
+	      representation += ' ';
+	    }
+	  }
 
 	  if (formatDefinition.header.contents.length > 0) {
   	  if (addLinks) {
