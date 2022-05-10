@@ -53,6 +53,14 @@ export class TreeService {
     this._viewingProxyStream.next(proxy);
   }
 
+  _minimize: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  get minimize() {
+    return this._minimize;
+  }
+  set minimize(toggle: any) {
+    this._minimize.next(toggle);
+  }
+
   ngOnInit() {
     // TODO: Add check for favorites in local storage
 

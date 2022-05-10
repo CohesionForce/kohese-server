@@ -25,6 +25,15 @@ limitations under the License.
           <span><b>{{itemProxy.kind}} Info: {{itemProxy.item.name}}</b></span>
         </div>
         <div class="panel-heading-right">
+          <button mat-icon-button matTooltip="minimize"
+            (click)=minimize()>
+            <ng-container *ngIf="(this.treeService.minimize.getValue() === false) else minimized">
+              <mat-icon class="fa fa-minus"></mat-icon>
+            </ng-container>
+            <ng-template #minimized>
+              <mat-icon class="fa fa-plus"></mat-icon>
+            </ng-template>
+          </button>
           <button mat-icon-button matTooltip="produce report"
             (click)=produceReport(itemProxy)>
             <mat-icon class="fa fa-file-text-o"></mat-icon>

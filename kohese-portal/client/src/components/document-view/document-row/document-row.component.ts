@@ -39,6 +39,7 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { SessionService } from '../../../services/user/session.service';
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
 import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
+import { TreeService } from '../../../services/tree/tree.service';
 
 @Component({
   selector: 'document-row',
@@ -63,6 +64,7 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
 
   _saveShortcutSubscription: Subscription;
   _exitShortcutSubscription: Subscription;
+  minimizeSub: Subscription;
 
   /* Getters */
   get itemRepository() {
@@ -92,6 +94,7 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
               private _navigationService: NavigationService,
               private element: ElementRef,
               private sessionService: SessionService,
+              private treeService: TreeService,
               private hotkeys: Hotkeys,
     ) {
     this.docReader = new commonmark.Parser();
@@ -137,7 +140,11 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
         });
         this.checkEntries();
         this.changeRef.markForCheck();
-      });
+    });
+
+    this.minimizeSub = this.treeService.minimize.subscribe(() => {
+      this.changeRef.detectChanges();
+    });
   }
 
   public ngOnDestroy(): void {

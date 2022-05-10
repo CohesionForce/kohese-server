@@ -336,6 +336,9 @@ implements OnInit, OnDestroy {
     this.changeRef.markForCheck();
   }
 
+  minimize() {
+    this.treeService.minimize.next(!this.treeService.minimize.getValue())
+  }
 
   onFilterChange() {
     console.log('>>> Filter string changed to: ' + this.filter);

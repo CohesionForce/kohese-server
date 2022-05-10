@@ -84,7 +84,6 @@ limitations under the License.
   </div>
 
 
-
   <mat-menu #contextMenu="matMenu">
     <ng-template matMenuContent>
       <ng-container *ngIf="!row.editable else editableBlock">
@@ -128,11 +127,27 @@ limitations under the License.
     </button>
   </mat-menu>
 
-  <format-object-editor [disabled]="(
-    !row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing)"
-    [object]="docInfo.proxy.item" [type]="docInfo.proxy.model.item"
-    [formatDefinitionType]="FormatDefinitionType.DOCUMENT">
-  </format-object-editor>
+
+  <ng-container *ngIf="((this.treeService.minimize.getValue() === false) && !row.editable) else minimal">
+    <format-object-editor
+      [disabled]="(!row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing)"
+      [object]="docInfo.proxy.item" [type]="docInfo.proxy.model.item"
+      [formatDefinitionType]="FormatDefinitionType.DOCUMENT">
+    </format-object-editor>
+  </ng-container>
+  <ng-template #minimal>
+    <div class=minimal-display>
+      {{docInfo.proxy.item.name}}
+      <ng-container *ngIf="row.editable">
+        <format-object-editor
+          [disabled]="(!row.editable || docInfo.proxy.item.preventModification || docInfo.proxy.model.item.restrictInstanceEditing)"
+          [object]="docInfo.proxy.item" [type]="docInfo.proxy.model.item"
+          [formatDefinitionType]="FormatDefinitionType.DOCUMENT">
+        </format-object-editor>
+      </ng-container>
+    </div>
+  </ng-template>
+
 </div>
 
 <!-- This is the best, incomplete example that we have of a standalone contextMenu component executed in another component.
