@@ -75,13 +75,17 @@ limitations under the License.
             <mat-icon class="fa fa-bars"></mat-icon>
           </button>
           <mat-menu #menu="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item (click)="addItem(row)">
+              <mat-icon class="fa fa-plus"></mat-icon>
+              add child
+            </button>
             <button mat-menu-item
-              (click)="$event.stopPropagation(); navigationService.navigate('Explore', { id: row.item.id })">
+              (click)="navigationService.navigate('Explore', { id: row.item.id })">
               <mat-icon class="fa fa-arrow-right"></mat-icon>
               Navigate in Explorer
             </button>
             <button mat-menu-item
-              (click)="$event.stopPropagation(); navigationService.addTab('Explore', { id: row.item.id })">
+              (click)="navigationService.addTab('Explore', { id: row.item.id })">
               <mat-icon class="fa fa-external-link"></mat-icon>
               Navigate in New Tab
             </button>
