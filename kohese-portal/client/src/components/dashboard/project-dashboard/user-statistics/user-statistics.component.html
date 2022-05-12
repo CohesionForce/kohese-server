@@ -65,7 +65,8 @@ limitations under the License.
       <div *ngFor="let stateType of stateInfo[type] | mapKey">
         <h6>{{stateType}}</h6>
         <mat-list>
-          <mat-list-item class=state-item *ngFor="let state of stateInfo[type][stateType].states" (click)="toggleState(type, stateType, state)"
+          <mat-list-item class=state-item *ngFor="let state of stateInfo[type][stateType].states"
+            (click)="toggleState(type, stateType, state)"
             [ngClass]="{'selected-state' : selectedStatesMap.get(stateType + state)}">
             {{state}}
           </mat-list-item>
