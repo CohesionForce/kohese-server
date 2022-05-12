@@ -36,10 +36,12 @@ limitations under the License.
   </div>
   <div class=middle-content style="overflow: auto">
     <mat-table *ngIf=selectedAssignments [dataSource]=tableStream>
-      <ng-container matColumnDef=kind>
-        <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
-        <mat-cell *matCellDef="let assignment"> {{assignment.kind}}</mat-cell>
+
+      <ng-container matColumnDef=assignedTo>
+        <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
+        <mat-cell *matCellDef="let assignment"> {{assignment.item.assignedTo}}</mat-cell>
       </ng-container>
+
       <ng-container matColumnDef=name>
         <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
         <mat-cell *matCellDef="let assignment"> {{assignment.item.name}}</mat-cell>
@@ -50,9 +52,14 @@ limitations under the License.
         <mat-cell *matCellDef="let assignment">{{assignment.state}}</mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef=assignedTo>
-        <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
-        <mat-cell *matCellDef="let assignment"> {{assignment.item.assignedTo}}</mat-cell>
+      <ng-container matColumnDef=kind>
+        <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
+        <mat-cell *matCellDef="let assignment"> {{assignment.kind}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef=due>
+        <mat-header-cell *matHeaderCellDef> Due </mat-header-cell>
+        <mat-cell *matCellDef="let assignment"> {{(assignment.item.estimatedCompletion) | date:'MM/dd/yyyy'}}</mat-cell>
       </ng-container>
 
       <mat-header-row *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>

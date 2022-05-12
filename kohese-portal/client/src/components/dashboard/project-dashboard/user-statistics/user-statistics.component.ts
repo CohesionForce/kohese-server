@@ -47,10 +47,10 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   selectedUserMap: Map<string, ItemProxy> = new Map<string, ItemProxy>();
   selectedAssignments: Array<any>;
   tableStream: MatTableDataSource<ItemProxy>;
-  rowDef = ['kind', 'name', 'state', 'assignedTo']
+  rowDef = ['assignedTo', 'name', 'state', 'kind', 'due'];
 
   useStates : boolean = false;
-  supportedTypes = ['Action', 'Task', 'Decision']
+  supportedTypes = ['Action', 'Task', 'Decision'];
   stateInfo : {} = {};
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
   origin : string;
