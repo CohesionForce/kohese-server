@@ -16,8 +16,9 @@
 
 
 // Angular
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Subscription, Observable } from 'rxjs';
 
@@ -55,26 +56,32 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
   origin : string;
 
+  allUsersToggled: boolean = false;
+
+  userControl: FormControl = new FormControl();
+  stateControl: FormControl = new FormControl();
+  enabledStates: Array<any> = [];
+
   constructor(
-    protected navigationService: NavigationService,
-    protected dialogService: DialogService,
-    private stateFilterService : StateFilterService,
-    private title : Title
-    ) {
+              protected navigationService: NavigationService,
+              protected dialogService: DialogService,
+              private stateFilterService : StateFilterService,
+              private title : Title,
+  ) {
     super(navigationService)
   }
 
   ngOnInit() {
-    this.origin = location.origin + '/explore;id='
+    this.origin = location.origin + '/explore;id=';
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
         let projectTitle = this.project.proxy.item.name;
         this.title.setTitle('User Statistics | ' + projectTitle);
-        this.deselectAll();
+        this.deselectAllUsers();
         this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
       }
-    })
+    });
   }
 
   ngOnDestroy() {
@@ -84,11 +91,36 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   toggleUser(user: ItemProxy) {
     // Determine if user needs to be added or removed from the selected list
     this.selectedAssignments = [];
+
     if (this.selectedUserMap.get(user.item.name)) {
-      this.selectedUserMap.delete(user.item.name)
+      this.selectedUserMap.delete(user.item.name);
     } else {
       this.selectedUserMap.set(user.item.name, user);
     }
+    this.buildSelectedAssignments();
+  }
+
+  toggleAllUsers() {
+
+    this.allUsersToggled = !this.allUsersToggled;
+    if(this.allUsersToggled) {
+      for (let idx in this.project.users) {
+        let user = this.project.users[idx];
+        this.selectedUserMap.set(user.item.name, user);
+      }
+      this.buildSelectedAssignments();
+    } else {
+      this.selectedUserMap = new Map<string, ItemProxy>();
+      this.userControl.reset('');
+      this.buildSelectedAssignments();
+
+    }
+  }
+
+  deselectAllUsers() {
+
+    this.selectedUserMap = new Map<string, ItemProxy>();
+    this.userControl.reset('');
     this.buildSelectedAssignments();
   }
 
@@ -100,21 +132,20 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         type : type,
         stateType : stateType,
         state : state
-      })
+      });
+    }
+    if(this.selectedStatesMap.size === 0) {
+      this.useStates = false;
+    } else {
+      this.useStates = true;
     }
     this.buildSelectedAssignments();
   }
 
-  selectAll() {
-    for (let idx in this.project.users) {
-      let user = this.project.users[idx];
-      this.selectedUserMap.set(user.item.name, user);
-    }
-    this.buildSelectedAssignments();
-  }
-
-  deselectAll() {
-    this.selectedUserMap = new Map<string, ItemProxy>();
+  resetStates() {
+    this.useStates = false;
+    this.selectedStatesMap.clear();
+    this.stateControl.reset();
     this.buildSelectedAssignments();
   }
 
@@ -136,12 +167,12 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
           if (match) {
             this.selectedAssignments.push(
               user.relations.referencedBy[kind].assignedTo[assignmentIdx]
-            )
+            );
             continue;
           }
         }
       }
-    })
+    });
 
     if (this.useStates) {
       this.selectedAssignments = this.selectedAssignments.filter((proxy)=>{
@@ -154,7 +185,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
           }
         }
         return false;
-      })
+      });
     }
 
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);

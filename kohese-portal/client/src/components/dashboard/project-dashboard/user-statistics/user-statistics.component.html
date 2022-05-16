@@ -15,24 +15,48 @@ limitations under the License.
 -->
 
 
-<button mat-raised-button style="background-color: rgb(0, 160, 223); color : white;" class=copy-button
-  (click)=copyToClipboard(selectedAssignments)>
-  Copy Statistics to Clipboard
-</button>
-<mat-checkbox [(ngModel)]=useStates style="float: right; padding-right : 20px"
-  (change)=buildSelectedAssignments()>
-  State Filter
-</mat-checkbox>
 <div *ngIf=project class=statistics-grid-container>
   <div class=left-content>
-    <button mat-raised-button (click)=selectAll()>Select All</button>
-    <button mat-raised-button (click)=deselectAll()>Select None</button>
-    <mat-list>
-      <mat-list-item *ngFor="let user of project.users" style="border: 1px solid black; padding : 10px;"
-        (click)=toggleUser(user) [ngClass]="{'selected-user' : selectedUserMap.get(user.item.name)}">
-        <mat-icon class="fa fa-user"></mat-icon>{{ user.item.name}}
-      </mat-list-item>
-    </mat-list>
+    <button mat-raised-button style="background-color: rgb(0, 160, 223); color : white;" class=copy-button
+      (click)=copyToClipboard(selectedAssignments)>
+      Copy Table
+    </button>
+    <!-- <button mat-raised-button (click)=toggleAllUsers()>Toggle All Users</button> -->
+    <div class=user-form>
+      <mat-form-field appearance="fill">
+        <mat-label>Users</mat-label>
+        <mat-select [formControl]="userControl" multiple placeholder="Users">
+          <mat-option (click)=toggleAllUsers()>All / Reset</mat-option>
+          <ng-container *ngIf="this.allUsersToggled === true">
+            <mat-optgroup [label]=exclude>exclude</mat-optgroup>
+          </ng-container>
+          <mat-option *ngFor="let user of project.users" [value]=user
+            (click)="toggleUser(user)">
+            {{user.item.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class=state-filter-form>
+      <mat-form-field appearance="fill">
+        <mat-label>State Filter</mat-label>
+        <mat-select [formControl]="stateControl" multiple placeholder="State Filter">
+          <mat-option (click)="resetStates()">Reset</mat-option>
+            <mat-optgroup *ngFor="let type of supportedTypes" [label]="type">
+              <!-- (mat-)optgroup does not supported nested structures.
+                   we use another mat-select here because (mat-)optgroup may only have a parent of <(mat-)select> -->
+              <mat-select multiple>
+                <mat-optgroup *ngFor="let stateType of stateInfo[type] | mapKey" [label]="stateType">
+                  <mat-option *ngFor="let state of stateInfo[type][stateType].states" [value]="state"
+                    (click)="toggleState(type, stateType, state)">
+                    {{state}}
+                  </mat-option>
+                </mat-optgroup>
+              </mat-select>
+            </mat-optgroup>
+        </mat-select>
+      </mat-form-field>
+    </div>
   </div>
   <div class=middle-content style="overflow: auto">
     <mat-table *ngIf=selectedAssignments [dataSource]=tableStream>
@@ -65,20 +89,5 @@ limitations under the License.
       <mat-header-row *matHeaderRowDef="rowDef; sticky: true"></mat-header-row>
       <mat-row (click)=openProxyDetails(proxy) *matRowDef="let proxy; columns: rowDef; let j=index;" tabindex="{{j}}"></mat-row>
     </mat-table>
-  </div>
-  <div class=right-content *ngIf=useStates>
-    <div *ngFor="let type of supportedTypes">
-      <h5 style="border-bottom : 1px darkgrey solid; padding-top : 10px">{{type}}</h5>
-      <div *ngFor="let stateType of stateInfo[type] | mapKey">
-        <h6>{{stateType}}</h6>
-        <mat-list>
-          <mat-list-item class=state-item *ngFor="let state of stateInfo[type][stateType].states"
-            (click)="toggleState(type, stateType, state)"
-            [ngClass]="{'selected-state' : selectedStatesMap.get(stateType + state)}">
-            {{state}}
-          </mat-list-item>
-        </mat-list>
-      </div>
-    </div>
   </div>
 </div>
