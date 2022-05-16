@@ -113,7 +113,6 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       this.selectedUserMap = new Map<string, ItemProxy>();
       this.userControl.reset('');
       this.buildSelectedAssignments();
-
     }
   }
 
