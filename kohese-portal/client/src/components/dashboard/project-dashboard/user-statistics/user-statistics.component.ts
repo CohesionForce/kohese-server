@@ -105,6 +105,8 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.totalNumberOfUsers = this.project.users.length;
     if(this.numberOfItemsSelected === this.totalNumberOfUsers) {
       this.selectAllToggled = true;
+    } else {
+      this.selectAllToggled = false;
     }
 
     this.buildSelectedAssignments();
