@@ -32,6 +32,7 @@ import { NavigationService } from '../../../../services/navigation/navigation.se
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../../details/details.component';
 import { StateInfo, StateFilterService } from '../../state-filter.service';
+import { MatOption } from '@angular/material/core';
 
 @Component({
   selector: 'user-statistics',
@@ -56,7 +57,10 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
   origin : string;
 
-  allUsersToggled: boolean = false;
+  selectAllToggled: boolean = false;
+  numberOfItemsSelected: number;
+  totalNumberOfUsers: number;
+  @ViewChild('selectAll') private selectAll: MatOption
 
   userControl: FormControl = new FormControl();
   stateControl: FormControl = new FormControl();
@@ -97,27 +101,31 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     } else {
       this.selectedUserMap.set(user.item.name, user);
     }
+    this.numberOfItemsSelected = this.userControl.value.length;
+    this.totalNumberOfUsers = this.project.users.length;
+    if(this.numberOfItemsSelected === this.totalNumberOfUsers) {
+      this.selectAllToggled = true;
+    }
+
     this.buildSelectedAssignments();
   }
 
   toggleAllUsers() {
-
-    this.allUsersToggled = !this.allUsersToggled;
-    if(this.allUsersToggled) {
+    this.selectAllToggled = !this.selectAllToggled;
+    if(this.selectAllToggled) {
       for (let idx in this.project.users) {
         let user = this.project.users[idx];
         this.selectedUserMap.set(user.item.name, user);
       }
+
+      this.userControl.patchValue([...this.project.users.map(item => item), 0]);
       this.buildSelectedAssignments();
     } else {
-      this.selectedUserMap = new Map<string, ItemProxy>();
-      this.userControl.reset('');
-      this.buildSelectedAssignments();
+      this.deselectAllUsers();
     }
   }
 
   deselectAllUsers() {
-
     this.selectedUserMap = new Map<string, ItemProxy>();
     this.userControl.reset('');
     this.buildSelectedAssignments();
@@ -157,7 +165,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
           let assignment = user.relations.referencedBy[kind].assignedTo[assignmentIdx];
           let match = false;
           for (let projectIdx in this.project.projectItems) {
-            match = assignment.hasAncestor(this.project.projectItems[projectIdx])
+            match = assignment.hasAncestor(this.project.projectItems[projectIdx]);
             if (match) {
               break;
             }
