@@ -82,7 +82,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         this.project = newProject;
         let projectTitle = this.project.proxy.item.name;
         this.title.setTitle('User Statistics | ' + projectTitle);
-        this.deselectAllUsers();
+        this.toggleAllUsers();
         this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
       }
     });
