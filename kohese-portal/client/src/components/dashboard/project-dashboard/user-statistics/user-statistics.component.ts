@@ -325,20 +325,15 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.tableStream = new MatTableDataSource<ItemProxy>(this.sortedData);
   }
 
-  // Angular compare with no null/undefined checking
-  compare(a: number | string, b: number | string, isAsc: boolean) {
-    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
-  }
-
-  // custom compare
+  // Includes null/undefined checking
   private compareItems(itemA: any, itemB: any, isAsc: boolean): number {
     let retVal: number = 0;
     if (itemA && itemB) {
-      if (itemA > itemB) retVal = 1 * (isAsc ? 1 : -1);
-      else if (itemA < itemB) retVal = -1 * (isAsc ? 1 : -1);
+      if (itemA > itemB) retVal = 1;
+      else if (itemA < itemB) retVal = -1;
     }
-    else if (itemA) retVal = 1 * (isAsc ? 1 : -1);
-    else if (itemB) retVal = -1 * (isAsc ? 1 : -1);
-    return retVal;
+    else if (itemA) retVal = 1;
+    else if (itemB) retVal = -1;
+    return retVal * (isAsc ? 1 : -1);
   }
 }
