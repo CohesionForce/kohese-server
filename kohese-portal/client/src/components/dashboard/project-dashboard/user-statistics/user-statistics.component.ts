@@ -17,7 +17,9 @@
 
 // Angular
 import { Component, OnInit, Input, OnDestroy, ViewChild } from '@angular/core';
+import { MatOption } from '@angular/material/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { Sort } from '@angular/material/sort';
 import { FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Subscription, Observable } from 'rxjs';
@@ -32,7 +34,6 @@ import { NavigationService } from '../../../../services/navigation/navigation.se
 import { DialogService } from '../../../../services/dialog/dialog.service';
 import { DetailsComponent } from '../../../details/details.component';
 import { StateInfo, StateFilterService } from '../../state-filter.service';
-import { MatOption } from '@angular/material/core';
 
 @Component({
   selector: 'user-statistics',
@@ -48,6 +49,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
 
   selectedUserMap: Map<string, ItemProxy> = new Map<string, ItemProxy>();
   selectedAssignments: Array<any>;
+  sortedData: Array<any>;
   tableStream: MatTableDataSource<ItemProxy>;
   rowDef = ['assignedTo', 'name', 'state', 'kind', 'due'];
 
@@ -55,6 +57,8 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   supportedTypes = ['Action', 'Task', 'Decision'];
   stateInfo : {} = {};
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
+  matchingObjects : Array<any> = [];
+  disregardUsers: boolean = false;
   origin : string;
 
   selectAllToggled: boolean = false;
@@ -143,12 +147,17 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         state : state
       });
     }
-    if(this.selectedStatesMap.size === 0) {
-      this.useStates = false;
+    if (!this.disregardUsers) {
+      if(this.selectedStatesMap.size === 0) {
+        this.useStates = false;
+      } else {
+        this.useStates = true;
+      }
+      this.buildSelectedAssignments();
     } else {
       this.useStates = true;
+      this.buildSelectedStates();
     }
-    this.buildSelectedAssignments();
   }
 
   resetStates() {
@@ -199,6 +208,33 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
 
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
   }
+
+  buildSelectedStates () {
+    this.matchingObjects = [];
+
+    if(this.disregardUsers) {
+      for (let proxy of this.project.projectItems) {
+        this.matchingObjects = this.matchingObjects.concat(proxy);
+        this.matchingObjects = this.matchingObjects.concat(proxy.getDescendants())
+      }
+
+      this.matchingObjects = this.matchingObjects.filter((proxy) => {
+        for (let stateKind of proxy.model.item.stateProperties) {
+          let string = stateKind + proxy.item[stateKind];
+          if (this.selectedStatesMap.get(string)){
+            return true
+          } else {
+            continue;
+          }
+        }
+        return false;
+      });
+
+      this.tableStream = new MatTableDataSource<ItemProxy>(this.matchingObjects);
+    } else {
+      this.buildSelectedAssignments();
+    }
+}
 
   openProxyDetails(proxy: ItemProxy) {
     this.dialogService.openComponentDialog(DetailsComponent, {
@@ -252,5 +288,57 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       document.removeEventListener('copy', null);
     });
     document.execCommand('copy');
+  }
+
+  sortData(sort: Sort) {
+    let data: Array<any> = [];
+    if (this.disregardUsers) {
+      data = this.matchingObjects.slice();
+    } else {
+      data = this.selectedAssignments.slice();
+    }
+
+    if (!sort.active || sort.direction === '') {
+      this.sortedData = data;
+      this.tableStream = new MatTableDataSource<ItemProxy>(this.sortedData);
+      return;
+    }
+
+    this.sortedData = data.sort( (a, b) => {
+      const isAsc = sort.direction === 'asc';
+      switch (sort.active) {
+        case 'assignedTo':
+          return this.compareItems(a.item.assignedTo, b.item.assignedTo, isAsc);
+        case 'name':
+          return this.compareItems(a.item.name, b.item.name, isAsc);
+        case 'state':
+          return this.compareItems(a.state, b.state, isAsc);
+        case 'kind':
+          return this.compareItems(a.kind, b.kind, isAsc);
+        case 'due':
+          return this.compareItems(a.item.estimatedCompletion, b.item.estimatedCompletion, isAsc);
+        default:
+          return 0;
+      }
+    });
+
+    this.tableStream = new MatTableDataSource<ItemProxy>(this.sortedData);
+  }
+
+  // Angular compare with no null/undefined checking
+  compare(a: number | string, b: number | string, isAsc: boolean) {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
+  // custom compare
+  private compareItems(itemA: any, itemB: any, isAsc: boolean): number {
+    let retVal: number = 0;
+    if (itemA && itemB) {
+      if (itemA > itemB) retVal = 1 * (isAsc ? 1 : -1);
+      else if (itemA < itemB) retVal = -1 * (isAsc ? 1 : -1);
+    }
+    else if (itemA) retVal = 1 * (isAsc ? 1 : -1);
+    else if (itemB) retVal = -1 * (isAsc ? 1 : -1);
+    return retVal;
   }
 }

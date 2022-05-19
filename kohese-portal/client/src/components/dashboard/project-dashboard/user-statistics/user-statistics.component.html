@@ -45,6 +45,9 @@ limitations under the License.
         <mat-label>State Filter</mat-label>
         <mat-select [formControl]="stateControl" multiple placeholder="State Filter">
           <mat-option (click)="resetStates()">Reset</mat-option>
+          <mat-option (click)="this.disregardUsers = !this.disregardUsers; buildSelectedStates()">
+            Include Unassigned
+          </mat-option>
             <mat-optgroup *ngFor="let type of supportedTypes" [label]="type">
               <!-- (mat-)optgroup does not supported nested structures.
                    we use another mat-select here because (mat-)optgroup may only have a parent of <(mat-)select> -->
@@ -62,30 +65,30 @@ limitations under the License.
     </div>
   </div>
   <div class=middle-content style="overflow: auto">
-    <mat-table *ngIf=selectedAssignments [dataSource]=tableStream>
+    <mat-table matSort (matSortChange)="sortData($event)" *ngIf=selectedAssignments [dataSource]=tableStream>
 
       <ng-container matColumnDef=assignedTo>
-        <mat-header-cell *matHeaderCellDef> Assigned To </mat-header-cell>
+        <mat-header-cell mat-sort-header=assignedTo *matHeaderCellDef> Assigned To </mat-header-cell>
         <mat-cell *matCellDef="let assignment"> {{assignment.item.assignedTo}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef=name>
-        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+        <mat-header-cell mat-sort-header=name *matHeaderCellDef> Name </mat-header-cell>
         <mat-cell *matCellDef="let assignment"> {{assignment.item.name}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef=state>
-        <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
+        <mat-header-cell mat-sort-header=state *matHeaderCellDef> State </mat-header-cell>
         <mat-cell *matCellDef="let assignment">{{assignment.state}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef=kind>
-        <mat-header-cell *matHeaderCellDef> Kind </mat-header-cell>
+        <mat-header-cell mat-sort-header=kind *matHeaderCellDef> Kind </mat-header-cell>
         <mat-cell *matCellDef="let assignment"> {{assignment.kind}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef=due>
-        <mat-header-cell *matHeaderCellDef> Due </mat-header-cell>
+        <mat-header-cell mat-sort-header=due *matHeaderCellDef> Due </mat-header-cell>
         <mat-cell *matCellDef="let assignment"> {{(assignment.item.estimatedCompletion) | date:'MM/dd/yyyy'}}</mat-cell>
       </ng-container>
 
