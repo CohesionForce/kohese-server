@@ -58,7 +58,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   stateInfo : {} = {};
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
   matchingObjects : Array<any> = [];
-  disregardUsers: boolean = false;
+  disregardingUsers: boolean = false;
   origin : string;
 
   selectAllToggled: boolean = false;
@@ -127,12 +127,13 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       this.userControl.patchValue([...this.project.users.map(item => item), 0]);
       this.buildSelectedAssignments();
     } else {
-      this.deselectAllUsers();
+      this.resetUsers();
     }
   }
 
-  deselectAllUsers() {
-    this.selectedUserMap = new Map<string, ItemProxy>();
+  resetUsers() {
+    this.disregardingUsers = false;
+    this.selectedUserMap.clear();
     this.userControl.reset('');
     this.buildSelectedAssignments();
   }
@@ -147,7 +148,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         state : state
       });
     }
-    if (!this.disregardUsers) {
+    if (!this.disregardingUsers) {
       if(this.selectedStatesMap.size === 0) {
         this.useStates = false;
       } else {
@@ -155,7 +156,11 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       }
       this.buildSelectedAssignments();
     } else {
-      this.useStates = true;
+      if (this.selectedStatesMap.size === 0) {
+        this.useStates = false;
+      } else {
+        this.useStates = true;
+      }
       this.buildSelectedStates();
     }
   }
@@ -209,10 +214,29 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
   }
 
+  allStates: Array<any> = [];
+  selectAllStates() {
+    if(this.disregardingUsers) {
+
+      for(let type of this.supportedTypes) {
+        for(let stateType in this.stateInfo[type]) {
+          this.stateControl.patchValue([...this.stateInfo[type][stateType].states]);
+          for(let state of this.stateInfo[type][stateType].states) {
+            // this.stateControl.patchValue([state]);
+            this.toggleState(type, stateType, state);
+          }
+        }
+      }
+
+    } else {
+      this.buildSelectedAssignments();
+    }
+  }
+
   buildSelectedStates () {
     this.matchingObjects = [];
 
-    if(this.disregardUsers) {
+    if(this.disregardingUsers) {
       for (let proxy of this.project.projectItems) {
         this.matchingObjects = this.matchingObjects.concat(proxy);
         this.matchingObjects = this.matchingObjects.concat(proxy.getDescendants())
@@ -271,7 +295,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
           '    <td>' + item.item.name  + '</td>\n' +
           '    <td>' + item.kind + '</td>\n' +
           '    <td>' + item.state + '</td>\n' +
-          '    <td>' + item.item.assignedTo + '</td>\n' +
+          '    <td>' + (item.item.assignedTo ? item.item.assignedTo : 'unassigned') + '</td>\n' +
           '  </tr>\n';
         textString += 'Id: ' + item.item.id + '\n' +
                       'Name: ' + item.item.name  + '\n' +
@@ -292,7 +316,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
 
   sortData(sort: Sort) {
     let data: Array<any> = [];
-    if (this.disregardUsers) {
+    if (this.disregardingUsers) {
       data = this.matchingObjects.slice();
     } else {
       data = this.selectedAssignments.slice();
