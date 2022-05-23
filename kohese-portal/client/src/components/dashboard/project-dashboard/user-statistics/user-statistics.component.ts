@@ -220,7 +220,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       for(let type of this.supportedTypes) {
         for(let stateType in this.stateInfo[type]) {
           // TODO: find a way to patch all values in a multi-optgroup form
-          this.stateControl.patchValue([...this.stateInfo[type][stateType].states]);
+          // this.stateControl.patchValue([...this.stateInfo[type][stateType].states]);
           for(let state of this.stateInfo[type][stateType].states) {
             this.toggleState(type, stateType, state);
           }
