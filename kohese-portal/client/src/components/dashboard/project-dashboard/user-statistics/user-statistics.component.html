@@ -47,10 +47,6 @@ limitations under the License.
           <ng-template #toggled>
             <mat-option #selectAll (click)=toggleAllUsers()>Reset</mat-option>
           </ng-template>
-          <mat-option
-            (click)="this.disregardingUsers = !this.disregardingUsers; buildSelectedStates(); selectAllStates()">
-            Unassigned
-          </mat-option>
           <mat-optgroup [label]=users>users
             <mat-option *ngFor="let user of project.users" [value]=user
               (click)="toggleUser(user)">
@@ -60,6 +56,10 @@ limitations under the License.
         </mat-select>
       </mat-form-field>
     </div>
+    <mat-checkbox class="unassigned-action"
+      (change)="this.disregardingUsers = !this.disregardingUsers; selectAllStates()">
+      Show Unassigned Items
+    </mat-checkbox>
     <div class=state-filter-form>
       <mat-form-field appearance="fill">
         <mat-label>State Filter</mat-label>

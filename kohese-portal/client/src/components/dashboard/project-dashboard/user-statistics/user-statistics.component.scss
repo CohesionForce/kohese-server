@@ -22,9 +22,7 @@
   .statistics-grid-container {
     display: grid;
     overflow: hidden;
-    // height: calc(100% - 35px) !important;
     height: 100%;
-    // height: calc(100% - 76px) !important;
     padding-top: 1em;
     padding-left: 0.1em;
     gap: 1em;
@@ -45,6 +43,10 @@
 
       .user-form {
         margin-top: 1em;
+      }
+
+      .unassigned-action {
+        margin-bottom: 1em;
       }
     }
 

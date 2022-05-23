@@ -217,18 +217,19 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   allStates: Array<any> = [];
   selectAllStates() {
     if(this.disregardingUsers) {
-
       for(let type of this.supportedTypes) {
         for(let stateType in this.stateInfo[type]) {
+          // TODO: find a way to patch all values in a multi-optgroup form
           this.stateControl.patchValue([...this.stateInfo[type][stateType].states]);
           for(let state of this.stateInfo[type][stateType].states) {
-            // this.stateControl.patchValue([state]);
             this.toggleState(type, stateType, state);
           }
         }
       }
-
+      this.buildSelectedStates();
     } else {
+      this.disregardingUsers = false;
+      this.resetStates();
       this.buildSelectedAssignments();
     }
   }
