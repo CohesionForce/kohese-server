@@ -16,7 +16,7 @@
 
 
 // Angular
-import { Component, OnInit, Input, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { MatOption } from '@angular/material/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Sort } from '@angular/material/sort';
@@ -40,7 +40,8 @@ import { StateInfo, StateFilterService } from '../../state-filter.service';
   templateUrl: './user-statistics.component.html',
   styleUrls: ['./user-statistics.component.scss']
 })
-export class UserStatisticsComponent extends NavigatableComponent implements OnInit, OnDestroy {
+export class UserStatisticsComponent extends NavigatableComponent
+  implements OnInit, AfterViewInit, OnDestroy {
 
   @Input()
   projectStream: Observable<ProjectInfo>;
@@ -58,12 +59,14 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   stateInfo : {} = {};
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
   matchingObjects : Array<any> = [];
-  disregardingUsers: boolean = false;
   origin : string;
 
   selectAllToggled: boolean = false;
   numberOfItemsSelected: number;
   totalNumberOfUsers: number;
+  includeUnassigned: boolean = false;
+  unassigned: Array<ItemProxy> = [];
+  @ViewChild('unassignedOption') private unassignedOption: MatOption
   @ViewChild('selectAll') private selectAll: MatOption
 
   userControl: FormControl = new FormControl();
@@ -86,10 +89,13 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         this.project = newProject;
         let projectTitle = this.project.proxy.item.name;
         this.title.setTitle('User Statistics | ' + projectTitle);
-        this.toggleAllUsers();
         this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
       }
     });
+  }
+
+  ngAfterViewInit() {
+    this.toggleAllUsers();
   }
 
   ngOnDestroy() {
@@ -105,12 +111,15 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     } else {
       this.selectedUserMap.set(user.item.name, user);
     }
+
     this.numberOfItemsSelected = this.userControl.value.length;
-    this.totalNumberOfUsers = this.project.users.length;
+    this.totalNumberOfUsers = this.project.users.length + 1;
     if(this.numberOfItemsSelected === this.totalNumberOfUsers) {
       this.selectAllToggled = true;
+      this.selectAll.select();
     } else {
       this.selectAllToggled = false;
+      this.selectAll.deselect();
     }
 
     this.buildSelectedAssignments();
@@ -124,7 +133,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         this.selectedUserMap.set(user.item.name, user);
       }
 
-      this.userControl.patchValue([...this.project.users.map(item => item), 0]);
+      this.userControl.patchValue([...this.project.users.map(item => item)]);
       this.buildSelectedAssignments();
     } else {
       this.resetUsers();
@@ -132,7 +141,8 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   }
 
   resetUsers() {
-    this.disregardingUsers = false;
+    this.unassigned = [];
+    this.includeUnassigned = false;
     this.selectedUserMap.clear();
     this.userControl.reset('');
     this.buildSelectedAssignments();
@@ -148,21 +158,13 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         state : state
       });
     }
-    if (!this.disregardingUsers) {
-      if(this.selectedStatesMap.size === 0) {
-        this.useStates = false;
-      } else {
-        this.useStates = true;
-      }
-      this.buildSelectedAssignments();
+
+    if(this.selectedStatesMap.size > 0) {
+      this.useStates = true;
     } else {
-      if (this.selectedStatesMap.size === 0) {
-        this.useStates = false;
-      } else {
-        this.useStates = true;
-      }
-      this.buildSelectedStates();
+      this.useStates = false;
     }
+    this.buildSelectedAssignments();
   }
 
   resetStates() {
@@ -175,6 +177,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   buildSelectedAssignments() {
     this.selectedAssignments = [];
 
+    // includes project items with user relations
     Array.from(this.selectedUserMap.values(), (user: ItemProxy) => {
       for (let kind in user.relations.referencedBy) {
         for (let assignmentIdx in user.relations.referencedBy[kind].assignedTo) {
@@ -197,6 +200,31 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       }
     });
 
+    // includes project items with no user relations
+    if(this.includeUnassigned) {
+      for(let projectIdx of this.project.projectItems) {
+        if(projectIdx.children) {
+          for (let projectItem of projectIdx.children) {
+            this.hasUnassignedChildren(projectItem);
+          }
+        }
+        if(!projectIdx.item.assignedTo &&
+          (projectIdx.kind === 'Task' || projectIdx.kind === 'Action' || projectIdx.kind === 'Decision')) {
+
+          this.unassigned.push(projectIdx);
+        }
+      }
+    } else {
+      this.unassigned = [];
+    }
+    if(this.includeUnassigned && this.unassigned.length > 0) {
+      for(let proxy of this.unassigned) {
+        this.selectedAssignments.push(proxy);
+      }
+    }
+
+    // filters each project item against all selected states
+    // and prunes selected assignments appropriately
     if (this.useStates) {
       this.selectedAssignments = this.selectedAssignments.filter((proxy)=>{
         for (let stateKind of proxy.model.item.stateProperties) {
@@ -214,52 +242,42 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
   }
 
-  allStates: Array<any> = [];
-  selectAllStates() {
-    if(this.disregardingUsers) {
-      for(let type of this.supportedTypes) {
-        for(let stateType in this.stateInfo[type]) {
-          // TODO: find a way to patch all values in a multi-optgroup form
-          // this.stateControl.patchValue([...this.stateInfo[type][stateType].states]);
-          for(let state of this.stateInfo[type][stateType].states) {
-            this.toggleState(type, stateType, state);
-          }
+  hasUnassignedChildren(proxy: ItemProxy) {
+    if(!proxy.item.assignedTo &&
+        (proxy.kind === 'Task' || proxy.kind === 'Action' || proxy.kind === 'Decision')) {
+
+      this.unassigned.push(proxy);
+    }
+    if(proxy.children) {
+      for(let child of proxy.children) {
+        if(!child.item.assignedTo &&
+            (child.kind === 'Task' || child.kind === 'Action' || child.kind === 'Decision')) {
+          this.unassigned.push(child);
         }
+        this.hasUnassignedChildren(child);
       }
-      this.buildSelectedStates();
-    } else {
-      this.disregardingUsers = false;
-      this.resetStates();
-      this.buildSelectedAssignments();
+      console.log(this.unassigned);
     }
   }
 
-  buildSelectedStates () {
-    this.matchingObjects = [];
-
-    if(this.disregardingUsers) {
-      for (let proxy of this.project.projectItems) {
-        this.matchingObjects = this.matchingObjects.concat(proxy);
-        this.matchingObjects = this.matchingObjects.concat(proxy.getDescendants())
-      }
-
-      this.matchingObjects = this.matchingObjects.filter((proxy) => {
-        for (let stateKind of proxy.model.item.stateProperties) {
-          let string = stateKind + proxy.item[stateKind];
-          if (this.selectedStatesMap.get(string)){
-            return true
-          } else {
-            continue;
-          }
+  // TODO: allStates should be populated in getAllStates and implemented onInit.
+  //       Then we can provision select all and reset options for the state filter
+  //       We also need to implement a custom display for multiple states selected so it looks better
+  //       I haven't found a patchValue solution to the hacky way we had to do the multi-optgroup state-filter.
+  allStates: Array<any> = [];
+  selectAllStates() {
+    this.resetStates();
+    for(let type of this.supportedTypes) {
+      for(let stateType in this.stateInfo[type]) {
+        // TODO: find a way to patch all values in a multi-optgroup form
+        // this.stateControl.patchValue([...this.stateInfo[type][stateType].states]);
+        for(let state of this.stateInfo[type][stateType].states) {
+          this.toggleState(type, stateType, state);
         }
-        return false;
-      });
-
-      this.tableStream = new MatTableDataSource<ItemProxy>(this.matchingObjects);
-    } else {
-      this.buildSelectedAssignments();
+      }
     }
-}
+    this.buildSelectedAssignments();
+  }
 
   openProxyDetails(proxy: ItemProxy) {
     this.dialogService.openComponentDialog(DetailsComponent, {
@@ -317,11 +335,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
 
   sortData(sort: Sort) {
     let data: Array<any> = [];
-    if (this.disregardingUsers) {
-      data = this.matchingObjects.slice();
-    } else {
-      data = this.selectedAssignments.slice();
-    }
+    data = this.selectedAssignments.slice();
 
     if (!sort.active || sort.direction === '') {
       this.sortedData = data;
@@ -350,7 +364,6 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
     this.tableStream = new MatTableDataSource<ItemProxy>(this.sortedData);
   }
 
-  // Includes null/undefined checking
   private compareItems(itemA: any, itemB: any, isAsc: boolean): number {
     let retVal: number = 0;
     if (itemA && itemB) {

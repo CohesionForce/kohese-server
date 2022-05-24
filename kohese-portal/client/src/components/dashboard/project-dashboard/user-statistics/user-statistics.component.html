@@ -18,21 +18,13 @@ limitations under the License.
 <div *ngIf=project class=statistics-grid-container>
   <div class=left-content>
     <ng-container *ngIf="!sortedData else sorted">
-      <ng-container *ngIf="!this.disregardingUsers else includeUnassigned">
-        <button mat-raised-button style="background-color: rgb(0, 160, 223); color : white;" class=copy-button
-          (click)=copyToClipboard(selectedAssignments)>
-          Copy Table
-        </button>
-      </ng-container>
-      <ng-template #includeUnassigned>
-        <button mat-raised-button style="background-color: rgb(0, 160, 223); color : white;" class=copy-button
-          (click)=copyToClipboard(this.matchingObjects)>
-          Copy Table
-        </button>
-      </ng-template>
+      <button mat-raised-button class="copy-table"
+        (click)=copyToClipboard(selectedAssignments)>
+        Copy Table
+      </button>
     </ng-container>
     <ng-template #sorted>
-      <button mat-raised-button style="background-color: rgb(0, 160, 223); color : white;" class=copy-button
+      <button mat-raised-button class="copy-table"
         (click)=copyToClipboard(this.sortedData)>
         Copy Table
       </button>
@@ -48,6 +40,10 @@ limitations under the License.
             <mat-option #selectAll (click)=toggleAllUsers()>Reset</mat-option>
           </ng-template>
           <mat-optgroup [label]=users>users
+            <mat-option #unassignedOption [value]="unassignedItems"
+              (click)="this.includeUnassigned = !this.includeUnassigned; buildSelectedAssignments()">
+              Unassigned
+            </mat-option>
             <mat-option *ngFor="let user of project.users" [value]=user
               (click)="toggleUser(user)">
               {{user.item.name}}
@@ -56,10 +52,7 @@ limitations under the License.
         </mat-select>
       </mat-form-field>
     </div>
-    <mat-checkbox class="unassigned-action"
-      (change)="this.disregardingUsers = !this.disregardingUsers; selectAllStates()">
-      Show Unassigned Items
-    </mat-checkbox>
+
     <div class=state-filter-form>
       <mat-form-field appearance="fill">
         <mat-label>State Filter</mat-label>
