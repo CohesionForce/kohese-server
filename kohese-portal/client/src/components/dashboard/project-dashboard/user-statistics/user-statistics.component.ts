@@ -256,7 +256,6 @@ export class UserStatisticsComponent extends NavigatableComponent
         }
         this.hasUnassignedChildren(child);
       }
-      console.log(this.unassigned);
     }
   }
 
