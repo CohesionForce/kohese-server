@@ -92,6 +92,7 @@ export class UserStatisticsComponent extends NavigatableComponent
         this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
       }
     });
+    // this.userControl = new FormControl(this.project.users);
   }
 
   ngAfterViewInit() {
@@ -134,6 +135,7 @@ export class UserStatisticsComponent extends NavigatableComponent
       }
 
       this.userControl.patchValue([...this.project.users.map(item => item)]);
+      this.unassignedOption.select();
       this.buildSelectedAssignments();
     } else {
       this.resetUsers();
@@ -218,6 +220,7 @@ export class UserStatisticsComponent extends NavigatableComponent
       this.unassigned = [];
     }
     if(this.includeUnassigned && this.unassigned.length > 0) {
+      this.findDuplicates(this.unassigned);
       for(let proxy of this.unassigned) {
         this.selectedAssignments.push(proxy);
       }
@@ -259,17 +262,20 @@ export class UserStatisticsComponent extends NavigatableComponent
     }
   }
 
-  // TODO: allStates should be populated in getAllStates and implemented onInit.
-  //       Then we can provision select all and reset options for the state filter
-  //       We also need to implement a custom display for multiple states selected so it looks better
-  //       I haven't found a patchValue solution to the hacky way we had to do the multi-optgroup state-filter.
+  findDuplicates(arr: Array<ItemProxy>) {
+    arr.filter((item,index) => {
+      if(arr.indexOf(item) != index) {
+        this.unassigned.splice(index,1);
+      }
+    });
+  }
+
+  // TODO: Implement when a multi-optgroup patchValue solution has been found
   allStates: Array<any> = [];
   selectAllStates() {
     this.resetStates();
     for(let type of this.supportedTypes) {
       for(let stateType in this.stateInfo[type]) {
-        // TODO: find a way to patch all values in a multi-optgroup form
-        // this.stateControl.patchValue([...this.stateInfo[type][stateType].states]);
         for(let state of this.stateInfo[type][stateType].states) {
           this.toggleState(type, stateType, state);
         }

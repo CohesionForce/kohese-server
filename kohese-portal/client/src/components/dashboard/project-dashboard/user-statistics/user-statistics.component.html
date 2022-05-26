@@ -57,6 +57,12 @@ limitations under the License.
       <mat-form-field appearance="fill">
         <mat-label>State Filter</mat-label>
         <mat-select [formControl]="stateControl" multiple placeholder="State Filter">
+          <mat-select-trigger>
+            {{stateControl.value ? stateControl.value[0] : ''}}
+            <span *ngIf="stateControl.value?.length > 1" class="additional-selections">
+              (+{{stateControl.value.length - 1}} {{stateControl.value?.length === 2 ? 'other' : 'others'}})
+            </span>
+          </mat-select-trigger>
           <mat-option (click)="resetStates()">Reset</mat-option>
             <mat-optgroup *ngFor="let type of supportedTypes" [label]="type">
               <!-- (mat-)optgroup does not supported nested structures.
