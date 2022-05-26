@@ -16,7 +16,7 @@
 
 
 // Angular
-import { Component, OnInit, Input, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, ViewChild } from '@angular/core';
 import { MatOption } from '@angular/material/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Sort } from '@angular/material/sort';
@@ -41,7 +41,7 @@ import { StateInfo, StateFilterService } from '../../state-filter.service';
   styleUrls: ['./user-statistics.component.scss']
 })
 export class UserStatisticsComponent extends NavigatableComponent
-  implements OnInit, AfterViewInit, OnDestroy {
+  implements OnInit, OnDestroy {
 
   @Input()
   projectStream: Observable<ProjectInfo>;
@@ -90,13 +90,11 @@ export class UserStatisticsComponent extends NavigatableComponent
         let projectTitle = this.project.proxy.item.name;
         this.title.setTitle('User Statistics | ' + projectTitle);
         this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
+        this.resetUsers();
+        this.selectAllUsers();
       }
     });
-    // this.userControl = new FormControl(this.project.users);
-  }
 
-  ngAfterViewInit() {
-    this.toggleAllUsers();
   }
 
   ngOnDestroy() {
@@ -104,7 +102,6 @@ export class UserStatisticsComponent extends NavigatableComponent
   }
 
   toggleUser(user: ItemProxy) {
-    // Determine if user needs to be added or removed from the selected list
     this.selectedAssignments = [];
 
     if (this.selectedUserMap.get(user.item.name)) {
@@ -135,7 +132,21 @@ export class UserStatisticsComponent extends NavigatableComponent
       }
 
       this.userControl.patchValue([...this.project.users.map(item => item)]);
-      this.unassignedOption.select();
+      this.buildSelectedAssignments();
+    } else {
+      this.resetUsers();
+    }
+  }
+
+  selectAllUsers() {
+    this.selectAllToggled = true;
+    if(this.selectAllToggled) {
+      for (let idx in this.project.users) {
+        let user = this.project.users[idx];
+        this.selectedUserMap.set(user.item.name, user);
+      }
+
+      this.userControl.patchValue([...this.project.users.map(item => item)]);
       this.buildSelectedAssignments();
     } else {
       this.resetUsers();
