@@ -30,11 +30,13 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DynamicTypesService } from '../../../services/dynamic-types/dynamic-types.service';
+import { DialogService } from '../../../services/dialog/dialog.service';
 
 // Mocks
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 
 describe('Component: History Tab', ()=>{
   let historyComponent: HistoryTabComponent;
@@ -51,6 +53,7 @@ describe('Component: History Tab', ()=>{
       providers: [
         {provide: NavigationService, useClass: MockNavigationService},
         { provide: ItemRepository, useClass: MockItemRepository },
+        { provide: DialogService, useClass: MockDialogService },
         DynamicTypesService
       ]
     }).compileComponents();
