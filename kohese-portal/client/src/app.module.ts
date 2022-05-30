@@ -48,7 +48,6 @@ import { TreeViewModule } from './components/tree/tree.module'
 import { VersionsModule } from './components/versions/versions.module';
 import { ReportsModule } from './components/reports/reports.module';
 import { ImportModule } from './components/import/import.module';
-import { CopyModule } from './components/copy/copy.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
@@ -123,7 +122,6 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     LensModule,
     ReportsModule,
     ImportModule,
-    CopyModule,
     ItemBoardModule
   ],
   bootstrap: [AppComponent]

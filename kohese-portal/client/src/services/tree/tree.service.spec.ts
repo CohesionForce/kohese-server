@@ -15,16 +15,28 @@
  */
 
 
-
+// Angular
 import { TestBed } from '@angular/core/testing';
 
+// Other External Dependencies
+
+// Kohese
+import { LogService } from '../log/log.service';
 import { TreeService } from './tree.service';
+
+// Mocks
+import { MockLogService } from '../../../mocks/services/MockLogService';
 
 describe('TreeService', () => {
   let service: TreeService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        TreeService,
+        { provide: LogService, useClass: MockLogService }
+      ]
+    });
     service = TestBed.inject(TreeService);
   });
 

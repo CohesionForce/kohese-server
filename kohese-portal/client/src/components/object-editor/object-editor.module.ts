@@ -25,7 +25,6 @@ import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { MarkdownEditorModule } from '../markdown-editor/markdown-editor.module';
 import { TreeViewModule } from '../tree/tree.module';
-import { DocumentConfigurationEditorComponent } from './document-configuration/document-configuration-editor.component';
 import { FormatObjectEditorComponent } from './format-object-editor/format-object-editor.component';
 import { FormatDefinitionEditorComponent } from './format-definition-editor/format-definition-editor.component';
 import { TableModule } from '../table/table.module';
@@ -34,29 +33,32 @@ import { SinglevaluedFieldComponent } from './format-object-editor/field/singlev
 import { NamespaceEditorComponent } from './namespace-editor/namespace-editor.component';
 
 @NgModule({
-    declarations: [
-        DocumentConfigurationEditorComponent,
-        FormatObjectEditorComponent,
-        MultivaluedFieldComponent,
-        SinglevaluedFieldComponent,
-        FormatDefinitionEditorComponent,
-        NamespaceEditorComponent
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        AngularSplitModule,
-        MarkdownModule.forChild(),
-        MaterialModule,
-        PipesModule,
-        MarkdownEditorModule,
-        TreeViewModule,
-        TableModule
-    ],
-    exports: [
-        FormatObjectEditorComponent,
-        FormatDefinitionEditorComponent
-    ]
+  declarations: [
+    FormatObjectEditorComponent,
+    MultivaluedFieldComponent,
+    SinglevaluedFieldComponent,
+    FormatDefinitionEditorComponent,
+    NamespaceEditorComponent
+  ],
+  entryComponents: [
+    FormatObjectEditorComponent,
+    NamespaceEditorComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AngularSplitModule,
+    MarkdownModule.forChild(),
+    MaterialModule,
+    PipesModule,
+    MarkdownEditorModule,
+    TreeViewModule,
+    TableModule
+  ],
+  exports: [
+    FormatObjectEditorComponent,
+    FormatDefinitionEditorComponent
+  ]
 })
 export class ObjectEditorModule {
   public constructor() {
