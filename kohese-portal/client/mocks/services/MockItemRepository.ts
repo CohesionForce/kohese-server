@@ -48,6 +48,9 @@ export class MockItemRepository {
   mockRootProxy = ItemProxy.getWorkingTree().getRootProxy();
   state: any;
 
+  saveAndContinueSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  currentSaveAndContinueValue = this.saveAndContinueSubject.asObservable();
+
   constructor() {
     console.log('### MIR Constructor called');
     if (MockItemRepository.singleton) {
@@ -89,6 +92,7 @@ export class MockItemRepository {
       "parentId": "com.kohese"
     });
 
+    // 'Category'
     new ItemProxy('Namespace', {
       alias: 'SubGlobal',
       id: 'b32b6e10-ed3c-11ea-8737-9f31b413a913',
@@ -96,6 +100,7 @@ export class MockItemRepository {
       parentId: 'com.kohese'
     });
 
+    // 'Project'
     new ItemProxy('Namespace', {
       alias: 'SubSubGlobal',
       id: '03741da0-ed41-11ea-8737-9f31b413a913',

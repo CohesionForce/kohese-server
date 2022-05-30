@@ -31,10 +31,13 @@ import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { TreeService } from '../../services/tree/tree.service';
 import { LogService } from '../../services/log/log.service';
 import { TreeComponent } from './tree.component';
+import { DialogService } from '../../services/dialog/dialog.service';
 
 // Mocks
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockItem, MockAction } from '../../../mocks/data/MockItem';
+import { MockLogService } from '../../../mocks/services/MockLogService';
+import { MockDialogService } from '../../../mocks/services/MockDialogService';
 
 describe('TreeComponent', () => {
   let component: TreeComponent;
@@ -52,7 +55,8 @@ describe('TreeComponent', () => {
       ],
       providers: [
         { provide: TreeService, useClass: TreeService },
-        { provide: LogService, useClass: LogService }
+        { provide: LogService, useClass: MockLogService },
+        { provide: DialogService, useClass: MockDialogService }
       ]
     }).compileComponents();
 
