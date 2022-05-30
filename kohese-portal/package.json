@@ -65,7 +65,7 @@
     "ng2-file-upload": "^1.4.0",
     "ng2-tree": "^2.0.0-rc.11",
     "ngx-infinite-scroll": "^10.0.1",
-    "ngx-markdown": "^12.0.1",
+    "ngx-markdown": "^13.1.0",
     "ngx-toastr": "^13.2.1",
     "node-fetch": "^2.6.1",
     "nodegit": "^0.27.0",
