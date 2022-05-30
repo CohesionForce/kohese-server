@@ -20,20 +20,13 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatSelectModule } from '@angular/material/select';
-import { MatStepperModule } from '@angular/material/stepper';
 
 // Kohese
 import { MarkdownEditorModule } from '../markdown-editor/markdown-editor.module';
 import { SimpleDialogComponent } from './simple-dialog/simple-dialog.component';
 import { InputDialogComponent } from './input-dialog/input-dialog.component';
 import { DynamicComponentDirective, ComponentDialogComponent } from './component-dialog/component-dialog.component';
+import { MaterialModule } from '../../material.module';
 
 @NgModule({
   declarations: [
@@ -50,14 +43,7 @@ import { DynamicComponentDirective, ComponentDialogComponent } from './component
   imports: [
     CommonModule,
     FormsModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatSelectModule,
-    MatStepperModule,
-    MatIconModule,
+    MaterialModule,
     MarkdownEditorModule
   ]
 })

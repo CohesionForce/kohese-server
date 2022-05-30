@@ -25,7 +25,7 @@ import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 import { DialogService } from '../../../services/dialog/dialog.service';
 import { Dialog } from '../../dialog/Dialog.interface';
-import { TreeComponent } from '../../tree/tree.component';
+import { ActionTitle, TreeComponent } from '../../tree/tree.component';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { InputDialogComponent, InputDialogKind } from '../../dialog/input-dialog/input-dialog.component';
 
@@ -352,11 +352,19 @@ export class NamespaceEditorComponent implements Dialog {
       }
     }, undefined);
 
+    let action: string = 'Add Subcomponent(s)';
+    let name: string = ''
+    let title: ActionTitle = {
+      action: action,
+      name: name
+    }
+
     let results: Array<any> = await this._dialogService.openComponentsDialog(
       [{
       component: TreeComponent,
       matDialogData: {
         root: treeConfiguration.getProxyFor('Model-Definitions'),
+        getTitle: title,
         getChildren: (element: any) => {
           return (element as ItemProxy).children.filter((itemProxy:
             ItemProxy) => {
