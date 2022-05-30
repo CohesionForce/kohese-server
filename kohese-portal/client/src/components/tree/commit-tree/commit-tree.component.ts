@@ -43,11 +43,15 @@ import { CompareItemsComponent } from '../../compare-items/item-comparison/compa
 @Component({
   selector: 'commit-tree',
   templateUrl: './commit-tree.component.html',
-  styleUrls: ['../tree.component.scss'],
+  styleUrls: ['../tree.component.scss',
+              './commit-tree.component.scss'
+             ],
   //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   private _repositoryProxy: ItemProxy;
+  private processingComplete: boolean = false;
+
   @Output('rowSelected')
   public rowSelectedEmitter: EventEmitter<any> = new EventEmitter<any>();
 
@@ -78,11 +82,15 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
 
   private _itemRepositorySubscription: Subscription;
 
-  public constructor(route: ActivatedRoute, dialogService: DialogService,
-    private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:
-    ItemRepository, private _lensService: LensService,
-    private _navigationService: NavigationService,
-    private _dynamicTypesService: DynamicTypesService) {
+  public constructor(
+                      route: ActivatedRoute,
+                      dialogService: DialogService,
+                      private changeDetectorRef: ChangeDetectorRef,
+                      private _itemRepository: ItemRepository,
+                      private _lensService: LensService,
+                      private _navigationService: NavigationService,
+                      private _dynamicTypesService: DynamicTypesService
+  ) {
     super(route, dialogService);
   }
 
@@ -180,15 +188,17 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
 
         thisComponent.rootSubject.next(rootRow.object);
 
-        if (thisComponent._changeDetectorRef && !(thisComponent._changeDetectorRef as ViewRef).destroyed) {
+        if (thisComponent.changeDetectorRef && !(thisComponent.changeDetectorRef as ViewRef).destroyed) {
           // The view still exists, so detectChanges and keep processing the commits
-          thisComponent._changeDetectorRef.detectChanges();
+          thisComponent.changeDetectorRef.detectChanges();
           commitIteration++;
 
           if (sortedCommitArray.length) {
             setTimeout(processCommit, yieldWithNoDelay);
           } else {
             let afterTime = Date.now();
+            thisComponent.processingComplete = true;
+
             console.log('$$$ Time to build commit rows:  ' + (afterTime-beforeTime)/1000);
           }
         }
@@ -304,7 +314,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   }
 
   protected postTreeTraversalActivity(): void {
-    this._changeDetectorRef.markForCheck();
+    this.changeDetectorRef.markForCheck();
   }
 
   private openComparisonDialog(baseObject: any): void {
