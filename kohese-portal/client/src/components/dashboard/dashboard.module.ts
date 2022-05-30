@@ -35,7 +35,6 @@ import { PipesModule } from "../../pipes/pipes.module";
 import { DueAssignmentComponent } from "./assignment-dashboard/due-assignment/due-assignment.component";
 import { OpenAssignmentComponent } from "./assignment-dashboard/open-assignment/open-assignment.component";
 import { CompletedAssignmentComponent } from "./assignment-dashboard/completed-assignment/completed-assignment.component";
-import { DependencyInfoComponent } from './assignment-dashboard/dependency-info/dependency-info.component';
 import { LensModule } from "../lens/lens.module";
 import { ProjectDashboardComponent } from "./project-dashboard/project-dashboard.component";
 import { ProjectOverviewComponent } from "./project-dashboard/project-overview/project-overview.component";
@@ -56,7 +55,6 @@ import { AngularSplitModule } from 'angular-split';
     AssignmentDashboardComponent,
     DueAssignmentComponent,
     CompletedAssignmentComponent,
-    DependencyInfoComponent,
     ProjectDashboardComponent,
     ProjectOverviewComponent,
     UserStatisticsComponent,
