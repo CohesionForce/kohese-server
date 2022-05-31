@@ -36,6 +36,8 @@ import { CompareItemsComponent } from './compare-items.component';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { LogService } from '../../../services/log/log.service';
+import { MockLogService } from '../../../../mocks/services/MockLogService';
 
 describe('Component: compare-items', () => {
   let component: CompareItemsComponent;
@@ -54,8 +56,9 @@ describe('Component: compare-items', () => {
           baseProxy: proxy,
           changeProxy: proxy
         } },
-        { provide: ItemRepository, useClass: MockItemRepository },
         DynamicTypesService,
+        { provide: LogService, useClass: MockLogService },
+        { provide: ItemRepository, useClass: MockItemRepository },
         { provide: DialogService, useClass: MockDialogService },
         { provide: NavigationService, useClass: MockNavigationService },
         { provide: MatDialogRef, useValue: { close: () => {} } }

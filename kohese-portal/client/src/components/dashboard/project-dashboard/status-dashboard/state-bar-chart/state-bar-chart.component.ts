@@ -16,7 +16,7 @@
 
 
 // Angular
-import { Component, AfterViewInit, ViewChild, ElementRef, Input } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, Input, OnInit } from '@angular/core';
 import { Subscription, BehaviorSubject } from 'rxjs';
 
 // Other External Dependencies
@@ -27,14 +27,14 @@ import { StateSummaryDialogComponent } from './state-summary-dialog/state-summar
 import { DialogService } from './../../../../../services/dialog/dialog.service';
 import { ItemProxy } from './../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
-import { ProjectInfo } from '../../../../../services/project-service/project.service';
+import { ProjectInfo, ProjectService } from '../../../../../services/project-service/project.service';
 
 @Component({
   selector: 'state-bar-chart',
   templateUrl: './state-bar-chart.component.html',
   styleUrls: ['./state-bar-chart.component.scss']
 })
-export class StateBarChartComponent implements AfterViewInit {
+export class StateBarChartComponent implements OnInit, AfterViewInit {
   @ViewChild('chart')
   private _svgElement: ElementRef;
   svg;
@@ -43,6 +43,7 @@ export class StateBarChartComponent implements AfterViewInit {
   @Input()
   projectStream: BehaviorSubject<ProjectInfo>;
   projectStreamSub : Subscription;
+  treeConfigChangeSubjectSubscription: Subscription;
   project : ProjectInfo;
 
   // D3 Elements
@@ -59,8 +60,13 @@ export class StateBarChartComponent implements AfterViewInit {
     return this._kindNames;
   }
 
-  private _stateMap: { [kind: string]: { [attributeName: string]: { [stateName:
-    string]: Array<ItemProxy> } } } = {};
+  private _stateMap: {
+    [kind: string]: {
+      [attributeName: string]: {
+        [stateName:string]: Array<ItemProxy>
+      }
+    }
+  } = {};
   get stateMap() {
     return this._stateMap;
   }
@@ -93,7 +99,25 @@ export class StateBarChartComponent implements AfterViewInit {
     return Object;
   }
 
-  constructor(private dialogService : DialogService) {}
+  constructor(
+              private dialogService : DialogService,
+              private projectService: ProjectService
+  ) {}
+
+  public ngOnInit(): void {
+    this.treeConfigChangeSubjectSubscription = this.TreeConfiguration.getWorkingTree().getChangeSubject()
+    .subscribe((updatedItem) => {
+      let updatedProject = this.projectService.getProjectById(this.project.proxy.item.id);
+      if(updatedProject) {
+        // TODO: handle case for newly created and/or irrelevant items
+          // let updatedProxyID = updatedItem.proxy.item.id;
+          // if(this.project contains the updatedItem)...
+        this.project = updatedProject;
+      }
+
+      this.buildKindNames();
+    });
+  }
 
   public ngAfterViewInit(): void {
     this.svg = d3.select(this._svgElement.nativeElement);
@@ -102,35 +126,37 @@ export class StateBarChartComponent implements AfterViewInit {
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
-
-        for (let j: number = 0; j < this.project.projectItems.length; j++) {
-          this.project.projectItems[j].visitTree(undefined, (itemProxy:
-            ItemProxy) => {
-            if ((itemProxy.model.item.stateProperties.length > 0) && (this.
-              _kindNames.indexOf(itemProxy.kind) === -1)) {
-              this._kindNames.push(itemProxy.kind);
-            }
-          }, undefined);
-        }
-        this._kindNames.sort((oneKindName: string, anotherKindName: string) => {
-          return oneKindName.localeCompare(anotherKindName);
-        });
-
-        if (Object.keys(this._stateMap).length !== 0) {
-          this.kindSelectionToggled(this._kindNames, false);
-        }
-
-        this.kindSelectionToggled(this._kindNames, true);
+        this.buildKindNames();
       }
     });
+
   }
 
   public ngOnDestroy(): void {
     this.projectStreamSub.unsubscribe();
+    this.treeConfigChangeSubjectSubscription.unsubscribe();
   }
 
-  openStateSummaryDialog(proxies: Array<ItemProxy>, kindName: string,
-    stateName: string): void {
+  buildKindNames() {
+    for (let j: number = 0; j < this.project.projectItems.length; j++) {
+      this.project.projectItems[j].visitTree(undefined, (itemProxy: ItemProxy) => {
+        if ((itemProxy.model.item.stateProperties.length > 0) && (this._kindNames.indexOf(itemProxy.kind) === -1)) {
+          this._kindNames.push(itemProxy.kind);
+        }
+      }, undefined);
+    }
+    this._kindNames.sort((oneKindName: string, anotherKindName: string) => {
+      return oneKindName.localeCompare(anotherKindName);
+    });
+
+    if (Object.keys(this._stateMap).length !== 0) {
+      this.kindSelectionToggled(this._kindNames, false);
+    }
+
+    this.kindSelectionToggled(this._kindNames, true);
+  }
+
+  openStateSummaryDialog(proxies: Array<ItemProxy>, kindName: string, stateName: string): void {
     this.dialogService.openComponentDialog(StateSummaryDialogComponent, {
       data: {
         proxies : proxies,
@@ -143,24 +169,26 @@ export class StateBarChartComponent implements AfterViewInit {
     });
   }
 
-  updateGraph() {
+  async updateGraph() {
     /* Using d3's remove function did not remove all child nodes of the SVG
     element, possibly due to it using forward iteration instead of reverse
     iteration. Thus, the below removal approach has been used instead. */
-    for (let j: number = (this._svgElement.nativeElement.childNodes.length -
-      1); j >= 0; j--) {
-      this._svgElement.nativeElement.removeChild(this._svgElement.
-        nativeElement.childNodes[j]);
+    for (let j: number = (this._svgElement.nativeElement.childNodes.length - 1); j >= 0; j--) {
+      this._svgElement.nativeElement.removeChild(this._svgElement.nativeElement.childNodes[j]);
     }
 
     this.setScales();
 
+    let chartXTransformHeight = this._svgElement.nativeElement.clientHeight - StateBarChartComponent._X_AXIS_PADDING;
     this.xAxis = d3.axisBottom(this.xScale);
-    this.svg.append('g').attr('class','x-axis').attr('transform',
-      'translate(0,' + (this._svgElement.nativeElement.clientHeight -
-      StateBarChartComponent._X_AXIS_PADDING) + ')').call(this.xAxis).
-      selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr(
-      "dy", ".15em").attr("transform", function(d) {
+
+    // chart's rotated, x-axis state and attribute text
+    this.svg.append('g')
+    .attr('class','x-axis')
+    .attr('transform', 'translate(0,' + (chartXTransformHeight) + ')')
+    .call(this.xAxis)
+    .selectAll("text").style("text-anchor", "end")
+    .attr("dx", "-.8em").attr("dy", ".15em").attr("transform", function(d) {
       return "rotate(-65)"
     }).on('mouseover', (d: any) => {
       let attributeAndStateNames: Array<string> = d.split(': ');
@@ -169,50 +197,56 @@ export class StateBarChartComponent implements AfterViewInit {
         attributeName: attributeAndStateNames[0],
         stateName: attributeAndStateNames[1]
       };
+      // pushes the kind's name based on observed x-axis state a.k.a. attribute and attribute's name
+      // a.k.a. stateName to the selection's kindName for use in the state-summary dialog
       for (let kindName in this._stateMap) {
-        if (this._stateMap[kindName][attributeAndStateNames[0]] && this.
-          _stateMap[kindName][attributeAndStateNames[0]][
-          attributeAndStateNames[1]]) {
+        if (this._stateMap[kindName][attributeAndStateNames[0]] &&
+            this._stateMap[kindName][attributeAndStateNames[0]][attributeAndStateNames[1]]) {
           this._selection.kindNames.push(kindName);
         }
       }
     });
 
     this.yAxis = d3.axisLeft(this.yScale);
-    this.svg.append('g').attr('class', 'y-axis').attr('transform',
-      'translate(' + StateBarChartComponent._Y_AXIS_PADDING + ',' +
+    this.svg.append('g')
+    .attr('class', 'y-axis')
+    .attr('transform','translate(' + StateBarChartComponent._Y_AXIS_PADDING + ',' +
       -StateBarChartComponent._X_AXIS_PADDING + ')').call(this.yAxis);
 
     for (let kindName in this._stateMap) {
       let kindColor: string = TreeConfiguration.getWorkingTree().getModelProxyFor(kindName).view.item.color;
       for (let attributeName in this._stateMap[kindName]) {
         for (let stateName in this._stateMap[kindName][attributeName]) {
-          let proxies: Array<ItemProxy> = this._stateMap[kindName][
-            attributeName][stateName];
-          this.svg.append('rect').datum([proxies]).attr('fill', kindColor).
-            attr('x', this.xScale(attributeName + ': ' + stateName)).attr('y',
-            this.yScale(proxies.length) - StateBarChartComponent.
-            _X_AXIS_PADDING).attr('width', this.xScale.bandwidth()).attr(
-            'height', (this.yScale(0) - this.yScale(proxies.length))).on(
-            'mouseover', (d: any, i: number, nodes: Array<any>) => {
-            d3.select(nodes[i]).transition('hover').attr('fill', this.
-              lightenDarkenColor(kindColor, 70));
-            this._selection = {
-              kindNames: [kindName],
-              attributeName: attributeName,
-              stateName: stateName
-            };
+          let proxies: Array<ItemProxy> = this._stateMap[kindName][attributeName][stateName];
+
+          this.svg.append('rect').datum([proxies])
+            .attr('fill', kindColor)
+            .attr('x', this.xScale(attributeName + ': ' + stateName))
+            .attr('y',this.yScale(proxies.length) - StateBarChartComponent._X_AXIS_PADDING)
+            .attr('width', this.xScale.bandwidth())
+            .attr('height', (this.yScale(0) - this.yScale(proxies.length)))
+            .on('mouseover', (d: any, i: number, nodes: Array<any>) => {
+              d3.select(nodes[i]).transition('hover').attr('fill', this.lightenDarkenColor(kindColor, 70));
+              this._selection = {
+                kindNames: [kindName],
+                attributeName: attributeName,
+                stateName: stateName
+              };
           }).on('mouseout', (d: any, i: number, nodes: Array<any>) => {
-            d3.select(nodes[i]).transition('hoverOut').attr('fill', kindColor);
-            this._selection = undefined;
+              d3.select(nodes[i]).transition('hoverOut').attr('fill', kindColor);
+              this._selection = undefined;
           }).on('click', (d: any, i: any, nodes: Array<any>) => {
-            this.openStateSummaryDialog(proxies, kindName, stateName);
+              this.openStateSummaryDialog(proxies, kindName, stateName);
           });
         }
       }
     }
   }
 
+  /**
+   * sets the chart's x-axis labels and
+   * determines the max number of items to be displayed for the y-axis
+   */
   setScales () {
     let horizontalLabels: Array<string> = [];
     let maxItems: number = 0;
@@ -221,8 +255,7 @@ export class StateBarChartComponent implements AfterViewInit {
         for (let stateName in this._stateMap[kindName][attributeName]) {
           horizontalLabels.push(attributeName + ': ' + stateName);
 
-          let numberOfItems: number = this._stateMap[kindName][attributeName][
-            stateName].length;
+          let numberOfItems: number = this._stateMap[kindName][attributeName][stateName].length;
           if (numberOfItems > maxItems) {
             maxItems = numberOfItems;
           }
@@ -231,12 +264,13 @@ export class StateBarChartComponent implements AfterViewInit {
     }
 
     this.xScale = d3.scaleBand().domain(horizontalLabels).rangeRound([
-      StateBarChartComponent._Y_AXIS_PADDING, this._svgElement.nativeElement.
-      width.baseVal.value]).paddingInner(0.05);
+      StateBarChartComponent._Y_AXIS_PADDING,
+      this._svgElement.nativeElement.width.baseVal.value]).paddingInner(0.05);
 
-    this.yScale = d3.scaleLinear().domain([0, maxItems]).range([this.
-      _svgElement.nativeElement.clientHeight, StateBarChartComponent.
-      _X_AXIS_PADDING]);
+    this.yScale = d3.scaleLinear().domain([0, maxItems]).range([
+      this._svgElement.nativeElement.clientHeight,
+      StateBarChartComponent._X_AXIS_PADDING
+    ]);
   }
 
   // Move to service
@@ -265,7 +299,7 @@ export class StateBarChartComponent implements AfterViewInit {
     else if  ( g < 0 ) g = 0;
 
     return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
-}
+  }
 
   public toggleAllSelected(select: boolean): void {
     if (select) {
@@ -314,50 +348,47 @@ export class StateBarChartComponent implements AfterViewInit {
       delete this._stateMap[kindNames[kindIndex - 1]];
     }
 
-    for (let j: number = (moveUp ? (kindIndex + 1) : (kindIndex + 2)); j <
-      kindNames.length; j++) {
+    for (let j: number = (moveUp ? (kindIndex + 1) : (kindIndex + 2)); j < kindNames.length; j++) {
       intermediateMap[kindNames[j]] = this._stateMap[kindNames[j]];
       delete this._stateMap[kindNames[j]];
     }
 
     for (let intermediateKindName in intermediateMap) {
-      this._stateMap[intermediateKindName] = intermediateMap[
-        intermediateKindName];
+      this._stateMap[intermediateKindName] = intermediateMap[intermediateKindName];
     }
 
     this.updateGraph();
   }
 
-  public kindSelectionToggled(kindNames: Array<string>, selected: boolean):
-    void {
+  public async kindSelectionToggled(kindNames: Array<string>, selected: boolean): Promise<void> {
     if (selected) {
       for (let j: number = 0; j < this.project.projectItems.length; j++) {
-        this.project.projectItems[j].visitTree(undefined, (itemProxy:
-          ItemProxy) => {
+        this.project.projectItems[j].visitTree(undefined, (itemProxy: ItemProxy) => {
           if (kindNames.indexOf(itemProxy.kind) !== -1) {
             let kindMap: { [attributeName: string]: { [stateName: string]:
               Array<ItemProxy> } } = this._stateMap[itemProxy.kind];
             if (!kindMap) {
               kindMap = {};
+              // populates the statemap with the project's kind
+              // this is the first instance of population for the statemap
               this._stateMap[itemProxy.kind] = kindMap;
             }
 
-            let stateAttributeNames: Array<string> = itemProxy.model.item.
-              stateProperties;
+            let stateAttributeNames: Array<string> = itemProxy.model.item.stateProperties;
             for (let k: number = 0; k < stateAttributeNames.length; k++) {
-              let attributeMap: { [stateName: string]: Array<ItemProxy> } =
-                kindMap[stateAttributeNames[k]];
+              let attributeMap: { [stateName: string]: Array<ItemProxy> } = kindMap[stateAttributeNames[k]];
               if (!attributeMap) {
                 attributeMap = {};
+                // kindMap is populated with the (first) state attribute name
                 kindMap[stateAttributeNames[k]] = attributeMap;
                 for (let stateName in itemProxy.model.item.classProperties[
                   stateAttributeNames[k]].definition.properties.state) {
+                    // populates attributeMap with empty arrays corresponding to the current stateName
                   attributeMap[stateName] = [];
                 }
               }
 
-              let values: Array<ItemProxy> = attributeMap[itemProxy.item[
-                stateAttributeNames[k]]];
+              let values: Array<ItemProxy> = attributeMap[itemProxy.item[stateAttributeNames[k]]];
               if (!values) {
                 values = [];
                 attributeMap[itemProxy.item[stateAttributeNames[k]]] = values;
@@ -373,8 +404,7 @@ export class StateBarChartComponent implements AfterViewInit {
         for (let kindName in this._stateMap) {
           for (let attributeName in this._stateMap[kindName]) {
             for (let stateName in this._stateMap[kindName][attributeName]) {
-              if (this._stateMap[kindName][attributeName][stateName].length ===
-                0) {
+              if (this._stateMap[kindName][attributeName][stateName].length === 0) {
                 delete this._stateMap[kindName][attributeName][stateName];
               }
             }
@@ -387,22 +417,22 @@ export class StateBarChartComponent implements AfterViewInit {
       }
     }
 
-    this.updateGraph();
+    await this.updateGraph();
   }
 
   public getStateTotal(): number {
     let total: number = 0;
     for (let j: number = 0; j < this._selection.kindNames.length; j++) {
-      total += this._stateMap[this._selection.kindNames[j]][this._selection.
-        attributeName][this._selection.stateName].length;
+      total += this._stateMap[this._selection.kindNames[j]]
+        [this._selection.attributeName][this._selection.stateName].length;
     }
 
     return total;
   }
 
   public getStateDescription(kindName: string): string {
-    return TreeConfiguration.getWorkingTree().getProxyFor(kindName).item.
-      classProperties[this._selection.attributeName].definition.properties.
-      state[this._selection.stateName].description;
+    return TreeConfiguration.getWorkingTree()
+      .getProxyFor(kindName).item.classProperties[this._selection.attributeName]
+        .definition.properties.state[this._selection.stateName].description;
   }
 }
