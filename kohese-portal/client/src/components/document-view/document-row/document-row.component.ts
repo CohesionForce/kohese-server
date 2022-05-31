@@ -159,7 +159,7 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     if(row.docInfo.proxy.dirty === true) {
       this._itemRepository.upsertItem(row.docInfo.proxy.kind, row.docInfo.proxy.item).then((newProxy) => {
         row.docInfo.proxy = newProxy;
-        this.upsertComplete.next();
+        this.upsertComplete.next(true);
       });
     }
     row.editable = false;
