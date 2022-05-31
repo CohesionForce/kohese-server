@@ -16,11 +16,12 @@
 
 
 // Angular
-import { TestBed, ComponentFixture} from '@angular/core/testing';
+import { TestBed, ComponentFixture, fakeAsync} from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 // Other External Dependencies
 
@@ -28,6 +29,7 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations'
 import { NavigationService } from '../../services/navigation/navigation.service';
 import { SessionService } from '../../services/user/session.service';
 import { LensService } from '../../services/lens-service/lens.service';
+import { LogService } from '../../services/log/log.service';
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DialogService } from '../../services/dialog/dialog.service';
 import { AdminComponent } from './admin.component';
@@ -42,6 +44,7 @@ import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockSessionService } from '../../../mocks/services/MockSessionService';
 import { MockLensService } from '../../../mocks/services/MockLensService';
 import { MockCacheManager } from '../../../mocks/services/MockCacheManager';
+import { MockLogService } from '../../../mocks/services/MockLogService';
 
 describe('Component: Admin', () => {
   let adminComponent: AdminComponent;
@@ -66,7 +69,8 @@ describe('Component: Admin', () => {
         { provide: SessionService, useClass: MockSessionService },
         { provide: DialogService, useClass: MockDialogService },
         { provide: LensService, useClass: MockLensService },
-        { provide: CacheManager, useClass: MockCacheManager }
+        { provide: CacheManager, useClass: MockCacheManager },
+        { provide: LogService, useClass: MockLogService }
 
       ]
     }).compileComponents();
@@ -82,7 +86,7 @@ describe('Component: Admin', () => {
   });
 
   it('should instantiate the admin component', () => {
-   expect(AdminComponent).toBeTruthy();
+   expect(adminComponent).toBeTruthy();
   });
 
 });

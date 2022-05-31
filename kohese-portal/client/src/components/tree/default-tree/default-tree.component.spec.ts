@@ -38,12 +38,14 @@ import { ActionGroup } from '../tree-row/tree-row.component';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { Filter } from '../../filter/filter.class';
+import { LogService } from '../../../services/log/log.service';
 
 // Mocks
 import { MockItem } from '../../../../mocks/data/MockItem';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
+import { MockLogService } from '../../../../mocks/services/MockLogService';
 
 describe('Component: default-tree', () => {
   let component: DefaultTreeComponent;
@@ -68,6 +70,7 @@ describe('Component: default-tree', () => {
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: DialogService, useClass: MockDialogService },
         { provide: NavigationService, useClass: MockNavigationService },
+        { provide: LogService, useClass: MockLogService },
         DynamicTypesService
       ]
     }).compileComponents();

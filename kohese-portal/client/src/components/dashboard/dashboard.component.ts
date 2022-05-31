@@ -44,7 +44,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
   assignmentListStream : BehaviorSubject<Array<ItemProxy>> = new BehaviorSubject<Array<ItemProxy>>([]);
 
   /**Dashboard Initializations */
-  opened: boolean = false;
+  opened: boolean = true;
   selectedDashboard : DashboardSelectionInfo = {
     dashboard : null,
     dashboardType : null

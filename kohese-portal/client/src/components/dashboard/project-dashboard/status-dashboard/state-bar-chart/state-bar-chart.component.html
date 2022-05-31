@@ -15,6 +15,7 @@ limitations under the License.
 -->
 
 
+<!-- Filter Options -->
 <mat-expansion-panel>
   <mat-expansion-panel-header>
     Filter
@@ -100,9 +101,10 @@ limitations under the License.
         </h1>
         <h2>
           {{selection.stateName}}
-          <button mat-icon-button (click)="openStateSummaryDialog(stateMap[
-            kindName][selection.attributeName][selection.stateName], kindName,
-            selection.stateName)">
+          <button mat-icon-button
+            (click)="openStateSummaryDialog(
+              stateMap[kindName][selection.attributeName][selection.stateName],
+              kindName, selection.stateName)">
             <mat-icon class="fa fa-search"></mat-icon>
           </button>
         </h2>

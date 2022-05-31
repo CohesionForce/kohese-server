@@ -16,6 +16,7 @@
 
 
 const path = require('path');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -35,6 +36,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js' ]
   },
+  plugins: [ new NodePolyfillPlugin()],
   output: {
     filename: 'cache-bundle.js',
     path: path.resolve(__dirname, 'build/client/cache-worker')
