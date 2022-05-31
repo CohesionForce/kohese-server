@@ -63,6 +63,10 @@ limitations under the License.
         </button>
         <mat-menu #rowMenu="matMenu">
           <ng-template matMenuContent>
+            <button mat-menu-item (click)="addItem(docInfo.proxy)">
+              <mat-icon class="fa fa-plus"></mat-icon>
+              Add Child
+            </button>
             <button mat-menu-item
               (click)="navigationService.navigate('Explore', { id: docInfo.proxy.item.id })">
               <mat-icon class="fa fa-arrow-right"></mat-icon>

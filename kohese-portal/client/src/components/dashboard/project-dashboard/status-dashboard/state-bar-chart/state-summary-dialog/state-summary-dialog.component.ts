@@ -34,6 +34,7 @@ import { ItemProxy } from './../../../../../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../../../../../common/src/tree-configuration';
 import { FormatObjectEditorComponent } from '../../../../../object-editor/format-object-editor/format-object-editor.component';
 import { Hotkeys } from '../../../../../../services/hotkeys/hot-key.service';
+import { CreateWizardComponent } from '../../../../../create-wizard/create-wizard.component';
 
 @Component({
   selector: 'state-summary-dialog',
@@ -173,6 +174,14 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
 
   public getViewModel(itemProxy: ItemProxy): any {
     return itemProxy.model.view.item;
+  }
+
+  public addItem(proxy: ItemProxy) {
+    this._dialogService.openComponentDialog(CreateWizardComponent, {
+      data: {
+        parentId: proxy.item.id
+      }
+    }).updateSize('90%', '90%');
   }
 
   public save(itemProxy: ItemProxy): void {

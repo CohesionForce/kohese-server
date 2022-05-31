@@ -30,6 +30,7 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { ItemRepository } from '../../services/item-repository/item-repository.service';
 import { DashboardSelections, DashboardSelectionInfo, DashboardTypes } from './dashboard-selector/dashboard-selector.component';
 import { ProjectInfo, ProjectService } from '../../services/project-service/project.service';
+import { ActivatedRoute, Params } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,23 +46,26 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
   /**Dashboard Initializations */
   opened: boolean = true;
   selectedDashboard : DashboardSelectionInfo = {
-    dashboard : undefined,
-    dashboardType : undefined
+    dashboard : null,
+    dashboardType : null
   };
 
   selectedProject : ProjectInfo;
   initialized : boolean = false;
 
-  DashboardSelections : any = DashboardSelections;
+  DashboardSelections : DashboardSelections;
   DashboardTypes : any = DashboardTypes
 
-  dashboardSelectionStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(undefined);
+  dashboardSelectionStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(null);
 
   /**Subscriptions */
   treeConfigSubscription : Subscription;
   changeSubjectSubscription : Subscription;
+  paramSubscription: Subscription;
+  selectedProjectSubscription: Subscription;
 
   constructor(protected navigationService : NavigationService,
+              private router: ActivatedRoute,
               private projectService : ProjectService,
               private itemRepository : ItemRepository,
               private currentUserService : CurrentUserService,
@@ -87,6 +91,31 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
           }
         })
       }
+    });
+
+    this.paramSubscription = this.router.params.subscribe((params: Params) => {
+      if (params['project-id']) {
+        let project = this.projectService.getProjectById(params['project-id']);
+        if (project !== this.projectService.savedProject) {
+          // Update the project based on params if it is different
+          this.projectService.savedProject = project;
+          let projectTitle: string = this.projectService.savedProject.proxy.item.name;
+          this.title.setTitle('Project Dashboard | ' + projectTitle);
+          this.projectService.projectStream.next(project);
+          this.projectService.projectSelected.next(project);
+
+          let routedDashboardProjectSelection = {
+            dashboard: DashboardSelections.PROJECT_STATUS,
+            dashboardType: DashboardTypes.PROJECT
+          };
+          this.dashboardSelected(routedDashboardProjectSelection)
+        }
+      }
+    });
+
+    this.selectedProjectSubscription = this.projectService.projectSelected.subscribe((newProject) => {
+      this.selectedProject = newProject;
+      this.projectService.savedProject = this.selectedProject;
     });
   }
 
@@ -119,8 +148,4 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
     this.assignmentListStream.next(assignmentList);
   }
 
-  onProjectSelected(newProject : ProjectInfo) {
-    this.selectedProject = newProject;
-    this.projectService.savedProject = this.selectedProject;
-  }
 }
