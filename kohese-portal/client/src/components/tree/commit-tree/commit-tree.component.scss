@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
+ * Copyright (c) 2022 CohesionForce Inc | www.CohesionForce.com | info@CohesionForce.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,4 +15,19 @@
  */
 
 
-@import '../../../app.component';
+:host {
+  mat-progress-bar {
+    border-radius: 50px;
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 15em;
+
+    ::ng-deep .mat-progress-bar-fill::after {
+      background-color: #99c7b4;
+    }
+
+    ::ng-deep .mat-progress-bar-buffer {
+      background: #cff3ed;
+  }
+  }
+}
