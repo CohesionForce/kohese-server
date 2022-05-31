@@ -27,23 +27,21 @@ import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule } from "@angular/forms";
 
 @NgModule({
-  declarations: [
-    AppBarComponent,
-    SideBarComponent
-  ],
-  entryComponents: [
-  ],
-  imports : [
-    CommonModule,
-    MaterialModule,
-    ServicesModule,
-    UserModule,
-    BrowserModule,
-    FormsModule
-  ],
-  exports : [
-    AppBarComponent,
-    SideBarComponent
-  ]
+    declarations: [
+        AppBarComponent,
+        SideBarComponent
+    ],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        ServicesModule,
+        UserModule,
+        BrowserModule,
+        FormsModule
+    ],
+    exports: [
+        AppBarComponent,
+        SideBarComponent
+    ]
 })
 export class AppFrameModule {}

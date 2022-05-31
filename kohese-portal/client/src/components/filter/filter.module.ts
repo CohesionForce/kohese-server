@@ -25,17 +25,16 @@ import { TreeViewModule } from '../tree/tree.module';
 import { FilterComponent } from './filter.component';
 
 @NgModule({
-  declarations: [
-    FilterComponent
-  ],
-  entryComponents: [FilterComponent],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MaterialModule,
-    PipesModule,
-    TreeViewModule
-  ]
+    declarations: [
+        FilterComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MaterialModule,
+        PipesModule,
+        TreeViewModule
+    ]
 })
 export class FilterModule {
 }

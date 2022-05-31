@@ -44,32 +44,31 @@ import { Hotkeys } from './hotkeys/hot-key.service';
 import { InitializeLogs } from './item-repository/item-repository.registry'
 
 @NgModule({
-  declarations: [],
-  imports: [
-    RouterModule,
-    DialogModule
-  ],
-  exports : [],
-  entryComponents: [],
-  providers: [
-    CacheManager,
-    ItemRepository,
-    SessionService,
-    VersionControlService,
-    RepositoryService,
-    NavigationService,
-    AnalysisService,
-    DataProcessingService,
-    DialogService,
-    DynamicTypesService,
-    NotificationService,
-    StateService,
-    LensService,
-    ProjectService,
-    LogService,
-    Hotkeys,
-    ReportService
-  ]
+    declarations: [],
+    imports: [
+        RouterModule,
+        DialogModule
+    ],
+    exports: [],
+    providers: [
+        CacheManager,
+        ItemRepository,
+        SessionService,
+        VersionControlService,
+        RepositoryService,
+        NavigationService,
+        AnalysisService,
+        DataProcessingService,
+        DialogService,
+        DynamicTypesService,
+        NotificationService,
+        StateService,
+        LensService,
+        ProjectService,
+        LogService,
+        Hotkeys,
+        ReportService
+    ]
 })
 export class ServicesModule {
   public constructor() {

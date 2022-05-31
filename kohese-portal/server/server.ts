@@ -76,7 +76,7 @@ if (require.main === module) {
       console.log('::: Starting Kohese IO');
       var kio = require('./koheseIO');
       // eslint-disable-next-line no-unused-vars
-      var kioServer = kio.Server(appServer);
+      var kioServer = kio.Server(appServer, { maxHttpBufferSize: 1e8, pingTimeout: 30000 });
       // eslint-disable-next-line no-unused-vars
       var itemServer = require('./kio-itemServer');
 

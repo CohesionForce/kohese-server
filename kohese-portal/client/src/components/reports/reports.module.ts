@@ -28,21 +28,20 @@ import { ReportSpecificationComponent } from './report-specification/report-spec
 import { TreeViewModule } from '../tree/tree.module';
 
 @NgModule({
-  declarations: [
-    ReportsComponent,
-    ReportSpecificationComponent
-  ],
-  entryComponents: [ReportSpecificationComponent],
-  exports: [ReportsComponent],
-  imports: [
-    CommonModule,
-    FormsModule,
-    AngularSplitModule,
-    MarkdownModule.forChild(),
-    MaterialModule,
-    PipesModule,
-    TreeViewModule
-  ]
+    declarations: [
+        ReportsComponent,
+        ReportSpecificationComponent
+    ],
+    exports: [ReportsComponent],
+    imports: [
+        CommonModule,
+        FormsModule,
+        AngularSplitModule,
+        MarkdownModule.forChild(),
+        MaterialModule,
+        PipesModule,
+        TreeViewModule
+    ]
 })
 export class ReportsModule {
   public constructor() {

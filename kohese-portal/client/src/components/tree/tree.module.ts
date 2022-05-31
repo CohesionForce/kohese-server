@@ -39,39 +39,36 @@ import { DocumentTreeComponent } from "./document-tree/document-tree.component";
 import { TreeComponent } from './tree.component';
 
 @NgModule({
-  declarations: [
-    TreeRowComponent,
-    DefaultTreeComponent,
-    ReferenceTreeComponent,
-    VersionControlTreeComponent,
-    CommitTreeComponent,
-    DocumentTreeComponent,
-    FilterTreeComponent,
-    FilterTreeRowComponent,
-    TreeComponent
-  ],
-  entryComponents: [
-    TreeComponent
-  ],
-  imports : [
-    CommonModule,
-    DragDropModule,
-    MaterialModule,
-    ServicesModule,
-    BrowserModule,
-    FormsModule,
-    AngularSplitModule,
-    VirtualScrollModule,
-    PipesModule
-  ],
-  exports : [
-    DefaultTreeComponent,
-    ReferenceTreeComponent,
-    VersionControlTreeComponent,
-    CommitTreeComponent,
-    DocumentTreeComponent,
-    FilterTreeComponent,
-    TreeComponent
-  ]
+    declarations: [
+        TreeRowComponent,
+        DefaultTreeComponent,
+        ReferenceTreeComponent,
+        VersionControlTreeComponent,
+        CommitTreeComponent,
+        DocumentTreeComponent,
+        FilterTreeComponent,
+        FilterTreeRowComponent,
+        TreeComponent
+    ],
+    imports: [
+        CommonModule,
+        DragDropModule,
+        MaterialModule,
+        ServicesModule,
+        BrowserModule,
+        FormsModule,
+        AngularSplitModule,
+        VirtualScrollModule,
+        PipesModule
+    ],
+    exports: [
+        DefaultTreeComponent,
+        ReferenceTreeComponent,
+        VersionControlTreeComponent,
+        CommitTreeComponent,
+        DocumentTreeComponent,
+        FilterTreeComponent,
+        TreeComponent
+    ]
 })
 export class TreeViewModule {}

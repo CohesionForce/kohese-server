@@ -34,30 +34,26 @@ import { PipesModule } from "../../pipes/pipes.module";
 
 
 @NgModule({
-  declarations: [
-    CommitBrowserComponent,
-    HistoryLensComponent,
-    LensComponent
-
-  ],
-  entryComponents: [
-    CommitBrowserComponent
-  ],
-  imports : [
-    CommonModule,
-    MaterialModule,
-    ServicesModule,
-    BrowserModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AngularSplitModule,
-    TreeViewModule,
-    DetailsModule,
-    PipesModule
-  ],
-  exports : [
-    LensComponent,
-    CommitBrowserComponent
-  ]
+    declarations: [
+        CommitBrowserComponent,
+        HistoryLensComponent,
+        LensComponent
+    ],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        ServicesModule,
+        BrowserModule,
+        FormsModule,
+        ReactiveFormsModule,
+        AngularSplitModule,
+        TreeViewModule,
+        DetailsModule,
+        PipesModule
+    ],
+    exports: [
+        LensComponent,
+        CommitBrowserComponent
+    ]
 })
 export class LensModule {}

@@ -19,11 +19,11 @@
  * Created by josh on 9/8/15.
  */
 module.exports = function (app) {
-    var jwt = require('jsonwebtoken');
+    var jwtToken = require('jsonwebtoken');
     var jwtSecret;
-    var expressJwt = require('express-jwt');
+    var { expressjwt: jwt } = require("express-jwt");
     var express = require('express');
-    var RateLimit = require('express-rate-limit');
+    var rateLimit = require('express-rate-limit');
     var path = require('path');
     var bodyParser = require('body-parser');
     var util = require('util');
@@ -68,7 +68,7 @@ module.exports = function (app) {
     ];
 
     // set up rate limiter: safe maximum of requests per minute
-    var limiter = new RateLimit({
+    var limiter = rateLimit({
       windowMs: 1*60*1000, // 1 minute
       max: 20
     });
@@ -114,7 +114,7 @@ module.exports = function (app) {
           }
 
           console.log('::: Authenticated: ' + user.name + ' - ' + user.description);
-          var token = jwt.sign({
+          var token = jwtToken.sign({
             username: req.body.username
           }, jwtSecret);
           res.send(token);
@@ -142,13 +142,13 @@ module.exports = function (app) {
       next();
     });
 
-    app.use(expressJwt({
+    app.use(jwt({
       secret: jwtSecret,
-      algorithms: ['RS256', 'HS256'],
+      algorithms: ['HS256'],
     }).unless({path: ngRoutes}) );
 
     function decodeAuthToken(authToken){
-      var decodedToken = jwt.verify(authToken, jwtSecret);
+      var decodedToken = jwtToken.verify(authToken, jwtSecret);
       return decodedToken;
     }
     module.exports.decodeAuthToken = decodeAuthToken;
@@ -158,7 +158,7 @@ module.exports = function (app) {
 
       if (authHeader) {
         var header = authHeader.replace('Bearer ', '');
-        req.headers.koheseUser = jwt.verify(header, jwtSecret);
+        req.headers.koheseUser = jwtToken.verify(header, jwtSecret);
       } else {
         console.log('*** Authorization header is missing');
       }

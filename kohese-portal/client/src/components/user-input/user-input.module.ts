@@ -42,52 +42,47 @@ import { KdProxySelectorComponent } from './k-proxy-selector/kd-proxy-selector/k
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  declarations: [
-    KTextComponent,
-    KProxySelectorComponent,
-    KdProxySelectorComponent,
-    KUserSelectorComponent,
-    KDateComponent,
-    KSelectComponent,
-    KStateEditorComponent,
-    KMarkdownComponent,
-    MarkdownCheatSheetComponent,
-    ProxySelectorComponent,
-    ProxySelectorDialogComponent,
-    KdMarkdownComponent,
-    KTableComponent,
-    ProxyTableComponent,
-    ExpandedRowColumnComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    MarkdownModule.forChild(),
-    TreeModule,
-    PipesModule,
-    BrowserAnimationsModule
-  ],
-  exports: [
-    KTextComponent,
-    KProxySelectorComponent,
-    KUserSelectorComponent,
-    KDateComponent,
-    KSelectComponent,
-    KStateEditorComponent,
-    KMarkdownComponent,
-    ProxySelectorComponent,
-    KdProxySelectorComponent,
-    KdMarkdownComponent,
-    KTableComponent,
-    ProxyTableComponent,
-    ExpandedRowColumnComponent
-  ],
-  entryComponents: [
-    MarkdownCheatSheetComponent,
-    ProxySelectorDialogComponent,
-    ProxyTableComponent
-  ]
+    declarations: [
+        KTextComponent,
+        KProxySelectorComponent,
+        KdProxySelectorComponent,
+        KUserSelectorComponent,
+        KDateComponent,
+        KSelectComponent,
+        KStateEditorComponent,
+        KMarkdownComponent,
+        MarkdownCheatSheetComponent,
+        ProxySelectorComponent,
+        ProxySelectorDialogComponent,
+        KdMarkdownComponent,
+        KTableComponent,
+        ProxyTableComponent,
+        ExpandedRowColumnComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        MarkdownModule.forChild(),
+        TreeModule,
+        PipesModule,
+        BrowserAnimationsModule
+    ],
+    exports: [
+        KTextComponent,
+        KProxySelectorComponent,
+        KUserSelectorComponent,
+        KDateComponent,
+        KSelectComponent,
+        KStateEditorComponent,
+        KMarkdownComponent,
+        ProxySelectorComponent,
+        KdProxySelectorComponent,
+        KdMarkdownComponent,
+        KTableComponent,
+        ProxyTableComponent,
+        ExpandedRowColumnComponent
+    ]
 })
 export class UserInputModule {}

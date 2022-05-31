@@ -33,26 +33,23 @@ import { AngularSplitModule } from 'angular-split';
 import { TreeViewModule } from '../tree/tree.module';
 
 @NgModule({
-  declarations: [
-    TypeEditorComponent,
-    AttributeEditorComponent,
-    DataModelEditorComponent,
-    ViewModelEditorComponent
-  ],
-  entryComponents: [
-    AttributeEditorComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MaterialModule,
-    PipesModule,
-    AngularSplitModule,
-    StateMachineEditorModule,
-    FormatModule,
-    ObjectEditorModule,
-    TreeViewModule
-  ]
+    declarations: [
+        TypeEditorComponent,
+        AttributeEditorComponent,
+        DataModelEditorComponent,
+        ViewModelEditorComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MaterialModule,
+        PipesModule,
+        AngularSplitModule,
+        StateMachineEditorModule,
+        FormatModule,
+        ObjectEditorModule,
+        TreeViewModule
+    ]
 })
 export class TypeEditorModule {
 }

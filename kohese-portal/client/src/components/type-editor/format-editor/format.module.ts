@@ -28,28 +28,23 @@ import { TableEditorComponent } from './table-editor/table-editor.component';
 import { TablePreviewDialogComponent } from './table-editor/table-preview-dialog/table-preview-dialog.component';
 
 @NgModule({
-  declarations: [
-    ContainerSelectorComponent,
-    FormatPreviewComponent,
-    TableEditorComponent,
-    TablePreviewDialogComponent
-  ],
-  entryComponents: [
-    ContainerSelectorComponent,
-    FormatPreviewComponent,
-    TablePreviewDialogComponent
-  ],
-  exports : [
-    TableEditorComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MaterialModule,
-    PipesModule,
-    UserInputModule,
-    DocumentViewModule
-  ]
+    declarations: [
+        ContainerSelectorComponent,
+        FormatPreviewComponent,
+        TableEditorComponent,
+        TablePreviewDialogComponent
+    ],
+    exports: [
+        TableEditorComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MaterialModule,
+        PipesModule,
+        UserInputModule,
+        DocumentViewModule
+    ]
 })
 export class FormatModule {
 

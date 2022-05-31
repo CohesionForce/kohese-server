@@ -17,7 +17,6 @@
 
 import { HighlightPipe } from './highlight.pipe';
 import { MapKeyPipe } from './map-key.pipe';
-import { SanitizeHtmlPipe } from './sanitizeHtml.pipe';
 import { TruncatePipe } from './truncate.pipe';
 
 import { BrowserModule, DomSanitizer } from '@angular/platform-browser';
@@ -61,11 +60,6 @@ describe ('Pipes:', ()=>{
         })
     })
 
-    it('is instantiated', inject([DomSanitizer], (sanitizer : DomSanitizer)=>{
-      let pipe = new SanitizeHtmlPipe(sanitizer);
-      console.log(pipe);
-      expect(pipe).toBeTruthy();
-      }))
   })
   describe('Truncate Pipe', ()=>{
     let pipe : TruncatePipe;
