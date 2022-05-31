@@ -38,6 +38,7 @@ import { FormatObjectEditorComponent } from '../../object-editor/format-object-e
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { SessionService } from '../../../services/user/session.service';
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
+import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 
 @Component({
   selector: 'document-row',
@@ -153,6 +154,14 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     this.viewInitialized.emit(this.element);
+  }
+
+  public addItem(proxy: ItemProxy) {
+    this._dialogService.openComponentDialog(CreateWizardComponent, {
+      data: {
+        parentId: proxy.item.id
+      }
+    }).updateSize('90%', '90%');
   }
 
   save(row: any) {
