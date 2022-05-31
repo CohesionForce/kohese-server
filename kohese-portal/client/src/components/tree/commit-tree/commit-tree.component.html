@@ -32,13 +32,18 @@ limitations under the License.
     <div class="kt-head kth-cell">
       Descendants
     </div>
-    <div class="kt-body" id=descendants-tree>
-      <virtual-scroll #tree [items]="visibleRows">
-        <tree-row *ngFor="let row of tree.viewPortItems"
-          [treeRow]="row" [rowActions]="rowActions"
-          [menuActions]="menuActions" [images]="images">
-        </tree-row>
-      </virtual-scroll>
-    </div>
+    <ng-container *ngIf="processingComplete else processing">
+      <div class="kt-body" id=descendants-tree>
+        <virtual-scroll #tree [items]="visibleRows">
+          <tree-row *ngFor="let row of tree.viewPortItems"
+            [treeRow]="row" [rowActions]="rowActions"
+            [menuActions]="menuActions" [images]="images">
+          </tree-row>
+        </virtual-scroll>
+      </div>
+    </ng-container>
+    <ng-template #processing>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </ng-template>
   </div>
 </div>

@@ -255,16 +255,16 @@ export class JournalComponent implements OnDestroy {
     });
   }
 
-  public save(itemProxy: ItemProxy): void {
-    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
+  public async save(itemProxy: ItemProxy): Promise<void> {
+    await this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
       (returnedItemProxy: ItemProxy) => {
       this._changeDetectorRef.markForCheck();
     });
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
   }
 
-  public saveAndContinueEditing(itemProxy: ItemProxy): void {
-    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
+  public async saveAndContinueEditing(itemProxy: ItemProxy): Promise<void> {
+    await this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item).then(
       (returnedItemProxy: ItemProxy) => {
       this._changeDetectorRef.markForCheck();
     });
@@ -277,7 +277,7 @@ export class JournalComponent implements OnDestroy {
         return;
       }
       if (response === true) {
-        this._itemRepository.fetchItem(itemProxy);
+        await this._itemRepository.fetchItem(itemProxy);
         this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
         this._changeDetectorRef.markForCheck();
       }
