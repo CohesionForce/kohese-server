@@ -38,6 +38,7 @@ import { FormatObjectEditorComponent } from '../../object-editor/format-object-e
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
 import { SessionService } from '../../../services/user/session.service';
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
+import { CreateWizardComponent } from '../../create-wizard/create-wizard.component';
 
 @Component({
   selector: 'document-row',
@@ -155,11 +156,19 @@ export class DocumentRowComponent implements OnInit, OnDestroy, AfterViewInit {
     this.viewInitialized.emit(this.element);
   }
 
+  public addItem(proxy: ItemProxy) {
+    this._dialogService.openComponentDialog(CreateWizardComponent, {
+      data: {
+        parentId: proxy.item.id
+      }
+    }).updateSize('90%', '90%');
+  }
+
   save(row: any) {
     if(row.docInfo.proxy.dirty === true) {
       this._itemRepository.upsertItem(row.docInfo.proxy.kind, row.docInfo.proxy.item).then((newProxy) => {
         row.docInfo.proxy = newProxy;
-        this.upsertComplete.next();
+        this.upsertComplete.next(true);
       });
     }
     row.editable = false;

@@ -25,7 +25,6 @@ import { MaterialModule } from '../../material.module';
 import { PipesModule } from '../../pipes/pipes.module';
 import { MarkdownEditorModule } from '../markdown-editor/markdown-editor.module';
 import { TreeViewModule } from '../tree/tree.module';
-import { DocumentConfigurationEditorComponent } from './document-configuration/document-configuration-editor.component';
 import { FormatObjectEditorComponent } from './format-object-editor/format-object-editor.component';
 import { FormatDefinitionEditorComponent } from './format-definition-editor/format-definition-editor.component';
 import { TableModule } from '../table/table.module';
@@ -35,7 +34,6 @@ import { NamespaceEditorComponent } from './namespace-editor/namespace-editor.co
 
 @NgModule({
   declarations: [
-    DocumentConfigurationEditorComponent,
     FormatObjectEditorComponent,
     MultivaluedFieldComponent,
     SinglevaluedFieldComponent,
@@ -44,7 +42,6 @@ import { NamespaceEditorComponent } from './namespace-editor/namespace-editor.co
   ],
   entryComponents: [
     FormatObjectEditorComponent,
-    DocumentConfigurationEditorComponent,
     NamespaceEditorComponent
   ],
   imports: [

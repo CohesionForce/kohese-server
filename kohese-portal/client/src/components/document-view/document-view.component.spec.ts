@@ -38,12 +38,14 @@ import { DynamicTypesService } from '../../services/dynamic-types/dynamic-types.
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { AnalysisViews } from '../analysis/AnalysisViewComponent.class';
+import { LogService } from '../../services/log/log.service';
 
 // Mocks
 import { MockItem } from '../../../mocks/data/MockItem';
 import { MockDialogService } from '../../../mocks/services/MockDialogService';
 import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { MockNavigationService } from '../../../mocks/services/MockNavigationService';
+import { MockLogService } from '../../../mocks/services/MockLogService';
 
 
 describe('Component: Document View', ()=>{
@@ -65,6 +67,7 @@ describe('Component: Document View', ()=>{
         {provide: NavigationService, useClass: MockNavigationService},
         {provide: ItemRepository, useClass: MockItemRepository},
         {provide: DialogService, useClass: MockDialogService},
+        {provide: LogService, useClass: MockLogService},
         DynamicTypesService
       ]
     }).compileComponents();

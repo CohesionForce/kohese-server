@@ -42,39 +42,36 @@ import { ObjectEditorModule } from '../object-editor/object-editor.module';
 import { DirectivesModule } from '../../directives/directives.module';
 
 @NgModule({
-  declarations: [
-    DetailsComponent,
-    HistoryTabComponent,
-    ReferencesTabComponent,
-    ReferenceTableComponent,
-    ChildrenTabComponent,
-    ChildrenTableComponent,
-    JournalComponent
-  ],
-  entryComponents: [
-    DetailsComponent
-  ],
-  imports : [
-    CommonModule,
-    MaterialModule,
-    DocumentViewModule,
-    ActionTableModule,
-    FormsModule,
-    ReactiveFormsModule,
-    PipesModule,
-    UserInputModule,
-    TreeModule,
-    MarkdownModule,
-    CompareItemsModule,
-    TreeViewModule,
-    MarkdownEditorModule,
-    ObjectEditorModule,
-    DirectivesModule
-  ],
-  exports : [
-    DetailsComponent,
-    HistoryTabComponent,
-    ChildrenTabComponent,
-  ]
+    declarations: [
+        DetailsComponent,
+        HistoryTabComponent,
+        ReferencesTabComponent,
+        ReferenceTableComponent,
+        ChildrenTabComponent,
+        ChildrenTableComponent,
+        JournalComponent
+    ],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        DocumentViewModule,
+        ActionTableModule,
+        FormsModule,
+        ReactiveFormsModule,
+        PipesModule,
+        UserInputModule,
+        TreeModule,
+        MarkdownModule,
+        CompareItemsModule,
+        TreeViewModule,
+        MarkdownEditorModule,
+        ObjectEditorModule,
+        DirectivesModule
+    ],
+    exports: [
+        DetailsComponent,
+        HistoryTabComponent,
+        ChildrenTabComponent,
+    ]
 })
 export class DetailsModule {}

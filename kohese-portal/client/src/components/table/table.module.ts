@@ -23,14 +23,13 @@ import { MaterialModule } from '../../material.module';
 import { TableComponent } from './table.component';
 
 @NgModule({
-  declarations: [TableComponent],
-  entryComponents: [TableComponent],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MaterialModule
-  ],
-  exports: [TableComponent]
+    declarations: [TableComponent],
+    imports: [
+        CommonModule,
+        FormsModule,
+        MaterialModule
+    ],
+    exports: [TableComponent]
 })
 export class TableModule {
   public constructor() {

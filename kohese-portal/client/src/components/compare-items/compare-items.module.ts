@@ -30,29 +30,25 @@ import { ChangeSummaryComponent } from './change-summary/change-summary.componen
 import { ComparisonComponent } from './comparison.component';
 
 @NgModule({
-  declarations: [
-    CompareItemsComponent,
-    CommitComparisonComponent,
-    ChangeSummaryComponent,
-    ComparisonComponent
-  ],
-  entryComponents: [
-    CompareItemsComponent,
-    CommitComparisonComponent
-  ],
-  exports: [
-    ChangeSummaryComponent,
-    ComparisonComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    AngularSplitModule,
-    VirtualScrollModule,
-    MaterialModule,
-    PipesModule,
-    UserInputModule
-  ]
+    declarations: [
+        CompareItemsComponent,
+        CommitComparisonComponent,
+        ChangeSummaryComponent,
+        ComparisonComponent
+    ],
+    exports: [
+        ChangeSummaryComponent,
+        ComparisonComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        AngularSplitModule,
+        VirtualScrollModule,
+        MaterialModule,
+        PipesModule,
+        UserInputModule
+    ]
 })
 export class CompareItemsModule {
 }

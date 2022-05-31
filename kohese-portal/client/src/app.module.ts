@@ -48,7 +48,6 @@ import { TreeViewModule } from './components/tree/tree.module'
 import { VersionsModule } from './components/versions/versions.module';
 import { ReportsModule } from './components/reports/reports.module';
 import { ImportModule } from './components/import/import.module';
-import { CopyModule } from './components/copy/copy.module';
 
 import { ToastrModule } from 'ngx-toastr';
 import { AngularSplitModule } from 'angular-split';
@@ -72,29 +71,7 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     BrowserAnimationsModule,
     ServiceWorkerModule.register('/ngsw-worker.js', {enabled : true}),
     ToastrModule.forRoot(),
-    MarkdownModule.forRoot({
-      sanitize: SecurityContext.NONE,
-      markedOptions: {
-        provide: MarkedOptions,
-        useFactory: () => {
-          let markedRenderer: MarkedRenderer = new MarkedRenderer();
-          markedRenderer.image = (href: string, title: string, text:
-            string) => {
-            let imageHtml: string = new MarkedRenderer().image(href, title,
-              text);
-            imageHtml = imageHtml.substring(0, 5) +
-              'style="max-height: 100%; max-width: 100%;" ' + imageHtml.
-              substring(5);
-
-            return imageHtml;
-          };
-
-          let markedOptions: MarkedOptions = new MarkedOptions();
-          markedOptions.renderer = markedRenderer;
-          return markedOptions;
-        }
-      }
-    }),
+    MarkdownModule.forRoot(),
     InfiniteScrollModule,
     PipesModule,
     MaterialModule,
@@ -123,7 +100,6 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     LensModule,
     ReportsModule,
     ImportModule,
-    CopyModule,
     ItemBoardModule
   ],
   bootstrap: [AppComponent]
