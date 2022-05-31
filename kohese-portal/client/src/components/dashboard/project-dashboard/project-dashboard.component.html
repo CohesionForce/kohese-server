@@ -31,16 +31,16 @@ limitations under the License.
 </div>
 
 <div class=project-dashboard-wrapper>
-  <ng-container *ngIf="(projectStream | async)">
+  <ng-container *ngIf="(this.projectService.projectStream | async)">
     <ng-container [ngSwitch]="dashboardSelection">
       <ng-container *ngSwitchCase="DashboardSelections.PROJECT_OVERVIEW">
-        <project-overview [projectStream]="projectStream"></project-overview>
+        <project-overview [projectStream]="this.projectService.projectStream"></project-overview>
       </ng-container>
       <ng-container *ngSwitchCase="DashboardSelections.USER_STATISTICS">
-        <user-statistics [projectStream]="projectStream"></user-statistics>
+        <user-statistics [projectStream]="this.projectService.projectStream"></user-statistics>
       </ng-container>
       <ng-container *ngSwitchCase="DashboardSelections.PROJECT_STATUS">
-        <status-dashboard [projectStream]="projectStream"></status-dashboard>
+        <status-dashboard [projectStream]="this.projectService.projectStream"></status-dashboard>
       </ng-container>
     </ng-container>
   </ng-container>

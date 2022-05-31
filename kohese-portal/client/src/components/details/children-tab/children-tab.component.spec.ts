@@ -29,10 +29,12 @@ import { MaterialModule } from '../../../material.module';
 import { ChildrenTabComponent } from './children-tab.component';
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
+import { ItemRepository } from '../../../services/item-repository/item-repository.service';
 
 // Mocks
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { MockItem } from '../../../../mocks/data/MockItem';
+import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 
 describe('Component: Children Tab', ()=>{
   let childrenTabComponent: ChildrenTabComponent;
@@ -51,7 +53,8 @@ describe('Component: Children Tab', ()=>{
          ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {provide: NavigationService, useClass: MockNavigationService}
+        { provide: NavigationService, useClass: MockNavigationService },
+        { provide: ItemRepository, useClass: MockItemRepository }
       ]
     }).compileComponents();
 

@@ -30,12 +30,14 @@ import { ProxySelectorComponent } from './proxy-selector.component';
 import { ItemProxy } from '../../../../../../common/src/item-proxy';
 import { ItemRepository } from '../../../../services/item-repository/item-repository.service';
 import { PipesModule } from '../../../../pipes/pipes.module';
+import { LogService } from '../../../../services/log/log.service';
 
 // Mocks
 import { MockItem } from '../../../../../mocks/data/MockItem';
 import { MockItemRepository } from '../../../../../mocks/services/MockItemRepository';
+import { MockLogService } from '../../../../../mocks/services/MockLogService';
 
-describe('Component: Parent Selector', ()=>{
+describe('Component: Proxy Selector', ()=>{
   let proxySelectorComponent: ProxySelectorComponent;
   let proxySelectorFixture : ComponentFixture<ProxySelectorComponent>;
 
@@ -52,6 +54,7 @@ describe('Component: Parent Selector', ()=>{
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {provide: ItemRepository, useClass: MockItemRepository},
+        { provide: LogService, useClass: MockLogService }
       ]
     }).compileComponents();
 
