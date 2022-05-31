@@ -49,14 +49,10 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
   @Input()
   savedProject: ProjectInfo;
   project: ProjectInfo;
-  projectStream: BehaviorSubject<ProjectInfo>;
 
   treeConfigSubscription: Subscription;
   proxyChangeSubscription : Subscription;
   paramSubscription: Subscription;
-
-  @Output()
-  projectSelected: EventEmitter<ProjectInfo> = new EventEmitter<ProjectInfo>();
 
   constructor(
     private dialogService: DialogService,
@@ -70,7 +66,6 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
     }
 
   ngOnInit() {
-    this.projectStream = new BehaviorSubject<ProjectInfo>(undefined);
 
     this.dashboardSelectionSub =
       this.dashboardSelectionStream.subscribe((dashboard) => {
@@ -106,7 +101,7 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
       this.project = this.savedProject;
       let projectName: string = this.project.proxy.item.name;
       this.title.setTitle('Project Dashboard | ' + projectName);
-      this.projectStream.next(this.project);
+      this.projectService.projectStream.next(this.project);
     }
 
     this.navigationService.navigate('Dashboard', {
@@ -121,8 +116,8 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
           this.project = project;
           let projectTitle: string = this.project.proxy.item.name;
           this.title.setTitle('Project Dashboard | ' + projectTitle);
-          this.projectStream.next(this.project);
-          this.projectSelected.emit(this.project);
+          this.projectService.projectStream.next(this.project);
+          this.projectService.projectSelected.next(this.project);
           this.navigationService.navigate('Dashboard', {
             'project-id': (this.project.proxy ? this.project.proxy.item.id : '')
           });
@@ -148,8 +143,8 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
           this.project = selection;
           let projectTitle: string = this.project.proxy.item.name;
           this.title.setTitle('Project Dashboard | ' + projectTitle);
-          this.projectStream.next(this.project);
-          this.projectSelected.emit(this.project);
+          this.projectService.projectStream.next(this.project);
+          this.projectService.projectSelected.next(this.project);
           this.navigationService.navigate('Dashboard', {
             'project-id': (this.project.proxy ? this.project.proxy.item.id : '')
           });

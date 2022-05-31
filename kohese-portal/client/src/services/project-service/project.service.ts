@@ -17,7 +17,7 @@
 
 // Angular
 import { Injectable } from "@angular/core";
-import { Subscription } from "rxjs";
+import { BehaviorSubject, Subscription } from "rxjs";
 
 // Other External Dependencies
 
@@ -46,46 +46,46 @@ export class ProjectService {
 
   treeConfigSubscription: Subscription;
   proxyChangeSubscription: Subscription;
-
+  projectStream: BehaviorSubject<ProjectInfo> = new BehaviorSubject<ProjectInfo>(null);
+  projectSelected: BehaviorSubject<ProjectInfo> = new BehaviorSubject<ProjectInfo>(null);
 
   constructor(private itemRepository: ItemRepository) {
     this.initService();
   }
 
   initService() {
-    this.treeConfigSubscription =
-      this.itemRepository.getTreeConfig().subscribe((newConfig) => {
-        if (newConfig) {
+    this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
+      if (newConfig) {
 
-          this.currentConfig = newConfig.config;
+        this.currentConfig = newConfig.config;
 
-          if (!this.workingConfigLoaded) {
-            this.workingConfig = TreeConfiguration.getWorkingTree();
-            this.workingProjects = this.generateProjectInfo(this.workingConfig.getAllItemProxies())
-          }
-
-          let currentTree = this.currentConfig.getAllItemProxies();
-          let rootProxy = this.currentConfig.getRootProxy();
-          let changeSubject = this.currentConfig.getChangeSubject();
-
-          // Change Notification
-          if (this.proxyChangeSubscription) {
-            this.proxyChangeSubscription.unsubscribe();
-          }
-
-          this.proxyChangeSubscription = changeSubject.subscribe((notification) => {
-            if (notification.proxy) {
-              // TODO Update the Project info in the generated list
-              if (notification.proxy.kind === 'Project') {
-                this.projects = this.generateProjectInfo(this.currentConfig.getAllItemProxies());
-              }
-            }
-          })
-
-          // Generate Project Info
-          this.projects = this.generateProjectInfo(currentTree);
+        if (!this.workingConfigLoaded) {
+          this.workingConfig = TreeConfiguration.getWorkingTree();
+          this.workingProjects = this.generateProjectInfo(this.workingConfig.getAllItemProxies())
         }
-      })
+
+        let currentTree = this.currentConfig.getAllItemProxies();
+        let rootProxy = this.currentConfig.getRootProxy();
+        let changeSubject = this.currentConfig.getChangeSubject();
+
+        // Change Notification
+        if (this.proxyChangeSubscription) {
+          this.proxyChangeSubscription.unsubscribe();
+        }
+
+        this.proxyChangeSubscription = changeSubject.subscribe((notification) => {
+          if (notification.proxy) {
+            // TODO Update the Project info in the generated list
+            if (notification.proxy.kind === 'Project') {
+              this.projects = this.generateProjectInfo(this.currentConfig.getAllItemProxies());
+            }
+          }
+        })
+
+        // Generate Project Info
+        this.projects = this.generateProjectInfo(currentTree);
+      }
+      });
   }
 
   getProjects(): Array<ProjectInfo> {

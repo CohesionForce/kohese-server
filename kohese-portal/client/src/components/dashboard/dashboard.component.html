@@ -19,16 +19,12 @@ limitations under the License.
 <div class=dashboard-wrapper>
 
   <mat-sidenav-container>
-
     <mat-sidenav mode=side [opened]=opened>
-
       <dashboard-selector
         [user]=currentUser
         (dashboardSelected)=dashboardSelected($event)>
       </dashboard-selector>
-
     </mat-sidenav>
-
     <mat-sidenav-content>
 
       <div class=sidenav-toggle>
@@ -49,7 +45,6 @@ limitations under the License.
           <ng-container *ngSwitchCase="DashboardTypes.PROJECT">
             <project-dashboard
               [dashboardSelectionStream]="dashboardSelectionStream"
-              (projectSelected)="onProjectSelected($event)"
               [savedProject]="selectedProject">
             </project-dashboard>
           </ng-container>
