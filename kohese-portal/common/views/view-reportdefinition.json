@@ -6,7 +6,7 @@
     "id": "com.kohese"
   },
   "modelName": "ReportDefinition",
-  "icon": "",
+  "icon": "fa fa-sort-amount-asc",
   "color": "#000000",
   "localTypes": {},
   "viewProperties": {},
