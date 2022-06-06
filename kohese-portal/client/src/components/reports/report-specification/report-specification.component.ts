@@ -233,8 +233,7 @@ export class ReportSpecificationComponent {
   private async _produceReport(): Promise<void> {
     this._notificationService.addNotifications('PROCESSING: ' +
       'Export Report ' + this._reportSpecifications.name);
-    let initialReportContent: string = 'Name: ' + this._reportSpecifications.
-      name + '\n\nProduced by: ' + this._sessionService.user.name +
+    let initialReportContent: string = 'Produced by: ' + this._sessionService.user.name +
       '\n\nProduced on: ' + new Date() + '\n\n';
     await this._itemRepository.produceReport(this._getReportContent(
       initialReportContent, this._reportSpecifications), this.
