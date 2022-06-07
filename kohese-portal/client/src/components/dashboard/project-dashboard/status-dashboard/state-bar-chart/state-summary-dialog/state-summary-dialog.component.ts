@@ -184,13 +184,20 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
     }).updateSize('90%', '90%');
   }
 
-  public save(itemProxy: ItemProxy): void {
-    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+  public async save(itemProxy: ItemProxy): Promise<void> {
+    await this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
+
+    if(itemProxy.state !== this.stateName) {
+      for(let i=0; i < this.proxies.length; i++) {
+        this.proxies.splice(i, 1);
+        this.changeRef.detectChanges();
+      }
+    }
   }
 
-  public saveAndContinueEditing(itemProxy: ItemProxy): void {
-    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+  public async saveAndContinueEditing(itemProxy: ItemProxy): Promise<void> {
+    await this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
   }
 
   public async discardChanges(itemProxy: ItemProxy): Promise<void> {
