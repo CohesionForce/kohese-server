@@ -315,28 +315,29 @@ export class UserStatisticsComponent extends NavigatableComponent
         '<table>\n' +
         '  <thead>\n' +
         '    <tr>\n' +
-        '      <th>Id</th>\n' +
+        '      <th>Assigned To</th>\n' +
         '      <th>Name</th>\n' +
         '      <th>Kind</th>\n' +
         '      <th>State</th>\n' +
-        '      <th>Assigned To</th>\n' +
+        '      <th>Id</th>\n' +
         '    </tr>\n' +
         '  </thead>\n' +
         '  <tbody>';
       for (let item of items) {
         htmlString +=
           '  <tr>\n' +
-          '    <td><a href="' + this.origin + item.item.id + '">' + item.item.id + '</a></td>\n' +
+          '    <td>' + (item.item.assignedTo ? item.item.assignedTo : 'unassigned') + '</td>\n' +
           '    <td>' + item.item.name  + '</td>\n' +
           '    <td>' + item.kind + '</td>\n' +
           '    <td>' + item.state + '</td>\n' +
-          '    <td>' + (item.item.assignedTo ? item.item.assignedTo : 'unassigned') + '</td>\n' +
+          '    <td><a href="' + this.origin + item.item.id + '">' + item.item.id + '</a></td>\n' +
           '  </tr>\n';
-        textString += 'Id: ' + item.item.id + '\n' +
+        textString += 'Assigned To: ' + item.item.assignedTo + '\n\n' +
                       'Name: ' + item.item.name  + '\n' +
                       'Kind: ' + item.kind + '\n' +
                       'State: ' + item.state + '\n' +
-                      'Assigned To: ' + item.item.assignedTo + '\n\n'
+                      'Id: ' + item.item.id + '\n'
+
       }
       htmlString +=
         '  </tbody>\n' +
