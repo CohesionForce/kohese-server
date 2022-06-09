@@ -153,7 +153,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     return this._elementMap;
   }
 
-  private _absoluteRoot: any;
+  _absoluteRoot: any;
   get absoluteRoot() {
     return this._absoluteRoot;
   }
@@ -178,7 +178,7 @@ export class TreeComponent implements OnInit, AfterViewInit, Dialog {
     }
   }
 
-  private _getTitle: ActionTitle;
+  _getTitle: ActionTitle;
   get getTitle() {
     return this._getTitle;
   }
