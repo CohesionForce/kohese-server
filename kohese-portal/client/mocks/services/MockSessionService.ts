@@ -18,6 +18,12 @@
 import { MockUserData, MockUsersData } from '../data/MockUser';
 
 export class MockSessionService {
+
+  private _sessionMap: {} = {};
+  get sessionMap() {
+    return this._sessionMap;
+  }
+
   get user() {
     return MockUserData();
   }
