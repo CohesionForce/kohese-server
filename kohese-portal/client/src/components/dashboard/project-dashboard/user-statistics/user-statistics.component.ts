@@ -16,8 +16,11 @@
 
 
 // Angular
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, ViewChild } from '@angular/core';
+import { MatOption } from '@angular/material/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { Sort } from '@angular/material/sort';
+import { FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Subscription, Observable } from 'rxjs';
 
@@ -37,7 +40,8 @@ import { StateInfo, StateFilterService } from '../../state-filter.service';
   templateUrl: './user-statistics.component.html',
   styleUrls: ['./user-statistics.component.scss']
 })
-export class UserStatisticsComponent extends NavigatableComponent implements OnInit, OnDestroy {
+export class UserStatisticsComponent extends NavigatableComponent
+  implements OnInit, OnDestroy {
 
   @Input()
   projectStream: Observable<ProjectInfo>;
@@ -46,35 +50,51 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
 
   selectedUserMap: Map<string, ItemProxy> = new Map<string, ItemProxy>();
   selectedAssignments: Array<any>;
+  sortedData: Array<any>;
   tableStream: MatTableDataSource<ItemProxy>;
-  rowDef = ['kind', 'name', 'state', 'assignedTo']
+  rowDef = ['assignedTo', 'name', 'state', 'kind', 'due'];
 
   useStates : boolean = false;
-  supportedTypes = ['Action', 'Task', 'Decision']
+  supportedTypes = ['Action', 'Task', 'Decision'];
   stateInfo : {} = {};
   selectedStatesMap : Map<string, StateInfo> = new Map<string, StateInfo>([]);
+  matchingObjects : Array<any> = [];
   origin : string;
 
+  selectAllToggled: boolean = false;
+  numberOfItemsSelected: number;
+  totalNumberOfUsers: number;
+  includeUnassigned: boolean = false;
+  unassigned: Array<ItemProxy> = [];
+  @ViewChild('unassignedOption') private unassignedOption: MatOption
+  @ViewChild('selectAll') private selectAll: MatOption
+
+  userControl: FormControl = new FormControl();
+  stateControl: FormControl = new FormControl();
+  enabledStates: Array<any> = [];
+
   constructor(
-    protected navigationService: NavigationService,
-    protected dialogService: DialogService,
-    private stateFilterService : StateFilterService,
-    private title : Title
-    ) {
+              protected navigationService: NavigationService,
+              protected dialogService: DialogService,
+              private stateFilterService : StateFilterService,
+              private title : Title,
+  ) {
     super(navigationService)
   }
 
   ngOnInit() {
-    this.origin = location.origin + '/explore;id='
+    this.origin = location.origin + '/explore;id=';
     this.projectStreamSub = this.projectStream.subscribe((newProject) => {
       if (newProject) {
         this.project = newProject;
         let projectTitle = this.project.proxy.item.name;
         this.title.setTitle('User Statistics | ' + projectTitle);
-        this.deselectAll();
         this.stateInfo = this.stateFilterService.getStateInfoFor(this.supportedTypes);
+        this.resetUsers();
+        this.selectAllUsers();
       }
-    })
+    });
+
   }
 
   ngOnDestroy() {
@@ -82,13 +102,62 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
   }
 
   toggleUser(user: ItemProxy) {
-    // Determine if user needs to be added or removed from the selected list
     this.selectedAssignments = [];
+
     if (this.selectedUserMap.get(user.item.name)) {
-      this.selectedUserMap.delete(user.item.name)
+      this.selectedUserMap.delete(user.item.name);
     } else {
       this.selectedUserMap.set(user.item.name, user);
     }
+
+    this.numberOfItemsSelected = this.userControl.value.length;
+    this.totalNumberOfUsers = this.project.users.length + 1;
+    if(this.numberOfItemsSelected === this.totalNumberOfUsers) {
+      this.selectAllToggled = true;
+      this.selectAll.select();
+    } else {
+      this.selectAllToggled = false;
+      this.selectAll.deselect();
+    }
+
+    this.buildSelectedAssignments();
+  }
+
+  toggleAllUsers() {
+    this.selectAllToggled = !this.selectAllToggled;
+    if(this.selectAllToggled) {
+      for (let idx in this.project.users) {
+        let user = this.project.users[idx];
+        this.selectedUserMap.set(user.item.name, user);
+      }
+
+      this.userControl.patchValue([...this.project.users.map(item => item)]);
+      this.buildSelectedAssignments();
+    } else {
+      this.resetUsers();
+    }
+  }
+
+  selectAllUsers() {
+    this.selectAllToggled = true;
+    if(this.selectAllToggled) {
+      for (let idx in this.project.users) {
+        let user = this.project.users[idx];
+        this.selectedUserMap.set(user.item.name, user);
+      }
+
+      this.userControl.patchValue([...this.project.users.map(item => item)]);
+      this.buildSelectedAssignments();
+    } else {
+      this.resetUsers();
+    }
+  }
+
+  resetUsers() {
+    this.unassigned = [];
+    this.includeUnassigned = false;
+    this.selectedUserMap.clear();
+    this.userControl.reset('');
     this.buildSelectedAssignments();
   }
 
@@ -100,34 +169,35 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
         type : type,
         stateType : stateType,
         state : state
-      })
+      });
+    }
+
+    if(this.selectedStatesMap.size > 0) {
+      this.useStates = true;
+    } else {
+      this.useStates = false;
     }
     this.buildSelectedAssignments();
   }
 
-  selectAll() {
-    for (let idx in this.project.users) {
-      let user = this.project.users[idx];
-      this.selectedUserMap.set(user.item.name, user);
-    }
-    this.buildSelectedAssignments();
-  }
-
-  deselectAll() {
-    this.selectedUserMap = new Map<string, ItemProxy>();
+  resetStates() {
+    this.useStates = false;
+    this.selectedStatesMap.clear();
+    this.stateControl.reset();
     this.buildSelectedAssignments();
   }
 
   buildSelectedAssignments() {
     this.selectedAssignments = [];
 
+    // includes project items with user relations
     Array.from(this.selectedUserMap.values(), (user: ItemProxy) => {
       for (let kind in user.relations.referencedBy) {
         for (let assignmentIdx in user.relations.referencedBy[kind].assignedTo) {
           let assignment = user.relations.referencedBy[kind].assignedTo[assignmentIdx];
           let match = false;
           for (let projectIdx in this.project.projectItems) {
-            match = assignment.hasAncestor(this.project.projectItems[projectIdx])
+            match = assignment.hasAncestor(this.project.projectItems[projectIdx]);
             if (match) {
               break;
             }
@@ -136,13 +206,39 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
           if (match) {
             this.selectedAssignments.push(
               user.relations.referencedBy[kind].assignedTo[assignmentIdx]
-            )
+            );
             continue;
           }
         }
       }
-    })
+    });
 
+    // includes project items with no user relations
+    if(this.includeUnassigned) {
+      for(let projectIdx of this.project.projectItems) {
+        if(projectIdx.children) {
+          for (let projectItem of projectIdx.children) {
+            this.hasUnassignedChildren(projectItem);
+          }
+        }
+        if(!projectIdx.item.assignedTo &&
+          (projectIdx.kind === 'Task' || projectIdx.kind === 'Action' || projectIdx.kind === 'Decision')) {
+
+          this.unassigned.push(projectIdx);
+        }
+      }
+    } else {
+      this.unassigned = [];
+    }
+    if(this.includeUnassigned && this.unassigned.length > 0) {
+      this.findDuplicates(this.unassigned);
+      for(let proxy of this.unassigned) {
+        this.selectedAssignments.push(proxy);
+      }
+    }
+
+    // filters each project item against all selected states
+    // and prunes selected assignments appropriately
     if (this.useStates) {
       this.selectedAssignments = this.selectedAssignments.filter((proxy)=>{
         for (let stateKind of proxy.model.item.stateProperties) {
@@ -154,10 +250,49 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
           }
         }
         return false;
-      })
+      });
     }
 
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
+  }
+
+  hasUnassignedChildren(proxy: ItemProxy) {
+    if(!proxy.item.assignedTo &&
+        (proxy.kind === 'Task' || proxy.kind === 'Action' || proxy.kind === 'Decision')) {
+
+      this.unassigned.push(proxy);
+    }
+    if(proxy.children) {
+      for(let child of proxy.children) {
+        if(!child.item.assignedTo &&
+            (child.kind === 'Task' || child.kind === 'Action' || child.kind === 'Decision')) {
+          this.unassigned.push(child);
+        }
+        this.hasUnassignedChildren(child);
+      }
+    }
+  }
+
+  findDuplicates(arr: Array<ItemProxy>) {
+    arr.filter((item,index) => {
+      if(arr.indexOf(item) != index) {
+        this.unassigned.splice(index,1);
+      }
+    });
+  }
+
+  // TODO: Implement when a multi-optgroup patchValue solution has been found
+  allStates: Array<any> = [];
+  selectAllStates() {
+    this.resetStates();
+    for(let type of this.supportedTypes) {
+      for(let stateType in this.stateInfo[type]) {
+        for(let state of this.stateInfo[type][stateType].states) {
+          this.toggleState(type, stateType, state);
+        }
+      }
+    }
+    this.buildSelectedAssignments();
   }
 
   openProxyDetails(proxy: ItemProxy) {
@@ -195,7 +330,7 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
           '    <td>' + item.item.name  + '</td>\n' +
           '    <td>' + item.kind + '</td>\n' +
           '    <td>' + item.state + '</td>\n' +
-          '    <td>' + item.item.assignedTo + '</td>\n' +
+          '    <td>' + (item.item.assignedTo ? item.item.assignedTo : 'unassigned') + '</td>\n' +
           '  </tr>\n';
         textString += 'Id: ' + item.item.id + '\n' +
                       'Name: ' + item.item.name  + '\n' +
@@ -212,5 +347,47 @@ export class UserStatisticsComponent extends NavigatableComponent implements OnI
       document.removeEventListener('copy', null);
     });
     document.execCommand('copy');
+  }
+
+  sortData(sort: Sort) {
+    let data: Array<any> = [];
+    data = this.selectedAssignments.slice();
+
+    if (!sort.active || sort.direction === '') {
+      this.sortedData = data;
+      this.tableStream = new MatTableDataSource<ItemProxy>(this.sortedData);
+      return;
+    }
+
+    this.sortedData = data.sort( (a, b) => {
+      const isAsc = sort.direction === 'asc';
+      switch (sort.active) {
+        case 'assignedTo':
+          return this.compareItems(a.item.assignedTo, b.item.assignedTo, isAsc);
+        case 'name':
+          return this.compareItems(a.item.name, b.item.name, isAsc);
+        case 'state':
+          return this.compareItems(a.state, b.state, isAsc);
+        case 'kind':
+          return this.compareItems(a.kind, b.kind, isAsc);
+        case 'due':
+          return this.compareItems(a.item.estimatedCompletion, b.item.estimatedCompletion, isAsc);
+        default:
+          return 0;
+      }
+    });
+
+    this.tableStream = new MatTableDataSource<ItemProxy>(this.sortedData);
+  }
+
+  private compareItems(itemA: any, itemB: any, isAsc: boolean): number {
+    let retVal: number = 0;
+    if (itemA && itemB) {
+      if (itemA > itemB) retVal = 1;
+      else if (itemA < itemB) retVal = -1;
+    }
+    else if (itemA) retVal = 1;
+    else if (itemB) retVal = -1;
+    return retVal * (isAsc ? 1 : -1);
   }
 }
