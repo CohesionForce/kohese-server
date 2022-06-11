@@ -40,7 +40,7 @@ function Server(httpsServer, options){
 
       socket.conn.on("upgrade", () => {
         const upgradedTransport = socket.conn.transport.name; // in most cases, "websocket"
-        console.log('>>>> upgraded transport to %s for session %s', upgradedTransport, socket.id);
+        console.log('>>> upgraded transport to %s for session %s', upgradedTransport, socket.id);
       });
 
       socket.on('authenticate', function(request) {

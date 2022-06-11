@@ -13,8 +13,6 @@
     "noImplicitAny": false,
     "types": [
       "core-js",
-      "socket.io",
-      "socket.io-client",
       "node",
       "underscore",
       "jasmine",
