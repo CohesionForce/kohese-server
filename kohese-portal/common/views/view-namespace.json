@@ -6,7 +6,7 @@
     "id": "com.kohese"
   },
   "modelName": "Namespace",
-  "icon": "",
+  "icon": "fa fa-object-group",
   "color": "#000000",
   "localTypes": {},
   "viewProperties": {

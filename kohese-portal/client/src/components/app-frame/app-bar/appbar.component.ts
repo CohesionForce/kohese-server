@@ -16,7 +16,7 @@
 
 
 // Angular
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 // Other External Dependencies
@@ -40,7 +40,6 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 export class AppBarComponent extends NavigatableComponent
   implements OnInit, OnDestroy {
   public userName : string;
-  private repositoryStatus: any;
   public authenticated : boolean = false;
   private userSubscription: Subscription;
   private notificationSubscription: Subscription;
@@ -71,11 +70,13 @@ export class AppBarComponent extends NavigatableComponent
     return TreeConfiguration;
   }
 
-  constructor(private sessionService: SessionService,
-    protected NavigationService: NavigationService,
-    private CurrentUserService: CurrentUserService,
-    private _notificationService: NotificationService,
-    private _itemRepository: ItemRepository) {
+  constructor(
+              protected NavigationService: NavigationService,
+              private CurrentUserService: CurrentUserService,
+              private _notificationService: NotificationService,
+              private _itemRepository: ItemRepository,
+              private changeRef: ChangeDetectorRef
+  ) {
     super(NavigationService);
   }
 
@@ -86,22 +87,27 @@ export class AppBarComponent extends NavigatableComponent
         case(RepoStates.DISCONNECTED):
           this._itemRepositoryState = status.state;
           this.syncStatusString = 'Disconnected';
+          this.changeRef.detectChanges();
           break;
         case(RepoStates.USER_LOCKED_OUT):
           this._itemRepositoryState = status.state;
           this.syncStatusString = 'User Locked Out';
+          this.changeRef.detectChanges();
           break;
         case(RepoStates.SYNCHRONIZATION_FAILED):
           this._itemRepositoryState = status.state;
           this.syncStatusString = 'Synchronization Failed';
+          this.changeRef.detectChanges();
           break;
         case(RepoStates.SYNCHRONIZING):
           this._itemRepositoryState = status.state;
           this.syncStatusString = 'Syncing';
+          this.changeRef.detectChanges();
           break;
         case(RepoStates.SYNCHRONIZATION_SUCCEEDED):
           this._itemRepositoryState = status.state;
           this.syncStatusString = '';
+          this.changeRef.detectChanges();
           break;
       }
     });

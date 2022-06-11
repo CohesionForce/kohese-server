@@ -34,10 +34,10 @@ limitations under the License.
         <mat-label>Users</mat-label>
         <mat-select [formControl]="userControl" multiple placeholder="Users">
           <ng-container *ngIf="!this.selectAllToggled else toggled">
-            <mat-option #selectAll (click)=toggleAllUsers()>Select All</mat-option>
+            <mat-option #selectAll (click)=toggleAllUsers()>Select Assigned</mat-option>
           </ng-container>
           <ng-template #toggled>
-            <mat-option #selectAll (click)=toggleAllUsers()>Reset</mat-option>
+            <mat-option #selectAll (click)=toggleAllUsers()>Clear</mat-option>
           </ng-template>
           <mat-optgroup [label]=users>users
             <mat-option #unassignedOption [value]="unassignedItems"
@@ -63,7 +63,7 @@ limitations under the License.
               (+{{stateControl.value.length - 1}} {{stateControl.value?.length === 2 ? 'other' : 'others'}})
             </span>
           </mat-select-trigger>
-          <mat-option (click)="resetStates()">Reset</mat-option>
+          <mat-option (click)="resetStates()">Clear</mat-option>
             <mat-optgroup *ngFor="let type of supportedTypes" [label]="type">
               <!-- (mat-)optgroup does not supported nested structures.
                    we use another mat-select here because (mat-)optgroup may only have a parent of <(mat-)select> -->
