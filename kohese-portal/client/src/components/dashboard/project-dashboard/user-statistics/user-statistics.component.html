@@ -93,14 +93,14 @@ limitations under the License.
         <mat-cell *matCellDef="let assignment"> {{assignment.item.name}}</mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef=state>
-        <mat-header-cell mat-sort-header=state *matHeaderCellDef> State </mat-header-cell>
-        <mat-cell *matCellDef="let assignment">{{assignment.state}}</mat-cell>
-      </ng-container>
-
       <ng-container matColumnDef=kind>
         <mat-header-cell mat-sort-header=kind *matHeaderCellDef> Kind </mat-header-cell>
         <mat-cell *matCellDef="let assignment"> {{assignment.kind}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef=state>
+        <mat-header-cell mat-sort-header=state *matHeaderCellDef> State </mat-header-cell>
+        <mat-cell *matCellDef="let assignment">{{assignment.state}}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef=due>
