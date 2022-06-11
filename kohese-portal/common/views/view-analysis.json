@@ -7,7 +7,7 @@
     "id": "com.kohese"
   },
   "modelName": "Analysis",
-  "icon": "",
+  "icon": "fa fa-line-chart",
   "color": "#000000",
   "viewProperties": {
     "id": {

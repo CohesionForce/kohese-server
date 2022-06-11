@@ -1931,7 +1931,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "Proposed",
-            "displayName": "actionState",
+            "displayName": "Action State",
             "name": "actionState"
           },
           "assignedTo": {
@@ -1941,7 +1941,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "assignedTo",
+            "displayName": "Assigned To",
             "name": "assignedTo"
           },
           "estimatedStart": {
@@ -1951,7 +1951,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "estimatedStart",
+            "displayName": "Estimated Start",
             "name": "estimatedStart"
           },
           "estimatedCompletion": {
@@ -1961,7 +1961,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "estimatedCompletion",
+            "displayName": "Estimated Completion",
             "name": "estimatedCompletion"
           },
           "estimatedHoursEffort": {
@@ -1973,7 +1973,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "",
-            "displayName": "estimatedHoursEffort",
+            "displayName": "Estimated Hours Effort",
             "name": "estimatedHoursEffort"
           },
           "actualStart": {
@@ -1983,7 +1983,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "actualStart",
+            "displayName": "Actual Start",
             "name": "actualStart"
           },
           "actualCompletion": {
@@ -1993,7 +1993,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "actualCompletion",
+            "displayName": "Actual Completion",
             "name": "actualCompletion"
           },
           "remainingHoursEffort": {
@@ -2005,7 +2005,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "",
-            "displayName": "remainingHoursEffort",
+            "displayName": "Remaining Hours Effort",
             "name": "remainingHoursEffort"
           },
           "actualHoursEffort": {
@@ -2017,7 +2017,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "",
-            "displayName": "actualHoursEffort",
+            "displayName": "Actual Hours Effort",
             "name": "actualHoursEffort"
           },
           "predecessors": {
@@ -2031,7 +2031,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "predecessors",
+            "displayName": "Predecessors",
             "name": "predecessors"
           }
         },
@@ -2147,7 +2147,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -2155,7 +2155,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -2163,7 +2163,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -2171,7 +2171,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -2179,7 +2179,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -2195,7 +2195,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedBy",
-                    "customLabel": "approvedBy",
+                    "customLabel": "Approved By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -2203,7 +2203,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedOn",
-                    "customLabel": "approvedOn",
+                    "customLabel": "Approved On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -2211,7 +2211,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "rationale",
-                    "customLabel": "rationale",
+                    "customLabel": "Rationale",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -2219,7 +2219,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "alternatives",
-                    "customLabel": "alternatives",
+                    "customLabel": "Alternatives",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2227,7 +2227,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "costImpact",
-                    "customLabel": "costImpact",
+                    "customLabel": "Cost Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2235,7 +2235,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "scheduleImpact",
-                    "customLabel": "scheduleImpact",
+                    "customLabel": "Schedule Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2243,7 +2243,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "otherImpacts",
-                    "customLabel": "otherImpacts",
+                    "customLabel": "Other Impacts",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2259,7 +2259,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "predecessors",
-                    "customLabel": "predecessors",
+                    "customLabel": "Predecessors",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2267,7 +2267,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "assignedTo",
-                    "customLabel": "assignedTo",
+                    "customLabel": "Assigned To",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -2275,7 +2275,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "associatedWorkflow",
-                    "customLabel": "associatedWorkflow",
+                    "customLabel": "Associated Workflow",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -2283,7 +2283,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "estimatedStart",
-                    "customLabel": "estimatedStart",
+                    "customLabel": "Estimated Start",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -2291,7 +2291,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "estimatedCompletion",
-                    "customLabel": "estimatedCompletion",
+                    "customLabel": "Estimated Completion",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -2299,7 +2299,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "estimatedHoursEffort",
-                    "customLabel": "estimatedHoursEffort",
+                    "customLabel": "Estimated Hours Effort",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "number",
@@ -2307,7 +2307,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "actualStart",
-                    "customLabel": "actualStart",
+                    "customLabel": "Actual Start",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -2315,7 +2315,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "actualCompletion",
-                    "customLabel": "actualCompletion",
+                    "customLabel": "Actual Completion",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -2323,7 +2323,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "remainingHoursEffort",
-                    "customLabel": "remainingHoursEffort",
+                    "customLabel": "Remaining Hours Effort",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "number",
@@ -2331,7 +2331,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "actualHoursEffort",
-                    "customLabel": "actualHoursEffort",
+                    "customLabel": "Actual Hours Effort",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "number",
@@ -2344,7 +2344,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "decisionState",
-                    "customLabel": "decisionState",
+                    "customLabel": "Decision State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -2352,7 +2352,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "actionState",
-                    "customLabel": "actionState",
+                    "customLabel": "Action State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -2651,7 +2651,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -2659,7 +2659,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -2667,7 +2667,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -2675,7 +2675,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -2683,7 +2683,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -2699,7 +2699,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedBy",
-                    "customLabel": "approvedBy",
+                    "customLabel": "Approved By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -2707,7 +2707,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedOn",
-                    "customLabel": "approvedOn",
+                    "customLabel": "Approved On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -2715,7 +2715,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "rationale",
-                    "customLabel": "rationale",
+                    "customLabel": "Rationale",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -2723,7 +2723,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "alternatives",
-                    "customLabel": "alternatives",
+                    "customLabel": "Alternatives",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2731,7 +2731,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "costImpact",
-                    "customLabel": "costImpact",
+                    "customLabel": "Cost Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2739,7 +2739,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "scheduleImpact",
-                    "customLabel": "scheduleImpact",
+                    "customLabel": "Schedule Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2747,7 +2747,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "otherImpacts",
-                    "customLabel": "otherImpacts",
+                    "customLabel": "Other Impacts",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -2768,7 +2768,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "decisionState",
-                    "customLabel": "decisionState",
+                    "customLabel": "Decision State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -2815,7 +2815,7 @@ export function ModelDefinitions() {
               "contents": [
                 {
                   "propertyName": "id",
-                  "customLabel": "id",
+                  "customLabel": "ID",
                   "labelOrientation": "Top",
                   "kind": "text",
                   "visible": true,
@@ -2960,7 +2960,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -2968,7 +2968,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -2976,7 +2976,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -2984,7 +2984,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -2992,7 +2992,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -3074,7 +3074,7 @@ export function ModelDefinitions() {
             },
             "required": true,
             "default": "Proposed",
-            "displayName": "DecisionState",
+            "displayName": "Decision State",
             "name": "decisionState"
           },
           "approvedBy": {
@@ -3084,7 +3084,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "approvedBy",
+            "displayName": "Approved By",
             "name": "approvedBy"
           },
           "approvedOn": {
@@ -3094,7 +3094,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "approvedOn",
+            "displayName": "Approved On",
             "name": "approvedOn"
           },
           "rationale": {
@@ -3106,7 +3106,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "rationale",
+            "displayName": "Rationale",
             "name": "rationale"
           },
           "alternatives": {
@@ -3118,7 +3118,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "alternatives",
+            "displayName": "Alternatives",
             "name": "alternatives"
           },
           "supportedDecisions": {
@@ -3242,7 +3242,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -3250,7 +3250,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -3258,7 +3258,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -3266,7 +3266,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -3274,7 +3274,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -3290,7 +3290,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedBy",
-                    "customLabel": "approvedBy",
+                    "customLabel": "Approved By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -3298,7 +3298,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedOn",
-                    "customLabel": "approvedOn",
+                    "customLabel": "Approved On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -3306,7 +3306,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "rationale",
-                    "customLabel": "rationale",
+                    "customLabel": "Rationale",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -3314,7 +3314,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "alternatives",
-                    "customLabel": "alternatives",
+                    "customLabel": "Alternatives",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -3322,7 +3322,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "costImpact",
-                    "customLabel": "costImpact",
+                    "customLabel": "Cost Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -3330,7 +3330,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "scheduleImpact",
-                    "customLabel": "scheduleImpact",
+                    "customLabel": "Schedule Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -3338,7 +3338,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "otherImpacts",
-                    "customLabel": "otherImpacts",
+                    "customLabel": "Other Impacts",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -3359,7 +3359,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "decisionState",
-                    "customLabel": "decisionState",
+                    "customLabel": "Decision State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -3531,7 +3531,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -3539,7 +3539,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -3547,7 +3547,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -3555,7 +3555,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -3563,7 +3563,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item Ids",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -3579,7 +3579,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "components",
-                    "customLabel": "components",
+                    "customLabel": "Components",
                     "labelOrientation": "Top",
                     "visible": false,
                     "kind": "",
@@ -3587,7 +3587,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "delineated",
-                    "customLabel": "delineated",
+                    "customLabel": "Delineated",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "boolean",
@@ -3727,7 +3727,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -3735,7 +3735,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -3743,7 +3743,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -3751,7 +3751,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -3759,7 +3759,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item Ids",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -3775,7 +3775,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedBy",
-                    "customLabel": "approvedBy",
+                    "customLabel": "Approved By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -3783,7 +3783,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedOn",
-                    "customLabel": "approvedOn",
+                    "customLabel": "Approved On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -3791,7 +3791,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "rationale",
-                    "customLabel": "rationale",
+                    "customLabel": "Rationale",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -3799,7 +3799,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "alternatives",
-                    "customLabel": "alternatives",
+                    "customLabel": "Alternatives",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -3807,7 +3807,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "costImpact",
-                    "customLabel": "costImpact",
+                    "customLabel": "Cost Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -3815,7 +3815,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "scheduleImpact",
-                    "customLabel": "scheduleImpact",
+                    "customLabel": "Schedule Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -3823,7 +3823,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "otherImpacts",
-                    "customLabel": "otherImpacts",
+                    "customLabel": "Other Impacts",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -3844,7 +3844,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "decisionState",
-                    "customLabel": "decisionState",
+                    "customLabel": "Decision State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -4028,7 +4028,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -4036,7 +4036,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -4044,7 +4044,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -4052,7 +4052,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -4060,7 +4060,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item Ids",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -4290,7 +4290,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -4298,7 +4298,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Hs Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -4306,7 +4306,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -4314,7 +4314,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -4322,7 +4322,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -4403,7 +4403,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "Observed",
-            "displayName": "issueState",
+            "displayName": "Issue State",
             "name": "issueState"
           },
           "relatedIssues": {
@@ -4425,7 +4425,7 @@ export function ModelDefinitions() {
             },
             "required": true,
             "default": null,
-            "displayName": "analysisAction",
+            "displayName": "Analysis Action",
             "name": "analysisAction"
           },
           "resolutionActions": {
@@ -4439,7 +4439,7 @@ export function ModelDefinitions() {
             },
             "required": true,
             "default": null,
-            "displayName": "resolutionActions",
+            "displayName": "Resolution Actions",
             "name": "resolutionActions"
           },
           "response": {
@@ -4451,7 +4451,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "",
-            "displayName": "response",
+            "displayName": "Response",
             "name": "response"
           }
         },
@@ -4567,7 +4567,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -4575,7 +4575,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -4583,7 +4583,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -4591,7 +4591,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -4599,7 +4599,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -4615,7 +4615,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "observedBy",
-                    "customLabel": "observedBy",
+                    "customLabel": "Observed By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -4623,7 +4623,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "observedOn",
-                    "customLabel": "observedOn",
+                    "customLabel": "Observed On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -4631,7 +4631,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "context",
-                    "customLabel": "context",
+                    "customLabel": "Context",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -4639,7 +4639,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "relatedIssues",
-                    "customLabel": "relatedIssues",
+                    "customLabel": "Related Issues",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": true,
@@ -4647,7 +4647,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "analysisAction",
-                    "customLabel": "analysisAction",
+                    "customLabel": "Analysis Action",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -4655,7 +4655,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "resolutionActions",
-                    "customLabel": "resolutionActions",
+                    "customLabel": "Resolution Actions",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -4663,7 +4663,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "response",
-                    "customLabel": "response",
+                    "customLabel": "Response",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "markdown",
@@ -4676,7 +4676,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "issueState",
-                    "customLabel": "issueState",
+                    "customLabel": "Issue State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -4933,7 +4933,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -4941,7 +4941,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -4949,7 +4949,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -4957,7 +4957,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -4965,7 +4965,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -5093,7 +5093,7 @@ export function ModelDefinitions() {
         "color": "#000000",
         "viewProperties": {
           "DetectionMechanism": {
-            "displayName": "DetectionMechanism",
+            "displayName": "Detection Mechanism",
             "inputType": {
               "type": "text",
               "options": {}
@@ -5101,7 +5101,7 @@ export function ModelDefinitions() {
             "name": "DetectionMechanism"
           },
           "EventInputData": {
-            "displayName": "EventInputData",
+            "displayName": "Event Input Data",
             "inputType": {
               "type": "text",
               "options": {}
@@ -5117,7 +5117,7 @@ export function ModelDefinitions() {
             "name": "Responses"
           },
           "EventOutputData": {
-            "displayName": "EventOutputData",
+            "displayName": "Event Output Data",
             "inputType": {
               "type": "text",
               "options": {}
@@ -5237,7 +5237,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -5245,7 +5245,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -5253,7 +5253,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -5261,7 +5261,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -5269,7 +5269,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -5285,7 +5285,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedBy",
-                    "customLabel": "approvedBy",
+                    "customLabel": "Approved By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -5293,7 +5293,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedOn",
-                    "customLabel": "approvedOn",
+                    "customLabel": "Approved On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -5301,7 +5301,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "rationale",
-                    "customLabel": "rationale",
+                    "customLabel": "Rationale",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -5309,7 +5309,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "alternatives",
-                    "customLabel": "alternatives",
+                    "customLabel": "Alternatives",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5317,7 +5317,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "costImpact",
-                    "customLabel": "costImpact",
+                    "customLabel": "Cost Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5325,7 +5325,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "scheduleImpact",
-                    "customLabel": "scheduleImpact",
+                    "customLabel": "Schedule Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5333,7 +5333,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "otherImpacts",
-                    "customLabel": "otherImpacts",
+                    "customLabel": "Other Impacts",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5349,7 +5349,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "DetectionMechanism",
-                    "customLabel": "DetectionMechanism",
+                    "customLabel": "Detection Mechanism",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -5357,7 +5357,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "EventInputData",
-                    "customLabel": "EventInputData",
+                    "customLabel": "Event Input Data",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -5373,7 +5373,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "EventOutputData",
-                    "customLabel": "EventOutputData",
+                    "customLabel": "Event Output Data",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -5386,7 +5386,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "decisionState",
-                    "customLabel": "decisionState",
+                    "customLabel": "Decision State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -5425,7 +5425,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "name",
-                    "customLabel": "name",
+                    "customLabel": "Name",
                     "labelOrientation": "Top",
                     "kind": "text",
                     "tableDefinition": "",
@@ -5434,7 +5434,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "DetectionMechanism",
-                    "customLabel": "DetectionMechanism",
+                    "customLabel": "Detection Mechanism",
                     "labelOrientation": "Top",
                     "kind": "text",
                     "visible": true,
@@ -5442,7 +5442,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "EventInputData",
-                    "customLabel": "EventInputData",
+                    "customLabel": "Event Input Data",
                     "labelOrientation": "Top",
                     "kind": "text",
                     "visible": true,
@@ -5458,7 +5458,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "EventOutputData",
-                    "customLabel": "EventOutputData",
+                    "customLabel": "Event Output Data",
                     "labelOrientation": "Top",
                     "kind": "text",
                     "visible": true,
@@ -5479,11 +5479,11 @@ export function ModelDefinitions() {
             "id": "b1090aa0-fb86-11e9-be56-311e0135452a",
             "name": "KeyEventInfo",
             "columns": [
-              "name",
-              "DetectionMechanism",
-              "EventInputData",
+              "Name",
+              "Detection Mechanism",
+              "Event Input Data",
               "Responses",
-              "EventOutputData"
+              "Event Output Data"
             ],
             "expandedFormat": {
               "column1": [],
@@ -5496,8 +5496,8 @@ export function ModelDefinitions() {
             "id": "5b7cf180-aa97-11ea-b459-333ae1bfee22",
             "name": "KeyEventTableForUseCases",
             "columns": [
-              "name",
-              "DetectionMechanism",
+              "Name",
+              "Detection Mechanism",
               "Responses"
             ],
             "expandedFormat": {
@@ -5521,7 +5521,7 @@ export function ModelDefinitions() {
         "color": "#000000",
         "viewProperties": {
           "KeyEvents": {
-            "displayName": "KeyEvents",
+            "displayName": "Key Events",
             "inputType": {
               "type": "proxy-selector",
               "options": {}
@@ -5641,7 +5641,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -5649,7 +5649,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -5657,7 +5657,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -5665,7 +5665,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -5673,7 +5673,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -5689,7 +5689,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedBy",
-                    "customLabel": "approvedBy",
+                    "customLabel": "Approved By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -5697,7 +5697,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedOn",
-                    "customLabel": "approvedOn",
+                    "customLabel": "Approved On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -5705,7 +5705,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "rationale",
-                    "customLabel": "rationale",
+                    "customLabel": "Rationale",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -5713,7 +5713,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "alternatives",
-                    "customLabel": "alternatives",
+                    "customLabel": "Alternatives",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5721,7 +5721,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "costImpact",
-                    "customLabel": "costImpact",
+                    "customLabel": "Cost Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5729,7 +5729,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "scheduleImpact",
-                    "customLabel": "scheduleImpact",
+                    "customLabel": "Schedule Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5737,7 +5737,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "otherImpacts",
-                    "customLabel": "otherImpacts",
+                    "customLabel": "Other Impacts",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5753,7 +5753,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "KeyEvents",
-                    "customLabel": "KeyEvents",
+                    "customLabel": "Key Events",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -5766,7 +5766,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "decisionState",
-                    "customLabel": "decisionState",
+                    "customLabel": "Decision State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -5805,7 +5805,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "KeyEvents",
-                    "customLabel": "KeyEvents",
+                    "customLabel": "Key Events",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": true,
@@ -5875,7 +5875,7 @@ export function ModelDefinitions() {
               },
               "id": {
                 "name": "id",
-                "displayName": "Id",
+                "displayName": "ID",
                 "inputType": {
                   "type": "boolean",
                   "options": {}
@@ -5936,7 +5936,7 @@ export function ModelDefinitions() {
                       },
                       {
                         "propertyName": "id",
-                        "customLabel": "Id",
+                        "customLabel": "ID",
                         "labelOrientation": "Top",
                         "kind": "boolean",
                         "visible": true,
@@ -6165,7 +6165,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -6173,7 +6173,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -6181,7 +6181,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -6189,7 +6189,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -6197,7 +6197,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -6557,7 +6557,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -6565,7 +6565,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -6573,7 +6573,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -6581,7 +6581,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -6589,7 +6589,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -6605,7 +6605,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "password",
-                    "customLabel": "password",
+                    "customLabel": "Password",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "maskedString",
@@ -6613,7 +6613,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "email",
-                    "customLabel": "email",
+                    "customLabel": "Email",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -6621,7 +6621,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "username",
-                    "customLabel": "username",
+                    "customLabel": "User Name",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -6793,7 +6793,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -6801,7 +6801,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -6809,7 +6809,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -6817,7 +6817,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -6825,7 +6825,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -7053,7 +7053,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -7061,7 +7061,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -7069,7 +7069,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -7077,7 +7077,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -7085,7 +7085,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -7136,7 +7136,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "observedBy",
+            "displayName": "Observed By",
             "name": "observedBy"
           },
           "observedOn": {
@@ -7146,7 +7146,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "observedOn",
+            "displayName": "Observed On",
             "name": "observedOn"
           },
           "context": {
@@ -7160,7 +7160,7 @@ export function ModelDefinitions() {
             },
             "required": true,
             "default": "ROOT",
-            "displayName": "context",
+            "displayName": "Context",
             "name": "context"
           }
         },
@@ -7276,7 +7276,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -7284,7 +7284,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -7292,7 +7292,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -7300,7 +7300,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -7308,7 +7308,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -7324,7 +7324,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "observedBy",
-                    "customLabel": "observedBy",
+                    "customLabel": "Observed By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -7332,7 +7332,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "observedOn",
-                    "customLabel": "observedOn",
+                    "customLabel": "Observed On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -7340,7 +7340,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "context",
-                    "customLabel": "context",
+                    "customLabel": "Context",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -7546,7 +7546,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -7554,7 +7554,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -7562,7 +7562,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -7570,7 +7570,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -7578,7 +7578,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -7594,7 +7594,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "projectItems",
-                    "customLabel": "projectItems",
+                    "customLabel": "Project Items",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -7767,7 +7767,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -7775,7 +7775,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -7783,7 +7783,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -7791,7 +7791,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -7799,7 +7799,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -7815,7 +7815,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "entryPoints",
-                    "customLabel": "entryPoints",
+                    "customLabel": "Entry Points",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -7823,7 +7823,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "typeFormats",
-                    "customLabel": "typeFormats",
+                    "customLabel": "Type Formats",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -7996,7 +7996,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -8004,7 +8004,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -8012,7 +8012,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -8020,7 +8020,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -8028,7 +8028,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -8044,7 +8044,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "origin",
-                    "customLabel": "origin",
+                    "customLabel": "Origin",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -8052,7 +8052,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "mounted",
-                    "customLabel": "mounted",
+                    "customLabel": "Mounted",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "boolean",
@@ -8126,7 +8126,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "Proposed",
-            "displayName": "taskState",
+            "displayName": "Task State",
             "name": "taskState"
           },
           "assignedTo": {
@@ -8136,7 +8136,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "assignedTo",
+            "displayName": "Assigned To",
             "name": "assignedTo"
           },
           "estimatedStart": {
@@ -8146,7 +8146,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "estimatedStart",
+            "displayName": "Estimated Start",
             "name": "estimatedStart"
           },
           "estimatedCompletion": {
@@ -8156,7 +8156,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "estimatedCompletion",
+            "displayName": "Estimated Completion",
             "name": "estimatedCompletion"
           },
           "estimatedHoursEffort": {
@@ -8168,7 +8168,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "",
-            "displayName": "estimatedHoursEffort",
+            "displayName": "Estimated Hours Effort",
             "name": "estimatedHoursEffort"
           },
           "actualStart": {
@@ -8178,7 +8178,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "actualStart",
+            "displayName": "Actual Start",
             "name": "actualStart"
           },
           "actualCompletion": {
@@ -8188,7 +8188,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "actualCompletion",
+            "displayName": "Actual Completion",
             "name": "actualCompletion"
           },
           "remainingHoursEffort": {
@@ -8200,7 +8200,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "",
-            "displayName": "remainingHoursEffort",
+            "displayName": "Remaining Hours Effort",
             "name": "remainingHoursEffort"
           },
           "actualHoursEffort": {
@@ -8212,7 +8212,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": "",
-            "displayName": "actualHoursEffort",
+            "displayName": "Actual Hours Effort",
             "name": "actualHoursEffort"
           },
           "predecessors": {
@@ -8226,7 +8226,7 @@ export function ModelDefinitions() {
             },
             "required": false,
             "default": null,
-            "displayName": "predecessors",
+            "displayName": "Predecessors",
             "name": "predecessors"
           },
           "supportedDecisions": {
@@ -8350,7 +8350,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -8358,7 +8358,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -8366,7 +8366,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -8374,7 +8374,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -8382,7 +8382,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -8398,7 +8398,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "predecessors",
-                    "customLabel": "predecessors",
+                    "customLabel": "Predecessors",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -8406,7 +8406,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "assignedTo",
-                    "customLabel": "assignedTo",
+                    "customLabel": "Assigned To",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -8414,7 +8414,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "estimatedStart",
-                    "customLabel": "estimatedStart",
+                    "customLabel": "Estimated Start",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -8422,7 +8422,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "estimatedCompletion",
-                    "customLabel": "estimatedCompletion",
+                    "customLabel": "Estimated Completion",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -8430,7 +8430,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "estimatedHoursEffort",
-                    "customLabel": "estimatedHoursEffort",
+                    "customLabel": "Estimated Hours Effort",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "number",
@@ -8438,7 +8438,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "actualStart",
-                    "customLabel": "actualStart",
+                    "customLabel": "Actual Start",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -8446,7 +8446,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "actualCompletion",
-                    "customLabel": "actualCompletion",
+                    "customLabel": "Actual Completion",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -8454,7 +8454,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "remainingHoursEffort",
-                    "customLabel": "remainingHoursEffort",
+                    "customLabel": "Remaining Hours Effort",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "number",
@@ -8462,7 +8462,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "actualHoursEffort",
-                    "customLabel": "actualHoursEffort",
+                    "customLabel": "Actual Hours Effort",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "number",
@@ -8483,7 +8483,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "taskState",
-                    "customLabel": "taskState",
+                    "customLabel": "Task State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -8662,7 +8662,7 @@ export function ModelDefinitions() {
             "name": "Actors"
           },
           "BasicPath": {
-            "displayName": "BasicPath",
+            "displayName": "Basic Path",
             "inputType": {
               "type": "",
               "options": {}
@@ -8670,7 +8670,7 @@ export function ModelDefinitions() {
             "name": "BasicPath"
           },
           "AlternativePaths": {
-            "displayName": "AlternativePaths",
+            "displayName": "Alternative Paths",
             "inputType": {
               "type": "",
               "options": {}
@@ -8695,7 +8695,7 @@ export function ModelDefinitions() {
               },
               "PathDescription": {
                 "name": "PathDescription",
-                "displayName": "PathDescription",
+                "displayName": "Path Description",
                 "inputType": {
                   "type": "text",
                   "options": {}
@@ -8748,7 +8748,7 @@ export function ModelDefinitions() {
                       },
                       {
                         "propertyName": "PathDescription",
-                        "customLabel": "PathDescription",
+                        "customLabel": "Path Description",
                         "labelOrientation": "Top",
                         "kind": "text",
                         "visible": true,
@@ -8796,7 +8796,7 @@ export function ModelDefinitions() {
                     "contents": [
                       {
                         "propertyName": "PathName",
-                        "customLabel": "PathName",
+                        "customLabel": "Path Name",
                         "labelOrientation": "Top",
                         "kind": "text",
                         "visible": true,
@@ -8804,7 +8804,7 @@ export function ModelDefinitions() {
                       },
                       {
                         "propertyName": "PathDescription",
-                        "customLabel": "PathDescription",
+                        "customLabel": "Path Description",
                         "labelOrientation": "Top",
                         "kind": "text",
                         "tableDefinition": "",
@@ -8961,7 +8961,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "loadPending",
-                    "customLabel": "loadPending",
+                    "customLabel": "Load Pending",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -8969,7 +8969,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "hasValidationError",
-                    "customLabel": "hasValidationError",
+                    "customLabel": "Has Validation Error",
                     "labelOrientation": "Top",
                     "kind": "boolean",
                     "visible": false,
@@ -8977,7 +8977,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "$dirtyFields",
-                    "customLabel": "$dirtyFields",
+                    "customLabel": "Dirty Fields",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -8985,7 +8985,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "__deletedProperty",
-                    "customLabel": "__deletedProperty",
+                    "customLabel": "Deleted Property",
                     "labelOrientation": "Top",
                     "kind": "",
                     "visible": false,
@@ -8993,7 +8993,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "itemIds",
-                    "customLabel": "itemIds",
+                    "customLabel": "Item IDs",
                     "labelOrientation": "Top",
                     "kind": "string",
                     "visible": false,
@@ -9009,7 +9009,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedBy",
-                    "customLabel": "approvedBy",
+                    "customLabel": "Approved By",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -9017,7 +9017,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "approvedOn",
-                    "customLabel": "approvedOn",
+                    "customLabel": "Approved On",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "date",
@@ -9025,7 +9025,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "rationale",
-                    "customLabel": "rationale",
+                    "customLabel": "Rationale",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "text",
@@ -9033,7 +9033,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "alternatives",
-                    "customLabel": "alternatives",
+                    "customLabel": "Alternatives",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -9041,7 +9041,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "costImpact",
-                    "customLabel": "costImpact",
+                    "customLabel": "Cost Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -9049,7 +9049,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "scheduleImpact",
-                    "customLabel": "scheduleImpact",
+                    "customLabel": "Schedule Impact",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -9057,7 +9057,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "otherImpacts",
-                    "customLabel": "otherImpacts",
+                    "customLabel": "Other Impacts",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -9081,7 +9081,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "BasicPath",
-                    "customLabel": "BasicPath",
+                    "customLabel": "Basic Path",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -9089,7 +9089,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "AlternativePaths",
-                    "customLabel": "AlternativePaths",
+                    "customLabel": "Alternative Paths",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "",
@@ -9102,7 +9102,7 @@ export function ModelDefinitions() {
                 "contents": [
                   {
                     "propertyName": "decisionState",
-                    "customLabel": "decisionState",
+                    "customLabel": "Decision State",
                     "labelOrientation": "Top",
                     "visible": true,
                     "kind": "state-editor",
@@ -9149,7 +9149,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "BasicPath",
-                    "customLabel": "BasicPath",
+                    "customLabel": "Basic Path",
                     "labelOrientation": "Top",
                     "kind": "",
                     "formatDefinition": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",
@@ -9159,7 +9159,7 @@ export function ModelDefinitions() {
                   },
                   {
                     "propertyName": "AlternativePaths",
-                    "customLabel": "AlternativePaths",
+                    "customLabel": "Alternative Paths",
                     "labelOrientation": "Top",
                     "kind": "",
                     "formatDefinition": "e91a8a60-5d7c-11ea-9d2a-81904e0f9ce1",

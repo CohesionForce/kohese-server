@@ -107,7 +107,7 @@ let _workingTree = TreeConfiguration.getWorkingTree();
             console.log(JSON.stringify(err, null, '  '));
             postToAllPorts('connectionError', {});
           });
-          socket.on('reconnect', async () => {
+          socket.io.on('reconnect', async () => {
             console.log('^^^ Socket reconnected');
             _connectionAuthenticatedPromise = authenticate(_authRequest);
             await _connectionAuthenticatedPromise;
