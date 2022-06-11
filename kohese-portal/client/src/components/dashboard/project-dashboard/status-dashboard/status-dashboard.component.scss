@@ -80,5 +80,9 @@ mat-expansion-panel {
     grid-column-end: auto;
     place-self: stretch;
     overflow: auto;
+
+    .mat-column-state {
+      justify-content: center;
+    }
   }
 }

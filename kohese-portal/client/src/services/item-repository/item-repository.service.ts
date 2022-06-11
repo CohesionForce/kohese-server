@@ -757,7 +757,7 @@ export class ItemRepository {
 	        0].propertyName] + '](' + window.location.origin + LocationMap[
 	        'Explore'].route + ';id=' + koheseObject.id + ')\n\n');
   	  } else {
-        representation += '<b>Name: </b>' + (koheseObject[formatDefinition.header.contents[0].propertyName] + '\n\n');
+        representation += (koheseObject[formatDefinition.header.contents[0].propertyName] + '\n\n');
 	    }
 	  }
 

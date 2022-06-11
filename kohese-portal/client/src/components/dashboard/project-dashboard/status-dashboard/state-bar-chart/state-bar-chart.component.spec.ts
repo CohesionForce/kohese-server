@@ -28,10 +28,11 @@ import { MaterialModule } from '../../../../../material.module';
 import { DialogService } from '../../../../../services/dialog/dialog.service';
 import { TreeConfiguration } from '../../../../../../../common/src/tree-configuration';
 import { StateBarChartComponent } from './state-bar-chart.component';
-import { ProjectInfo } from '../../../../../services/project-service/project.service';
+import { ProjectInfo, ProjectService } from '../../../../../services/project-service/project.service';
 
 // Mocks
 import { MockDialogService } from '../../../../../../mocks/services/MockDialogService';
+import { MockProjectService } from '../../../../../../mocks/services/MockProjectService';
 
 describe('StateBarChartComponent', () => {
   let component: StateBarChartComponent;
@@ -45,7 +46,10 @@ describe('StateBarChartComponent', () => {
         BrowserAnimationsModule,
         MaterialModule
       ],
-      providers: [ { provide: DialogService, useClass: MockDialogService } ],
+      providers: [
+        { provide: DialogService, useClass: MockDialogService },
+        { provide: ProjectService, useClass: MockProjectService }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
