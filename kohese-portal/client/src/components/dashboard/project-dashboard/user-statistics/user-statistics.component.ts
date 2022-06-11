@@ -52,7 +52,7 @@ export class UserStatisticsComponent extends NavigatableComponent
   selectedAssignments: Array<any>;
   sortedData: Array<any>;
   tableStream: MatTableDataSource<ItemProxy>;
-  rowDef = ['assignedTo', 'name', 'state', 'kind', 'due'];
+  rowDef = ['assignedTo', 'name', 'kind', 'state', 'due'];
 
   useStates : boolean = false;
   supportedTypes = ['Action', 'Task', 'Decision'];
@@ -319,23 +319,27 @@ export class UserStatisticsComponent extends NavigatableComponent
         '      <th>Name</th>\n' +
         '      <th>Kind</th>\n' +
         '      <th>State</th>\n' +
+        '      <th>Due</th>\n' +
         '      <th>Id</th>\n' +
         '    </tr>\n' +
         '  </thead>\n' +
         '  <tbody>';
       for (let item of items) {
+        let dueDate = item.item.estimatedCompletion ?  new Date(item.item.estimatedCompletion).toDateString() : '';
         htmlString +=
           '  <tr>\n' +
-          '    <td>' + (item.item.assignedTo ? item.item.assignedTo : 'unassigned') + '</td>\n' +
+          '    <td>' + (item.item.assignedTo ? item.item.assignedTo : '') + '</td>\n' +
           '    <td>' + item.item.name  + '</td>\n' +
           '    <td>' + item.kind + '</td>\n' +
           '    <td>' + item.state + '</td>\n' +
+          '    <td>' + dueDate + '</td>\n' +
           '    <td><a href="' + this.origin + item.item.id + '">' + item.item.id + '</a></td>\n' +
           '  </tr>\n';
         textString += 'Assigned To: ' + item.item.assignedTo + '\n\n' +
                       'Name: ' + item.item.name  + '\n' +
                       'Kind: ' + item.kind + '\n' +
                       'State: ' + item.state + '\n' +
+                      'Due: ' + dueDate + '\n' +
                       'Id: ' + item.item.id + '\n'
 
       }
