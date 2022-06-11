@@ -15,15 +15,18 @@
  */
 
 
+// Angular
 import { BehaviorSubject } from 'rxjs'
 
+// Kohese
 import { ItemRepository, TreeConfigType } from './item-repository.service';
-import { KoheseDataModel,
-  KoheseViewModel } from '../../../../common/src/KoheseModel.interface';
+import { KoheseDataModel, KoheseViewModel } from '../../../../common/src/KoheseModel.interface';
 import { FormatDefinitionType } from '../../../../common/src/FormatDefinition.interface';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
-import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 import { ItemCache } from '../../../../common/src/item-cache';
+
+// Mocks
+import { MockItemRepository } from '../../../mocks/services/MockItemRepository';
 
 describe('ItemRepository', () => {
   // Save ItemCache used for testing since the ItemRepository creates an empty ItemCache
@@ -58,13 +61,13 @@ describe('ItemRepository', () => {
     let viewModel: KoheseViewModel = modelProxy.view.item;
 
     ///////////////////////////////////////////////////////////////////////////////
-    // console.log('*** Expect 1 >>>'+'%s', itemRepository.getMarkdownRepresentation(dataModel, undefined,
-    //   dataModel, viewModel, FormatDefinitionType.DEFAULT, 0, true));
+    console.log('*** Expect 1 >>>'+'%s', itemRepository.getMarkdownRepresentation(dataModel, undefined,
+      dataModel, viewModel, FormatDefinitionType.DEFAULT, 0, true));
 
     expect(itemRepository.getMarkdownRepresentation(dataModel, undefined,
       dataModel, viewModel, FormatDefinitionType.DEFAULT, 0, true).startsWith(
-      ' [KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n')).
-      toBe(true);
+      ' [KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n'))
+      .toBe(true);
 
     ///////////////////////////////////////////////////////////////////////////////
     console.log('*** Expect 2 >>>'+'%s', itemRepository.getMarkdownRepresentation(dataModel, undefined,
@@ -72,8 +75,8 @@ describe('ItemRepository', () => {
 
     expect(itemRepository.getMarkdownRepresentation(dataModel, undefined,
       dataModel, viewModel, FormatDefinitionType.DOCUMENT, 0, true).startsWith(
-      '<div style="font-size: x-large;">[KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n</div>\n\n')).
-      toBe(true);
+      '<div style="font-size: x-large;">[KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n</div>\n\n'))
+      .toBe(true);
 
     ///////////////////////////////////////////////////////////////////////////////
     // console.log('*** Expect 3 >>>'+'%s', itemRepository.getMarkdownRepresentation(dataModel, undefined,
@@ -81,16 +84,17 @@ describe('ItemRepository', () => {
 
     expect(itemRepository.getMarkdownRepresentation(dataModel, undefined,
       dataModel, viewModel, FormatDefinitionType.DEFAULT, 1, false).startsWith(
-      '# KoheseModel\n\n')).toBe(true);
+      '# KoheseModel\n\n'))
+      .toBe(true);
 
     ///////////////////////////////////////////////////////////////////////////////
-    // console.log('*** Expect 4 >>>'+'%s', itemRepository.getMarkdownRepresentation(dataModel, undefined,
-    //   dataModel, viewModel, FormatDefinitionType.DEFAULT, 1, true));
+    console.log('*** Expect 4 >>>'+'%s', itemRepository.getMarkdownRepresentation(dataModel, undefined,
+      dataModel, viewModel, FormatDefinitionType.DEFAULT, 1, true));
 
     expect(itemRepository.getMarkdownRepresentation(dataModel, undefined,
       dataModel, viewModel, FormatDefinitionType.DEFAULT, 1, true).startsWith(
-      '# [KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n')).
-      toBe(true);
+      '# [KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n'))
+      .toBe(true);
 
     ///////////////////////////////////////////////////////////////////////////////
     console.log('*** Expect 5 >>>'+'%s', itemRepository.getMarkdownRepresentation(dataModel, undefined,
@@ -98,7 +102,8 @@ describe('ItemRepository', () => {
 
     expect(itemRepository.getMarkdownRepresentation(dataModel, undefined,
       dataModel, viewModel, FormatDefinitionType.DEFAULT, -1, true).startsWith(
-      '[KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n')).toBe(true);
+      '[KoheseModel](http://localhost:9876/explore;id=KoheseModel)\n\n'))
+      .toBe(true);
   });
 
   ///////////////////////////////////////////////////////////////////////////////
