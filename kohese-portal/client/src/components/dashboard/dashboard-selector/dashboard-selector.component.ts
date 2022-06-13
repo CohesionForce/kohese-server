@@ -82,7 +82,7 @@ export class DashboardSelectorComponent implements OnInit, OnDestroy {
         this.linkClicked('open');
         this.selectDashboard(DashboardSelections.OPEN_ASSIGNMENTS);
       }
-      if (params['project-id']) {
+      if (params['project-id'] && !this.whichLink) {
         this.linkClicked('project status');
         this.selectDashboard(DashboardSelections.PROJECT_STATUS);
       }
