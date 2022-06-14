@@ -231,7 +231,6 @@ export class UserStatisticsComponent extends NavigatableComponent
       this.unassigned = [];
     }
     if(this.includeUnassigned && this.unassigned.length > 0) {
-      this.findDuplicates(this.unassigned);
       for(let proxy of this.unassigned) {
         this.selectedAssignments.push(proxy);
       }
@@ -253,6 +252,7 @@ export class UserStatisticsComponent extends NavigatableComponent
       });
     }
 
+    this.findDuplicates(this.selectedAssignments);
     this.tableStream = new MatTableDataSource<ItemProxy>(this.selectedAssignments);
   }
 
@@ -273,12 +273,18 @@ export class UserStatisticsComponent extends NavigatableComponent
     }
   }
 
+  // uses hash lookups for primitives and linear search for objects
   findDuplicates(arr: Array<ItemProxy>) {
-    arr.filter((item,index) => {
-      if(arr.indexOf(item) != index) {
-        this.unassigned.splice(index,1);
-      }
+    let prims = {"boolean":{}, "number":{}, "string":{}}, objs = [];
+
+    arr.filter(function(item) {
+        let type = typeof item;
+        if(type in prims)
+            return prims[type].hasOwnProperty(item) ? false : (prims[type][item] = true);
+        else
+            return objs.indexOf(item) >= 0 ? false : objs.push(item);
     });
+    this.selectedAssignments = objs;
   }
 
   // TODO: Implement when a multi-optgroup patchValue solution has been found
