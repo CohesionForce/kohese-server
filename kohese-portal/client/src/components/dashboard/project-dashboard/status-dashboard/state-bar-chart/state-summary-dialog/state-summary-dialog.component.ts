@@ -163,7 +163,7 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
               this.proxies.splice(this.proxies.indexOf(notification.proxy),1);
             }
           }
-          // this.changeRef.detectChanges();
+          this.changeRef.detectChanges();
           break;
         case 'delete':
           if(this.numCommentsMap[notification.proxy.item.id]) {
