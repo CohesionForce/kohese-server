@@ -85,7 +85,10 @@ limitations under the License.
     The padding-bottom value below is calculated via the following formula:
       padding-bottom = width * (viewBox height / viewBox width)
   -->
-  <svg class=svg-chart #chart viewBox="0 0 100 50" preserveAspectRatio="xMidYMin slice"></svg>
+  <svg  class=svg-chart #chart id="chart"
+        (window:resize)="onResize($event)"
+        viewBox="0 0 100 50"
+        preserveAspectRatio="xMidYMin slice"></svg>
   <ng-container *ngIf="selection">
     <div class=svg-chart-if-selection>
       <ng-container *ngIf="(selection.kindNames.length > 1)">

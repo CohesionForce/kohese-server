@@ -243,6 +243,10 @@ export class StateBarChartComponent implements OnInit, AfterViewInit {
     }
   }
 
+  onResize() {
+    this.updateGraph();
+  }
+
   /**
    * sets the chart's x-axis labels and
    * determines the max number of items to be displayed for the y-axis
