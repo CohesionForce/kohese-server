@@ -44,7 +44,7 @@ import { CreateWizardComponent } from '../../../../../create-wizard/create-wizar
 export class StateSummaryDialogComponent implements OnInit, OnDestroy {
 
   // Data
-  numCommentsMap = {}; //TODO: Add type definition
+  numCommentsMap = {};
   treeConfigSubscription: Subscription;
   changeSubjectSubscription: Subscription;
   _saveShortcutSubscription: Subscription;
@@ -109,14 +109,14 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
   private expansionPanels: QueryList<MatExpansionPanel>;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) private data: any,
-    private _itemRepository: ItemRepository,
-    private _navigationService: NavigationService,
-    private _dialogService: DialogService,
-    private sessionService: SessionService,
-    private changeRef : ChangeDetectorRef,
-    private hotkeys: Hotkeys
-    ) {
+              @Inject(MAT_DIALOG_DATA) private data: any,
+              private _itemRepository: ItemRepository,
+              private _navigationService: NavigationService,
+              private _dialogService: DialogService,
+              private sessionService: SessionService,
+              private changeRef : ChangeDetectorRef,
+              private hotkeys: Hotkeys
+  ) {
     if (this.data) {
       this._proxies = data.proxies;
       this._kindName = data.kindName;
@@ -153,6 +153,18 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
             this.changeRef.detectChanges();
           }
           break;
+        case 'update':
+          if(notification.proxy.state === this.stateName) {
+            if(!this.proxies.includes(notification.proxy)) {
+              this.proxies.push(notification.proxy);
+            }
+          } else {
+            if(this.proxies.includes(notification.proxy)) {
+              this.proxies.splice(this.proxies.indexOf(notification.proxy),1);
+            }
+          }
+          this.changeRef.detectChanges();
+          break;
         case 'delete':
           if(this.numCommentsMap[notification.proxy.item.id]) {
             delete this.numCommentsMap[notification.proxy.item.id];
@@ -163,8 +175,12 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this._saveShortcutSubscription.unsubscribe();
-    this._exitShortcutSubscription.unsubscribe();
+    if(this._saveShortcutSubscription) {
+      this._saveShortcutSubscription.unsubscribe();
+    }
+    if(this._exitShortcutSubscription) {
+      this._exitShortcutSubscription.unsubscribe();
+    }
   }
 
   toggleExpandRow(row) {
@@ -184,13 +200,13 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
     }).updateSize('90%', '90%');
   }
 
-  public save(itemProxy: ItemProxy): void {
-    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+  public async save(itemProxy: ItemProxy): Promise<void> {
+    await this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
     this._editableSet.splice(this._editableSet.indexOf(itemProxy.item.id), 1);
   }
 
-  public saveAndContinueEditing(itemProxy: ItemProxy): void {
-    this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
+  public async saveAndContinueEditing(itemProxy: ItemProxy): Promise<void> {
+    await this._itemRepository.upsertItem(itemProxy.kind, itemProxy.item);
   }
 
   public async discardChanges(itemProxy: ItemProxy): Promise<void> {
