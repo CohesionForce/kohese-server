@@ -25,6 +25,7 @@ import { Title } from '@angular/platform-browser';
 import { Subscription, Observable } from 'rxjs';
 
 // Other External Dependencies
+import { ToastrService } from 'ngx-toastr';
 
 // Kohese
 import { ProjectInfo } from '../../../../services/project-service/project.service';
@@ -77,6 +78,7 @@ export class UserStatisticsComponent extends NavigatableComponent
               protected navigationService: NavigationService,
               protected dialogService: DialogService,
               private stateFilterService : StateFilterService,
+              private toastr: ToastrService,
               private title : Title,
   ) {
     super(navigationService)
@@ -352,6 +354,7 @@ export class UserStatisticsComponent extends NavigatableComponent
       document.removeEventListener('copy', null);
     });
     document.execCommand('copy');
+    this.toastr.success('Copied!', 'Copy Table', {positionClass: 'toast-bottom-right'});
   }
 
   sortData(sort: Sort) {
