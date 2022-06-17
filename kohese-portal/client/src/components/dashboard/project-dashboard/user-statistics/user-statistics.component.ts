@@ -354,7 +354,7 @@ export class UserStatisticsComponent extends NavigatableComponent
       document.removeEventListener('copy', null);
     });
     document.execCommand('copy');
-    this.toastr.success('Copied!', 'Copy Table', {positionClass: 'toast-bottom-right'});
+    this.toastr.success('Copied!', 'User Statistics', {positionClass: 'toast-bottom-right'});
   }
 
   sortData(sort: Sort) {
