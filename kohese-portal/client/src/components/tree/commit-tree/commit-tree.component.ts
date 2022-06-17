@@ -336,7 +336,7 @@ export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
           baseCommitId: previousCommitId,
           changeCommitId: (baseObject as Commit).id
         }
-      }).updateSize('50%', '80%');
+      }).updateSize('60%', '80%');
     } else {
       let compareParameters: any = {
         editable: false

@@ -15,39 +15,34 @@ limitations under the License.
 -->
 
 
-<div style="height: 100%; width: 100%;">
-  <h2 mat-dialog-title style="height: 7%; width: 100%;">
-    Compare Commits
-  </h2>
-  <mat-form-field style="height: 7%; width: 100%;">
-    <mat-select placeholder="Change" [value]="changeCommitId"
-      (selectionChange)="changeCommitId = $event.value; compareCommits()">
-      <mat-option *ngFor="let commitId of (commitMap | mapKey)"
-        [value]="commitId">
-        {{commitMap[commitId].message}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <br/>
-  <mat-form-field style="height: 7%; width: 100%;">
-    <mat-select placeholder="Base" [value]="baseCommitId"
-      (selectionChange)="baseCommitId = $event.value; compareCommits()">
-      <mat-option *ngFor="let commitId of (commitMap | mapKey)"
-        [value]="commitId">
-        {{commitMap[commitId].message}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <br/>
-  <div style="height: calc(79% - 40px); width: 100%;">
-    <change-summary [comparisonsSubject]="comparisonsSubject"></change-summary>
+<h2 class="title" mat-dialog-title>Compare Commits</h2>
+<mat-dialog-content class="mat-typography">
+  <div class="float-container">
+    <div class="float-1">
+      <mat-form-field>
+        <mat-select placeholder="Change" [value]="changeCommitId"
+          (selectionChange)="changeCommitId = $event.value; compareCommits()">
+          <mat-option *ngFor="let commitId of (commitMap | mapKey)" [value]="commitId">
+            {{commitMap[commitId].message}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="float-2">
+      <mat-form-field>
+        <mat-select placeholder="Base" [value]="baseCommitId"
+          (selectionChange)="baseCommitId = $event.value; compareCommits()">
+          <mat-option *ngFor="let commitId of (commitMap | mapKey)" [value]="commitId">
+            {{commitMap[commitId].message}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
   </div>
-  <ng-container *ngIf="data">
-    <mat-dialog-actions style="height: 40px; display: flex; flex-direction:
-      row;">
-      <button mat-button class="flex-right-align" [mat-dialog-close]="">
-        Close
-      </button>
-    </mat-dialog-actions>
-  </ng-container>
-</div>
+  <br/>
+
+  <change-summary [comparisonsSubject]="comparisonsSubject"></change-summary>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button mat-dialog-close cdkFocusInitial color=primary>Close</button>
+</mat-dialog-actions>
