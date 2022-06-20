@@ -35,6 +35,8 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
+import { FormControl } from '@angular/forms';
+import { TooltipPosition } from '@angular/material/tooltip/tooltip';
 
 @Component({
   selector : 'assignment-dashboard',
@@ -91,6 +93,11 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   set focusedItemProxy(value: ItemProxy) {
     this._focusedItemProxy = value;
   }
+
+  positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
+  position = new FormControl(this.positionOptions[3]);
+  showDelay = new FormControl(1500);
+  hideDelay = new FormControl(0);
 
   constructor(
     private _navigationService : NavigationService,
