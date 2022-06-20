@@ -41,13 +41,9 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
 
   DashboardSelections: any = DashboardSelections;
 
-  @Input()
-  dashboardSelectionStream: Observable<DashboardSelections>
   dashboardSelectionSub: Subscription;
   dashboardSelection: DashboardSelections;
 
-  @Input()
-  savedProject: ProjectInfo;
   project: ProjectInfo;
 
   treeConfigSubscription: Subscription;
@@ -68,9 +64,9 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.dashboardSelectionSub =
-      this.dashboardSelectionStream.subscribe((dashboard) => {
+      this.projectService.dashboardSelectionStream.subscribe((dashboard) => {
         this.dashboardSelection = dashboard;
-      })
+      });
 
     this.treeConfigSubscription = this.itemRepository.getTreeConfig()
       .subscribe((newConfig) => {
@@ -95,10 +91,10 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
             }
           }
         }
-      })
+      });
 
-    if (this.savedProject) {
-      this.project = this.savedProject;
+    if (this.projectService.savedProject) {
+      this.project = this.projectService.savedProject;
       let projectName: string = this.project.proxy.item.name;
       this.title.setTitle('Project Dashboard | ' + projectName);
       this.projectService.projectStream.next(this.project);

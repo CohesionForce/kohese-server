@@ -33,17 +33,20 @@ import { DialogService } from '../../../services/dialog/dialog.service';
 import { ItemProxy } from '../../../../../common/src/item-proxy';
 import { SessionService } from '../../../services/user/session.service';
 import { TreeConfiguration } from '../../../../../common/src/tree-configuration';
+import { CurrentUserService } from '../../../../src/services/user/current-user.service';
+import { ProjectService } from '../../../../src/services/project-service/project.service';
 
 // Mocks
 import { MockItemRepository } from '../../../../mocks/services/MockItemRepository';
 import { MockNavigationService } from '../../../../mocks/services/MockNavigationService';
 import { MockDialogService } from '../../../../mocks/services/MockDialogService';
 import { MockSessionService } from '../../../../mocks/services/MockSessionService';
+import { MockCurrentUserService } from '../../../../mocks/services/MockCurrentUserService';
+import { MockProjectService } from '../../../../mocks/services/MockProjectService';
 
 describe('Component: ', ()=>{
   let assignmentDashboardComponent: AssignmentDashboardComponent;
   let assignmentDashboardFixture : ComponentFixture<AssignmentDashboardComponent>;
-  let dashboardSelectionStream = new BehaviorSubject<DashboardSelections>(DashboardSelections.OPEN_ASSIGNMENTS);
 
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -57,16 +60,16 @@ describe('Component: ', ()=>{
         { provide: NavigationService, useClass: MockNavigationService },
         { provide: ItemRepository, useClass: MockItemRepository },
         { provide: DialogService, useClass: MockDialogService },
-        { provide: SessionService, useClass: MockSessionService}
+        { provide: SessionService, useClass: MockSessionService},
+        { provide: CurrentUserService, useClass: MockCurrentUserService },
+        { provide: ProjectService, useClass: MockProjectService }
       ]
     }).compileComponents();
 
     assignmentDashboardFixture = TestBed.createComponent(AssignmentDashboardComponent);
     assignmentDashboardComponent = assignmentDashboardFixture.componentInstance;
-    assignmentDashboardComponent.dashboardSelectionStream = dashboardSelectionStream;
     assignmentDashboardComponent.assignmentListStream =
-      new BehaviorSubject<Array<ItemProxy>>([TreeConfiguration.getWorkingTree().
-      getProxyFor('test-uuid3')]);
+      new BehaviorSubject<Array<ItemProxy>>([TreeConfiguration.getWorkingTree().getProxyFor('test-uuid3')]);
 
     assignmentDashboardFixture.detectChanges();
 

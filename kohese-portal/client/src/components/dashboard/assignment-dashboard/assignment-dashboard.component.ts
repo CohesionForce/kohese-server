@@ -36,6 +36,7 @@ import { DashboardSelections } from '../dashboard-selector/dashboard-selector.co
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
 import { CurrentUserService } from '../../../services/user/current-user.service';
+import { ProjectService } from '../../../services/project-service/project.service';
 
 @Component({
   selector : 'assignment-dashboard',
@@ -60,8 +61,6 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   sortedAssignmentList : Array<ItemProxy> = [];
   assignmentListSub : Subscription;
 
-  @Input()
-  dashboardSelectionStream : Observable<DashboardSelections>;
   assignmentType : DashboardSelections;
   assignmentTypeSub : Subscription;
 
@@ -102,6 +101,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
               private _dialogService : DialogService,
               private sessionService : SessionService,
               private currentUserService: CurrentUserService,
+              private projectService: ProjectService,
               private itemRepository: ItemRepository,
               private hotkeys : Hotkeys,
               private title : Title
@@ -124,7 +124,7 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.assignmentTypeSub = this.dashboardSelectionStream.subscribe((dashboardType)=>{
+    this.assignmentTypeSub = this.projectService.dashboardSelectionStream.subscribe((dashboardType)=>{
       this.assignmentType = dashboardType;
       this.sortedAssignmentList = this.sortAssignments(this.assignmentType, this.assignmentList);
       this.changeRef.markForCheck();

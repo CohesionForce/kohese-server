@@ -15,12 +15,18 @@
  */
 
 
+// Angular
+import { BehaviorSubject } from 'rxjs';
+
+// Kohese
 import { TreeConfiguration } from '../../../common/src/tree-configuration';
 import { ProjectInfo } from '../../src/services/project-service/project.service';
+import { DashboardSelections } from '../../src/components/dashboard/dashboard-selector/dashboard-selector.component';
 
 export class MockProjectService {
-  public constructor() {
-  }
+  public constructor() {}
+
+  dashboardSelectionStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(null);
 
   public getProjects(): Array<ProjectInfo> {
     return [{

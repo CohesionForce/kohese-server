@@ -19,6 +19,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of as ObservableOf } from 'rxjs';
 
+// Other External Dependencies
+import { ToastrService } from 'ngx-toastr';
+
 // Kohese
 import { DashboardModule } from '../../dashboard.module';
 import { DialogService } from '../../../../services/dialog/dialog.service';
@@ -42,7 +45,8 @@ describe('UserStatisticsComponent', () => {
       providers: [
         { provide: NavigationService, useClass: MockNavigationService },
         { provide: DialogService, useClass: MockDialogService },
-        { provide: StateFilterService, useClass: MockStateFilterService }
+        { provide: StateFilterService, useClass: MockStateFilterService },
+        { provide: ToastrService, useValue: ToastrService }
       ]
     }).compileComponents();
 
