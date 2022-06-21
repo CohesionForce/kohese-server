@@ -37,6 +37,7 @@ import { FormatObjectEditorComponent } from '../../object-editor/format-object-e
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
 import { FormControl } from '@angular/forms';
 import { TooltipPosition } from '@angular/material/tooltip/tooltip';
+import { CurrentUserService } from '../../../services/user/current-user.service';
 
 @Component({
   selector : 'assignment-dashboard',
@@ -47,6 +48,8 @@ import { TooltipPosition } from '@angular/material/tooltip/tooltip';
 export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   // Data
   numCommentsMap = {}; //TODO: Add type definition
+  currentUser : ItemProxy;
+  username : string;
   treeConfigSubscription: Subscription;
   changeSubjectSubscription: Subscription;
   _saveShortcutSubscription: Subscription;
@@ -100,13 +103,15 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   hideDelay = new FormControl(0);
 
   constructor(
-    private _navigationService : NavigationService,
-    private changeRef : ChangeDetectorRef,
-    private _itemRepository : ItemRepository,
-    private _dialogService : DialogService,
-    private sessionService : SessionService,
-    private hotkeys : Hotkeys,
-    private title : Title
+              private _navigationService : NavigationService,
+              private changeRef : ChangeDetectorRef,
+              private _itemRepository : ItemRepository,
+              private _dialogService : DialogService,
+              private sessionService : SessionService,
+              private currentUserService: CurrentUserService,
+              private itemRepository: ItemRepository,
+              private hotkeys : Hotkeys,
+              private title : Title
     ) {
       this.title.setTitle('Dashboard');
       this.assignmentTypes = DashboardSelections;
@@ -126,16 +131,27 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.assignmentTypeSub =this.dashboardSelectionStream.subscribe((dashboardType)=>{
+    this.assignmentTypeSub = this.dashboardSelectionStream.subscribe((dashboardType)=>{
       this.assignmentType = dashboardType;
       this.sortedAssignmentList = this.sortAssignments(this.assignmentType, this.assignmentList);
       this.changeRef.markForCheck();
-    })
+    });
     this.assignmentListSub = this.assignmentListStream.subscribe((assignmentList)=>{
       this.assignmentList = assignmentList;
       this.sortedAssignmentList = this.sortAssignments(this.assignmentType, assignmentList);
       this.changeRef.markForCheck();
-    })
+    });
+
+    this.currentUserService.getCurrentUserSubject().subscribe((userInfo) => {
+      if (userInfo) {
+        this.username = userInfo.username;
+        this.treeConfigSubscription = this.itemRepository.getTreeConfig().subscribe((newConfig) => {
+          if (newConfig) {
+          this.currentUser = newConfig.config.getProxyByProperty('KoheseUser', 'username', this.username);
+          }
+        })
+      }
+    });
 
     // TODO: decide how to handle assignments (current and prior) on the dashboard with regard to the lenses
     this.treeConfigSubscription = TreeConfiguration.getWorkingTree().getChangeSubject().subscribe((notification: any) => {
@@ -151,7 +167,14 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
               this.changeRef.detectChanges();
             }
             break;
+          case 'create':
+            this.buildAssignmentList();
+            break;
+          case 'update':
+            this.buildAssignmentList();
+            break;
           case 'delete':
+            this.buildAssignmentList();
             if(this.numCommentsMap[notification.proxy.item.id]) {
               delete this.numCommentsMap[notification.proxy.item.id];
             }
@@ -211,6 +234,17 @@ export class AssignmentDashboardComponent implements OnInit, OnDestroy {
         itemProxy: itemProxy
       }
     }).updateSize('90%', '90%');
+  }
+
+  buildAssignmentList () {
+    let assignments = [];
+    for(let referenceCategory in this.currentUser.relations.referencedBy) {
+      for(let user in this.currentUser.relations.referencedBy[referenceCategory].assignedTo) {
+        assignments.push(this.currentUser.relations.referencedBy[referenceCategory].assignedTo[user]);
+      }
+    }
+    this.sortedAssignmentList = this.sortAssignments(this.assignmentType, assignments);
+    this.changeRef.detectChanges();
   }
 
   sortAssignments(sortStrategy : DashboardSelections, assignmentList : Array<ItemProxy>) {
