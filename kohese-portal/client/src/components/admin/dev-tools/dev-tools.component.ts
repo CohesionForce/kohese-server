@@ -18,6 +18,8 @@
 // Angular
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { FormControl } from '@angular/forms';
+import { TooltipPosition } from '@angular/material/tooltip/tooltip';
 
 // Other External Dependencies
 
@@ -39,6 +41,12 @@ export class DevToolsComponent implements OnInit {
     ) {
       this.title.setTitle('Dev Tools');
     }
+
+    positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
+    position = new FormControl(this.positionOptions[3]);
+    showDelay = new FormControl(1500);
+    hideDelay = new FormControl(0);
+
 
   ngOnInit() {
     this.logRegistry = this.logService.getLogEvents();

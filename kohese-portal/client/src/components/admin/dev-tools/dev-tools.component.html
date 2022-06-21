@@ -17,7 +17,10 @@ limitations under the License.
 
 <div style="height: 50px; display: flex; flex-direction: row;">
   <button mat-icon-button matTooltip="Save settings"
-    class="flex-right-align" (click)="saveLogSelections()">
+    class="flex-right-align" (click)="saveLogSelections()"
+    [matTooltipPosition]="position.value!"
+    [matTooltipShowDelay]="showDelay.value"
+    [matTooltipHideDelay]="hideDelay.value">
     <mat-icon class="fa fa-save"></mat-icon>
   </button>
 </div>
