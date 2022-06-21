@@ -18,6 +18,8 @@
 import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef,
          ViewChildren, QueryList } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { FormControl } from '@angular/forms';
+import { TooltipPosition } from '@angular/material/tooltip/tooltip';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { Observable, Subscription } from 'rxjs';
 
@@ -35,8 +37,6 @@ import { TreeConfiguration } from '../../../../../common/src/tree-configuration'
 import { DashboardSelections } from '../dashboard-selector/dashboard-selector.component';
 import { FormatObjectEditorComponent } from '../../object-editor/format-object-editor/format-object-editor.component';
 import { Hotkeys } from '../../../services/hotkeys/hot-key.service';
-import { FormControl } from '@angular/forms';
-import { TooltipPosition } from '@angular/material/tooltip/tooltip';
 import { CurrentUserService } from '../../../services/user/current-user.service';
 
 @Component({
