@@ -45,19 +45,31 @@ limitations under the License.
             Users
             <button mat-icon-button matTooltip="Expand all Users"
               style="margin-left: auto;"
-              (click)="expandAll()">
+              (click)="expandAll()"
+              [matTooltipPosition]="position.value!"
+              [matTooltipShowDelay]="showDelay.value"
+              [matTooltipHideDelay]="hideDelay.value">
               <mat-icon class="fa fa-chevron-down"></mat-icon>
             </button>
             <button mat-icon-button matTooltip="Collapse all Users"
-              (click)="collapseAll()">
+              (click)="collapseAll()"
+              [matTooltipPosition]="position.value!"
+              [matTooltipShowDelay]="showDelay.value"
+              [matTooltipHideDelay]="hideDelay.value">
               <mat-icon class="fa fa-chevron-up"></mat-icon>
             </button>
             <button mat-icon-button matTooltip="Add a user"
-              (click)="add()">
+              (click)="add()"
+              [matTooltipPosition]="position.value!"
+              [matTooltipShowDelay]="showDelay.value"
+              [matTooltipHideDelay]="hideDelay.value">
               <mat-icon class="fa fa-plus"></mat-icon>
             </button>
             <button mat-icon-button matTooltip="User Lockout List"
-              (click)="displayUserLockoutList()">
+              (click)="displayUserLockoutList()"
+              [matTooltipPosition]="position.value!"
+              [matTooltipShowDelay]="showDelay.value"
+              [matTooltipHideDelay]="hideDelay.value">
               <mat-icon class="fa fa-lock"></mat-icon>
             </button>
           </h2>
@@ -79,24 +91,36 @@ limitations under the License.
                     <ng-container *ngIf="(editableSet.indexOf(user.item.id) === -1) else editableBlock">
                       <button mat-icon-button matTooltip="Edit this user"
                         [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
-                        (click)="$event.stopPropagation(); panel.open(); editableSet.push(user.item.id); focusedItemProxy = user">
+                        (click)="$event.stopPropagation(); panel.open(); editableSet.push(user.item.id); focusedItemProxy = user"
+                        [matTooltipPosition]="position.value!"
+                        [matTooltipShowDelay]="showDelay.value"
+                        [matTooltipHideDelay]="hideDelay.value">
                         <mat-icon class="fa fa-edit"></mat-icon>
                       </button>
                     </ng-container>
                     <ng-template #editableBlock>
                       <button mat-icon-button matTooltip="Save this user"
                         [ngStyle]="{ 'margin-left': (isModified(user) ? '' : 'auto') }"
-                        (click)="$event.stopPropagation(); save(user)">
+                        (click)="$event.stopPropagation(); save(user)"
+                        [matTooltipPosition]="position.value!"
+                        [matTooltipShowDelay]="showDelay.value"
+                        [matTooltipHideDelay]="hideDelay.value">
                         <mat-icon class="fa fa-save"></mat-icon>
                       </button>
                       <button mat-icon-button matTooltip="Discard unsaved changes to this user"
-                        (click)="$event.stopPropagation(); discardChanges(user)">
+                        (click)="$event.stopPropagation(); discardChanges(user)"
+                        [matTooltipPosition]="position.value!"
+                        [matTooltipShowDelay]="showDelay.value"
+                        [matTooltipHideDelay]="hideDelay.value">
                         <mat-icon class="fa fa-times"></mat-icon>
                       </button>
                     </ng-template>
 
                     <button mat-icon-button matTooltip="Other Options" [matMenuTriggerFor]="menu"
-                      (click)="$event.stopPropagation();">
+                      (click)="$event.stopPropagation();"
+                      [matTooltipPosition]="position.value!"
+                      [matTooltipShowDelay]="showDelay.value"
+                      [matTooltipHideDelay]="hideDelay.value">
                       <mat-icon class="fa fa-bars"></mat-icon>
                     </button>
                     <mat-menu #menu="matMenu" [overlapTrigger]="false">
@@ -130,7 +154,10 @@ limitations under the License.
                       <!-- div to display tooltip on disabled button -->
                       <div matTooltip="Unlock User First" [matTooltipDisabled]="(lockoutList.indexOf(user.item.username) === -1)">
                         <button mat-menu-item (click)="remove(user)"
-                          [disabled]="lockoutList.indexOf(user.item.username) > -1">
+                          [disabled]="lockoutList.indexOf(user.item.username) > -1"
+                          [matTooltipPosition]="position.value!"
+                          [matTooltipShowDelay]="showDelay.value"
+                          [matTooltipHideDelay]="hideDelay.value">
                           <mat-icon class="fa fa-trash"></mat-icon>
                           Remove This User
                         </button>
