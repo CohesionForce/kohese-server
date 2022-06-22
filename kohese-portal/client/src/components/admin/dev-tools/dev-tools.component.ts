@@ -42,12 +42,6 @@ export class DevToolsComponent implements OnInit {
       this.title.setTitle('Dev Tools');
     }
 
-    positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
-    position = new FormControl(this.positionOptions[3]);
-    showDelay = new FormControl(1500);
-    hideDelay = new FormControl(0);
-
-
   ngOnInit() {
     this.logRegistry = this.logService.getLogEvents();
 
@@ -57,6 +51,11 @@ export class DevToolsComponent implements OnInit {
   saveLogSelections() {
     this.logService.updateLogRegistry(this.logRegistry);
   }
+
+  positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
+  position = new FormControl(this.positionOptions[3]);
+  showDelay = new FormControl(1500);
+  hideDelay = new FormControl(0);
 
   public areAllConsoleMessagesSelected(): boolean {
     for (let j: number = 0; j < this.logRegistry.length; j++) {
