@@ -25,6 +25,7 @@ import { BehaviorSubject, Subscription } from "rxjs";
 import { ItemProxy } from '../../../../common/src/item-proxy';
 import { TreeConfiguration } from '../../../../common/src/tree-configuration';
 import { ItemRepository } from "../item-repository/item-repository.service";
+import { DashboardSelections } from "../../components/dashboard/dashboard-selector/dashboard-selector.component";
 
 export interface ProjectInfo {
   proxy: ItemProxy,
@@ -35,7 +36,7 @@ export interface ProjectInfo {
 
 @Injectable()
 export class ProjectService {
-  projects: Array<ProjectInfo>;
+  projects: Array<ProjectInfo> = [];
   workingProjects: Array<ProjectInfo>;
   savedProject: ProjectInfo;
 
@@ -48,6 +49,7 @@ export class ProjectService {
   proxyChangeSubscription: Subscription;
   projectStream: BehaviorSubject<ProjectInfo> = new BehaviorSubject<ProjectInfo>(null);
   projectSelected: BehaviorSubject<ProjectInfo> = new BehaviorSubject<ProjectInfo>(null);
+  dashboardSelectionStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(null);
 
   constructor(private itemRepository: ItemRepository) {
     this.initService();

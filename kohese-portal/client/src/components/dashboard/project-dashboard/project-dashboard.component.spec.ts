@@ -52,7 +52,6 @@ describe('ProjectDashboardComponent', () => {
 
     fixture = TestBed.createComponent(ProjectDashboardComponent);
     projectDashboardComponent = fixture.componentInstance;
-    projectDashboardComponent.dashboardSelectionStream = ObservableOf(DashboardSelections.PROJECT_OVERVIEW);
 
     fixture.detectChanges();
   });

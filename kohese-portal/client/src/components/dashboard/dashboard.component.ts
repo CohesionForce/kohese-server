@@ -56,7 +56,6 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
   DashboardSelections : DashboardSelections;
   DashboardTypes : any = DashboardTypes
 
-  dashboardSelectionStream : BehaviorSubject<DashboardSelections> = new BehaviorSubject<DashboardSelections>(null);
 
   /**Subscriptions */
   treeConfigSubscription : Subscription;
@@ -134,7 +133,7 @@ export class DashboardComponent extends NavigatableComponent implements OnInit, 
 
   dashboardSelected(dashboard : DashboardSelectionInfo) {
     this.selectedDashboard = dashboard;
-    this.dashboardSelectionStream.next(this.selectedDashboard.dashboard);
+    this.projectService.dashboardSelectionStream.next(this.selectedDashboard.dashboard);
   }
 
   buildAssignmentList () {

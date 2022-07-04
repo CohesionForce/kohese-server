@@ -37,16 +37,10 @@ limitations under the License.
       <div class="dashboard-content" *ngIf=initialized>
         <ng-container [ngSwitch]="selectedDashboard.dashboardType">
           <ng-container *ngSwitchCase="DashboardTypes.ASSIGNMENT">
-            <assignment-dashboard
-              [assignmentListStream]="assignmentListStream"
-              [dashboardSelectionStream]="dashboardSelectionStream">
-            </assignment-dashboard>
+            <assignment-dashboard [assignmentListStream]="assignmentListStream"></assignment-dashboard>
           </ng-container>
           <ng-container *ngSwitchCase="DashboardTypes.PROJECT">
-            <project-dashboard
-              [dashboardSelectionStream]="dashboardSelectionStream"
-              [savedProject]="selectedProject">
-            </project-dashboard>
+            <project-dashboard></project-dashboard>
           </ng-container>
         </ng-container>
       </div>
