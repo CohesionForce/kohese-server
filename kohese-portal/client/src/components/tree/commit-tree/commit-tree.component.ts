@@ -50,7 +50,7 @@ import { CompareItemsComponent } from '../../compare-items/item-comparison/compa
 })
 export class CommitTreeComponent extends Tree implements OnInit, OnDestroy {
   private _repositoryProxy: ItemProxy;
-  private processingComplete: boolean = false;
+  processingComplete: boolean = false;
 
   @Output('rowSelected')
   public rowSelectedEmitter: EventEmitter<any> = new EventEmitter<any>();

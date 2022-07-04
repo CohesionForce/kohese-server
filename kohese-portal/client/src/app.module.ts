@@ -15,14 +15,25 @@
  */
 
 
+// Angular
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, SecurityContext } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
-import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
 
-/* Custom Modules */
+// Other External Dependencies
+import { ToastrModule } from 'ngx-toastr';
+import { AngularSplitModule } from 'angular-split';
+import { TreeModule } from '@circlon/angular-tree-component';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { MarkdownModule } from 'ngx-markdown';
+
+// Kohese
+import { environment } from '../environments/environment.prod';
+import { AppComponent } from './app.component';
 import { AnalysisModule } from './components/analysis/analysis.module';
 import { DetailsModule } from './components/details/details.module';
 import { DocumentViewModule } from './components/document-view/document-view.module';
@@ -37,9 +48,7 @@ import { LoginModule } from './components/login/login.module';
 import { UserModule } from './services/user/user.module';
 import { AdminModule } from './components/admin/admin.module';
 import { CompareItemsModule } from './components/compare-items/compare-items.module';
-import { AppRoutingModule } from './app-routing.module';
 import { DashboardModule } from './components/dashboard/dashboard.module';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ExploreModule } from './components/explore/explore.module';
 import { ObjectEditorModule } from './components/object-editor/object-editor.module';
 import { NavigatorModule } from './components/navigator/navigator.module';
@@ -48,15 +57,8 @@ import { TreeViewModule } from './components/tree/tree.module'
 import { VersionsModule } from './components/versions/versions.module';
 import { ReportsModule } from './components/reports/reports.module';
 import { ImportModule } from './components/import/import.module';
-
-import { ToastrModule } from 'ngx-toastr';
-import { AngularSplitModule } from 'angular-split';
-import { TreeModule } from '@circlon/angular-tree-component';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
-
+import { HotkeysHelpModule } from './components/hotkeys/hotkeys-help/hotkeys-help.module'
 import { MaterialModule } from './material.module';
-import { environment } from '../environments/environment.prod';
 import { LensModule } from './components/lens/lens.module';
 import { ItemBoardModule } from './components/item-board/item-board.module';
 
@@ -100,7 +102,8 @@ import { ItemBoardModule } from './components/item-board/item-board.module';
     LensModule,
     ReportsModule,
     ImportModule,
-    ItemBoardModule
+    ItemBoardModule,
+    HotkeysHelpModule
   ],
   bootstrap: [AppComponent]
 })
