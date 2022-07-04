@@ -21,7 +21,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input,
 import { MatTable } from '@angular/material/table';
 
 // Other External Dependencies
-import { v1 as Uuid } from 'uuid';
+import { v1 as UuidV1 } from 'uuid';
 
 // Kohese
 import { DialogService } from '../../../services/dialog/dialog.service';
@@ -196,9 +196,12 @@ export class ViewModelEditorComponent {
     return Object;
   }
 
-  public constructor(private _changeDetectorRef: ChangeDetectorRef,
-    private _dialogService: DialogService, private _itemRepository:
-    ItemRepository) {
+  public constructor(
+                      private _changeDetectorRef: ChangeDetectorRef,
+                      private _dialogService: DialogService,
+                      private _itemRepository: ItemRepository,
+  ) {
+    UuidV1();
   }
 
   public save(): void {
@@ -290,7 +293,7 @@ export class ViewModelEditorComponent {
       return !!input;
     });
     if (name) {
-      let id: string = (<any> Uuid).default();
+      let id: string = UuidV1;
       this._viewModel.tableDefinitions[id] = {
         id: id,
         name: name,
@@ -336,7 +339,7 @@ export class ViewModelEditorComponent {
       return !!input;
     });
     if (name) {
-      let id: string = (<any> Uuid).default();
+      let id: string = UuidV1.default();
       let formatDefinition: FormatDefinition = {
         id: id,
         name: name,
