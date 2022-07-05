@@ -153,22 +153,22 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
             this.changeRef.detectChanges();
           }
           break;
+        case 'create':
+          this.discernStateChanges(notification.proxy);
+          break;
         case 'update':
-          if(notification.proxy.state === this.stateName) {
-            if(!this.proxies.includes(notification.proxy)) {
-              this.proxies.push(notification.proxy);
-            }
-          } else {
-            if(this.proxies.includes(notification.proxy)) {
-              this.proxies.splice(this.proxies.indexOf(notification.proxy),1);
-            }
-          }
+          this.discernStateChanges(notification.proxy);
           this.changeRef.detectChanges();
           break;
         case 'delete':
+          this.discernStateChanges(notification.proxy);
+          if(this.proxies.includes(notification.proxy)) {
+            this.proxies.splice(this.proxies.indexOf(notification.proxy),1);
+          }
           if(this.numCommentsMap[notification.proxy.item.id]) {
             delete this.numCommentsMap[notification.proxy.item.id];
           }
+          this.changeRef.detectChanges();
           break;
       }
   });
@@ -180,6 +180,18 @@ export class StateSummaryDialogComponent implements OnInit, OnDestroy {
     }
     if(this._exitShortcutSubscription) {
       this._exitShortcutSubscription.unsubscribe();
+    }
+  }
+
+  discernStateChanges(proxy: ItemProxy) {
+    if(proxy.state === this.stateName) {
+      if(!this.proxies.includes(proxy)) {
+        this.proxies.push(proxy);
+      }
+    } else {
+      if(this.proxies.includes(proxy)) {
+        this.proxies.splice(this.proxies.indexOf(proxy),1);
+      }
     }
   }
 
