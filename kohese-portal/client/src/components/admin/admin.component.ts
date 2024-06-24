@@ -21,6 +21,8 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, OnDestro
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { Title } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { TooltipPosition } from '@angular/material/tooltip/tooltip';
 
 // Other External Dependencies
 
@@ -112,6 +114,10 @@ export class AdminComponent implements OnInit, OnDestroy {
     return this._navigationService;
   }
 
+  positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
+  position = new FormControl(this.positionOptions[3]);
+  showDelay = new FormControl(1500);
+  hideDelay = new FormControl(0);
   @ViewChildren(MatExpansionPanel)
   private expansionPanels: QueryList<MatExpansionPanel>;
 

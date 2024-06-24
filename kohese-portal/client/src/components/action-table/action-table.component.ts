@@ -19,6 +19,8 @@
 import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Observable, Subscription } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { TooltipPosition } from '@angular/material/tooltip/tooltip';
 
 // Other External Dependencies
 
@@ -59,6 +61,11 @@ export class ActionTableComponent extends NavigatableComponent
   get navigationService() {
     return this._navigationService;
   }
+
+  positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
+  position = new FormControl(this.positionOptions[3]);
+  showDelay = new FormControl(1500);
+  hideDelay = new FormControl(0);
 
   constructor(
     private _navigationService: NavigationService,

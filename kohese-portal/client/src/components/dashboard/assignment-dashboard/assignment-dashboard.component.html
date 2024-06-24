@@ -19,10 +19,21 @@ limitations under the License.
   <div class=assignments-column>
     <h4 class=assignments-header>
       Assignments:
-      <button mat-icon-button matTooltip="Expand all Assignments" (click)="expandAll()" class="flex-right-align">
+      <button mat-icon-button
+              matTooltip="Expand all"
+              (click)="expandAll()"
+              [matTooltipPosition]="position.value!"
+              [matTooltipShowDelay]="showDelay.value"
+              [matTooltipHideDelay]="hideDelay.value"
+              class="flex-right-align">
         <mat-icon class="fa fa-chevron-down"></mat-icon>
       </button>
-      <button mat-icon-button matTooltip="Collapse all Assignments" (click)="collapseAll()">
+      <button mat-icon-button
+              matTooltip="Collapse all"
+              (click)="collapseAll()"
+              [matTooltipPosition]="position.value!"
+              [matTooltipShowDelay]="showDelay.value"
+              [matTooltipHideDelay]="hideDelay.value">
         <mat-icon class="fa fa-chevron-up"></mat-icon>
       </button>
     </h4>

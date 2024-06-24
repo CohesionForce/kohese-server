@@ -19,7 +19,11 @@ limitations under the License.
   <label><b>{{itemProxy.kind}} Information: {{itemProxy.item.name}}</b></label>
   <ng-container *ngIf="itemProxy.item.parentId && !isDialog">
     <button mat-icon-button matTooltip="Go to parent" style="margin-left: auto;"
-      (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })">
+      (click)="this.navigationService.navigate('Explore', { id: itemProxy.item.parentId })"
+      [matTooltipPosition]="position.value!"
+      [matTooltipShowDelay]="showDelay.value"
+      [matTooltipHideDelay]="hideDelay.value"
+      class="flex-right-align">
       <mat-icon class="fa fa-level-up"></mat-icon>
     </button>
   </ng-container>
