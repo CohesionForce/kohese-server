@@ -15,10 +15,10 @@
  */
 
 // Angular
-import { Component, OnInit, Input, OnDestroy, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 // Other External Dependencies
 
@@ -55,12 +55,12 @@ export class ProjectDashboardComponent implements OnInit, OnDestroy {
   paramSubscription: Subscription;
 
   constructor(
-    private dialogService: DialogService,
-    private router: ActivatedRoute,
-    private navigationService: NavigationService,
-    private itemRepository: ItemRepository,
-    private projectService : ProjectService,
-    private title : Title
+    public dialogService: DialogService,
+    public router: ActivatedRoute,
+    public navigationService: NavigationService,
+    public itemRepository: ItemRepository,
+    public projectService : ProjectService,
+    public title : Title
     ) {
       this.title.setTitle('Project Dashboard');
     }

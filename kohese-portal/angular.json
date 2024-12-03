@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "aot": false,
+            "aot": true,
             "outputPath": "build/client/bundle",
             "index": "client/index.html",
             "main": "client/bootstrap.ts",

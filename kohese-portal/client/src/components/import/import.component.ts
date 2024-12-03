@@ -130,6 +130,21 @@ export class ImportComponent implements OnInit {
     return this._getIcon;
   }
 
+  private _isFavorite: (element: any) => boolean;
+  get isFavorite() {
+    return this._isFavorite;
+  }
+  @Input('isFavorite')
+  set isFavorite(isFavorite: (element: any) => boolean) {
+    if(this._isFavorite === undefined) {
+      this._isFavorite = (element: any) => {
+        return false;
+      }
+    } else {
+      this._isFavorite = isFavorite;
+    }
+  }
+
   public constructor(@Optional() @Inject(MAT_DIALOG_DATA) private _data: any,
     @Optional() private _matDialogRef: MatDialogRef<ImportComponent>,
     private _changeDetectorRef: ChangeDetectorRef, private _itemRepository:

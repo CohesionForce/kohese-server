@@ -25,7 +25,7 @@ import { DOCUMENT } from "@angular/common";
 
 // Kohese
 import { DialogService } from '../dialog/dialog.service';
-import { HotkeysHelpComponent } from '../hotkeys/hotkeys-help/hotkeys-help.component';
+import { HotkeysHelpComponent } from '../../components/hotkeys/hotkeys-help/hotkeys-help.component';
 
 type Options = {
   element: any;
